@@ -17,8 +17,10 @@ export Window, GTKCanvas, Canvas,
     
 if OS_NAME == :Darwin
     const libgtk = "libgtk-quartz-2.0"
+elseif OS_NAME == :Windows
+    const libgtk = "libgtk-win32-2.0-0"
 else
-    const libgtk = "libgtk-2"
+    const libgtk = "libgtk-x11-2.0"
 end
 
 abstract GTKWidget
