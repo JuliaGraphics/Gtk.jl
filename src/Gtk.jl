@@ -150,17 +150,19 @@ const canvases = Canvas[]
 function canvas_on_draw_event(w::GtkWidget,e::Ptr{Void},index::Int)
     widget = canvases[index]
     cc = CairoContext(e)
-    set_source_surface(cc, widget.back, 0, 0)
-    paint(cc)
+    ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
+        (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
+    ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
     false
 end
 
 function canvas_on_expose_event(w::GtkWidget,e::Ptr{Void},index::Int)
     widget = canvases[index]
-    cc = CairoContext(ccall((:gdk_cairo_create,libgtk),Ptr{Void},(Ptr{Void},),gdk_window(widget)))
-    set_source_surface(cc, widget.back, 0, 0)
-    paint(cc)
-    Cairo._destroy(cc)
+    cc = ccall((:gdk_cairo_create,libgtk),Ptr{Void},(Ptr{Void},),gdk_window(widget))
+    ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
+        (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
+    ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
+    ccall((:cairo_destroy,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
     false
 end
 
