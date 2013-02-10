@@ -64,8 +64,8 @@ function init()
         error( "Failed to initialize GTK" )
     end
     global timeout
-    timeout = Base.TimeoutAsyncWork(globalEventLoop(),gtk_doevent)
-    Base.startTimer(timeout,int64(20),int64(20))
+    timeout = Base.TimeoutAsyncWork(gtk_doevent)
+    Base.start_timer(timeout,int64(20),int64(20))
 end
 
 convert(::Type{GtkWidget},w::GTKWidget) = w.handle
