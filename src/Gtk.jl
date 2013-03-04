@@ -6,7 +6,7 @@
 #include(joinpath(Pkg.dir(),"GTK","deps","ext.jl"))
 require("Cairo")
 
-module GTK
+module Gtk
 using Cairo
 import Base.convert
 
@@ -14,16 +14,24 @@ export Window, GTKCanvas, Canvas,
     cairo_surface_for, width, height, reveal, cairo_context, cairo_surface,
     gtk_doevent
 
-    
-if OS_NAME == :Darwin
-    const libgtk = "libgtk-quartz-2.0"
-elseif OS_NAME == :Windows
-    const libgtk = "libgtk-win32-2.0-0"
+const gtk_version = 2
+
+if gtk_version == 3
+    const libgtk = "libgtk-3"
+elseif gtk_version == 2
+    if OS_NAME == :Darwin
+        const libgtk = "libgtk-quartz-2.0"
+    elseif OS_NAME == :Windows
+        const libgtk = "libgtk-win32-2.0-0"
+    else
+        const libgtk = "libgtk-x11-2.0"
+    end
 else
-    const libgtk = "libgtk-x11-2.0"
+    error("Unsupported Gtk version $gtk_version")
 end
 
 abstract GTKWidget
+
 typealias GtkWidget Ptr{Void}
 typealias Enum Int32
 
@@ -135,9 +143,13 @@ type Canvas <: GTKWidget
         widget.back = cairo_surface_for(widget)
         widget.backcc = CairoContext(widget.back)
         push!(canvases, widget)
-        #g_signal_connect_data(widget,"draw",cfunction(canvas_on_draw_event,Bool,(GtkWidget,Ptr{Void},Int)),0)
-        g_signal_connect_data(widget,"expose-event",
-            pointer(Function,uint(cfunction(canvas_on_expose_event,Bool,(GtkWidget,Ptr{Void},Int)))),0)
+        if gtk_version == 3
+            g_signal_connect_data(widget,"draw",
+                pointer(Function,uint(cfunction(canvas_on_draw_event,Bool,(GtkWidget,Ptr{Void},Int)))),0)
+        else
+            g_signal_connect_data(widget,"expose-event",
+                pointer(Function,uint(cfunction(canvas_on_expose_event,Bool,(GtkWidget,Ptr{Void},Int)))),0)
+        end
         g_signal_connect_data(widget,"destroy",
             pointer(Function,uint(cfunction(canvas_on_destroy,Bool,(GtkWidget,Int)))),0)
         ccall((:gtk_widget_show,libgtk),Void,(GtkWidget,),widget)
