@@ -8,6 +8,7 @@ typealias GtkWidget Ptr{GTKWidget}
 convert(::Type{GtkWidget},w::GTKWidget) = w.handle
 width(w::GTKWidget) = w.all.width
 height(w::GTKWidget) = w.all.height
+show(io::IO, w::GTKWidget) = print(io, typeof(w))
 
 typealias Enum Int32
 baremodule GtkWindowType
@@ -19,15 +20,38 @@ baremodule GConnectFlags
     const G_CONNECT_SWAPPED = 2
 end
 
-const gtk_gc_preserve = ObjectIdDict()
+const gc_preserve = ObjectIdDict() # reference counted closures
+const gc_preserve_gtk = ObjectIdDict() # gtk objects
 
-function gc_unpreserve(w::GtkWidget, widget::GTKWidget)
-    delete!(gtk_gc_preserve, widget)
+function gc_unref(x::ANY)
+    global gc_preserve
+    count = get(gc_preserve, x, 0)-1
+    if count <= 0
+        delete!(gc_preserve, x)
+    end
     nothing
 end
-function gc_preserve(widget::GTKWidget)
-    global gtk_gc_preserve
-    on_signal_destroy(widget, gc_unpreserve)
-    gtk_gc_preserve[widget] = widget
-    widget
+gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+gc_unref_closure(T::Type) = cfunction(gc_unref, Void, (T, Ptr{Void}))
+
+function gc_unref(x::GTKWidget)
+    global gc_preserve_gtk
+    delete!(gc_preserve_gtk, x)
+    nothing
+end
+gc_unref(::GtkWidget, x::GTKWidget) = gc_unref(x)
+
+function gc_ref(x::ANY)
+    global gc_preserve
+    gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
+    x
+end
+
+function gc_ref(x::GTKWidget)
+    global gc_preserve_gtk
+    if !contains(gc_preserve_gtk, x)
+        on_signal_destroy(x, gc_unref, x)
+        gc_preserve_gtk[x] = x
+    end
+    x
 end
