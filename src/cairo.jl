@@ -66,7 +66,7 @@ end
 function cairo_surface_for(widget::Canvas)
     w, h = width(widget), height(widget)
     CairoSurface(
-        ccall((:gdk_window_create_similar_surface,libgtk), Ptr{Void},
+        ccall((:gdk_window_create_similar_surface,libgdk), Ptr{Void},
         (Ptr{Void}, Enum, Int32, Int32), 
         gdk_window(widget), CAIRO_CONTENT_COLOR_ALPHA, w, h),
     w, h)
@@ -80,7 +80,7 @@ function canvas_on_draw_event(::GtkWidget,cc::Ptr{Void},widget::Canvas) # cc is 
 end
 
 function canvas_on_expose_event(::GtkWidget,e::Ptr{Void},widget::Canvas) # e is a GdkEventExpose
-    cc = ccall((:gdk_cairo_create,libgtk),Ptr{Void},(Ptr{Void},),gdk_window(widget))
+    cc = ccall((:gdk_cairo_create,libgdk),Ptr{Void},(Ptr{Void},),gdk_window(widget))
     ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)

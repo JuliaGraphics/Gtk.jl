@@ -31,7 +31,7 @@ function signal_connect{T}(w::GTKWidget,sig::ASCIIString,closure::T,cb::Ptr{Void
         unref = gc_unref_closure(T)
         gc_ref(closure)
     end
-    ccall((:g_signal_connect_data,libgtk), Culong,
+    ccall((:g_signal_connect_data,libgobject), Culong,
         (GtkWidget, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
         w, sig, cb, closure, unref, gconnectflags)
 end
@@ -86,7 +86,7 @@ function notify_motion{T}(p::GtkWidget, eventp::Ptr{GdkEventMotion}, closure::GT
        0 == event.state & closure.exclude
         ret = ccall(closure.callback, Cint, (GtkWidget, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
     end
-    ccall((:gdk_event_request_motions,libgtk), Void, (Ptr{GdkEventMotion},), eventp)
+    ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
 function on_signal_motion{T}(widget::GTKWidget, move_cb::Function, closure::T,
@@ -117,12 +117,12 @@ function on_signal_motion{T}(widget::GTKWidget, move_cb::Function, closure::T,
 end
 
 function reveal(c::GTKWidget, immediate::Bool=false)
-    #region = ccall((:gdk_region_rectangle,libgtk),Ptr{Void},(Ptr{GdkRectangle},),&c.all)
-    #ccall((:gdk_window_invalidate_region,libgtk),Void,(Ptr{Void},Ptr{Void},Bool),
+    #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&c.all)
+    #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
     #    gdk_window(c), region, true)
     ccall((:gtk_widget_queue_draw,libgtk), Void, (GtkWidget,), c)
     if immediate
-        ccall((:gdk_window_process_updates,libgtk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
+        ccall((:gdk_window_process_updates,libgdk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
     end
 end
 
