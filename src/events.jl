@@ -82,8 +82,8 @@ type GTK_signal_motion{T}
 end
 function notify_motion{T}(p::GtkWidget, eventp::Ptr{GdkEventMotion}, closure::GTK_signal_motion{T})
     event = unsafe_load(eventp)
-    if 0 != event.state & closure.include &&
-       0 == event.state & closure.exclude
+    if event.state & closure.include == closure.include &&
+       event.state & closure.exclude == 0
         ret = ccall(closure.callback, Cint, (GtkWidget, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
     end
     ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
