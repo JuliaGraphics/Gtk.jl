@@ -76,7 +76,7 @@ function canvas_on_draw_event(::GtkWidget,cc::Ptr{Void},widget::Canvas) # cc is 
     ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
-    false # propagate the event further
+    int32(false) # propagate the event further
 end
 
 function canvas_on_expose_event(::GtkWidget,e::Ptr{Void},widget::Canvas) # e is a GdkEventExpose

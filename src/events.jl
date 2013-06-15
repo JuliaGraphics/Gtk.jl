@@ -71,7 +71,7 @@ function on_signal_button_release{T}(widget::GTKWidget, release_cb::Function, cl
     ccall((:gtk_widget_add_events,libgtk),Void,(GtkWidget,Cint),
         widget,GdkEventMask.GDK_BUTTON_RELEASE_MASK)
     signal_connect(widget, "button-release-event", closure,
-        cfunction(press_cb, Cint, (GtkWidget, Ptr{GdkEventButton}, T)), 0)
+        cfunction(release_cb, Cint, (GtkWidget, Ptr{GdkEventButton}, T)), 0)
 end
 
 type GTK_signal_motion{T}
@@ -85,6 +85,8 @@ function notify_motion{T}(p::GtkWidget, eventp::Ptr{GdkEventMotion}, closure::GT
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
         ret = ccall(closure.callback, Cint, (GtkWidget, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
+    else
+        ret = int32(false)
     end
     ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
