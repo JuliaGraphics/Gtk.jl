@@ -3,7 +3,9 @@ type Canvas <: GTKWidget
     handle::GtkWidget
     parent::GTKWidget
     all::GdkRectangle
-    redraw::Union(Function,Nothing)
+    mouse::MouseHandler
+    redraw::Union(Function,Nothing) # Tk compatibility
+    redrawf::Union(Function,Nothing)
     redrawp::Ptr{Void} # function Void(GTKWidget, CairoSurface)
     redrawclosure::Any
     back::CairoSurface   # backing store
@@ -14,7 +16,8 @@ type Canvas <: GTKWidget
         ccall((:gtk_widget_set_double_buffered,libgtk),Void,(GtkWidget,Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(GtkWidget,Int32,Int32), da, w, h)
         ccall((:gtk_container_add,libgtk),Void,(GtkWidget,GtkWidget), parent, da)
-        widget = new(da, parent, GdkRectangle(0,0,w,h), nothing, C_NULL, nothing)
+        widget = new(da, parent, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing, C_NULL, nothing)
+        widget.mouse.widget = widget
         on_signal_resize(widget, notify_resize, widget)
         if gtk_version == 3
             signal_connect(widget,"draw",widget,
@@ -23,6 +26,9 @@ type Canvas <: GTKWidget
             signal_connect(widget,"expose-event",widget,
                 cfunction(canvas_on_expose_event,Void,(GtkWidget,Ptr{Void},Canvas)),0)
         end
+        on_signal_button_press(widget, mousedown_cb, widget.mouse)
+        on_signal_button_release(widget, mouseup_cb, widget.mouse)
+        on_signal_motion(widget, mousemove_cb, widget.mouse, 0, 0)
         ccall((:gtk_widget_show,libgtk),Void,(GtkWidget,),widget)
         gc_ref(widget)
     end
@@ -33,9 +39,9 @@ width(c::Canvas) = c.all.width
 height(c::Canvas) = c.all.height
 
 function on_signal_redraw(widget::Canvas, resize_cb::Union(Function,Nothing), closure::ANY)
-    widget.redraw = resize_cb
-    widget.redrawp = if isgeneric(closure) && Base.isstructtype(closure)
-            cfunction(redraw, Void, (Canvas, CairoSurface, typeof(closure)))
+    widget.redrawf = resize_cb
+    widget.redrawp = if resize_cb !== nothing && isgeneric(closure) && Base.isstructtype(closure)
+            cfunction(resize_cb, Void, (Canvas, CairoSurface, typeof(closure)))
         else
             C_NULL
         end
@@ -56,8 +62,10 @@ function redraw(widget::Canvas, immediate::Bool=false)
     if widget.all.width > 0 && widget.all.height > 0
         if widget.redrawp != C_NULL
             ccall(widget.redrawp, Void, (Any, Any, Any), widget, widget.back, widget.redrawclosure)
+        elseif isa(widget.redrawf, Function)
+            widget.redrawf(widget, widget.back, widget.redrawclosure)
         elseif isa(widget.redraw, Function)
-            widget.redraw(widget, widget.back, widget.redrawclosure)
+            widget.redraw(widget)
         end
         reveal(widget, immediate)
     end
