@@ -7,12 +7,11 @@ import Base: convert, show
 import Base.Graphics: width, height, getgc
 
 export GTKCanvas, Window, Canvas,
-    width, height, reveal, redraw, cairo_context,
+    width, height, reveal, configure, draw, cairo_context,
     gtk_doevent, GdkEventMask, GdkModifierType
 export signal_connect, signal_disconnect,
-    on_signal_destroy, on_signal_redraw,
-    on_signal_button_press, on_signal_button_release,
-    on_signal_motion
+    on_signal_destroy, on_signal_button_press,
+    on_signal_button_release, on_signal_motion
 #export Toplevel, Frame, Labelframe, Notebook, Panedwindow
 #export Label, Button
 #export Checkbutton, Radio, Combobox
@@ -34,7 +33,6 @@ export signal_connect, signal_disconnect,
 #       get_visible, set_visible,
 #       set_position,
 #       raise, focus, update, destroy
-
 
 
 const gtk_version = 2 # This is the only configuration option

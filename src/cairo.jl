@@ -4,10 +4,8 @@ type Canvas <: GTKWidget
     parent::GTKWidget
     all::GdkRectangle
     mouse::MouseHandler
-    redraw::Union(Function,Nothing) # Tk compatibility
-    redrawf::Union(Function,Nothing)
-    redrawp::Ptr{Void} # function Void(GTKWidget, CairoSurface)
-    redrawclosure::Any
+    resize::Union(Function,Nothing)
+    draw::Union(Function,Nothing)
     back::CairoSurface   # backing store
     backcc::CairoContext
 
@@ -16,7 +14,7 @@ type Canvas <: GTKWidget
         ccall((:gtk_widget_set_double_buffered,libgtk),Void,(GtkWidget,Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(GtkWidget,Int32,Int32), da, w, h)
         ccall((:gtk_container_add,libgtk),Void,(GtkWidget,GtkWidget), parent, da)
-        widget = new(da, parent, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing, C_NULL, nothing)
+        widget = new(da, parent, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
         on_signal_resize(widget, notify_resize, widget)
         if gtk_version == 3
@@ -38,34 +36,36 @@ Canvas(parent::GTKWidget) = Canvas(parent, -1, -1)
 width(c::Canvas) = c.all.width
 height(c::Canvas) = c.all.height
 
-function on_signal_redraw(widget::Canvas, resize_cb::Union(Function,Nothing), closure::ANY)
-    widget.redrawf = resize_cb
-    widget.redrawp = if resize_cb !== nothing && isgeneric(closure) && Base.isstructtype(closure)
-            cfunction(resize_cb, Void, (Canvas, CairoSurface, typeof(closure)))
-        else
-            C_NULL
-        end
-    widget.redrawclosure = closure
-    redraw(widget)
-    nothing
-end
-
 function notify_resize(::GtkWidget, size::Ptr{GdkRectangle}, widget::Canvas)
     widget.all = unsafe_load(size)
     widget.back = cairo_surface_for(widget)
     widget.backcc = CairoContext(widget.back)
-    redraw(widget)
+    if isa(widget.resize,Function)
+        widget.resize(widget)
+    end
+    draw(widget,false)
     nothing
 end
 
-function redraw(widget::Canvas, immediate::Bool=false)
+function resize(config::Function, widget::Canvas)
+    widget.resize = config
     if widget.all.width > 0 && widget.all.height > 0
-        if widget.redrawp != C_NULL
-            ccall(widget.redrawp, Void, (Any, Any, Any), widget, widget.back, widget.redrawclosure)
-        elseif isa(widget.redrawf, Function)
-            widget.redrawf(widget, widget.back, widget.redrawclosure)
-        elseif isa(widget.redraw, Function)
-            widget.redraw(widget)
+        if isa(widget.resize, Function)
+            widget.resize(widget)
+        end
+        draw(widget, false)
+    end
+end
+
+function draw(redraw::Function, widget::Canvas)
+    widget.draw = redraw
+    draw(widget, false)
+end
+
+function draw(widget::Canvas, immediate::Bool=true)
+    if widget.all.width > 0 && widget.all.height > 0
+        if isa(widget.draw,Function)
+            widget.draw(widget)
         end
         reveal(widget, immediate)
     end

@@ -118,7 +118,7 @@ function on_signal_motion{T}(widget::GTKWidget, move_cb::Function, closure::T,
         cfunction(notify_motion, Cint, (GtkWidget, Ptr{GdkEventMotion}, GTK_signal_motion{T})), 0)
 end
 
-function reveal(c::GTKWidget, immediate::Bool=false)
+function reveal(c::GTKWidget, immediate::Bool=true)
     #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&c.all)
     #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
     #    gdk_window(c), region, true)
