@@ -1,5 +1,5 @@
 
-gtk_doevent(::Int32) = gtk_doevent()
+gtk_doevent(timer,::Int32) = gtk_doevent()
 function gtk_doevent()
     try
         while (ccall((:gtk_events_pending,libgtk), Cint, ())) == true
@@ -21,7 +21,7 @@ function init()
     end
     global timeout
     timeout = Base.TimeoutAsyncWork(gtk_doevent)
-    Base.start_timer(timeout,int64(100),int64(10))
+    Base.start_timer(timeout,.1,.005)
 end
 
 function signal_connect{T}(w::GTKWidget,sig::ASCIIString,closure::T,cb::Ptr{Void},gconnectflags)
