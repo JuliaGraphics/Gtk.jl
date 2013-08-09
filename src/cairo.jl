@@ -76,7 +76,7 @@ function cairo_surface_for(widget::Canvas)
     CairoSurface(
         ccall((:gdk_window_create_similar_surface,libgdk), Ptr{Void},
         (Ptr{Void}, Enum, Int32, Int32), 
-        gdk_window(widget), CAIRO_CONTENT_COLOR_ALPHA, w, h),
+        gdk_window(widget), Cairo.CONTENT_COLOR_ALPHA, w, h),
     w, h)
 end
 
