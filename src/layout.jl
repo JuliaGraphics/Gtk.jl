@@ -1,4 +1,5 @@
 abstract GtkLayout <: GtkWidget
+typealias GtkContainer Union(GtkLayout,)
 #GtkGrid — Pack widgets in a rows and columns
 #GtkAlignment — A widget which controls the alignment and size of its child
 #GtkAspectFrame — A frame that constrains its child to a particular aspect ratio
@@ -11,6 +12,31 @@ abstract GtkLayout <: GtkWidget
 #GtkExpander — A container which can hide its child
 #GtkOverlay — A container which overlays widgets on top of each other
 #GtkOrientable — An interface for flippable widgets
+
+add!(w::GtkContainer, child::GtkWidget) = ccall((:gtk_container_add,libgtk), Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child)
+delete!(w::GtkContainer, child::GtkWidget) = ccall((:gtk_container_remove,libgtk), Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child)
+
+type GList
+    data::Ptr{Void}
+    next::Ptr{GList}
+    prev::Ptr{GList}
+end
+function GList(list::Ptr{GList},)
+    glist = unsafe_load(list)
+    finalize(glist, (glist)->ccall(:g_list_free,Void,(Ptr{GList},),list))
+    glist
+end
+start(list::GList) = (list,list)
+next(list::GList,i) = unsafe_load(i[1].next)
+done(list::GList,i) = i[1] != C_NULL
+length(list::GList) = ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),list)
+
+start(w::GtkContainer) = start(GList(ccall((:gtk_container_get_children,libgtk), Ptr{GList}, (Ptr{GtkWidget},), w)))
+next(w::GtkContainer,i) = (convert(GtkWidget,convert(Ptr{GtkWidget},i[1].data)), next(i))
+done(w::GtkContainer,i) = done(i[2],i)
+length(w::GtkContainer) = length(start(w)[2])
 
 if gtk_version == 3
 ### GtkGrid was introduced in Gtk3 (replaces GtkTable)

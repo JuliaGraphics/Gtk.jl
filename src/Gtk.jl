@@ -3,7 +3,7 @@
 module Gtk
 using Cairo
 
-import Base: convert, show, size, getindex, setindex!
+import Base: convert, show, size, getindex, setindex!, add!, delete!
 import Base.Graphics: width, height, getgc
 
 # generic interface:
