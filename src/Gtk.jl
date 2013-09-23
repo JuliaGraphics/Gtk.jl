@@ -3,16 +3,32 @@
 module Gtk
 using Cairo
 
-import Base: convert, show
+import Base: convert, show, size, getindex, setindex!
 import Base.Graphics: width, height, getgc
 
-export GTKCanvas, Window, Canvas,
+# generic interface:
+export Window, Canvas, #TopLevel=Window
     width, height, reveal, configure, draw, cairo_context,
-    gtk_doevent, GdkEventMask, GdkModifierType
-export signal_connect, signal_disconnect,
+
+    #property, margin, padding, align
+
+# Gtk objects
+export GtkCanvas
+
+# Gtk3 objects
+export GtkGrid
+
+# Gtk2 objects
+export GtkTable, GtkAlignment
+
+# Gtk-specific event handling
+export gtk_doevent, GdkEventMask, GdkModifierType,
+    signal_connect, signal_disconnect,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion
-#export Toplevel, Frame, Labelframe, Notebook, Panedwindow
+
+# Tk-compatibility (missing):
+#export Frame, Labelframe, Notebook, Panedwindow
 #export Label, Button
 #export Checkbutton, Radio, Combobox
 #export Slider, Spinbox
@@ -25,8 +41,6 @@ export signal_connect, signal_disconnect,
 #export scrollbars_add
 #export get_value, set_value,
 #       get_items, set_items,
-#       get_width, set_width,
-#       get_height, set_height,
 #       get_size, set_size,
 #       get_enabled, set_enabled,
 #       get_editable, set_editable,
@@ -56,13 +70,17 @@ else
 end
 if OS_NAME == :Windows
     const libgobject = "libgobject-2.0-0"
+    const libglib = "libglib-2.0-0"
 else
     const libgobject = "libgobject-2.0"
+    const libglib = "libglib-2.0"
 end
+
 
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
+include("layout.jl")
 include("container.jl")
 include("cairo.jl")
 

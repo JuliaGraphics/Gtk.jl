@@ -17,81 +17,81 @@ function gtk_doevent()
 end
 function init()
     if !ccall((:gtk_init_check,libgtk), Bool, (Ptr{Void}, Ptr{Void}), C_NULL, C_NULL)
-        error( "Failed to initialize GTK" )
+        error( "Failed to initialize Gtk" )
     end
     global timeout
     timeout = Base.TimeoutAsyncWork(gtk_doevent)
     Base.start_timer(timeout,.1,.005)
 end
 
-function signal_connect{T}(w::GTKWidget,sig::ASCIIString,closure::T,cb::Ptr{Void},gconnectflags)
-    if isa(closure, GTKWidget)
+function signal_connect{T}(w::GtkWidget,sig::ASCIIString,closure::T,cb::Ptr{Void},gconnectflags)
+    if isa(closure, GtkWidget)
         unref = C_NULL
     else
         unref = gc_unref_closure(T)
         gc_ref(closure)
     end
     ccall((:g_signal_connect_data,libgobject), Culong,
-        (GtkWidget, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
+        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
         w, sig, cb, closure, unref, gconnectflags)
 end
 # Signals API for the cb pointer
-# GTK 2
+# Gtk 2
 #   https://developer.gnome.org/gtk2/stable/GtkObject.html#GtkObject-destroy
 #   https://developer.gnome.org/gtk2/stable/GtkWidget.html#GtkWidget-accel-closures-changed
-# GTK 3
+# Gtk 3
 #   https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed
 
 
-function signal_disconnect(w::GTKWidget, handler_id::Culong)
-    ccall(:g_signal_handler_disconnect, Void, (GtkWidget, Culong), w, handler_id)
+function signal_disconnect(w::GtkWidget, handler_id::Culong)
+    ccall(:g_signal_handler_disconnect, Void, (Ptr{GtkWidget}, Culong), w, handler_id)
 end
 
-function on_signal_resize{T}(widget::GTKWidget, resize_cb::Function, closure::T)
+function on_signal_resize{T}(widget::GtkWidget, resize_cb::Function, closure::T)
     signal_connect(widget, "size-allocate", closure,
-        cfunction(resize_cb, Void, (GtkWidget, Ptr{GdkRectangle}, T)), 0)
+        cfunction(resize_cb, Void, (Ptr{GtkWidget}, Ptr{GdkRectangle}, T)), 0)
 end
-function notify_resize(::GtkWidget, size::Ptr{GdkRectangle}, widget::GTKWidget)
+function notify_resize(::Ptr{GtkWidget}, size::Ptr{GdkRectangle}, widget::GtkWidget)
     widget.all = unsafe_load(size)
     nothing
 end
 
-function on_signal_destroy{T}(widget::GTKWidget, destroy_cb::Function, closure::T)
+function on_signal_destroy{T}(widget::GtkWidget, destroy_cb::Function, closure::T)
     signal_connect(widget, "destroy", closure,
-        cfunction(destroy_cb, Void, (GtkWidget, T)), 0)
+        cfunction(destroy_cb, Void, (Ptr{GtkWidget}, T)), 0)
 end
 
-function on_signal_button_press{T}(widget::GTKWidget, press_cb::Function, closure::T)
-    ccall((:gtk_widget_add_events,libgtk),Void,(GtkWidget,Cint),
+function on_signal_button_press{T}(widget::GtkWidget, press_cb::Function, closure::T)
+    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GtkWidget},Cint),
         widget,GdkEventMask.GDK_BUTTON_PRESS_MASK)
     signal_connect(widget, "button-press-event", closure,
-        cfunction(press_cb, Cint, (GtkWidget, Ptr{GdkEventButton}, T)), 0)
+        cfunction(press_cb, Cint, (Ptr{GtkWidget}, Ptr{GdkEventButton}, T)), 0)
 end
-function on_signal_button_release{T}(widget::GTKWidget, release_cb::Function, closure::T)
-    ccall((:gtk_widget_add_events,libgtk),Void,(GtkWidget,Cint),
+function on_signal_button_release{T}(widget::GtkWidget, release_cb::Function, closure::T)
+    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GtkWidget},Cint),
         widget,GdkEventMask.GDK_BUTTON_RELEASE_MASK)
     signal_connect(widget, "button-release-event", closure,
-        cfunction(release_cb, Cint, (GtkWidget, Ptr{GdkEventButton}, T)), 0)
+        cfunction(release_cb, Cint, (Ptr{GtkWidget}, Ptr{GdkEventButton}, T)), 0)
 end
 
-type GTK_signal_motion{T}
+type Gtk_signal_motion{T}
     closure::T
     callback::Ptr{Void}
     include::Uint32
     exclude::Uint32
 end
-function notify_motion{T}(p::GtkWidget, eventp::Ptr{GdkEventMotion}, closure::GTK_signal_motion{T})
+function notify_motion{T}(p::Ptr{GtkWidget}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion{T})
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
-        ret = ccall(closure.callback, Cint, (GtkWidget, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
+        ret = ccall(closure.callback, Cint, (Ptr{GtkWidget}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
     else
         ret = int32(false)
     end
     ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
-function on_signal_motion{T}(widget::GTKWidget, move_cb::Function, closure::T,
+function on_signal_motion{T}(widget::GtkWidget, move_cb::Function, closure::T,
         include=0, exclude=GdkModifierType.GDK_BUTTONS_MASK)
     exclude &= ~include
     mask = GdkEventMask.GDK_POINTER_MOTION_HINT_MASK
@@ -106,23 +106,23 @@ function on_signal_motion{T}(widget::GTKWidget, move_cb::Function, closure::T,
     else #if 0 != include & (GdkModifierType.GDK_BUTTON4_MASK|GdkModifierType.GDK_BUTTON5_MASK)
         mask |= GdkEventMask.GDK_BUTTON_MOTION_MASK
     end
-    ccall((:gtk_widget_add_events,libgtk),Void,(GtkWidget,Cint), widget, mask)
+    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GtkWidget},Cint), widget, mask)
     @assert Base.isstructtype(T)
-    closure = GTK_signal_motion(
+    closure = Gtk_signal_motion(
         closure,
-        cfunction(move_cb, Cint, (GtkWidget, Ptr{GdkEventMotion}, T)),
+        cfunction(move_cb, Cint, (Ptr{GtkWidget}, Ptr{GdkEventMotion}, T)),
         uint32(include),
         uint32(exclude)
         )
     signal_connect(widget, "motion-notify-event", closure,
-        cfunction(notify_motion, Cint, (GtkWidget, Ptr{GdkEventMotion}, GTK_signal_motion{T})), 0)
+        cfunction(notify_motion, Cint, (Ptr{GtkWidget}, Ptr{GdkEventMotion}, Gtk_signal_motion{T})), 0)
 end
 
-function reveal(c::GTKWidget, immediate::Bool=true)
+function reveal(c::GtkWidget, immediate::Bool=true)
     #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&c.all)
     #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
     #    gdk_window(c), region, true)
-    ccall((:gtk_widget_queue_draw,libgtk), Void, (GtkWidget,), c)
+    ccall((:gtk_widget_queue_draw,libgtk), Void, (Ptr{GtkWidget},), c)
     if immediate
         ccall((:gdk_window_process_updates,libgdk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
     end
@@ -139,7 +139,7 @@ type MouseHandler
     button3release::Function
     motion::Function
     button1motion::Function
-    widget::GTKWidget
+    widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
