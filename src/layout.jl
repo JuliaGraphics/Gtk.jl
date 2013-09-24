@@ -1,5 +1,4 @@
 abstract GtkLayouts <: GtkWidget
-typealias GtkContainer Union(GtkLayouts,)
 
 #GtkGrid — Pack widgets in a rows and columns
 #GtkAlignment — A widget which controls the alignment and size of its child
@@ -23,31 +22,6 @@ typealias GtkContainer Union(GtkLayouts,)
 #GtkOverlay — A container which overlays widgets on top of each other
 #GtkExpander — A container which can hide its child
 #GtkOrientable — An interface for flippable widgets
-
-add!(w::GtkContainer, child::GtkWidget) = ccall((:gtk_container_add,libgtk), Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child)
-delete!(w::GtkContainer, child::GtkWidget) = ccall((:gtk_container_remove,libgtk), Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child)
-
-type GList
-    data::Ptr{Void}
-    next::Ptr{GList}
-    prev::Ptr{GList}
-end
-function GList(list::Ptr{GList},)
-    glist = unsafe_load(list)
-    finalize(glist, (glist)->ccall(:g_list_free,Void,(Ptr{GList},),list))
-    glist
-end
-start(list::GList) = (list,list)
-next(list::GList,i) = unsafe_load(i[1].next)
-done(list::GList,i) = i[1] != C_NULL
-length(list::GList) = ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),list)
-
-start(w::GtkContainer) = start(GList(ccall((:gtk_container_get_children,libgtk), Ptr{GList}, (Ptr{GtkWidget},), w)))
-next(w::GtkContainer,i) = (convert(GtkWidget,convert(Ptr{GtkWidget},i[1].data)), next(i))
-done(w::GtkContainer,i) = done(i[2],i)
-length(w::GtkContainer) = length(start(w)[2])
 
 if gtk_version == 3
 ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
@@ -91,12 +65,13 @@ end
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 type GtkTable <: GtkLayouts
     handle::Ptr{GtkWidget}
-    x::Cuint, y::Cuint
+    x::Cuint
+    y::Cuint
     function GtkTable(x, y, homogeneous=false)
         gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkWidget}, (Cint, Cint, Cint), x, y, homogeneous),x,y))
     end
 end
-setindex(grid::GtkGrid, x::child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
+setindex(grid::GtkTable, child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
     (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i)-1, first(j)-1, last(j)-1)
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
@@ -201,21 +176,21 @@ function getindex(pane::GtkPaned, i::Integer)
     return convert(GtkWidget, x)
 end
 
-function setindex(grid::GtkGrid, x::child, i)
+function setindex(grid::GtkPaned, child, i::Integer)
     if i == 1
-        ccall((:gtk_paned_add1, libgtk), Void, (Ptr{GtkWidget},), pane)
+        ccall((:gtk_paned_add1, libgtk), Void, (Ptr{GtkWidget},Ptr{GtkWidget}), pane, child)
     elseif i == 2
-        ccall((:gtk_paned_add2, libgtk), Void, (Ptr{GtkWidget},), pane)
+        ccall((:gtk_paned_add2, libgtk), Void, (Ptr{GtkWidget},Ptr{GtkWidget}), pane, child)
     else
         error("tried to set pane $i of GtkPane")
     end
 end
 
-function setindex(grid::GtkGrid, x::child, i, resize::Bool, shrink::Bool=true)
+function setindex(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
     if i == 1
-        ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GtkWidget},Cint,Cint), pane, resize, shrink)
+        ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GtkWidget},Ptr{GtkWidget},Cint,Cint), pane, child, resize, shrink)
     elseif i == 2
-        ccall((:gtk_paned_pack2, libgtk), Void, (Ptr{GtkWidget},Cint,Cint), pane, resize, shrink)
+        ccall((:gtk_paned_pack2, libgtk), Void, (Ptr{GtkWidget},Ptr{GtkWidget},Cint,Cint), pane, child, resize, shrink)
     else
         error("tried to set pane $i of GtkPane")
     end
@@ -231,8 +206,8 @@ type GtkLayout <: GtkLayouts
         gc_ref(new(layout))
     end
 end
-setindex!(layout::GtkLayout, x::child, i, j) = ccall((:gtk_layout_put,libgtk),Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},Cint,Cint), layout, x, i, j)
+setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put,libgtk),Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},Cint,Cint), layout, child, i, j)
 function size(layout::GtkLayout)
     sz = Array(Cuint,2)
     ccall((:gtk_layout_get_size,libgtk),Void,

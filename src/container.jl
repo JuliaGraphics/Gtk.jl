@@ -1,26 +1,45 @@
-type Window <: GtkWidget
-    handle::Ptr{GtkWidget}
-    all::GdkRectangle
-    resizable::Bool
-    function Window(title, w=-1, h=-1, resizable=true, toplevel=true)
-        hnd = ccall((:gtk_window_new,libgtk),Ptr{GtkWidget},(Enum,),
-            toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
-        ccall((:gtk_window_set_title,libgtk),Void,(Ptr{GtkWidget},Ptr{Uint8}),hnd,title)
-        if resizable
-            ccall((:gtk_window_set_default_size,libgtk),Void,(Ptr{GtkWidget},Int32,Int32),hnd,w,h)
-        else
-            ccall((:gtk_window_set_resizable,libgtk),Void,(Ptr{GtkWidget},Bool),hnd,false)
-            ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkWidget},Int32,Int32),hnd,w,h)
-        end
-        ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GtkWidget},),hnd)
-        widget = new(hnd, GdkRectangle(0,0,w,h))
-        on_signal_resize(widget, notify_resize, widget)
-        gtk_doevent()
-        gc_ref(widget)
+typealias GtkContainer Union(GtkLayouts,GtkWindows)
+
+push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
+delete!(w::GtkContainer, child) = (ccall((:gtk_container_remove,libgtk), Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
+
+type GList
+    data::Ptr{Void}
+    next::Ptr{GList}
+    prev::Ptr{GList}
+end
+function glist(list::Ptr{GList},)
+    if list == C_NULL
+        return ()
+    end
+    l = unsafe_load(list)
+    finalizer(l, (l)->ccall(:g_list_free,Void,(Ptr{GList},),list))
+    l
+end
+start(list::GList) = (list,list)
+function next(list::GList,s)
+    nx = s[1].next==C_NULL ? () : (unsafe_load(s[1].next),s[2])
+    return (s[1].data, nx)
+end
+done(list::GList,s::(GList,GList)) = false
+done(list::GList,s) = true
+length(list::GList) = ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),list)
+
+start(w::GtkContainer) = start(glist(ccall((:gtk_container_get_children,libgtk), Ptr{GList}, (Ptr{GtkWidget},), w)))
+function next(w::GtkContainer,i)
+    d,s = next(i[2],i)
+    (convert(GtkWidget,convert(Ptr{GtkWidget},d)), s)
+end
+done(w::GtkContainer,s::(GList,GList)) = false
+done(w::GtkContainer,s) = true
+function length(w::GtkContainer)
+    s = start(w)
+    if done(s)
+        return 0
+    else
+        return length(s[2])
     end
 end
-const TopLevel = Window
 
-#GtkScrolledWindow
-#GtkFrame — A bin with a decorative frame and optional label
-#GtkSeparator — A separator widget

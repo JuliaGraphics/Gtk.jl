@@ -2,10 +2,10 @@ abstract GtkWidget
 const GTKWidget = GtkWidget #deprecated name
 
 const jlref_quark = ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), "jlref_quark")
-const gchararray_id = ccall((:g_type_from_name,libgobject,Int,(Ptr{Uint8},),"gchararray")
-const gdouble_id = ccall((:g_type_from_name,libgobject,Int,(Ptr{Uint8},),"gdouble")
-const gint64_id = ccall((:g_type_from_name,libgobject,Int,(Ptr{Uint8},),"gint")
-const guint64_id = ccall((:g_type_from_name,libgobject,Int,(Ptr{Uint8},),"guint")
+const gchararray_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gchararray")
+const gdouble_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gdouble")
+const gint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gint")
+const guint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"guint")
 
 # All GtkWidgets are expected to have a 'handle' field
 # of type Ptr{GtkWidget} corresponding to the Gtk object
@@ -14,7 +14,7 @@ const guint64_id = ccall((:g_type_from_name,libgobject,Int,(Ptr{Uint8},),"guint"
 # or to override the size, width, and height methods
 convert(::Type{Ptr{GtkWidget}},w::GtkWidget) = w.handle
 function convert(::Type{GtkWidget},w::Ptr{GtkWidget})
-    x = ccall((:g_object_get_qdata, libgobject), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
+    x = ccall((:g_object_get_qdata, libgobject), Ptr{GtkWidget}, (Ptr{GtkWidget},Uint32), w, jlref_quark)
     x == C_NULL && error("GtkObject didn't have a corresponding Julia object")
     unsafe_pointer_to_objref(x)::GtkWidget
 end
@@ -25,6 +25,17 @@ width(w::GtkWidget) = w.all.width
 height(w::GtkWidget) = w.all.height
 size(w::GtkWidget) = (w.all.width, w.all.height)
 show(io::IO, w::GtkWidget) = print(io, typeof(w))
+
+### Functions and methods common to all GtkWidget objects
+#GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =
+#    ccall((:gtk_adjustment_new,libgtk),Ptr{Void},
+#        (Cdouble,Cdouble,Cdouble,Cdouble,Cdouble,Cdouble),
+#        value, lower, upper, step_increment, page_increment, page_size)
+
+visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GtkWidget},),w))
+visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GtkWidget},Cint),w,state)
+show(w::GtkWidget) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GtkWidget},),w)
+showall(w::GtkWidget) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GtkWidget},),w)
 
 ### Getting and Setting Properties
 function GValue(s::String)
@@ -131,38 +142,36 @@ end
 
 ### Garbage collection [prevention]
 const gc_preserve = ObjectIdDict() # reference counted closures
-const gc_preserve_gtk = ObjectIdDict() # gtk objects
-
 function gc_ref(x::ANY)
     global gc_preserve
     gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
     x
 end
-
-function gc_ref(x::GtkWidget)
-    global gc_preserve_gtk
-    if !contains(gc_preserve_gtk, x)
-        #on_signal_destroy(x, gc_unref, x)
-        ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GtkWidget}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
-            cfunction(gc_unref, Void, (Any,)))
-        ccall((:g_object_ref,libgobject),Ptr{GtkWidget},(Ptr{GtkWidget},),x)
-        finalize(x, (x)->ccall((:g_object_unref,libgobject),Void,(Ptr{GtkWidget},),x))
-        gc_preserve_gtk[x] = x
-    end
-    x
-end
-
 function gc_unref(x::ANY)
     global gc_preserve
-    count = get(gc_preserve, x, 0)-1
+    count = get(gc_preserve, x, 0)::Int-1
     if count <= 0
         delete!(gc_preserve, x)
     end
     nothing
 end
 gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
-gc_unref_closure(T::Type) = cfunction(gc_unref, Void, (T, Ptr{Void}))
+
+const gc_preserve_gtk = ObjectIdDict() # gtk objects
+function gc_ref{T<:GtkWidget}(x::T)
+    global gc_preserve_gtk
+    if !(x in gc_preserve_gtk)
+        #on_signal_destroy(x, gc_unref, x)
+        ccall((:g_object_set_qdata_full, libgobject), Void,
+            (Ptr{GtkWidget}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
+            cfunction(gc_unref, Void, (T,)))
+        ccall((:g_object_ref,libgobject),Ptr{GtkWidget},(Ptr{GtkWidget},),x)
+        finalizer(x, (x)->ccall((:g_object_unref,libgobject),Void,(Ptr{GtkWidget},),x))
+        gc_preserve_gtk[x] = x
+    end
+    x
+end
+
 
 function gc_unref(x::GtkWidget)
     global gc_preserve_gtk
@@ -171,8 +180,5 @@ function gc_unref(x::GtkWidget)
     nothing
 end
 gc_unref(::Ptr{GtkWidget}, x::GtkWidget) = gc_unref(x)
+gc_unref_closure{T<:GtkWidget}(::Type{T}) = cfunction(gc_unref, Void, (T, Ptr{Void}))
 
-#GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =
-#    ccall((:gtk_adjustment_new,libgtk),Ptr{Void},
-#        (Cdouble,Cdouble,Cdouble,Cdouble,Cdouble,Cdouble),
-#        value, lower, upper, step_increment, page_increment, page_size)

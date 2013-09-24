@@ -3,23 +3,25 @@
 module Gtk
 using Cairo
 
-import Base: convert, show, size, getindex, setindex!, add!, delete!
+import Base: convert, show, showall, size, getindex, setindex!, push!, delete!, start, next, done
 import Base.Graphics: width, height, getgc
 
 # generic interface:
 export Window, Canvas, #TopLevel=Window
     width, height, size, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    length, add!, delete!
+    length, add!, delete!, visible
 
     #property, margin, padding, align
+    #raise, focus, destroy, enabled
 
 # Gtk objects
 export GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
-    GtkExpander, GtkOverlay, GtkOrientable
+    GtkExpander, GtkOverlay,
+    GtkLabel
 
 # Gtk3 objects
-export GtkGrid
+export GtkGrid, GtkOrientable
 
 # Gtk2 objects
 export GtkTable, GtkAlignment
@@ -32,7 +34,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 
 # Tk-compatibility (missing):
 #export Frame, Labelframe, Notebook, Panedwindow
-#export Label, Button
+#export Button
 #export Checkbutton, Radio, Combobox
 #export Slider, Spinbox
 #export Entry, set_validation, Text
@@ -44,11 +46,8 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 #export scrollbars_add
 #export get_value, set_value,
 #       get_items, set_items,
-#       get_enabled, set_enabled,
 #       get_editable, set_editable,
-#       get_visible, set_visible,
-#       set_position,
-#       raise, focus, update, destroy
+#       set_position
 
 
 const gtk_version = 2 # This is the only configuration option
@@ -82,9 +81,17 @@ end
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
+include("windows.jl")
 include("layout.jl")
-include("container.jl")
+include("displays.jl")
+include("buttons.jl")
+include("input.jl")
+include("text.jl")
+include("menus.jl")
+include("selectors.jl")
+include("misc.jl")
 include("cairo.jl")
+include("container.jl")
 
 init()
 end
