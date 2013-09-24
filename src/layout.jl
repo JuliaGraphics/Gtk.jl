@@ -1,5 +1,6 @@
-abstract GtkLayout <: GtkWidget
-typealias GtkContainer Union(GtkLayout,)
+abstract GtkLayouts <: GtkWidget
+typealias GtkContainer Union(GtkLayouts,)
+
 #GtkGrid — Pack widgets in a rows and columns
 #GtkAlignment — A widget which controls the alignment and size of its child
 #GtkAspectFrame — A frame that constrains its child to a particular aspect ratio
@@ -7,10 +8,20 @@ typealias GtkContainer Union(GtkLayout,)
 #GtkButtonBox — A container for arranging buttons
 #GtkFixed — A container which allows you to position widgets at fixed coordinates
 #GtkPaned — A widget with two adjustable panes
-#GtkLayout — Infinite scrollable area containing child widgets and/or custom drawing
+#GtkLayout — Infinite scrollable area containing child widgets at (x,y) locations
 #GtkNotebook — A tabbed notebook container
 #GtkExpander — A container which can hide its child
 #GtkOverlay — A container which overlays widgets on top of each other
+#GtkOrientable — An interface for flippable widgets
+
+# Introduced in Gtk3.10
+#GtkRevealer — Hide and show with animation
+#GtkListBox — A list container
+#GtkStack — A stacking container
+#GtkStackSwitcher — A controller for GtkStack
+#GtkHeaderBar — A box with a centered child
+#GtkOverlay — A container which overlays widgets on top of each other
+#GtkExpander — A container which can hide its child
 #GtkOrientable — An interface for flippable widgets
 
 add!(w::GtkContainer, child::GtkWidget) = ccall((:gtk_container_add,libgtk), Void,
@@ -40,7 +51,7 @@ length(w::GtkContainer) = length(start(w)[2])
 
 if gtk_version == 3
 ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-type GtkGrid <: GtkLayout
+type GtkGrid <: GtkLayouts
     handle::Ptr{GtkWidget}
     function GtkGrid()
         gc_ref(new(ccall((:gtk_grid_new, libgtk), Ptr{GtkWidget}, ())))
@@ -73,21 +84,23 @@ end
 function insert!(grid::GtkGrid, i::GtkWidget, side::Symbol)
     ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GtkWidget}, Cint), grid, i-1)
 end
+else
+GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
-type GtkTable <: GtkLayout
+type GtkTable <: GtkLayouts
     handle::Ptr{GtkWidget}
     x::Cuint, y::Cuint
     function GtkTable(x, y, homogeneous=false)
-        gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkWidget}, (Cint, Cint, Cint), x, y, homogeneous)))
+        gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkWidget}, (Cint, Cint, Cint), x, y, homogeneous),x,y))
     end
 end
 setindex(grid::GtkGrid, x::child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
     (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i)-1, first(j)-1, last(j)-1)
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
-type GtkAlignment <: GtkLayout
+type GtkAlignment <: GtkLayouts
     handle::Ptr{GtkWidget}
     function GtkAlignment(xalign, yalign, xscale, yscale) # % of available space, 0<=a<=1
         gc_ref(new(ccall((:gtk_alignment_new, libgtk), Ptr{GtkWidget},
@@ -96,7 +109,7 @@ type GtkAlignment <: GtkLayout
 end
 
 ### GtkAspectFrame
-type GtkAspectFrame <: GtkLayout
+type GtkAspectFrame <: GtkLayouts
     handle::Ptr{GtkWidget}
     function GtkAspectFrame(xalign, yalign, ratio) # % of available space, 0<=a<=1
         gc_ref(new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkWidget},
@@ -109,7 +122,7 @@ type GtkAspectFrame <: GtkLayout
 end
 
 ### GtkBox
-type GtkBox <: GtkLayout
+type GtkBox <: GtkLayouts
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkBox(vertical::Bool, spacing=0)
@@ -132,7 +145,7 @@ type GtkBox <: GtkLayout
 end
 
 ### GtkButtonBox
-type GtkButtonBox <: GtkLayout
+type GtkButtonBox <: GtkLayouts
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkButtonBox(vertical::Bool)
@@ -152,10 +165,11 @@ type GtkButtonBox <: GtkLayout
     end
 end
 
-### GtkFixed TODO: this is a bad option, typically, so I'm leaving it out for now
+### GtkFixed
+# this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-type GtkPaned <: GtkLayout
+type GtkPaned <: GtkLayouts
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkPaned(vertical::Bool)
@@ -208,12 +222,68 @@ function setindex(grid::GtkGrid, x::child, i, resize::Bool, shrink::Bool=true)
 end
 
 ### GtkLayout
-
-### GtkNotebook
+type GtkLayout <: GtkLayouts
+    handle::Ptr{GtkWidget}
+    function GtkLayout(width, height)
+        layout = ccall((:gtk_layout_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Void},Ptr{Void}), C_NULL, C_NULL)
+        ccall((:gtk_layout_set_size,libgtk),Void,(Ptr{GtkWidget},Cuint,Cuint),layout,width,height)
+        gc_ref(new(layout))
+    end
+end
+setindex!(layout::GtkLayout, x::child, i, j) = ccall((:gtk_layout_put,libgtk),Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},Cint,Cint), layout, x, i, j)
+function size(layout::GtkLayout)
+    sz = Array(Cuint,2)
+    ccall((:gtk_layout_get_size,libgtk),Void,
+        (Ptr{GtkWidget},Ptr{Cuint},Ptr{Cuint}),sz,pointer(sz,2))
+    sz
+end
+width(layout::GtkLayout) = size(layout)[1]
+height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
+type GtkExpander <: GtkLayouts
+    handle::Ptr{GtkWidget}
+    function GtkExpander(title)
+        gc_ref(new(ccall((:gtk_expander_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Uint8},), bytestring(title))))
+    end
+end
+
+### GtkNotebook
+type GtkNotebook <: GtkLayouts
+    handle::Ptr{GtkWidget}
+    function GtkNotebook()
+        gc_ref(new(ccall((:gtk_notebook_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Uint8},), bytestring(title))))
+    end
+end
+function push!(w::GtkNotebook, x::GtkWidget, label::String)
+    ccall((:gtk_notebook_append_page,libgtk), Cint,
+        (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{GtkWidget}),
+        w, x, label)
+end
+function splice!(w::GtkNotebook, i::Integer)
+    ccall((:gtk_notebook_remove_page,libgtk), Cint,
+        (Ptr{GtkWidget}, Cint), w, i-1)
+end
+
 
 ### GtkOverlay
-
-### GtkOrientable
+if gtk_version == 3
+type GtkOverlay <: GtkLayouts
+    handle::Ptr{GtkWidget}
+    function GtkOverlay()
+        gc_ref(new(ccall((:gtk_overlay_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Uint8},), bytestring(title))))
+    end
+end
+function push!(w::GtkNotebook, x::GtkWidget)
+    ccall((:gtk_overlay_add_overlay,libgtk), Cint,
+        (Ptr{GtkWidget}, Ptr{GtkWidget}), w, x)
+end
+else
+GtkOverlay(x...) = error("GtkOverlay is not available until Gtk3.2")
+end
 

@@ -1,7 +1,6 @@
 # Canvas is the plain Gtk drawing canvas built on Cairo.
 type Canvas <: GtkWidget
     handle::Ptr{GtkWidget}
-    parent::GtkWidget
     all::GdkRectangle
     mouse::MouseHandler
     resize::Union(Function,Nothing)
@@ -14,7 +13,7 @@ type Canvas <: GtkWidget
         ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GtkWidget},Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkWidget},Int32,Int32), da, w, h)
         ccall((:gtk_container_add,libgtk),Void,(Ptr{GtkWidget},Ptr{GtkWidget}), parent, da)
-        widget = new(da, parent, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
+        widget = new(da, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
         on_signal_resize(widget, notify_resize, widget)
         if gtk_version == 3

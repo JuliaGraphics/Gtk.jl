@@ -21,3 +21,6 @@ type Window <: GtkWidget
 end
 const TopLevel = Window
 
+#GtkScrolledWindow
+#GtkFrame — A bin with a decorative frame and optional label
+#GtkSeparator — A separator widget

@@ -8,12 +8,15 @@ import Base.Graphics: width, height, getgc
 
 # generic interface:
 export Window, Canvas, #TopLevel=Window
-    width, height, reveal, configure, draw, cairo_context,
+    width, height, size, #minsize, maxsize
+    reveal, configure, draw, cairo_context,
+    length, add!, delete!
 
     #property, margin, padding, align
 
 # Gtk objects
-export GtkCanvas
+export GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
+    GtkExpander, GtkOverlay, GtkOrientable
 
 # Gtk3 objects
 export GtkGrid
@@ -41,7 +44,6 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 #export scrollbars_add
 #export get_value, set_value,
 #       get_items, set_items,
-#       get_size, set_size,
 #       get_enabled, set_enabled,
 #       get_editable, set_editable,
 #       get_visible, set_visible,
