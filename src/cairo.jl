@@ -8,7 +8,7 @@ type Canvas <: GtkWidget
     back::CairoSurface   # backing store
     backcc::CairoContext
 
-    function Canvas(parent::Union(GtkWidget,Nothing), w, h)
+    function Canvas(w, h)
         da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GtkWidget},())
         ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GtkWidget},Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkWidget},Int32,Int32), da, w, h)
@@ -25,13 +25,9 @@ type Canvas <: GtkWidget
         on_signal_button_press(widget, mousedown_cb, widget.mouse)
         on_signal_button_release(widget, mouseup_cb, widget.mouse)
         on_signal_motion(widget, mousemove_cb, widget.mouse, 0, 0)
-        if isa(parent,GtkWidget)
-            add!(parent, widget)
-        end
         gc_ref(widget)
     end
 end
-Canvas(parent::GtkWidget) = Canvas(parent, -1, -1)
 Canvas(w, h) = Canvas(false, w, h)
 Canvas() = Canvas(-1,-1)
 

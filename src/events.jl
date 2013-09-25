@@ -24,7 +24,7 @@ function init()
     Base.start_timer(timeout,.1,.005)
 end
 
-function signal_connect{T}(w::GtkWidget,sig::ASCIIString,closure::T,cb::Ptr{Void},gconnectflags)
+function signal_connect{T}(w::GtkWidget,sig::ByteString,closure::T,cb::Ptr{Void},gconnectflags)
     if isa(closure, GtkWidget)
         unref = C_NULL
     else

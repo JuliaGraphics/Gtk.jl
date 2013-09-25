@@ -1,4 +1,4 @@
-typealias GtkContainer Union(GtkLayouts,GtkWindows)
+typealias GtkContainer Union(GtkLayouts,GtkWindows,GtkContainerLike)
 
 push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
     (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
@@ -43,3 +43,16 @@ function length(w::GtkContainer)
     end
 end
 
+for container in (
+    :GtkGrid,:GtkAlignment,:GtkAspectFrame,:GtkBox,
+    :GtkButtonBox,:GtkFixed,:GtkPaned,:GtkLayout,:GtkNotebook,
+    :GtkExpander,:GtkOverlay,:GtkOrientable,
+
+    :GtkWindow,
+
+    :GtkButton,:GtkCheckButton,:GtkToggleButton,:GtkRadioButton,:GtkLinkButton
+    )
+    @eval begin
+        $container(child::GtkWidget,vargs...) = push!($container(vargs...),child)
+    end
+end

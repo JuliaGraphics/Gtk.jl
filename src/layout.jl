@@ -1,6 +1,5 @@
 abstract GtkLayouts <: GtkWidget
 
-#GtkGrid — Pack widgets in a rows and columns
 #GtkAlignment — A widget which controls the alignment and size of its child
 #GtkAspectFrame — A frame that constrains its child to a particular aspect ratio
 #GtkBox — A container box
@@ -10,10 +9,9 @@ abstract GtkLayouts <: GtkWidget
 #GtkLayout — Infinite scrollable area containing child widgets at (x,y) locations
 #GtkNotebook — A tabbed notebook container
 #GtkExpander — A container which can hide its child
-#GtkOverlay — A container which overlays widgets on top of each other
-#GtkOrientable — An interface for flippable widgets
 
-# Introduced in Gtk3.10
+# Introduced in Gtk3
+#GtkGrid — Pack widgets in a rows and columns
 #GtkRevealer — Hide and show with animation
 #GtkListBox — A list container
 #GtkStack — A stacking container

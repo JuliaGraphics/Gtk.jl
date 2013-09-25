@@ -1,4 +1,5 @@
 abstract GtkWidget
+abstract GtkContainerLike <: GtkWidget
 const GTKWidget = GtkWidget #deprecated name
 
 const jlref_quark = ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), "jlref_quark")
