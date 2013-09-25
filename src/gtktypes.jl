@@ -2,10 +2,6 @@ abstract GtkWidget
 const GTKWidget = GtkWidget #deprecated name
 
 const jlref_quark = ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), "jlref_quark")
-const gchararray_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gchararray")
-const gdouble_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gdouble")
-const gint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gint")
-const guint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"guint")
 
 # All GtkWidgets are expected to have a 'handle' field
 # of type Ptr{GtkWidget} corresponding to the Gtk object
@@ -36,72 +32,6 @@ visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{Gt
 visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GtkWidget},Cint),w,state)
 show(w::GtkWidget) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GtkWidget},),w)
 showall(w::GtkWidget) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GtkWidget},),w)
-
-### Getting and Setting Properties
-function GValue(s::String)
-    v = zeros(Int,3)
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gchararray_id);
-    ccall((:g_value_set_string,libgobject),Void,(Ptr{Void},Ptr{Uint8}), v, bytestring(s))
-    v
-end
-function GValue(s::Symbol)
-    v = zeros(Int,3)
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gchararray_id);
-    ccall((:g_value_set_static_string,libgobject),Void,(Ptr{Void},Ptr{Uint8}), v, s)
-    v
-end
-function GValue(i::Unsigned)
-    v = zeros(Int,3)
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, guint64_id);
-    ccall((:g_value_set_uint64,libgobject),Void,(Ptr{Void},Uint64), v, i)
-    v
-end
-function GValue(i::Signed)
-    v = zeros(Int,3)
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gint64_id);
-    ccall((:g_value_set_int64,libgobject),Void,(Ptr{Void},Int64), v, i)
-    v
-end
-function GValue(i::FloatingPoint)
-    v = zeros(Int,3)
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gdouble_id);
-    ccall((:g_value_set_double,libgobject),Void,(Ptr{Void},Cdouble), v, i)
-    v
-end
-setindex!(w::GtkWidget, value, name::String) = ccall((:g_object_set_property, libgobject), Void, 
-    (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, bytestring(name), GValue(value))
-setindex!(w::GtkWidget, value, name::Symbol) = ccall((:g_object_set_property, libgobject), Void, 
-    (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, GValue(value))
-
-typealias StringLike Union(String,Symbol)
-#function setindex!{T<:Number}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},T,Ptr{Void}...), w, name, value, C_NULL)
-#end
-#function setindex!{T<:String}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Uint8},Ptr{Void}...), w, name, gc_ref(bytestring(value)), C_NULL) #TODO: is the gc root necessary?
-#end
-#function setindex!{T<:GtkWidget}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{T},Ptr{Void}...), w, name, value, C_NULL)
-#end
-function getindex!{T<:Number}(w::GtkWidget, name::StringLike, ::Type{T})
-    value = Array(T, 1)
-    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{T},Ptr{Void}...), w, name, value, C_NULL)
-    value[1]
-end
-function getindex!{T<:String}(w::GtkWidget, name::StringLike, ::Type{T})
-    value = Array(Ptr{Uint8}, 1)
-    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Ptr{Uint8}},Ptr{Void}...), w, name, value, C_NULL)
-    s = bytestring(value[1])
-    ccall((:g_free, libglib), Void, (Ptr{Void},), value[1])
-    s
-end
-function getindex!{T<:GtkWidget}(w::GtkWidget, name::StringLike, ::Type{T})
-    value = Array(Ptr{GtkWidget}, 1)
-    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Ptr{T}},Ptr{Void}...), w, name, value, C_NULL)
-    gc_ref(value[1])
-    ccall((:g_object_unref, libglib), Void, (Ptr{Void},), value[1])
-    convert(GtkWidget, value[1])::T
-end
 
 ### Miscellaneous types
 typealias Enum Int32

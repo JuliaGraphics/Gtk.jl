@@ -79,6 +79,7 @@ end
 
 
 include("gtktypes.jl")
+include("gvalues.jl")
 include("gdk.jl")
 include("events.jl")
 include("windows.jl")
