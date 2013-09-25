@@ -64,7 +64,7 @@ function GValue(i::Bool)
 end
 
 setindex!(w::GtkWidget, value, name) = setindex!(w, value, bytestring(name))
-setindex!{T}(w::GtkWidget, value, name, ::Type{T}) = setindex!(w, convert(T,value), bytestring(name))
+setindex!{T}(w::GtkWidget, value, name, ::Type{T}) = setindex!(w, convert(T,value), name)
 function setindex!(w::GtkWidget, value, name::Union(ByteString,Symbol))
     v = GValue(value)
     ccall((:g_object_set_property, libgobject), Void, 
@@ -144,3 +144,44 @@ getindex{T}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) = error("do
 #    ccall((:g_object_unref, libglib), Void, (Ptr{Void},), value[1])
 #    convert(GtkWidget, value[1])::T
 #end
+
+immutable GParamSpec
+  g_type_instance::Ptr{Void}
+  name::Ptr{Uint8}
+  flags::Cint
+  value_type::Csize_t
+  owner_type::Csize_t
+end
+
+function show(io::IO, w::GtkWidget)
+    print(io,typeof(w),'(')
+    clss = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
+    n = Array(Cuint,1)
+    props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
+        (Ptr{Void},Ptr{Cuint}),clss,n)
+    v = GValue(ByteString)
+    for i = 1:n[1]
+        param = unsafe_load(unsafe_load(props,i))
+        print(io,bytestring(param.name))
+        const READABLE=1
+        if (param.flags&1)==READABLE &&
+                bool(ccall((:g_value_type_transformable,libgobject),Cint,
+                (Int,Int),param.value_type,gchararray_id))
+            ccall((:g_object_get_property,libgobject), Void,
+                (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, param.name, v)
+            str = ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{Void},),v)
+            value = (str == C_NULL ? "NULL" : bytestring(str))
+            ccall((:g_value_reset,libgobject),Ptr{Void},(Ptr{Void},), v)
+            if param.value_type == gchararray_id && str != C_NULL
+                print(io,"=\"",value,'"')
+            else
+                print(io,'=',value)
+            end
+        end
+        if i != n
+            print(io,", ")
+        end
+    end
+    print(')')
+    ccall((:g_value_unset,libgobject),Ptr{Void},(Ptr{Void},), v)
+end

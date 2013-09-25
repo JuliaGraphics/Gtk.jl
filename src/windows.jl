@@ -3,7 +3,6 @@ abstract GtkWindows <: GtkWidget
 type GtkWindow <: GtkWindows
     handle::Ptr{GtkWidget}
     all::GdkRectangle
-    resizable::Bool
     function GtkWindow(title, w=-1, h=-1, resizable=true, toplevel=true)
         hnd = ccall((:gtk_window_new,libgtk),Ptr{GtkWidget},(Enum,),
             toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)

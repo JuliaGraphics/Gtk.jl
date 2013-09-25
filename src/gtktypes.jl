@@ -20,7 +20,7 @@ parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk),
 width(w::GtkWidget) = w.all.width
 height(w::GtkWidget) = w.all.height
 size(w::GtkWidget) = (w.all.width, w.all.height)
-show(io::IO, w::GtkWidget) = print(io, typeof(w))
+show(io::IO, w::GtkWidget) = print(io,typeof(w))
 
 ### Functions and methods common to all GtkWidget objects
 #GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =

@@ -1,11 +1,11 @@
-type GdkRectangle
+immutable GdkRectangle
     x::Int32
     y::Int32
     width::Int32
     height::Int32
     GdkRectangle(x,y,w,h) = new(x,y,w,h)
 end
-type GdkPoint
+immutable GdkPoint
     x::Int32
     y::Int32
     GdkPoint(x,y) = new(x,y)
@@ -90,7 +90,7 @@ baremodule GdkModifierType
     const GDK_MODIFIER_MASK = 0x5c001fff
 end
 
-type GdkEventButton
+immutable GdkEventButton
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -105,7 +105,7 @@ type GdkEventButton
     y_root::Float64
 end
 
-type GdkEventMotion
+immutable GdkEventMotion
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
