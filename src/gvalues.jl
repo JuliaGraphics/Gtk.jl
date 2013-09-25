@@ -166,6 +166,18 @@ end
 #    convert(GtkWidget, value[1])::T
 #end
 
+setindex!{T}(w::GtkWidget, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
+setindex!(w::GtkWidget, value, child::GtkWidget, name) = setindex!(w, value, child, bytestring(name))
+setindex!{T}(w::GtkWidget, value, child::GtkWidget, name, ::Type{T}) = setindex!(w, convert(T,value), child, name)
+function setindex!(w::GtkWidget, value, child::GtkWidget, name::Union(ByteString,Symbol))
+    v = GValue(value)
+    ccall((:gtk_container_child_set_property,libgtk), Void, 
+        (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, child, name, v)
+    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
+    w
+end
+
+
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{Uint8}
@@ -203,6 +215,6 @@ function show(io::IO, w::GtkWidget)
             print(io,", ")
         end
     end
-    print(')')
+    print(io,')')
     ccall((:g_value_unset,libgobject),Ptr{Void},(Ptr{Void},), v)
 end

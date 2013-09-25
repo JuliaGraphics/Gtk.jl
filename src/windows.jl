@@ -22,8 +22,5 @@ end
 const Window = GtkWindow
 const TopLevel = Window # deprecated
 
-
-
 #GtkScrolledWindow
-#GtkFrame — A bin with a decorative frame and optional label
 #GtkSeparator — A separator widget

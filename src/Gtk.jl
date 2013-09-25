@@ -3,22 +3,26 @@
 module Gtk
 using Cairo
 
-import Base: convert, show, showall, size, getindex, setindex!, push!, delete!, start, next, done
+import Base: convert, show, showall, size, length, getindex, setindex!,
+             insert!, push!, unshift!, shift!, pop!, delete!,
+             start, next, done
 import Base.Graphics: width, height, getgc
+import Cairo: destroy
 
 # generic interface:
 export Window, Canvas, #TopLevel=Window
     width, height, size, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    length, add!, delete!, visible
+    length, add!, delete!, visible, destroy
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
 # Gtk objects
-export GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
-    GtkExpander, GtkOverlay,
-    GtkLabel
+export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
+    GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
+    GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkToggleButton,
+    GtkLinkButton, GtkVolumeButton
 
 # Gtk3 objects
 export GtkGrid, GtkOrientable

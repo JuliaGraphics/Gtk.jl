@@ -36,7 +36,7 @@ function getindex(grid::GtkGrid, i::Integer, j::Integer)
     return convert(GtkWidget, x)
 end
 
-setindex(grid::GtkGrid, x::child, i, j) = ccall((:gtk_grid_attach, libgtk), Void,
+setindex(grid::GtkGrid, child, i, j) = ccall((:gtk_grid_attach, libgtk), Void,
     (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
 
 function insert!(grid::GtkGrid, i::Integer, side::Symbol)
@@ -53,7 +53,7 @@ function insert!(grid::GtkGrid, i::Integer, side::Symbol)
     end
 end
 
-function insert!(grid::GtkGrid, i::GtkWidget, side::Symbol)
+function insert!(grid::GtkGrid, i, side::Symbol)
     ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GtkWidget}, Cint), grid, i-1)
 end
 else
@@ -69,8 +69,8 @@ type GtkTable <: GtkLayouts
         gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkWidget}, (Cint, Cint, Cint), x, y, homogeneous),x,y))
     end
 end
-setindex(grid::GtkTable, child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
-    (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i)-1, first(j)-1, last(j)-1)
+setindex!(grid::GtkTable, child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
+    (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
 type GtkAlignment <: GtkLayouts
@@ -78,6 +78,19 @@ type GtkAlignment <: GtkLayouts
     function GtkAlignment(xalign, yalign, xscale, yscale) # % of available space, 0<=a<=1
         gc_ref(new(ccall((:gtk_alignment_new, libgtk), Ptr{GtkWidget},
             (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale)))
+    end
+end
+
+### GtkFrame — A bin with a decorative frame and optional label
+type GtkFrame <: GtkWindows
+    handle::Ptr{GtkWidget}
+    function GtkFrame(label::String)
+        gc_ref(new(ccall((:gtk_frame_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Uint8},), bytestring(label))))
+    end
+    function GtkFrame()
+        gc_ref(new(ccall((:gtk_frame_new, libgtk), Ptr{GtkWidget},
+            (Ptr{Uint8},), C_NULL)))
     end
 end
 
@@ -228,18 +241,31 @@ end
 type GtkNotebook <: GtkLayouts
     handle::Ptr{GtkWidget}
     function GtkNotebook()
-        gc_ref(new(ccall((:gtk_notebook_new, libgtk), Ptr{GtkWidget},
-            (Ptr{Uint8},), bytestring(title))))
+        gc_ref(new(ccall((:gtk_notebook_new, libgtk), Ptr{GtkWidget},())))
     end
 end
-function push!(w::GtkNotebook, x::GtkWidget, label::String)
+function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,String), label::String)
+    ccall((:gtk_notebook_insert_page,libgtk), Cint,
+        (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{GtkWidget}),
+        w, x, label, position-1)+1
+    w
+end
+function unshift!(w::GtkNotebook, x::Union(GtkWidget,String), label::String)
+    ccall((:gtk_notebook_prepend_page,libgtk), Cint,
+        (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{GtkWidget}),
+        w, x, label)+1
+    w
+end
+function push!(w::GtkNotebook, x::Union(GtkWidget,String), label::String)
     ccall((:gtk_notebook_append_page,libgtk), Cint,
         (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{GtkWidget}),
-        w, x, label)
+        w, x, label)+1
+    w
 end
 function splice!(w::GtkNotebook, i::Integer)
     ccall((:gtk_notebook_remove_page,libgtk), Cint,
         (Ptr{GtkWidget}, Cint), w, i-1)
+    w
 end
 
 
@@ -259,4 +285,5 @@ end
 else
 GtkOverlay(x...) = error("GtkOverlay is not available until Gtk3.2")
 end
+
 

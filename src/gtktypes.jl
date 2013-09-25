@@ -17,6 +17,7 @@ function convert(::Type{GtkWidget},w::Ptr{GtkWidget})
 end
 convert(::Type{Ptr{GtkWidget}},w::String) = convert(Ptr{GtkWidget},GtkLabel(w))
 
+destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GtkWidget},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w))
 width(w::GtkWidget) = w.all.width
 height(w::GtkWidget) = w.all.height
@@ -97,8 +98,13 @@ function gc_ref{T<:GtkWidget}(x::T)
             (Ptr{GtkWidget}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
             cfunction(gc_unref, Void, (T,)))
         ccall((:g_object_ref,libgobject),Ptr{GtkWidget},(Ptr{GtkWidget},),x)
-        finalizer(x, (x)->ccall((:g_object_unref,libgobject),Void,(Ptr{GtkWidget},),x))
-        gc_preserve_gtk[x] = x
+        finalizer(x,function(x)
+                global gc_preserve_gtk
+                ccall((:g_object_unref,libgobject),Void,(Ptr{GtkWidget},),x)
+                gc_preserve_gtk[WeakRef(x)] = x #convert to a strong-reference
+            end)
+        wx = WeakRef(x)
+        gc_preserve_gtk[wx] = wx
     end
     x
 end

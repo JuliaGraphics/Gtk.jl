@@ -25,7 +25,7 @@ function next(list::GList,s)
 end
 done(list::GList,s::(GList,GList)) = false
 done(list::GList,s) = true
-length(list::GList) = ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),list)
+length(list::GList) = ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),&list)
 
 start(w::GtkContainer) = start(glist(ccall((:gtk_container_get_children,libgtk), Ptr{GList}, (Ptr{GtkWidget},), w)))
 function next(w::GtkContainer,i)
@@ -36,7 +36,7 @@ done(w::GtkContainer,s::(GList,GList)) = false
 done(w::GtkContainer,s) = true
 function length(w::GtkContainer)
     s = start(w)
-    if done(s)
+    if done(w,s)
         return 0
     else
         return length(s[2])
@@ -44,13 +44,13 @@ function length(w::GtkContainer)
 end
 
 for container in (
-    :GtkGrid,:GtkAlignment,:GtkAspectFrame,:GtkBox,
+    :GtkGrid,:GtkAlignment,:GtkFrame,:GtkAspectFrame,:GtkBox,
     :GtkButtonBox,:GtkFixed,:GtkPaned,:GtkLayout,:GtkNotebook,
     :GtkExpander,:GtkOverlay,:GtkOrientable,
 
     :GtkWindow,
 
-    :GtkButton,:GtkCheckButton,:GtkToggleButton,:GtkRadioButton,:GtkLinkButton
+    :GtkButton,:GtkCheckButton,:GtkToggleButton,:GtkRadioButton,:GtkLinkButton,:GtkVolumeButton
     )
     @eval begin
         $container(child::GtkWidget,vargs...) = push!($container(vargs...),child)
