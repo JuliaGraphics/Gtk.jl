@@ -36,7 +36,7 @@ function getindex(grid::GtkGrid, i::Integer, j::Integer)
     return convert(GtkWidget, x)
 end
 
-setindex(grid::GtkGrid, child, i, j) = ccall((:gtk_grid_attach, libgtk), Void,
+setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
     (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
 
 function insert!(grid::GtkGrid, i::Integer, side::Symbol)
@@ -69,8 +69,9 @@ type GtkTable <: GtkLayouts
         gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkWidget}, (Cint, Cint, Cint), x, y, homogeneous),x,y))
     end
 end
-setindex!(grid::GtkTable, child, i, j) = ccall((:gtk_table_attach_defaults, libgtk), Void,
-    (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
+setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) =
+    ccall((:gtk_table_attach_defaults, libgtk), Void,
+        (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
 type GtkAlignment <: GtkLayouts
