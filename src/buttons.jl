@@ -13,7 +13,7 @@
 #GtkSwitch — A "light switch" style toggle
 #GtkLockButton — A widget to unlock or lock privileged operations
 
-type GtkButton <: GtkContainerLike
+type GtkButton <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkButton()
         gc_ref(new(ccall((:gtk_button_new,libgtk),Ptr{GtkWidget},())))
@@ -25,7 +25,7 @@ type GtkButton <: GtkContainerLike
 end
 
 
-type GtkCheckButton <: GtkContainerLike
+type GtkCheckButton <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkCheckButton()
         gc_ref(new(ccall((:gtk_check_button_new,libgtk),Ptr{GtkWidget},())))
@@ -36,7 +36,7 @@ type GtkCheckButton <: GtkContainerLike
     end
 end
 
-type GtkToggleButton <: GtkContainerLike
+type GtkToggleButton <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkToggleButton()
         b=gc_ref(new(ccall((:gtk_toggle_button_new,libgtk),Ptr{GtkWidget},())))
@@ -71,7 +71,7 @@ else
 const GtkSwitch = GtkToggleButton
 end
 
-type GtkRadioButton <: GtkContainerLike
+type GtkRadioButton <: GtkBin
     handle::Ptr{GtkWidget}
     GtkRadioButton(group=Ptr{Void}) =
         gc_ref(new(ccall((:gtk_radio_button_new,libgtk),Ptr{GtkWidget},
@@ -103,7 +103,7 @@ for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
     end
 end
 
-type GtkLinkButton <: GtkContainerLike
+type GtkLinkButton <: GtkBin
     handle::Ptr{GtkWidget}
     GtkLinkButton(uri::String) =
         gc_ref(new(ccall((:gtk_switch_new,libgtk),Ptr{GtkWidget},
@@ -125,7 +125,7 @@ end
 
 #TODO: GtkScaleButton
 
-type GtkVolumeButton <: GtkContainerLike
+type GtkVolumeButton <: GtkBin
     handle::Ptr{GtkWidget}
     GtkLinkButton() =
         gc_ref(new(ccall((:gtk_volume_button_new,libgtk),Ptr{GtkWidget},())))

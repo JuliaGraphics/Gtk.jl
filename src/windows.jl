@@ -1,6 +1,4 @@
-abstract GtkWindows <: GtkWidget
-
-type GtkWindow <: GtkWindows
+type GtkWindow <: GtkBin
     handle::Ptr{GtkWidget}
     all::GdkRectangle
     function GtkWindow(title, w=-1, h=-1, resizable=true, toplevel=true)

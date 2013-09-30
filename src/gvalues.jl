@@ -1,5 +1,5 @@
 ### Getting and Setting Properties
-const gchararray_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gchararray")
+const gstring_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gchararray")
 const gdouble_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gdouble")
 const gint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gint64")
 const guint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"guint64")
@@ -7,73 +7,65 @@ const gboolean_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gboo
 
 
 GValue() = zeros(Int64,3)
-function GValue(::Type{ByteString})
-    v = GValue()
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gchararray_id)
-    v
+macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
+    quote
+        function $(esc(:GValue))(::Type{$as_type})
+            v = GValue()
+            ccall((:g_value_init,libgobject),Void,(Ptr{Void},Csize_t), v, $with_id)
+            v
+        end
+        function $(esc(:GValue))(x::$pass_x)
+            v = GValue($as_type)
+            $(if to_gtype == :string; :(x = bytestring(x)) end)
+            ccall(($(string("g_value_set_",to_gtype)),libgobject),Void,(Ptr{Void},$as_ctype), v, x)
+            v
+        end
+        $(if to_gtype == :static_string; to_gtype = :string; nothing end)
+        # GValue isn't a type, so we can't write methods for it. However, maybe in the future this will be useful
+        #function $(esc(:getindex)){T<:$pass_x}(v::GValue, ::Type{T})
+        #    x = ccall(($(string("g_value_get_",to_gtype)),libgobject),$as_ctype,(Ptr{Void},),v)
+        #    $(if to_gtype == :string; :(x = bytestring(x)) end)
+        #    $(if pass_x == :Symbol; :(x = symbol(x)) end)
+        #    return convert($pass_x,x)
+        #end
+        function $(esc(:getindex)){T<:$pass_x}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
+            v = GValue($as_type)
+            ccall((:g_object_get_property,libgobject), Void,
+                (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
+            x = ccall(($(string("g_value_get_",to_gtype)),libgobject),$as_ctype,(Ptr{Void},),v)
+            $(if to_gtype == :string; :(x = bytestring(x)) end)
+            $(if pass_x == :Symbol; :(x = symbol(x)) end)
+            ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
+            return convert($pass_x,x)
+        end
+        function $(esc(:getindex)){T<:$pass_x}(w::GtkWidget, child::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
+            v = GValue($as_type)
+            ccall((:gtk_container_child_get_property,libgobject), Void,
+                (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
+            x = ccall(($(string("g_value_get_",to_gtype)),libgobject),$as_ctype,(Ptr{Void},),v)
+            $(if to_gtype == :string; :(x = bytestring(x)) end)
+            $(if pass_x == :Symbol; :(x = symbol(x)) end)
+            ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
+            return convert($pass_x,x)
+        end
+    end
 end
-function GValue(::Type{Uint64})
-    v = GValue()
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, guint64_id)
-    v
-end
-function GValue(::Type{Int64})
-    v = GValue()
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gint64_id)
-    v
-end
-function GValue(::Type{Float64})
-    v = GValue()
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gdouble_id)
-    v
-end
-function GValue(::Type{Bool})
-    v = GValue()
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gboolean_id)
-    v
-end
-function GValue(::Type{GtkWidget})
-    v = GValue()
-    gWidget_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"GtkWidget")
-    ccall((:g_value_init,libgobject),Void,(Ptr{Void},Int), v, gWidget_id)
-    v
-end
+GValue(s::String) = GValue(bytestring(s))
+@GValue String          ByteString  Ptr{Uint8}      string          gstring_id
+@GValue Symbol          ByteString  Ptr{Uint8}      static_string   gstring_id
+@GValue Unsigned        Uint64      Uint64          uint64          guint64_id
+@GValue Signed          Int64       Int64           int64           gint64_id
+@GValue FloatingPoint   Float64     Float64         double          gdouble_id
+@GValue Bool            Bool        Cint            boolean         gboolean_id
+@GValue GtkWidget       GtkWidget   Ptr{GtkWidget}  object          ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"GtkWidget")
 
-function GValue(s::String)
-    v = GValue(ByteString)
-    ccall((:g_value_set_string,libgobject),Void,(Ptr{Void},Ptr{Uint8}), v, bytestring(s))
-    v
-end
-function GValue(s::Symbol)
-    v = GValue(ByteString)
-    ccall((:g_value_set_static_string,libgobject),Void,(Ptr{Void},Ptr{Uint8}), v, s)
-    v
-end
-function GValue(i::Unsigned)
-    v = GValue(Uint64)
-    ccall((:g_value_set_uint64,libgobject),Void,(Ptr{Void},Uint64), v, i)
-    v
-end
-function GValue(i::Signed)
-    v = GValue(Int64)
-    ccall((:g_value_set_int64,libgobject),Void,(Ptr{Void},Int64), v, i)
-    v
-end
-function GValue(i::FloatingPoint)
-    v = GValue(Float64)
-    ccall((:g_value_set_double,libgobject),Void,(Ptr{Void},Cdouble), v, i)
-    v
-end
-function GValue(i::Bool)
-    v = GValue(Bool)
-    ccall((:g_value_set_boolean,libgobject),Void,(Ptr{Void},Cint), v, i)
-    v
-end
-function GValue(w::GtkWidget)
-    v = GValue(GtkWidget)
-    ccall((:g_value_set_object,libgobject),Void,(Ptr{Void},Ptr{GtkWidget}), v, w)
-    v
-end
+getindex{T}(w::GtkWidget, name, ::Type{T}) = getindex(w, bytestring(name), T)
+getindex{T}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) =
+    error("don't know how to represent gproperty of type $T in Julia") # prevent recursion
+
+getindex{T}(w::GtkWidget, child::GtkWidget, name, ::Type{T}) = getindex(w, child, bytestring(name), T)
+getindex{T}(w::GtkWidget, child::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) =
+    error("don't know how to represent gproperty of type $T in Julia") # prevent recursion
 
 setindex!(w::GtkWidget, value, name) = setindex!(w, value, bytestring(name))
 setindex!{T}(w::GtkWidget, value, name, ::Type{T}) = setindex!(w, convert(T,value), name)
@@ -85,87 +77,6 @@ function setindex!(w::GtkWidget, value, name::Union(ByteString,Symbol))
     w
 end
 
-getindex{T}(w::GtkWidget, name, ::Type{T}) = getindex(w, bytestring(name), T)
-getindex{T}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) =
-    error("don't know how to represent gproperty of type $T in Julia") # prevent recursion
-function getindex{T<:String}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
-    v = GValue(ByteString)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    str = convert(T,bytestring(ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{Void},),v)))
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return str
-end
-function getindex{T<:Signed}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
-    v = GValue(Int64)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    i = convert(T,ccall((:g_value_get_int64,libgobject),Int64,(Ptr{Void},),v))
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return i
-end
-function getindex{T<:Unsigned}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
-    v = GValue(Uint64)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    i = convert(T,ccall((:g_value_get_uint64,libgobject),Uint64,(Ptr{Void},),v))
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return i
-end
-function getindex{T<:FloatingPoint}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
-    v = GValue(Float64)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    i = convert(T,ccall((:g_value_get_double,libgobject),Float64,(Ptr{Void},),v))
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return i
-end
-function getindex(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{Bool})
-    v = GValue(Bool)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    i = bool(ccall((:g_value_get_boolean,libgobject),Cint,(Ptr{Void},),v))
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return i
-end
-function getindex(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{GtkWidget})
-    v = GValue(GtkWidget)
-    ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
-    w = ccall((:g_value_get_object,libgobject),Ptr{GtkWidget},(Ptr{Void},),v)
-    ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-    return convert(GtkWidget,w)
-end
-
-#function setindex!{T<:Number}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},T,Ptr{Void}...), w, name, value, C_NULL)
-#end
-#function setindex!{T<:String}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Uint8},Ptr{Void}...), w, name, gc_ref(bytestring(value)), C_NULL) #TODO: is the gc root necessary?
-#end
-#function setindex!{T<:GtkWidget}(w::GtkWidget, value, name::StringLike, ::Type{T})
-#    ccall((:g_object_set, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{T},Ptr{Void}...), w, name, value, C_NULL)
-#end
-#function getindex{T<:Number}(w::GtkWidget, name::StringLike, ::Type{T})
-#    value = Array(T, 1)
-#    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{T},Ptr{Void}...), w, name, value, C_NULL)
-#    value[1]
-#end
-#function getindex{T<:String}(w::GtkWidget, name::StringLike, ::Type{T})
-#    value = Array(Ptr{Uint8}, 1)
-#    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Ptr{Uint8}},Ptr{Void}...), w, name, value, C_NULL)
-#    s = bytestring(value[1])
-#    ccall((:g_free, libglib), Void, (Ptr{Void},), value[1])
-#    s
-#end
-#function getindex{T<:GtkWidget}(w::GtkWidget, name::StringLike, ::Type{T})
-#    value = Array(Ptr{GtkWidget}, 1)
-#    ccall((:g_object_get, libgobject), Void, (Ptr{GtkWidget},Ptr{Uint8},Ptr{Ptr{T}},Ptr{Void}...), w, name, value, C_NULL)
-#    gc_ref(value[1])
-#    ccall((:g_object_unref, libglib), Void, (Ptr{Void},), value[1])
-#    convert(GtkWidget, value[1])::T
-#end
-
 setindex!{T}(w::GtkWidget, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
 setindex!(w::GtkWidget, value, child::GtkWidget, name) = setindex!(w, value, child, bytestring(name))
 setindex!{T}(w::GtkWidget, value, child::GtkWidget, name, ::Type{T}) = setindex!(w, convert(T,value), child, name)
@@ -176,7 +87,6 @@ function setindex!(w::GtkWidget, value, child::GtkWidget, name::Union(ByteString
     ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
     w
 end
-
 
 immutable GParamSpec
   g_type_instance::Ptr{Void}
@@ -199,13 +109,13 @@ function show(io::IO, w::GtkWidget)
         const READABLE=1
         if (param.flags&1)==READABLE &&
                 bool(ccall((:g_value_type_transformable,libgobject),Cint,
-                (Int,Int),param.value_type,gchararray_id))
+                (Int,Int),param.value_type,gstring_id))
             ccall((:g_object_get_property,libgobject), Void,
                 (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, param.name, v)
             str = ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{Void},),v)
             value = (str == C_NULL ? "NULL" : bytestring(str))
             ccall((:g_value_reset,libgobject),Ptr{Void},(Ptr{Void},), v)
-            if param.value_type == gchararray_id && str != C_NULL
+            if param.value_type == gstring_id && str != C_NULL
                 print(io,"=\"",value,'"')
             else
                 print(io,'=',value)

@@ -1,5 +1,3 @@
-typealias GtkContainer Union(GtkLayouts,GtkWindows,GtkContainerLike)
-
 push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
     (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
 delete!(w::GtkContainer, child) = (ccall((:gtk_container_remove,libgtk), Void,
@@ -41,31 +39,32 @@ done(w::GtkContainer,s::(Any,())) = true
 length(w::GtkContainer) = length(start(w)[2])
 getindex(w::GtkContainer, i::Integer) = convert(GtkWidget,convert(Ptr{GtkWidget},start(w)[2][i]))::GtkWidget
 
-const gtkbintypes = [
-    :GtkWindow,:GtkAlignment,:GtkFrame,:GtkAspectFrame,
-    :GtkButtonBox,:GtkPaned,:GtkLayout,:GtkExpander,
-    :GtkButton,:GtkCheckButton,:GtkToggleButton,:GtkRadioButton,:GtkLinkButton,:GtkVolumeButton
-]
-if gtk_version==3
-    push!(gtkbintypes,:GtkFixed)
+function Base.subtypes(T::DataType, b::Bool)
+    if b == false
+        return subtypes(T)
+    elseif T.abstract
+        queue = DataType[T,]
+        subt = DataType[]
+        while !isempty(queue)
+            for x in subtypes(pop!(queue))
+                if isa(x,DataType)
+                    if x.abstract
+                        push!(queue, x)
+                    else
+                        push!(subt, x)
+                    end
+                end
+            end
+        end
+        return subt
+    else
+        return DataType[]
+    end
 end
-const gtkcontainertypes = [
-    :GtkNotebook,:GtkBox,:GtkOrientable,:GtkTable
-]
-if gtk_version==3
-    push!(gtkcontainertypes,:GtkGrid)
-    push!(gtkcontainertypes,:GtkOverlay)
-end
-append!(gtkcontainertypes,gtkbintypes)
-const gtkwidgettypes = [
-    :GtkLabel
-]
-append!(gtkwidgettypes,gtkcontainertypes)
-for container in gtkcontainertypes
-    @eval $container(child::GtkWidget,vargs...) = push!($container(vargs...),child)
+for container in subtypes(GtkContainer,true)
+    @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
 end
 
-typealias GtkBin @eval Union($(gtkbintypes...))
 function start(w::GtkBin)
     child = ccall((:gtk_bin_get_child,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
     if child != C_NULL

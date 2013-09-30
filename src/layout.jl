@@ -1,5 +1,3 @@
-abstract GtkLayouts <: GtkWidget
-
 #GtkAlignment — A widget which controls the alignment and size of its child
 #GtkAspectFrame — A frame that constrains its child to a particular aspect ratio
 #GtkBox — A container box
@@ -23,7 +21,7 @@ abstract GtkLayouts <: GtkWidget
 
 if gtk_version == 3
 ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-type GtkGrid <: GtkLayouts
+type GtkGrid <: GtkContainer
     handle::Ptr{GtkWidget}
     function GtkGrid()
         gc_ref(new(ccall((:gtk_grid_new, libgtk), Ptr{GtkWidget}, ())))
@@ -61,7 +59,7 @@ GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
-type GtkTable <: GtkLayouts
+type GtkTable <: GtkContainer
     handle::Ptr{GtkWidget}
     x::Cuint
     y::Cuint
@@ -74,7 +72,7 @@ setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j
         (Ptr{GtkWidget}, Ptr{GtkWidget}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
-type GtkAlignment <: GtkLayouts
+type GtkAlignment <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkAlignment(xalign, yalign, xscale, yscale) # % of available space, 0<=a<=1
         gc_ref(new(ccall((:gtk_alignment_new, libgtk), Ptr{GtkWidget},
@@ -83,7 +81,7 @@ type GtkAlignment <: GtkLayouts
 end
 
 ### GtkFrame — A bin with a decorative frame and optional label
-type GtkFrame <: GtkWindows
+type GtkFrame <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkFrame(label::String)
         gc_ref(new(ccall((:gtk_frame_new, libgtk), Ptr{GtkWidget},
@@ -96,7 +94,7 @@ type GtkFrame <: GtkWindows
 end
 
 ### GtkAspectFrame
-type GtkAspectFrame <: GtkLayouts
+type GtkAspectFrame <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkAspectFrame(xalign, yalign, ratio) # % of available space, 0<=a<=1
         gc_ref(new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkWidget},
@@ -109,7 +107,7 @@ type GtkAspectFrame <: GtkLayouts
 end
 
 ### GtkBox
-type GtkBox <: GtkLayouts
+type GtkBox <: GtkContainer
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkBox(vertical::Bool, spacing=0)
@@ -132,7 +130,7 @@ type GtkBox <: GtkLayouts
 end
 
 ### GtkButtonBox
-type GtkButtonBox <: GtkLayouts
+type GtkButtonBox <: GtkBin
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkButtonBox(vertical::Bool)
@@ -156,7 +154,7 @@ end
 # this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-type GtkPaned <: GtkLayouts
+type GtkPaned <: GtkContainer
     handle::Ptr{GtkWidget}
     if gtk_version == 3
         function GtkPaned(vertical::Bool)
@@ -209,7 +207,7 @@ function setindex(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=
 end
 
 ### GtkLayout
-type GtkLayout <: GtkLayouts
+type GtkLayout <: GtkContainer
     handle::Ptr{GtkWidget}
     function GtkLayout(width, height)
         layout = ccall((:gtk_layout_new, libgtk), Ptr{GtkWidget},
@@ -230,7 +228,7 @@ width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
-type GtkExpander <: GtkLayouts
+type GtkExpander <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkExpander(title)
         gc_ref(new(ccall((:gtk_expander_new, libgtk), Ptr{GtkWidget},
@@ -239,7 +237,7 @@ type GtkExpander <: GtkLayouts
 end
 
 ### GtkNotebook
-type GtkNotebook <: GtkLayouts
+type GtkNotebook <: GtkContainer
     handle::Ptr{GtkWidget}
     function GtkNotebook()
         gc_ref(new(ccall((:gtk_notebook_new, libgtk), Ptr{GtkWidget},())))
@@ -272,13 +270,14 @@ end
 
 ### GtkOverlay
 if gtk_version == 3
-type GtkOverlay <: GtkLayouts
+type GtkOverlay <: GtkContainer #technically, this is a GtkBin, except it behaves more like a container
     handle::Ptr{GtkWidget}
     function GtkOverlay()
         gc_ref(new(ccall((:gtk_overlay_new, libgtk), Ptr{GtkWidget},
             (Ptr{Uint8},), bytestring(title))))
     end
 end
+GtkOverlay(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlay(), w)
 function push!(w::GtkNotebook, x::GtkWidget)
     ccall((:gtk_overlay_add_overlay,libgtk), Cint,
         (Ptr{GtkWidget}, Ptr{GtkWidget}), w, x)
