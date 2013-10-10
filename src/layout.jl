@@ -173,12 +173,6 @@ type GtkPaned <: GtkContainer
         end
     end
 end
-for box in (:GtkPaned, :GtkButtonBox, :GtkBox)
-    @eval $box(orientation::Symbol,vargs...) = $box(
-            (orientation==:v ? true :
-            (orientation==:h ? false :
-            error("invalid $($box) orientation $orientation"))),vargs...)
-end
 
 function getindex(pane::GtkPaned, i::Integer)
     if i == 1

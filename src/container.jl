@@ -2,6 +2,10 @@ push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
     (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); show(child); w)
 delete!(w::GtkContainer, child::GtkWidget) = (ccall((:gtk_container_remove,libgtk), Void,
     (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
+empty!(w::GtkContainer) =
+    for child in w
+        delete!(w,child)
+    end
 
 type GSList
     data::Ptr{Void}

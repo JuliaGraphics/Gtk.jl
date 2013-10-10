@@ -5,7 +5,7 @@ using Cairo
 
 import Base: convert, show, showall, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, delete!,
-             start, next, done, parent, isempty
+             start, next, done, parent, isempty, empty!
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
@@ -21,7 +21,8 @@ export width, height, size, #minsize, maxsize
 export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
-    GtkToggleButton, GtkLinkButton, GtkVolumeButton
+    GtkToggleButton, GtkLinkButton, GtkVolumeButton,
+    GtkEntry, GtkScale, GtkSpinButton
 
 # Gtk3 objects
 export GtkGrid, GtkOrientable
@@ -124,6 +125,12 @@ end
 for container in subtypes(GtkContainer,true)
     @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
 end
+for orientable in (:GtkPaned, :GtkButtonBox, :GtkBox, :GtkScale)
+    @eval $orientable(orientation::Symbol,vargs...) = $orientable(
+            (orientation==:v ? true :
+            (orientation==:h ? false :
+            error("invalid $($orientable) orientation $orientation"))),vargs...)
+end
 
 # Alternative Names
 module ShortNames
@@ -153,10 +160,14 @@ module ShortNames
     const ToggleButton = GtkToggleButton
     const LinkButton = GtkLinkButton
     const VolumeButton = GtkVolumeButton
+    const Entry = GtkEntry
+    const Scale = GtkScale
+    const SpinButton = GtkSpinButton
     export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton
+        Entry, Scale, SpinButton
 
     if Gtk.gtk_version == 3
         const Grid = GtkGrid
