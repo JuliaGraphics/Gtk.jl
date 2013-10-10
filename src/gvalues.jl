@@ -40,8 +40,8 @@ macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
         end
         function $(esc(:getindex)){T<:$pass_x}(w::GtkWidget, child::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
             v = GValue($as_type)
-            ccall((:gtk_container_child_get_property,libgobject), Void,
-                (Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, name, v)
+            ccall((:gtk_container_child_get_property,libgtk), Void,
+                (Ptr{GtkWidget}, Ptr{GtkWidget}, Ptr{Uint8}, Ptr{Void}), w, child, name, v)
             x = ccall(($(string("g_value_get_",to_gtype)),libgobject),$as_ctype,(Ptr{Void},),v)
             $(if to_gtype == :string; :(x = bytestring(x)) end)
             $(if pass_x == :Symbol; :(x = symbol(x)) end)

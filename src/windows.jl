@@ -14,11 +14,10 @@ type GtkWindow <: GtkBin
         widget = new(hnd, GdkRectangle(0,0,w,h))
         on_signal_resize(widget, notify_resize, widget)
         gtk_doevent()
+        show(widget)
         gc_ref(widget)
     end
 end
-const Window = GtkWindow
-const TopLevel = Window # deprecated
 
 #GtkScrolledWindow
 #GtkSeparator — A separator widget

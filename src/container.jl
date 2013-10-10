@@ -1,69 +1,44 @@
 push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
-delete!(w::GtkContainer, child) = (ccall((:gtk_container_remove,libgtk), Void,
+    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); show(child); w)
+delete!(w::GtkContainer, child::GtkWidget) = (ccall((:gtk_container_remove,libgtk), Void,
     (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
 
-type GList
+type GSList
     data::Ptr{Void}
-    next::Ptr{GList}
-    prev::Ptr{GList}
+    next::Ptr{GSList}
 end
-function glist(list::Ptr{GList},)
+function gslist(list::Ptr{GSList},own::Bool=false)
     if list == C_NULL
         return ()
     end
     l = unsafe_load(list)
-    finalizer(l, (l)->ccall(:g_list_free,Void,(Ptr{GList},),list))
+    own ? finalizer(l, (l)->ccall(:g_list_free,Void,(Ptr{GSList},),list)) : nothing
     l
 end
-start(list::GList) = list
-function next(list::GList,s)
+start(list::GSList) = list
+function next(list::GSList,s)
     nx = s.next==C_NULL ? () : unsafe_load(s.next)
     return (s.data, nx)
 end
-done(list::GList,s::GList) = false
-done(list::GList,s) = true
-length(list::GList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{GList},),&list))
-getindex(list::GList, i::Integer) = ccall((:g_list_nth_data,libglib),Ptr{Void},(Ptr{GList},Cuint),&list,i-1)
+done(list::GSList,s::GSList) = false
+done(list::GSList,s) = true
+length(list::GSList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{GSList},),&list))
+getindex(list::GSList, i::Integer) = ccall((:g_list_nth_data,libglib),Ptr{Void},(Ptr{GSList},Cuint),&list,i-1)
+
+
 
 function start(w::GtkContainer)
-    list = glist(ccall((:gtk_container_get_children,libgtk), Ptr{GList}, (Ptr{GtkWidget},), w))
+    list = gslist(ccall((:gtk_container_get_children,libgtk), Ptr{GSList}, (Ptr{GtkWidget},), w), true)
     (list,list)
 end
 function next(w::GtkContainer,i)
-    d,s = next(i[2],i[1])
-    (convert(GtkWidget,convert(Ptr{GtkWidget},d)), (i[2],s))
+    d,s = next(i[1],i[2])
+    (convert(GtkWidget,convert(Ptr{GtkWidget},d)), (i[1],s))
 end
-done(w::GtkContainer,s::(GList,GList)) = false
+done(w::GtkContainer,s::(GSList,GSList)) = false
 done(w::GtkContainer,s::(Any,())) = true
 length(w::GtkContainer) = length(start(w)[2])
 getindex(w::GtkContainer, i::Integer) = convert(GtkWidget,convert(Ptr{GtkWidget},start(w)[2][i]))::GtkWidget
-
-function Base.subtypes(T::DataType, b::Bool)
-    if b == false
-        return subtypes(T)
-    elseif T.abstract
-        queue = DataType[T,]
-        subt = DataType[]
-        while !isempty(queue)
-            for x in subtypes(pop!(queue))
-                if isa(x,DataType)
-                    if x.abstract
-                        push!(queue, x)
-                    else
-                        push!(subt, x)
-                    end
-                end
-            end
-        end
-        return subt
-    else
-        return DataType[]
-    end
-end
-for container in subtypes(GtkContainer,true)
-    @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
-end
 
 function start(w::GtkBin)
     child = ccall((:gtk_bin_get_child,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
@@ -84,3 +59,12 @@ function getindex(w::GtkBin, i::Integer)
     c::GtkWidget
 end
  
+immutable GtkNullContainer <: GtkContainer end
+function push!(::GtkNullContainer, w::GtkWidget)
+    p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
+    if p != C_NULL
+        p = ccall((:gtk_container_remove,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},Ptr{GtkWidget},), p, w)
+    end
+    GtkNullContainer()
+end
+convert(::Type{Ptr{GtkWidget}},::GtkNullContainer) = convert(Ptr{GtkWidget},0)

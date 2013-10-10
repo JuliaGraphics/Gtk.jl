@@ -5,13 +5,12 @@ using Cairo
 
 import Base: convert, show, showall, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, delete!,
-             start, next, done
+             start, next, done, parent, isempty
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
 # generic interface:
-export Window, Canvas, #TopLevel=Window
-    width, height, size, #minsize, maxsize
+export width, height, size, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     length, add!, delete!, visible, destroy
 
@@ -21,8 +20,8 @@ export Window, Canvas, #TopLevel=Window
 # Gtk objects
 export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
-    GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkToggleButton,
-    GtkLinkButton, GtkVolumeButton
+    GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
+    GtkToggleButton, GtkLinkButton, GtkVolumeButton
 
 # Gtk3 objects
 export GtkGrid, GtkOrientable
@@ -35,6 +34,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
     signal_connect, signal_disconnect,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion
+
 
 # Tk-compatibility (missing):
 #export Frame, Labelframe, Notebook, Panedwindow
@@ -86,6 +86,7 @@ include("gtktypes.jl")
 include("gvalues.jl")
 include("gdk.jl")
 include("events.jl")
+include("container.jl")
 include("windows.jl")
 include("layout.jl")
 include("displays.jl")
@@ -96,7 +97,79 @@ include("menus.jl")
 include("selectors.jl")
 include("misc.jl")
 include("cairo.jl")
-include("container.jl")
+
+
+function Base.subtypes(T::DataType, b::Bool)
+    if b == false
+        return subtypes(T)
+    elseif T.abstract
+        queue = DataType[T,]
+        subt = DataType[]
+        while !isempty(queue)
+            for x in subtypes(pop!(queue))
+                if isa(x,DataType)
+                    if x.abstract
+                        push!(queue, x)
+                    else
+                        push!(subt, x)
+                    end
+                end
+            end
+        end
+        return subt
+    else
+        return DataType[]
+    end
+end
+for container in subtypes(GtkContainer,true)
+    @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
+end
+
+# Alternative Names
+module ShortNames
+    using Gtk
+
+    # Gtk-specific event handling
+    export width, height, size, #minsize, maxsize
+        reveal, configure, draw, cairo_context,
+        length, add!, delete!, visible, destroy
+
+    const Window = GtkWindow
+    const Canvas = GtkCanvas
+    const BoxLayout = GtkBox
+    const ButtonBox = GtkButtonBox
+    const Paned = GtkPaned
+    const Layout = GtkLayout
+    const Notebook = GtkNotebook
+    const Expander = GtkExpander
+    const Overlay = GtkOverlay
+    const Frame = GtkFrame
+    const AspectFrame = GtkAspectFrame
+    const Label = GtkLabel
+    const Button = GtkButton
+    const CheckButton = GtkCheckButton
+    const RadioButton = GtkRadioButton
+    const RadioButtonGroup = GtkRadioButtonGroup
+    const ToggleButton = GtkToggleButton
+    const LinkButton = GtkLinkButton
+    const VolumeButton = GtkVolumeButton
+    export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
+        Expander, Overlay, Frame, AspectFrame,
+        Label, Button, CheckButton, RadioButton, RadioButtonGroup,
+        ToggleButton, LinkButton, VolumeButton
+
+    if Gtk.gtk_version == 3
+        const Grid = GtkGrid
+        const Orientable = GtkOrientable
+    end
+    export Grid, Orientable
+
+    const Table = GtkTable
+    const Alignment = GtkAlignment
+    export Table, Aligment
+end
+using .ShortNames
+export Canvas, Window
 
 init()
 end
