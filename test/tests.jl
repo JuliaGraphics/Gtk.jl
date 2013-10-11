@@ -135,13 +135,13 @@ f = BoxLayout(:v); push!(w,f)
 r = Array(RadioButton,3)
 r[1] = RadioButton(choices[1]); push!(f,r[1])
 r[2] = RadioButton(r[1],choices[2]); push!(f,r[2])
-r[3] = RadioButton(r[2],choices[3],active=true); push!(f,r[3])
+r[3] = RadioButton(r[2],choices[3],true); push!(f,r[3])
 @assert [b[:active,Bool] for b in r] == [false, false, true]
 r[1][:active] = true
 @assert [b[:active,Bool] for b in r] == [true, false, false]
 destroy(w)
 
-r = RadioButtonGroup(choices,active=2)
+r = RadioButtonGroup(choices,2)
 @assert length(r) == 5
 @assert sum([b[:active,Bool] for b in r]) == 1
 itms = Array(Any,length(r))

@@ -39,19 +39,11 @@ end
 type GtkToggleButton <: GtkBin
     handle::Ptr{GtkWidget}
     function GtkToggleButton()
-        b=gc_ref(new(ccall((:gtk_toggle_button_new,libgtk),Ptr{GtkWidget},())))
-        if active
-            ccall((:gtk_toggle_button_set_active,libgtk),Void,(Ptr{GtkWidget},Cint),b,true)
-        end
-        b
+        gc_ref(new(ccall((:gtk_toggle_button_new,libgtk),Ptr{GtkWidget},())))
     end
     function GtkToggleButton(title::String)
-        b=gc_ref(new(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GtkWidget},
+        gc_ref(new(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GtkWidget},
             (Ptr{Uint8},), bytestring(title))))
-        if active
-            ccall((:gtk_toggle_button_set_active,libgtk),Void,(Ptr{GtkWidget},Cint),b,true)
-        end
-        b
     end
 end
 
@@ -103,16 +95,16 @@ type GtkRadioButtonGroup <: GtkContainer
     GtkRadioButtonGroup(layout::GtkContainer) = new(layout)
 end
 GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBox(true))
-function GtkRadioButtonGroup(elem::Vector; active::Int=1)
+function GtkRadioButtonGroup(elem::Vector, active::Int=1)
     grp = GtkRadioButtonGroup()
     for (i,e) in enumerate(elem)
-        push!(grp, e, active=(i==active))
+        push!(grp, e, i==active)
     end
     grp
 end
 convert(::Type{Ptr{GtkWidget}},grp::GtkRadioButtonGroup) = convert(Ptr{GtkWidget},grp.handle)
 show(io::IO,::GtkRadioButtonGroup) = print(io,"GtkRadioButtonGroup()")
-function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton;active::Bool=false)
+function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton,active::Bool)
     push!(grp, e)
     gtk_toggle_button_set_active(e, active)
     grp
@@ -126,21 +118,14 @@ function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup,label;active::Bool=false)
+function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothing)
     if isdefined(grp,:anchor)
         e = GtkRadioButton(grp.anchor, label)
     else
         grp.anchor = e = GtkRadioButton(label)
     end
-    push!(grp.handle, e)
-    gtk_toggle_button_set_active(e, active)
-    grp
-end
-function push!(grp::GtkRadioButtonGroup,label)
-    if isdefined(grp,:anchor)
-        e = GtkRadioButton(grp.anchor, label)
-    else
-        grp.anchor = e = GtkRadioButton(label)
+    if isa(active,Bool)
+        gtk_toggle_button_set_active(e,active::Bool)
     end
     push!(grp.handle, e)
     grp
@@ -183,9 +168,17 @@ function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
     b
 end
 # Append a named argument, active::Bool, to the various constructors
+# but first, resolve some conflicts
+GtkRadioButton(a::GtkRadioButton,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a),active)
+GtkRadioButton(a::GtkRadioButton,b::GtkWidget,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
+GtkRadioButton(a::GtkRadioButton,b,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
 for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
     @eval begin
-        $btn(a...;active::Bool=false) = gtk_toggle_button_set_active($btn(a...),active)
+        $btn(active::Bool) = gtk_toggle_button_set_active($btn(),active)
+        $btn(a,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
+        $btn(a::GtkWidget,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
+        $btn(a,b,active::Bool) = gtk_toggle_button_set_active($btn(a,b),active)
+        $btn(a,b,c,active::Bool) = gtk_toggle_button_set_active($btn(a,b,c),active)
     end
 end
 

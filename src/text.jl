@@ -11,6 +11,9 @@
 #GtkTextTagTable — Collection of tags that can be used together
 #GtkTextView — Widget that displays a GtkTextBuffer
 
+#TODO: GtkTextBuffer and GtkTextTag manager objects, needed for GtkTextView
+#TODO: GtkAccel manager objects
+
 type GtkLabel <: GtkWidget
     handle::Ptr{GtkWidget}
     function GtkLabel(title)
@@ -19,3 +22,10 @@ type GtkLabel <: GtkWidget
     end
 end
 
+#type GtkTextView <: GtkWidget
+#    handle::Ptr{GtkWidget}
+#    function GtkTextView()
+#        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkWidget},
+#            (Ptr{Void},),C_NULL)))
+#    end
+#end

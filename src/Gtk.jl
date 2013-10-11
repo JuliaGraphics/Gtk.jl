@@ -25,7 +25,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkEntry, GtkScale, GtkSpinButton
 
 # Gtk3 objects
-export GtkGrid, GtkOrientable
+export GtkGrid
 
 # Gtk2 objects
 export GtkTable, GtkAlignment
@@ -166,14 +166,13 @@ module ShortNames
     export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
-        ToggleButton, LinkButton, VolumeButton
+        ToggleButton, LinkButton, VolumeButton,
         Entry, Scale, SpinButton
 
     if Gtk.gtk_version == 3
         const Grid = GtkGrid
-        const Orientable = GtkOrientable
     end
-    export Grid, Orientable
+    export Grid
 
     const Table = GtkTable
     const Alignment = GtkAlignment
