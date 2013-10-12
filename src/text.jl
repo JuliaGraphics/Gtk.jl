@@ -15,17 +15,18 @@
 #TODO: GtkAccel manager objects
 
 type GtkLabel <: GtkWidget
-    handle::Ptr{GtkWidget}
+    handle::Ptr{GtkObject}
     function GtkLabel(title)
-        gc_ref(new(ccall((:gtk_label_new,libgtk),Ptr{GtkWidget},
+        gc_ref(new(ccall((:gtk_label_new,libgtk),Ptr{GtkObject},
             (Ptr{Uint8},), bytestring(title))))
     end
 end
 
+
 #type GtkTextView <: GtkWidget
-#    handle::Ptr{GtkWidget}
+#    handle::Ptr{GtkObject}
 #    function GtkTextView()
-#        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkWidget},
+#        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkObject},
 #            (Ptr{Void},),C_NULL)))
 #    end
 #end

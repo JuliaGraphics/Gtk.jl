@@ -1,6 +1,6 @@
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
 type GtkCanvas <: GtkWidget
-    handle::Ptr{GtkWidget}
+    handle::Ptr{GtkObject}
     all::GdkRectangle
     mouse::MouseHandler
     resize::Union(Function,Nothing)
@@ -9,18 +9,18 @@ type GtkCanvas <: GtkWidget
     backcc::CairoContext
 
     function GtkCanvas(w, h)
-        da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GtkWidget},())
-        ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GtkWidget},Int32), da, false)
-        ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkWidget},Int32,Int32), da, w, h)
+        da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GtkObject},())
+        ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GtkObject},Int32), da, false)
+        ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkObject},Int32,Int32), da, w, h)
         widget = new(da, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
         on_signal_resize(widget, notify_resize, widget)
         if gtk_version == 3
             signal_connect(widget,"draw",widget,
-                cfunction(canvas_on_draw_event,Cint,(Ptr{GtkWidget},Ptr{Void},GtkCanvas)),0)
+                cfunction(canvas_on_draw_event,Cint,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
         else
             signal_connect(widget,"expose-event",widget,
-                cfunction(canvas_on_expose_event,Void,(Ptr{GtkWidget},Ptr{Void},GtkCanvas)),0)
+                cfunction(canvas_on_expose_event,Void,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
         end
         on_signal_button_press(widget, mousedown_cb, widget.mouse)
         on_signal_button_release(widget, mouseup_cb, widget.mouse)
@@ -31,7 +31,7 @@ end
 GtkCanvas(w, h) = GtkCanvas(false, w, h)
 GtkCanvas() = GtkCanvas(-1,-1)
 
-function notify_resize(::Ptr{GtkWidget}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
+function notify_resize(::Ptr{GtkObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     widget.all = unsafe_load(size)
     widget.back = cairo_surface_for(widget)
     widget.backcc = CairoContext(widget.back)
@@ -75,14 +75,14 @@ function cairo_surface_for(widget::GtkCanvas)
     w, h)
 end
 
-function canvas_on_draw_event(::Ptr{GtkWidget},cc::Ptr{Void},widget::GtkCanvas) # cc is a Cairo context
+function canvas_on_draw_event(::Ptr{GtkObject},cc::Ptr{Void},widget::GtkCanvas) # cc is a Cairo context
     ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
     int32(false) # propagate the event further
 end
 
-function canvas_on_expose_event(::Ptr{GtkWidget},e::Ptr{Void},widget::GtkCanvas) # e is a GdkEventExpose
+function canvas_on_expose_event(::Ptr{GtkObject},e::Ptr{Void},widget::GtkCanvas) # e is a GdkEventExpose
     cc = ccall((:gdk_cairo_create,libgdk),Ptr{Void},(Ptr{Void},),gdk_window(widget))
     ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)

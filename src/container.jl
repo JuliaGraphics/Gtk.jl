@@ -1,7 +1,7 @@
 push!(w::GtkContainer, child) = (ccall((:gtk_container_add,libgtk), Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); show(child); w)
+    (Ptr{GtkObject},Ptr{GtkObject},), w, child); show(child); w)
 delete!(w::GtkContainer, child::GtkWidget) = (ccall((:gtk_container_remove,libgtk), Void,
-    (Ptr{GtkWidget},Ptr{GtkWidget},), w, child); w)
+    (Ptr{GtkObject},Ptr{GtkObject},), w, child); w)
 empty!(w::GtkContainer) =
     for child in w
         delete!(w,child)
@@ -32,20 +32,20 @@ getindex(list::GSList, i::Integer) = ccall((:g_list_nth_data,libglib),Ptr{Void},
 
 
 function start(w::GtkContainer)
-    list = gslist(ccall((:gtk_container_get_children,libgtk), Ptr{GSList}, (Ptr{GtkWidget},), w), true)
+    list = gslist(ccall((:gtk_container_get_children,libgtk), Ptr{GSList}, (Ptr{GtkObject},), w), true)
     (list,list)
 end
 function next(w::GtkContainer,i)
     d,s = next(i[1],i[2])
-    (convert(GtkWidget,convert(Ptr{GtkWidget},d)), (i[1],s))
+    (convert(GtkWidget,convert(Ptr{GtkObject},d)), (i[1],s))
 end
 done(w::GtkContainer,s::(GSList,GSList)) = false
 done(w::GtkContainer,s::(Any,())) = true
 length(w::GtkContainer) = length(start(w)[2])
-getindex(w::GtkContainer, i::Integer) = convert(GtkWidget,convert(Ptr{GtkWidget},start(w)[2][i]))::GtkWidget
+getindex(w::GtkContainer, i::Integer) = convert(GtkWidget,convert(Ptr{GtkObject},start(w)[2][i]))::GtkWidget
 
 function start(w::GtkBin)
-    child = ccall((:gtk_bin_get_child,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
+    child = ccall((:gtk_bin_get_child,libgtk), Ptr{GtkObject}, (Ptr{GtkObject},), w)
     if child != C_NULL
         return convert(GtkWidget,child)
     else
@@ -65,10 +65,10 @@ end
  
 immutable GtkNullContainer <: GtkContainer end
 function push!(::GtkNullContainer, w::GtkWidget)
-    p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},), w)
+    p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GtkObject}, (Ptr{GtkObject},), w)
     if p != C_NULL
-        p = ccall((:gtk_container_remove,libgtk), Ptr{GtkWidget}, (Ptr{GtkWidget},Ptr{GtkWidget},), p, w)
+        p = ccall((:gtk_container_remove,libgtk), Ptr{GtkObject}, (Ptr{GtkObject},Ptr{GtkObject},), p, w)
     end
     GtkNullContainer()
 end
-convert(::Type{Ptr{GtkWidget}},::GtkNullContainer) = convert(Ptr{GtkWidget},0)
+convert(::Type{Ptr{GtkObject}},::GtkNullContainer) = convert(Ptr{GtkObject},0)
