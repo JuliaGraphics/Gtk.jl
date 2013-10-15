@@ -25,4 +25,37 @@
 #GtkListStore — A list-like data structure that can be used with the GtkTreeView
 #GtkTreeStore — A tree-like data structure that can be used with the GtkTreeView
 
+#GtkComboBox — A widget used to choose from a list of items
+#GtkComboBoxText — A simple, text-only combo box
+
+type GtkComboBoxText <: GtkWidget
+    handle::Ptr{GtkObject}
+    GtkComboBoxText(with_entry::Bool=false) =
+        gc_ref(new(with_entry ? ccall((:gtk_combo_box_text_new_with_entry,libgtk),Ptr{GtkObject},())
+                              : ccall((:gtk_combo_box_text_new,libgtk),Ptr{GtkObject},())))
+end
+push!(cb::GtkComboBoxText,text::String) =
+    (ccall((:gtk_combo_box_text_append_text,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8}),cb,bytestring(text)); cb)
+unshift!(cb::GtkComboBoxText,text::String) =
+    (ccall((:gtk_combo_box_text_prepend_text,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8}),cb,bytestring(text)); cb)
+insert!(cb::GtkComboBoxText,i::Integer,text::String) =
+    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,bytestring(text)); cb)
+
+if gtk_version == 3
+push!(cb::GtkComboBoxText,id::String,text::String) =
+    (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,bytestring(id),bytestring(text)); cb)
+push!(cb::GtkComboBoxText,id::Symbol,text::String) =
+    (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
+unshift!(cb::GtkComboBoxText,id::String,text::String) =
+    (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,bytestring(id),bytestring(text)); cb)
+unshift!(cb::GtkComboBoxText,id::Symbol,text::String) =
+    (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
+insert!(cb::GtkComboBoxText,i::Integer,id::String,text::String) =
+    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,bytestring(id),bytestring(text)); cb)
+insert!(cb::GtkComboBoxText,i::Integer,id::Symbol,text::String) =
+    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,id,bytestring(text)); cb)
+end
+
+delete!(cb::GtkComboBoxText,i::Integer) =
+    (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GtkObject},Cint),cb,i); cb)
 

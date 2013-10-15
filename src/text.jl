@@ -22,11 +22,37 @@ type GtkLabel <: GtkWidget
     end
 end
 
+type GtkTextMark <: GtkObject
+    handle::Ptr{GtkObject}
+    GtkTextMark(left_gravity::Bool=false) =
+        gc_ref(new(ccall((:gtk_text_mark_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},Cint),C_NULL,left_gravity)))
+end
+visible(w::GtkTextMark) =
+    bool(ccall((:gtk_text_mark_get_visible,libgtk),Cint,(Ptr{GtkObject},),w))
+visible(w::GtkTextMark, state::Bool) =
+    ccall((:gtk_text_mark_set_visible,libgtk),Void,(Ptr{GtkObject},Cint),w,state)
+show(w::GtkTextMark) = visible(w,true)
 
-#type GtkTextView <: GtkWidget
-#    handle::Ptr{GtkObject}
-#    function GtkTextView()
-#        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkObject},
-#            (Ptr{Void},),C_NULL)))
-#    end
-#end
+type GtkTextTag <: GtkObject
+    handle::Ptr{GtkObject}
+    GtkTextTag() =
+        gc_ref(new(ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},),C_NULL)))
+    GtkTextTag(name::String) =
+        gc_ref(new(ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(name))))
+end
+
+type GtkTextBuffer <: GtkObject
+    handle::Ptr{GtkObject}
+    GtkTextBuffer() = gc_ref(new(ccall((:gtk_text_buffer_new,libgtk),Ptr{GtkObject},
+        (Ptr{GtkObject},),C_NULL)))
+end
+#TODO: iterators, tags, text, child widgets, clipboard
+
+type GtkTextView <: GtkWidget
+    handle::Ptr{GtkObject}
+    function GtkTextView(buffer=GtkTextBuffer())
+        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkObject},
+            (Ptr{GtkObject},),buffer)))
+    end
+end
+#TODO: scrolling, views

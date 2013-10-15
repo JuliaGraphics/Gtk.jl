@@ -4,7 +4,7 @@ const gdouble_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gdoub
 const gint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gint64")
 const guint64_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"guint64")
 const gboolean_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"gboolean")
-
+const gobject_id = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"GObject")
 
 GValue() = zeros(Int64,3)
 macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
@@ -28,7 +28,7 @@ macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
         #    $(if pass_x == :Symbol; :(x = symbol(x)) end)
         #    return convert($pass_x,x)
         #end
-        function $(esc(:getindex)){T<:$pass_x}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
+        function $(esc(:getindex)){T<:$pass_x}(w::GtkObject, name::Union(ByteString,Symbol), ::Type{T})
             v = GValue($as_type)
             ccall((:g_object_get_property,libgobject), Void,
                 (Ptr{GtkObject}, Ptr{Uint8}, Ptr{Void}), w, name, v)
@@ -36,7 +36,7 @@ macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
             $(if to_gtype == :string; :(x = bytestring(x)) end)
             $(if pass_x == :Symbol; :(x = symbol(x)) end)
             ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-            return convert($pass_x,x)
+            return convert(T,x)
         end
         function $(esc(:getindex)){T<:$pass_x}(w::GtkWidget, child::GtkWidget, name::Union(ByteString,Symbol), ::Type{T})
             v = GValue($as_type)
@@ -46,7 +46,7 @@ macro GValue(pass_x,as_type,as_ctype,to_gtype,with_id)
             $(if to_gtype == :string; :(x = bytestring(x)) end)
             $(if pass_x == :Symbol; :(x = symbol(x)) end)
             ccall((:g_value_unset,libgobject),Void,(Ptr{Void},),v)
-            return convert($pass_x,x)
+            return convert(T,x)
         end
     end
 end
@@ -57,19 +57,19 @@ GValue(s::String) = GValue(bytestring(s))
 @GValue Signed          Int64       Int64           int64           gint64_id
 @GValue FloatingPoint   Float64     Float64         double          gdouble_id
 @GValue Bool            Bool        Cint            boolean         gboolean_id
-@GValue GtkWidget       GtkWidget   Ptr{GtkObject}  object          ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),"GtkWidget")
+@GValue GtkObject       GtkObject   Ptr{GtkObject}  object          gobject_id
 
-getindex{T}(w::GtkWidget, name, ::Type{T}) = getindex(w, bytestring(name), T)
-getindex{T}(w::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) =
+getindex{T}(w::GtkObject, name, ::Type{T}) = getindex(w, bytestring(name), T)
+getindex{T}(w::GtkObject, name::Union(ByteString,Symbol), ::Type{T}) =
     error("don't know how to represent gproperty of type $T in Julia") # prevent recursion
 
 getindex{T}(w::GtkWidget, child::GtkWidget, name, ::Type{T}) = getindex(w, child, bytestring(name), T)
 getindex{T}(w::GtkWidget, child::GtkWidget, name::Union(ByteString,Symbol), ::Type{T}) =
     error("don't know how to represent gproperty of type $T in Julia") # prevent recursion
 
-setindex!(w::GtkWidget, value, name) = setindex!(w, value, bytestring(name))
-setindex!{T}(w::GtkWidget, value, name, ::Type{T}) = setindex!(w, convert(T,value), name)
-function setindex!(w::GtkWidget, value, name::Union(ByteString,Symbol))
+setindex!(w::GtkObject, value, name) = setindex!(w, value, bytestring(name))
+setindex!{T}(w::GtkObject, value, name, ::Type{T}) = setindex!(w, convert(T,value), name)
+function setindex!(w::GtkObject, value, name::Union(ByteString,Symbol))
     v = GValue(value)
     ccall((:g_object_set_property, libgobject), Void, 
         (Ptr{GtkObject}, Ptr{Uint8}, Ptr{Void}), w, name, v)
@@ -96,7 +96,7 @@ immutable GParamSpec
   owner_type::Csize_t
 end
 
-function show(io::IO, w::GtkWidget)
+function show(io::IO, w::GtkObject)
     print(io,typeof(w),'(')
     clss = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
     n = Array(Cuint,1)

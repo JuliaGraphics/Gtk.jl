@@ -141,12 +141,12 @@ function start(grp::GtkRadioButtonGroup)
 end
 function next(w::GtkRadioButtonGroup,i)
     d,s = next(i[1],i[2])
-    (convert(GtkWidget,convert(Ptr{GtkObject},d))::GtkRadioButton, (i[1],s))
+    (convert(GtkRadioButton,convert(Ptr{GtkObject},d)), (i[1],s))
 end
 done(w::GtkRadioButtonGroup,s::(GSList,GSList)) = false
 done(w::GtkRadioButtonGroup,s::(Any,())) = true
 length(w::GtkRadioButtonGroup) = length(start(w)[2])
-getindex(w::GtkRadioButtonGroup, i::Integer) = convert(GtkWidget,convert(Ptr{GtkObject},start(w)[2][i]))::GtkRadioButton
+getindex(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,convert(Ptr{GtkObject},start(w)[2][i]))
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
 function getindex(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
     k = symbol(name)

@@ -1,8 +1,5 @@
 #https://developer.gnome.org/gtk2/stable/MenusAndCombos.html
 
-#GtkComboBox — A widget used to choose from a list of items
-#GtkComboBoxText — A simple, text-only combo box
-#GtkComboBoxEntry — A text entry field with a dropdown list
 #GtkMenu — A menu widget
 #GtkMenuBar — A subclass widget for GtkMenuShell which holds GtkMenuItem widgets
 #GtkMenuItem — The widget used for item in menus

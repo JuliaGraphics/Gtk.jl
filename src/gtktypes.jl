@@ -11,11 +11,11 @@ const jlref_quark = ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},)
 # and an 'all' field which has type GdkRectangle
 # corresponding to the rectangle allocated to the object,
 # or to override the size, width, and height methods
-convert(::Type{Ptr{GtkObject}},w::GtkWidget) = w.handle
-function convert(::Type{GtkWidget},w::Ptr{GtkObject})
+convert(::Type{Ptr{GtkObject}},w::GtkObject) = w.handle
+function convert{T<:GtkObject}(::Type{T},w::Ptr{GtkObject})
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GtkObject}, (Ptr{GtkObject},Uint32), w, jlref_quark)
     x == C_NULL && error("GtkObject didn't have a corresponding Julia object")
-    unsafe_pointer_to_objref(x)::GtkWidget
+    unsafe_pointer_to_objref(x)::T
 end
 convert(::Type{Ptr{GtkObject}},w::String) = convert(Ptr{GtkObject},GtkLabel(w))
 
@@ -24,7 +24,7 @@ parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk),
 width(w::GtkWidget) = w.all.width
 height(w::GtkWidget) = w.all.height
 size(w::GtkWidget) = (w.all.width, w.all.height)
-show(io::IO, w::GtkWidget) = print(io,typeof(w))
+show(io::IO, w::GtkObject) = print(io,typeof(w))
 
 ### Functions and methods common to all GtkWidget objects
 #GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =
@@ -94,26 +94,35 @@ gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 const gc_preserve_gtk = ObjectIdDict() # gtk objects
 function gc_ref{T<:GtkObject}(x::T)
     global gc_preserve_gtk
-    if !(x in gc_preserve_gtk)
-        #on_signal_destroy(x, gc_unref, x)
-        ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GtkObject}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
-            cfunction(gc_unref, Void, (T,)))
+    addref = function()
         ccall((:g_object_ref,libgobject),Ptr{GtkObject},(Ptr{GtkObject},),x)
         finalizer(x,function(x)
                 global gc_preserve_gtk
                 ccall((:g_object_unref,libgobject),Void,(Ptr{GtkObject},),x)
                 gc_preserve_gtk[WeakRef(x)] = x #convert to a strong-reference
             end)
-        wx = WeakRef(x)
+        wx = WeakRef(x) # record the existence of the object, but allow the finalizer
         gc_preserve_gtk[wx] = wx
+    end
+    ref = get(gc_preserve_gtk,x,nothing)
+    if isa(ref,Nothing)
+        ccall((:g_object_set_qdata_full, libgobject), Void,
+            (Ptr{GtkObject}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
+            cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
+        addref()
+    elseif !isa(ref,WeakRef)
+        # oops, we previously deleted the link, but now it's back
+        addref()
     end
     x
 end
 
 
 function gc_unref(x::GtkObject)
+    # this strongly destroys and invalidates the object
+    # it is intended to be called by Gtk, not in user code function
     global gc_preserve_gtk
+    ccall((:g_object_steal_qdata,libgobject),Ptr{Any},(Ptr{GtkObject},Uint32),x,jlref_quark)
     delete!(gc_preserve_gtk, x)
     x.handle = C_NULL
     nothing
