@@ -42,18 +42,12 @@ insert!(cb::GtkComboBoxText,i::Integer,text::String) =
     (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,bytestring(text)); cb)
 
 if gtk_version == 3
-push!(cb::GtkComboBoxText,id::String,text::String) =
-    (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,bytestring(id),bytestring(text)); cb)
-push!(cb::GtkComboBoxText,id::Symbol,text::String) =
-    (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
-unshift!(cb::GtkComboBoxText,id::String,text::String) =
-    (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,bytestring(id),bytestring(text)); cb)
-unshift!(cb::GtkComboBoxText,id::Symbol,text::String) =
-    (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
-insert!(cb::GtkComboBoxText,i::Integer,id::String,text::String) =
-    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,bytestring(id),bytestring(text)); cb)
-insert!(cb::GtkComboBoxText,i::Integer,id::Symbol,text::String) =
-    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,id,bytestring(text)); cb)
+push!(cb::GtkComboBoxText,id::(String,Symbol),text::String) =
+    (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,staticstring(text)); cb)
+unshift!(cb::GtkComboBoxText,id::(String,Symbol),text::String) =
+    (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GtkObject},Ptr{Uint8},Ptr{Uint8}),cb,id,staticstring(text)); cb)
+insert!(cb::GtkComboBoxText,i::Integer,id::(String,Symbol),text::String) =
+    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GtkObject},Cint,Ptr{Uint8}),cb,i-1,id,staticstring(text)); cb)
 end
 
 delete!(cb::GtkComboBoxText,i::Integer) =

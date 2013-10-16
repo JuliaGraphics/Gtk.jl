@@ -2,9 +2,11 @@ abstract GtkObject
 abstract GtkWidget <: GtkObject
 abstract GtkContainer <: GtkWidget
 abstract GtkBin <: GtkContainer
-const GTKWidget = GtkWidget #deprecated name
 
-const jlref_quark = ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), "jlref_quark")
+macro quark_str(q)
+    :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), staticstring($q)) )
+end
+const jlref_quark = quark"julia_ref"
 
 # All GtkWidgets are expected to have a 'handle' field
 # of type Ptr{GtkObject} corresponding to the Gtk object
@@ -89,6 +91,7 @@ function gc_unref(x::ANY)
     end
     nothing
 end
+gc_ref_closure{T}(x::T) = (gc_ref(x);cfunction(gc_unref, Void, (T, Ptr{Void})))
 gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
 const gc_preserve_gtk = ObjectIdDict() # gtk objects
@@ -113,6 +116,8 @@ function gc_ref{T<:GtkObject}(x::T)
     elseif !isa(ref,WeakRef)
         # oops, we previously deleted the link, but now it's back
         addref()
+    else
+        # already gc-protected, nothing to do
     end
     x
 end
@@ -127,6 +132,5 @@ function gc_unref(x::GtkObject)
     x.handle = C_NULL
     nothing
 end
-gc_unref(::Ptr{GtkObject}, x::GtkWidget) = gc_unref(x)
-gc_unref_closure{T<:GtkObject}(::Type{T}) = cfunction(gc_unref, Void, (T, Ptr{Void}))
-
+gc_unref(::Ptr{GtkObject}, x::GtkObject) = gc_unref(x)
+gc_ref_closure(x::GtkObject) = C_NULL

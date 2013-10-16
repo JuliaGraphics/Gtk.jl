@@ -22,7 +22,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
     GtkToggleButton, GtkLinkButton, GtkVolumeButton,
-    GtkEntry, GtkScale, GtkSpinButton
+    GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText
 
 # Gtk3 objects
 export GtkGrid
@@ -82,6 +82,8 @@ else
     const libglib = "libglib-2.0"
 end
 
+staticstring(s::String) = bytestring(s)
+staticstring(s::Symbol) = s
 
 include("gtktypes.jl")
 include("gvalues.jl")
@@ -142,6 +144,7 @@ module ShortNames
         reveal, configure, draw, cairo_context,
         length, add!, delete!, visible, destroy
 
+    # Gtk objects
     const Window = GtkWindow
     const Canvas = GtkCanvas
     const BoxLayout = GtkBox
@@ -164,17 +167,20 @@ module ShortNames
     const Entry = GtkEntry
     const Scale = GtkScale
     const SpinButton = GtkSpinButton
+    const ComboBoxText = GtkComboBoxText
     export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton,
-        Entry, Scale, SpinButton
+        Entry, Scale, SpinButton, ComboBoxText
 
+    # Gtk 3
     if Gtk.gtk_version == 3
         const Grid = GtkGrid
     end
     export Grid
 
+    # Gtk 2
     const Table = GtkTable
     const Alignment = GtkAlignment
     export Table, Aligment

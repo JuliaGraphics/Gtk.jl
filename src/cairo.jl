@@ -14,7 +14,7 @@ type GtkCanvas <: GtkWidget
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkObject},Int32,Int32), da, w, h)
         widget = new(da, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
-        on_signal_resize(widget, notify_resize, widget)
+        on_signal_resize(notify_resize, widget)
         if gtk_version == 3
             signal_connect(widget,"draw",widget,
                 cfunction(canvas_on_draw_event,Cint,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
@@ -22,9 +22,9 @@ type GtkCanvas <: GtkWidget
             signal_connect(widget,"expose-event",widget,
                 cfunction(canvas_on_expose_event,Void,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
         end
-        on_signal_button_press(widget, mousedown_cb, widget.mouse)
-        on_signal_button_release(widget, mouseup_cb, widget.mouse)
-        on_signal_motion(widget, mousemove_cb, widget.mouse, 0, 0)
+        on_signal_button_press(mousedown_cb, widget, widget.mouse)
+        on_signal_button_release(widget, mouseup_cb, widget, widget.mouse)
+        on_signal_motion(mousemove_cb, widget, 0, 0, widget.mouse)
         gc_ref(widget)
     end
 end

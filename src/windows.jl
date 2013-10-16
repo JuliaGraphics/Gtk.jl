@@ -12,7 +12,7 @@ type GtkWindow <: GtkBin
             ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GtkObject},Int32,Int32),hnd,w,h)
         end
         widget = new(hnd, GdkRectangle(0,0,w,h))
-        on_signal_resize(widget, notify_resize, widget)
+        on_signal_resize(notify_resize, widget)
         gtk_doevent()
         show(widget)
         gc_ref(widget)
