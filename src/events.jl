@@ -27,23 +27,23 @@ end
 # id = signal_connect(widget, :event, Void, ()) do ptr, obj
 #    stuff
 # end
-function signal_connect{RT,T}(cb::Function,w::GtkObject,sig::Union(String,Symbol),
-        ::Type{RT},param_types::Tuple,gconnectflags=0,closure::T=w)
+function signal_connect(cb::Function,w::GtkObject,sig::Union(String,Symbol),
+        RT::Type,param_types::Tuple,gconnectflags=0,closure=w) #TODO: assert that length(param_types) is correct
     ccall((:g_signal_connect_data,libgobject), Culong,
         (Ptr{GtkObject}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
             w,
             staticstring(sig),
-            cfunction(cb,RT,tuple(Ptr{GtkObject},param_types...,T)),
+            cfunction(cb,RT,tuple(Ptr{GtkObject},param_types...,typeof(closure))),
             closure,
-            gc_ref_closure(T),
+            gc_ref_closure(w),
             gconnectflags)
 end
 
 # widget[:event, Void, ()] = function(ptr, obj)
 #    stuff
 # end
-#function setindex!{RT}(w::GtkObject,cb::Function,
-#        sig::Union(String,Symbol),::Type{RT},param_types::Tuple,vargs...)
+#function setindex!(w::GtkObject,cb::Function,
+#        sig::Union(String,Symbol),RT::Type,param_types::Tuple,vargs...)
 #    signal_connect(w,sig,cb,RT,param_types,vargs...)
 #end
 
@@ -64,7 +64,7 @@ signal_handler_block(w::GtkObject, handler_id::Culong) =
 signal_handler_unblock(w::GtkObject, handler_id::Culong) =
     ccall(:g_signal_handler_unblock, Void, (Ptr{GtkObject}, Culong), w, handler_id)
 
-function signal_emit{RT}(w::GtkObject, sig::Union(String,Symbol), ::Type{RT}, args...)
+function signal_emit(w::GtkObject, sig::Union(String,Symbol), RT::Type, args...)
     i = isa(sig, String) ? search(sig, "::") : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i)+1:end]
@@ -95,7 +95,7 @@ function on_signal_button_press(press_cb::Function, widget::GtkWidget, vargs...)
         widget,GdkEventMask.GDK_BUTTON_PRESS_MASK)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
-function on_signal_button_release(widget::GtkWidget, release_cb::Function, vargs...)
+function on_signal_button_release(release_cb::Function, widget::GtkWidget, vargs...)
     ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GtkObject},Cint),
         widget,GdkEventMask.GDK_BUTTON_RELEASE_MASK)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)

@@ -16,19 +16,16 @@ type GtkCanvas <: GtkWidget
         widget.mouse.widget = widget
         on_signal_resize(notify_resize, widget)
         if gtk_version == 3
-            signal_connect(widget,"draw",widget,
-                cfunction(canvas_on_draw_event,Cint,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
+            signal_connect(canvas_on_draw_event,widget,"draw",Cint,(Ptr{Void},))
         else
-            signal_connect(widget,"expose-event",widget,
-                cfunction(canvas_on_expose_event,Void,(Ptr{GtkObject},Ptr{Void},GtkCanvas)),0)
+            signal_connect(canvas_on_expose_event,widget,"expose-event",Void,(Ptr{Void},))
         end
-        on_signal_button_press(mousedown_cb, widget, widget.mouse)
-        on_signal_button_release(widget, mouseup_cb, widget, widget.mouse)
-        on_signal_motion(mousemove_cb, widget, 0, 0, widget.mouse)
+        on_signal_button_press(mousedown_cb, widget, 0, widget.mouse)
+        on_signal_button_release(mouseup_cb, widget, 0, widget.mouse)
+        on_signal_motion(mousemove_cb, widget, 0, 0, 0, widget.mouse)
         gc_ref(widget)
     end
 end
-GtkCanvas(w, h) = GtkCanvas(false, w, h)
 GtkCanvas() = GtkCanvas(-1,-1)
 
 function notify_resize(::Ptr{GtkObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
