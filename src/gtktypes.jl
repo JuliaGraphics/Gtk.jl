@@ -4,7 +4,7 @@ abstract GtkContainer <: GtkWidget
 abstract GtkBin <: GtkContainer
 
 macro quark_str(q)
-    :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), staticstring($q)) )
+    :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), bytestring($q)) )
 end
 const jlref_quark = quark"julia_ref"
 

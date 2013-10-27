@@ -91,14 +91,14 @@ end
 function getindex{T}(w::GtkObject, name::Union(String,Symbol), ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, staticstring(name), &v)
+        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
     v[T]
 end
 
 function getindex{T}(w::GtkWidget, child::GtkWidget, name::Union(String,Symbol), ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, staticstring(name), &v)
+        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
     v[T]
 end
 
@@ -106,7 +106,7 @@ setindex!{T}(w::GtkObject, value, name::Union(String,Symbol), ::Type{T}) = setin
 function setindex!(w::GtkObject, value, name::Union(String,Symbol))
     v = gvalue(value)
     ccall((:g_object_set_property, libgobject), Void, 
-        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, staticstring(name), &v)
+        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue1},),&v)
     w
 end
@@ -116,7 +116,7 @@ setindex!{T}(w::GtkWidget, value, child::GtkWidget, name::Union(String,Symbol), 
 function setindex!(w::GtkWidget, value, child::GtkWidget, name::Union(String,Symbol))
     v = gvalue(value)
     ccall((:gtk_container_child_set_property,libgtk), Void, 
-        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, staticstring(name), &v)
+        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue1},),&v)
     w
 end

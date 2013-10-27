@@ -4,15 +4,15 @@ module Gtk
 using Cairo
 
 import Base: convert, show, showall, size, length, getindex, setindex!,
-             insert!, push!, unshift!, shift!, pop!, delete!,
-             start, next, done, parent, isempty, empty!
+             insert!, push!, unshift!, shift!, pop!, splice!, delete!,
+             start, next, done, parent, isempty, empty!, first, last
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
 # generic interface:
 export width, height, size, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    length, add!, delete!, visible, destroy
+    length, add!, delete!, splice!, visible, destroy
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
@@ -82,8 +82,10 @@ else
     const libglib = "libglib-2.0"
 end
 
-staticstring(s::String) = bytestring(s)
-staticstring(s::Symbol) = s
+# local copy, handles Symbol and easier UTF8-strings
+bytestring(s) = Base.bytestring(s)
+bytestring(s::Symbol) = s
+bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
 
 include("gtktypes.jl")
 include("gvalues.jl")
@@ -142,7 +144,7 @@ module ShortNames
     # Gtk-specific event handling
     export width, height, size, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        length, add!, delete!, visible, destroy
+        length, add!, delete!, splice!, visible, destroy
 
     # Gtk objects
     const Window = GtkWindow
