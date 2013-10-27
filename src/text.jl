@@ -72,7 +72,7 @@ type GtkTextIter
     function GtkTextIter(text::GtkTextBuffer,char_offset::Integer,reverse::Bool=false)
         iter = _GtkTextIter(text,reverse)
         ccall((:gtk_text_buffer_get_iter_at_offset,libgtk),Void,
-            (Ptr{GtkObject},Ptr{Void},Cint,Cint),text,iter.handle,char_offset-1)
+            (Ptr{GtkObject},Ptr{Void},Cint),text,iter.handle,char_offset-1)
         iter
     end
     function GtkTextIter(text::GtkTextBuffer,line::Integer,char_offset::Integer,reverse::Bool=false)
@@ -199,13 +199,13 @@ end
 Base.(:(==))(lhs::GtkTextIter,rhs::GtkTextIter) = bool(ccall((:gtk_text_iter_equal,libgtk),
     Cint,(Ptr{Void},Ptr{Void}),lhs,rhs))
 Base.(:(!=))(lhs::GtkTextIter,rhs::GtkTextIter) = !(lhs == rhs)
-Base.(:(<))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_equal,libgtk),Cint,
+Base.(:(<))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{Void},Ptr{Void}),lhs,rhs) < 0
-Base.(:(<=))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_equal,libgtk),Cint,
+Base.(:(<=))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{Void},Ptr{Void}),lhs,rhs) <= 0
-Base.(:(>))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_equal,libgtk),Cint,
+Base.(:(>))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{Void},Ptr{Void}),lhs,rhs) > 0
-Base.(:(>=))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_equal,libgtk),Cint,
+Base.(:(>=))(lhs::GtkTextIter,rhs::GtkTextIter) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{Void},Ptr{Void}),lhs,rhs) >= 0
 start(iter::GtkTextIter) = iter
 function next(iter::GtkTextIter,state)
@@ -214,8 +214,8 @@ function next(iter::GtkTextIter,state)
     (c,iter)
 end
 done(iter::GtkTextIter,state) = (iter.reverse ? iter[:is_start] : iter[:is_end])::Bool
-Base.(:+)(iter::GtkTextIter, count::Integer) = (skip(iter, count); iter)
-Base.(:-)(iter::GtkTextIter, count::Integer) = (skip(iter, -count); iter)
+Base.(:+)(iter::GtkTextIter, count::Integer) = (iter = copy(iter); skip(iter, count); iter)
+Base.(:-)(iter::GtkTextIter, count::Integer) = (iter = copy(iter); skip(iter, -count); iter)
 Base.skip(iter::GtkTextIter, count::Integer) =
     bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
         (Ptr{Void},Cint), iter, count*(iter.reverse ? -1 : 1) ))
@@ -227,23 +227,17 @@ function Base.skip(iter::GtkTextIter, count::Integer, what::Symbol)
     elseif what === :line || what === :lines
         bool(ccall((:gtk_text_iter_forward_lines,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
-    elseif what === :word_end || what === :word_ends
+    elseif what === :word || what === :words
         bool(ccall((:gtk_text_iter_forward_word_ends,libgtk),Cint,
-            (Ptr{Void},Cint), iter, count))
-    elseif what === :word_start || what === :word_starts
-        bool(ccall((:gtk_text_iter_forward_word_starts,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
     elseif what === :word_cursor_position || what === :word_cursor_positions
         bool(ccall((:gtk_text_iter_forward_cursor_positions,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
-    elseif what === :sentence_end || what === :sentence_ends
+    elseif what === :sentence || what === :sentences
         bool(ccall((:gtk_text_iter_forward_sentence_ends,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
-    elseif what === :visible_word_end || what === :visible_word_ends
+    elseif what === :visible_word || what === :visible_words
         bool(ccall((:gtk_text_iter_forward_visible_word_ends,libgtk),Cint,
-            (Ptr{Void},Cint), iter, count))
-    elseif what === :visible_word_start || what === :visible_word_starts
-        bool(ccall((:gtk_text_iter_forward_visible_word_starts,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
     elseif what === :visible_cursor_position || what === :visible_cursor_positions
         bool(ccall((:gtk_text_iter_forward_visible_cursor_positions,libgtk),Cint,
@@ -283,7 +277,7 @@ colon(a::GtkTextIter,b::GtkTextIter) = GtkTextRange(a,b)
 first(r::GtkTextRange) = r.a
 last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(copy(first(r)))
-next(r::GtkTextRange,i::GtkTextIter) = next(i)
+next(r::GtkTextRange,i::GtkTextIter) = next(i,i)
 done(r::GtkTextRange,i::GtkTextIter) = (i==last(r))
 getindex(text::GtkTextRange, key::String, outtype::Type=Any) = getindex!(text, symbol(key), outtype)
 function getindex(text::GtkTextRange, key::Symbol, outtype::Type=Any)
@@ -318,8 +312,8 @@ in(x::GtkTextIter, r::GtkTextRange) = bool(ccall((:gtk_text_iter_in_range,libgtk
 #TODO: clipboard, selection/cursor, user_action_groups
 
 start(text::GtkTextBuffer) = start(GtkTextIter(text))
-next(text::GtkTextBuffer, iter::GtkTextIter) = next(iter)
-done(text::GtkTextBuffer, iter::GtkTextIter) = done(iter)
+next(text::GtkTextBuffer, iter::GtkTextIter) = next(iter,iter)
+done(text::GtkTextBuffer, iter::GtkTextIter) = done(iter,iter)
 length(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_char_count,libgtk),Cint,
     (Ptr{GtkObject},),text)
 #get_line_count(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_line_count,libgtk),Cint,(Ptr{GtkObject},),text)

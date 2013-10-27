@@ -5,7 +5,7 @@ using Cairo
 
 import Base: convert, show, showall, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
-             start, next, done, parent, isempty, empty!, first, last
+             start, next, done, parent, isempty, empty!, first, last, in
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
