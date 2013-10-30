@@ -1,5 +1,5 @@
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
-type GtkCanvas <: GtkWidget
+type GtkCanvas <: GtkWidget # NOT an @GType
     handle::Ptr{GtkObject}
     all::GdkRectangle
     mouse::MouseHandler

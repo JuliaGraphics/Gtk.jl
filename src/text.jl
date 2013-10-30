@@ -124,14 +124,14 @@ function getindex(text::GtkTextIter, key::Symbol, outtype::Type=Any)
         ccall((:gtk_text_iter_get_visible_line_index,libgtk),Cint,(Ptr{Void},),text)
     elseif key === :visible_line_offset
         ccall((:gtk_text_iter_get_visible_line_offset,libgtk),Cint,(Ptr{Void},),text)
-#    elseif key === :marks
-#        gslist(ccall((:gtk_text_iter_get_marks,libgtk),Ptr{GSList},(Ptr{Void},),text),false) # GtkTextMark iter
-#    elseif key === :toggled_on_tags
-#        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList},(Ptr{Void},Cint),text,true),false) # GtkTextTag iter
-#    elseif key === :toggled_off_tags
-#        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList},(Ptr{Void},Cint),text,false),false) # GtkTextTag iter
+    elseif key === :marks
+        gslist(ccall((:gtk_text_iter_get_marks,libgtk),Ptr{GSList{GtkTextMark}},(Ptr{Void},),text),false) # GtkTextMark iter
+    elseif key === :toggled_on_tags
+        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList{GtkTextTag}},(Ptr{Void},Cint),text,true),false) # GtkTextTag iter
+    elseif key === :toggled_off_tags
+        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList{GtkTextTag}},(Ptr{Void},Cint),text,false),false) # GtkTextTag iter
 #    elseif key === :child_anchor
-#        convert(GtkTextChildAnchor,ccall((:gtk_text_iter_get_child_anchor,libgtk),Ptr{GtkTextChildAnchor},(Ptr{Void},Cint),text,false)) # GtkTextTag iter
+#        convert(GtkTextChildAnchor,ccall((:gtk_text_iter_get_child_anchor,libgtk),Ptr{GtkTextChildAnchor},(Ptr{Void},Cint),text,false))
     elseif key === :can_insert
         bool(ccall((:gtk_text_iter_can_insert,libgtk),Cint,(Ptr{Void},Cint),text,true))
     elseif key === :starts_word
@@ -246,7 +246,7 @@ function Base.skip(iter::GtkTextIter, count::Integer, what::Symbol)
         bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
             (Ptr{Void},Cint), iter, count))
     elseif what === :line_end || what === :line_ends
-        assert(count >= 0, "GtkTextIter cannot iterate line_ends backwards")
+        @assert(count >= 0, "GtkTextIter cannot iterate line_ends backwards")
         for i = 1:count
             if !bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
                     (Ptr{Void},Cint), iter, count))

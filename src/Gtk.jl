@@ -87,6 +87,7 @@ bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
 
+include("gslist.jl")
 include("gtktypes.jl")
 include("gvalues.jl")
 include("gdk.jl")
