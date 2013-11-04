@@ -35,7 +35,7 @@ function signal_connect(cb::Function,w::GtkObject,sig::Union(String,Symbol),
             bytestring(sig),
             cfunction(cb,RT,tuple(Ptr{GtkObject},param_types...,typeof(closure))),
             closure,
-            gc_ref_closure(w),
+            gc_ref_closure(closure),
             gconnectflags)
 end
 
