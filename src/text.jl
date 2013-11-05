@@ -13,45 +13,27 @@
 
 #TODO: GtkAccel manager objects
 
-type GtkLabel <: GtkWidget
-    handle::Ptr{GtkObject}
-    function GtkLabel(title)
-        gc_ref(new(ccall((:gtk_label_new,libgtk),Ptr{GtkObject},
-            (Ptr{Uint8},), bytestring(title))))
-    end
-end
+@GType GtkLabel <: GtkWidget
+GtkLabel(title) = GtkLabel(
+    ccall((:gtk_label_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},), bytestring(title)))
 
+@GType GtkTextBuffer
+GtkTextBuffer() = GtkTextBuffer(
+    ccall((:gtk_text_buffer_new,libgtk),Ptr{GtkObject},(Ptr{GtkObject},),C_NULL))
 
-type GtkTextBuffer <: GtkObject
-    handle::Ptr{GtkObject}
-    GtkTextBuffer() = gc_ref(new(ccall((:gtk_text_buffer_new,libgtk),Ptr{GtkObject},
-        (Ptr{GtkObject},),C_NULL)))
-end
+@GType GtkTextView <: GtkWidget
+GtkTextView(buffer=GtkTextBuffer()) = GtkTextView(
+    ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkObject},(Ptr{GtkObject},),buffer))
 
-type GtkTextView <: GtkWidget
-    handle::Ptr{GtkObject}
-    function GtkTextView(buffer=GtkTextBuffer())
-        gc_ref(new(ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GtkObject},
-            (Ptr{GtkObject},),buffer)))
-    end
-end
+@GType GtkTextMark
+GtkTextMark(left_gravity::Bool=false) = GtkTextMark(
+    ccall((:gtk_text_mark_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},Cint),C_NULL,left_gravity))
 
-type GtkTextMark <: GtkObject
-    handle::Ptr{GtkObject}
-    GtkTextMark(left_gravity::Bool=false) =
-        gc_ref(new(ccall((:gtk_text_mark_new,libgtk),Ptr{GtkObject},
-            (Ptr{Uint8},Cint),C_NULL,left_gravity)))
-end
-
-type GtkTextTag <: GtkObject
-    handle::Ptr{GtkObject}
-    GtkTextTag() =
-        gc_ref(new(ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},
-            (Ptr{Uint8},),C_NULL)))
-    GtkTextTag(name::String) =
-        gc_ref(new(ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},
-            (Ptr{Uint8},),bytestring(name))))
-end
+@GType GtkTextTag
+GtkTextTag() = GtkTextTag(
+    ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},),C_NULL))
+GtkTextTag(name::String) = GtkTextTag(
+    ccall((:gtk_text_tag_new,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(name)))
 
 type GtkTextIter
     handle::Ptr{Void}

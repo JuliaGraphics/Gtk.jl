@@ -20,56 +20,47 @@
 #GtkOrientable — An interface for flippable widgets
 
 if gtk_version == 3
-### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-type GtkGrid <: GtkContainer
-    handle::Ptr{GtkObject}
-    function GtkGrid()
-        gc_ref(new(ccall((:gtk_grid_new, libgtk), Ptr{GtkObject}, ())))
+    ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
+    @GType GtkGrid <: GtkContainer
+    GtkGrid() = GtkGrid(ccall((:gtk_grid_new, libgtk), Ptr{GtkObject}, ()))
+
+    function getindex(grid::GtkGrid, j::Integer, i::Integer)
+        x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GtkObject}, (Ptr{GtkObject}, Cint, Cint), grid, i-1, j-1)
+        x == C_NULL && error("tried to get non-existent child at [$i $j]")
+        return convert(GtkWidget, x)
     end
-end
 
-function getindex(grid::GtkGrid, j::Integer, i::Integer)
-    x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GtkObject}, (Ptr{GtkObject}, Cint, Cint), grid, i-1, j-1)
-    x == C_NULL && error("tried to get non-existent child at [$i $j]")
-    return convert(GtkWidget, x)
-end
+    setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
+        (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
+    #TODO:
+    # setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child::Array, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
+    #    (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
 
-setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
-    (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
-#TODO:
-# setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child::Array, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
-#    (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
-
-function insert!(grid::GtkGrid, i::Integer, side::Symbol)
-    if side == :left
-        ccall((:gtk_grid_insert_column,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
-    elseif side == :right
-        ccall((:gtk_grid_insert_column,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i)
-    elseif side == :top
-        ccall((:gtk_grid_insert_row,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
-    elseif side == :bottom
-        ccall((:gtk_grid_insert_row,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i)
-    else
-        error(string("invalid GtkPositionType ",s))
+    function insert!(grid::GtkGrid, i::Integer, side::Symbol)
+        if side == :left
+            ccall((:gtk_grid_insert_column,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
+        elseif side == :right
+            ccall((:gtk_grid_insert_column,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i)
+        elseif side == :top
+            ccall((:gtk_grid_insert_row,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
+        elseif side == :bottom
+            ccall((:gtk_grid_insert_row,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i)
+        else
+            error(string("invalid GtkPositionType ",s))
+        end
     end
-end
 
-function insert!(grid::GtkGrid, i, side::Symbol)
-    ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
-end
+    function insert!(grid::GtkGrid, i, side::Symbol)
+        ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GtkObject}, Cint), grid, i-1)
+    end
 else
-GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")
+    GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
-type GtkTable <: GtkContainer
-    handle::Ptr{GtkObject}
-    x::Cuint
-    y::Cuint
-    function GtkTable(x, y, homogeneous=false)
-        gc_ref(new(ccall((:gtk_table_new, libgtk), Ptr{GtkObject}, (Cint, Cint, Cint), x, y, homogeneous),x,y))
-    end
-end
+@GType GtkTable <: GtkContainer
+GtkTable(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTable(ccall((:gtk_table_new, libgtk), Ptr{GtkObject}, (Cint, Cint, Cint), x, y, homogeneous))
+GtkTable(homogeneous::Bool=false) = GtkTable(0,0,homogeneous)
 setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) =
     ccall((:gtk_table_attach_defaults, libgtk), Void,
         (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
@@ -79,108 +70,82 @@ setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j
 #        (Ptr{GtkObject}, Ptr{GtkObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
-type GtkAlignment <: GtkBin
-    handle::Ptr{GtkObject}
-    function GtkAlignment(xalign, yalign, xscale, yscale) # % of available space, 0<=a<=1
-        gc_ref(new(ccall((:gtk_alignment_new, libgtk), Ptr{GtkObject},
-            (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale)))
-    end
-end
+@GType GtkAlignment <: GtkBin
+GtkAlignment(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
+    GtkAlignment(ccall((:gtk_alignment_new, libgtk), Ptr{GtkObject},
+        (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale))
 
 ### GtkFrame — A bin with a decorative frame and optional label
-type GtkFrame <: GtkBin
-    handle::Ptr{GtkObject}
-    function GtkFrame(label::String)
-        gc_ref(new(ccall((:gtk_frame_new, libgtk), Ptr{GtkObject},
-            (Ptr{Uint8},), bytestring(label))))
-    end
-    function GtkFrame()
-        gc_ref(new(ccall((:gtk_frame_new, libgtk), Ptr{GtkObject},
-            (Ptr{Uint8},), C_NULL)))
-    end
-end
+@GType GtkFrame <: GtkBin
+GtkFrame(label::String) = GtkGrame(ccall((:gtk_frame_new, libgtk), Ptr{GtkObject},
+        (Ptr{Uint8},), bytestring(label)))
+GtkFrame() = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GtkObject},
+        (Ptr{Uint8},), C_NULL))
 
 ### GtkAspectFrame
-type GtkAspectFrame <: GtkBin
-    handle::Ptr{GtkObject}
-    function GtkAspectFrame(xalign, yalign, ratio) # % of available space, 0<=a<=1
-        gc_ref(new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkObject},
-            (Cfloat, Cfloat, Cfloat, Cint), xalign, yalign, ratio, false)))
-    end
-    function GtkAspectFrame(xalign, yalign) # % of available space, 0<=a<=1. Uses the aspect ratio of the child
-        gc_ref(new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkObject},
-            (Cfloat, Cfloat, Cfloat, Cint), xalign, yalign, 1., true)))
-    end
-end
+@GType GtkAspectFrame <: GtkBin
+GtkAspectFrame(xalign, yalign, ratio) = # % of available space, 0<=a<=1
+    GtkAspectFrame(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkObject},
+        (Cfloat, Cfloat, Cfloat, Cint), xalign, yalign, ratio, false))
+GtkAspectFrame(xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
+    GtkAspectFrame(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GtkObject},
+        (Cfloat, Cfloat, Cfloat, Cint), xalign, yalign, 1., true))
 
 ### GtkBox
-type GtkBox <: GtkContainer
-    handle::Ptr{GtkObject}
-    if gtk_version == 3
-        function GtkBox(vertical::Bool, spacing=0)
-            gc_ref(new(ccall((:gtk_box_new, libgtk), Ptr{GtkObject},
-                (Cint, Cint), vertical, spacing)))
-        end
-    else
-        function GtkBox(vertical::Bool, spacing=0)
-            gc_ref(new(
-                if vertical
-                    ccall((:gtk_vbox_new, libgtk), Ptr{GtkObject},
-                        (Cint, Cint), false, spacing)
-                else
-                    ccall((:gtk_hbox_new, libgtk), Ptr{GtkObject},
-                        (Cint, Cint), false, spacing)
-                end
-                ))
-        end
-    end
+@GType GtkBox <: GtkContainer
+if gtk_version == 3
+    GtkBox(vertical::Bool, spacing=0) =
+        GtkBox(ccall((:gtk_box_new, libgtk), Ptr{GtkObject},
+            (Cint, Cint), vertical, spacing))
+else
+    GtkBox(vertical::Bool, spacing=0) =
+        GtkBox(
+            if vertical
+                ccall((:gtk_vbox_new, libgtk), Ptr{GtkObject},
+                    (Cint, Cint), false, spacing)
+            else
+                ccall((:gtk_hbox_new, libgtk), Ptr{GtkObject},
+                    (Cint, Cint), false, spacing)
+            end
+            )
 end
 
 ### GtkButtonBox
-type GtkButtonBox <: GtkBin
-    handle::Ptr{GtkObject}
-    if gtk_version == 3
-        function GtkButtonBox(vertical::Bool)
-            gc_ref(new(ccall((:gtk_button_box_new, libgtk), Ptr{GtkObject},
-                (Cint,), vertical)))
-        end
-    else
-        function GtkButtonBox(vertical::Bool)
-            gc_ref(new(
-                if vertical
-                    ccall((:gtk_vbutton_box_new, libgtk), Ptr{GtkObject},())
-                else
-                    ccall((:gtk_hbutton_box_new, libgtk), Ptr{GtkObject},())
-                end
-                ))
-        end
-    end
+@GType GtkButtonBox <: GtkBin
+if gtk_version == 3
+    GtkButtonBox(vertical::Bool) =
+        GtkButtonBox(ccall((:gtk_button_box_new, libgtk), Ptr{GtkObject},
+            (Cint,), vertical))
+else
+     GtkButtonBox(vertical::Bool) =
+        GtkButtonBox(
+            if vertical
+                ccall((:gtk_vbutton_box_new, libgtk), Ptr{GtkObject},())
+            else
+                ccall((:gtk_hbutton_box_new, libgtk), Ptr{GtkObject},())
+            end
+            )
 end
 
 ### GtkFixed
 # this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-type GtkPaned <: GtkContainer
-    handle::Ptr{GtkObject}
-    if gtk_version == 3
-        function GtkPaned(vertical::Bool)
-            gc_ref(new(ccall((:gtk_paned_new, libgtk), Ptr{GtkObject},
-                (Cint, Cint), vertical, spacing)))
-        end
-    else
-        function GtkPaned(vertical::Bool)
-            gc_ref(new(
-                if vertical
-                    ccall((:gtk_vpaned_new, libgtk), Ptr{GtkObject},())
-                else
-                    ccall((:gtk_hpaned_new, libgtk), Ptr{GtkObject},())
-                end
-                ))
-        end
-    end
+@GType GtkPaned <: GtkContainer
+if gtk_version == 3
+    GtkPaned(vertical::Bool) =
+        GtkPaned(ccall((:gtk_paned_new, libgtk), Ptr{GtkObject},
+            (Cint, Cint), vertical, spacing))
+else
+    GtkPaned(vertical::Bool) =
+        GtkPaned(
+            if vertical
+                ccall((:gtk_vpaned_new, libgtk), Ptr{GtkObject},())
+            else
+                ccall((:gtk_hpaned_new, libgtk), Ptr{GtkObject},())
+            end
+            )
 end
-
 function getindex(pane::GtkPaned, i::Integer)
     if i == 1
         x = ccall((:gtk_paned_get_child1, libgtk), Ptr{GtkObject}, (Ptr{GtkObject},), pane)
@@ -214,42 +179,33 @@ function setindex(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=
 end
 
 ### GtkLayout
-type GtkLayout <: GtkContainer
-    handle::Ptr{GtkObject}
-    function GtkLayout(width, height)
-        layout = ccall((:gtk_layout_new, libgtk), Ptr{GtkObject},
-            (Ptr{Void},Ptr{Void}), C_NULL, C_NULL)
-        ccall((:gtk_layout_set_size,libgtk),Void,(Ptr{GtkObject},Cuint,Cuint),layout,width,height)
-        gc_ref(new(layout))
-    end
+@GType GtkLayout <: GtkContainer
+function GtkLayout(width, height)
+    layout = ccall((:gtk_layout_new, libgtk), Ptr{GtkObject},
+        (Ptr{Void},Ptr{Void}), C_NULL, C_NULL)
+    ccall((:gtk_layout_set_size,libgtk),Void,(Ptr{GtkObject},Cuint,Cuint),layout,width,height)
+    GtkLayout(layout)
 end
 setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put,libgtk),Void,
     (Ptr{GtkObject},Ptr{GtkObject},Cint,Cint), layout, child, i, j)
 function size(layout::GtkLayout)
     sz = Array(Cuint,2)
     ccall((:gtk_layout_get_size,libgtk),Void,
-        (Ptr{GtkObject},Ptr{Cuint},Ptr{Cuint}),sz,pointer(sz,2))
+        (Ptr{GtkObject},Ptr{Cuint},Ptr{Cuint}),layout,pointer(sz,1),pointer(sz,2))
     sz
 end
 width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
-type GtkExpander <: GtkBin
-    handle::Ptr{GtkObject}
-    function GtkExpander(title)
-        gc_ref(new(ccall((:gtk_expander_new, libgtk), Ptr{GtkObject},
-            (Ptr{Uint8},), bytestring(title))))
-    end
-end
+@GType GtkExpander <: GtkBin
+GtkExpander(title) =
+    GtkExpander(ccall((:gtk_expander_new, libgtk), Ptr{GtkObject},
+        (Ptr{Uint8},), bytestring(title)))
 
 ### GtkNotebook
-type GtkNotebook <: GtkContainer
-    handle::Ptr{GtkObject}
-    function GtkNotebook()
-        gc_ref(new(ccall((:gtk_notebook_new, libgtk), Ptr{GtkObject},())))
-    end
-end
+@GType GtkNotebook <: GtkContainer
+GtkNotebook() = GtkNotebook(ccall((:gtk_notebook_new, libgtk), Ptr{GtkObject},()))
 function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,String), label::String)
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{GtkObject}),
@@ -277,20 +233,15 @@ end
 
 ### GtkOverlay
 if gtk_version == 3
-type GtkOverlay <: GtkContainer #technically, this is a GtkBin, except it behaves more like a container
-    handle::Ptr{GtkObject}
-    function GtkOverlay()
-        gc_ref(new(ccall((:gtk_overlay_new, libgtk), Ptr{GtkObject},
-            (Ptr{Uint8},), bytestring(title))))
+    @GType GtkOverlay <: GtkContainer #technically, this is a GtkBin, except it behaves more like a container
+    GtkOverlay() = GtkOverlay(ccall((:gtk_overlay_new, libgtk), Ptr{GtkObject},
+        (Ptr{Uint8},), bytestring(title)))
+    GtkOverlay(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlay(), w)
+    function push!(w::GtkNotebook, x::GtkWidget)
+        ccall((:gtk_overlay_add_overlay,libgtk), Cint,
+            (Ptr{GtkObject}, Ptr{GtkObject}), w, x)
     end
-end
-GtkOverlay(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlay(), w)
-function push!(w::GtkNotebook, x::GtkWidget)
-    ccall((:gtk_overlay_add_overlay,libgtk), Cint,
-        (Ptr{GtkObject}, Ptr{GtkObject}), w, x)
-end
 else
-GtkOverlay(x...) = error("GtkOverlay is not available until Gtk3.2")
+    GtkOverlay(x...) = error("GtkOverlay is not available until Gtk3.2")
 end
-
 
