@@ -1,5 +1,7 @@
 function push!(w::GtkContainer, child)
-    child = convert(Ptr{GObject},child)
+    if isa(child,String)
+        child = GtkLabel(child)
+    end
     ccall((:gtk_container_add,libgtk), Void, (Ptr{GObject},Ptr{GObject},), w, child)
     show(child)
     w
@@ -41,7 +43,7 @@ function getindex(w::GtkBin, i::Integer)
 end
  
 immutable GtkNullContainer <: GtkContainer end
-function push!(w::GtkNullContainer, w::GtkWidget)
+function push!(::GtkNullContainer, w::GtkWidget)
     p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
     if p != C_NULL
         p = ccall((:gtk_container_remove,libgtk), Ptr{GObject}, (Ptr{GObject},Ptr{GObject},), p, w)

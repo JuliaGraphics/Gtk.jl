@@ -5,7 +5,8 @@ using Cairo
 
 import Base: convert, show, showall, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
-             start, next, done, parent, isempty, empty!, first, last, in
+             start, next, done, parent, isempty, empty!, first, last, in,
+             eltype, copy
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
@@ -88,6 +89,7 @@ bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
 
 include("gslist.jl")
+include("gerror.jl")
 include("gtktypes.jl")
 include("gvalues.jl")
 include("gdk.jl")

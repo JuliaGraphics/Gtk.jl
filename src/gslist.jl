@@ -3,7 +3,7 @@ type GSList{T}
     data::Ptr{T}
     next::Ptr{GSList{T}}
 end
-Base.eltype{T}(::GSList{T}) = Ptr{T}
+eltype{T}(::GSList{T}) = Ptr{T}
 function gslist{T}(list::Ptr{GSList{T}},own::Bool=false)
     # this function assumes the caller will take care of garbage management
     # if own = false, then you must ensure the list is not destroyed
