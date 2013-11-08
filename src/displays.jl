@@ -24,7 +24,7 @@ convert{U<:Unsigned}(::Type{U},x::RGBA) = convert(U,(x.r)|(x.g>>8)|(x.b>>16)|(x.
 #MatrixStrided(p, width=10,height=20,rowstride=30)
 #MatrixStrided(p, rowstride=20,nbytes=100)
 #MatrixStrided(p, width=10,height=20,rowstride=30,nbytes=100)
-type MatrixStrided{T} <: AbstractArray{T,2}
+type MatrixStrided{T} <: AbstractMatrix{T}
     p::Ptr{T}
     nbytes::Int
     rowstride::Int
@@ -76,63 +76,64 @@ function copy{T}(a::MatrixStrided{T})
     unsafe_copy!(a2.p, a.p, a.nbytes)
     a2
 end
-Base.step(::Integer) = 1
-function getindex{T}(a::MatrixStrided{T},x::RangeIndex,y::RangeIndex)
-    i1 = (first(x)-1)*sizeof(T)+1
-    @assert(1 <= i1 <= a.rowstride, "MatrixStrided: x1 index must be inbounds")
-    j1 = (first(y)-1)*a.rowstride
-    @assert(0 <= j1 && j1+i1 <= a.nbytes, "MatrixStrided: y1 index must be inbounds")
-    if isa(x,Integer) && isa(y,Integer)
-        return unsafe_load(a.p+i1+j1)
-    end
-
-    i2 = (last(x)-1)*sizeof(T)+1
-    @assert(1 <= i2 <= a.rowstride, "MatrixStrided: x2 index must be inbounds")
-    @assert(j1+i2 <= a.nbytes, "MatrixStrided: y1 index must be inbounds")
-    j2 = (last(y)-1)*a.rowstride
-    @assert(0 <= j2 && j2+max(i1,i2) <= a.nbytes, "MatrixStrided: y2 index must be inbounds")
-    
+function getindex{T}(a::MatrixStrided{T},x::Integer,y::Integer)
+    @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
+    @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
+    return unsafe_load(a.p + (x-1)*sizeof(T) + (y-1)*a.rowstride)
+end
+function getindex{T}(a::MatrixStrided{T},x::Index,y::Index)
+    @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
+    @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
     z = Array(T,length(x),length(y))
-    zj = 0
-    for j = j1:step(y)*a.rowstride:j2
-        zj += 1
-        zi = 1
-        for i = i1:step(x)*sizeof(T):i2
-            zi += 1
-            z[zj,zi] = unsafe_load(a.p+i+j)
+    const rs = a.rowstride
+    const st = sizeof(T)
+    const p = a.p
+    const lenx = length(x)
+    for zj = 1:length(y)
+        j = (y[zj]-1)*rs
+        for zi = 1:lenx
+            i = (x[zi]-1)*st
+            z[zi,zj] = unsafe_load(p+i+j)
         end
     end
     return z
 end
-function setindex!{T}(a::MatrixStrided{T},z,x::RangeIndex,y::RangeIndex)
-    i1 = (first(x)-1)*sizeof(T)+1
-    @assert(1 <= i1 <= a.rowstride, "MatrixStrided: x1 index must be inbounds")
-    j1 = (first(y)-1)*a.rowstride
-    @assert(0 <= j1 && j1+i1 <= a.nbytes, "MatrixStrided: y1 index must be inbounds")
-    if isa(x,Integer) && isa(y,Integer)
-        unsafe_store!(a.p+i1+j1,convert(T,z))
-        return a
-    end
-
-    i2 = (last(x)-1)*sizeof(T)+1
-    @assert(1 <= i2 <= a.rowstride, "MatrixStrided: x2 index must be inbounds")
-    @assert(j1+i2 <= a.nbytes, "MatrixStrided: y1 index must be inbounds")
-    j2 = (last(y)-1)*a.rowstride
-    @assert(0 <= j2 && j2+max(i1,i2) <= a.nbytes, "MatrixStrided: y2 index must be inbounds")
-    
-    zj = 1
-    for j = j1:step(y)*a.rowstride:j2
-        zj += 1
-        zi = 1
-        for i = i1:step(x)*sizeof(T):i2
-            zi += 1
-            elem::T = isa(z,T) ? z::T : convert(T,z[zj,zi])
-            unsafe_store!(a.p+i+j,elem)
+function setindex!{T}(a::MatrixStrided{T},z,x::Integer,y::Integer)
+    @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
+    @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
+    unsafe_store!(a.p + (x-1)*sizeof(T) + (y-1)*a.rowstride, convert(T,z))
+    a
+end
+function setindex!{T}(a::MatrixStrided{T},z,x::Index,y::Index)
+    @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
+    @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
+    const rs = a.rowstride
+    const st = sizeof(T)
+    const p = a.p
+    const lenx = length(x)
+    if !isa(z,AbstractMatrix)
+        const elem = convert(T,z)::T
+        for zj = 1:length(y)
+            j = (y[zj]-1)*rs + p
+            for zi = 1:lenx
+                i = (x[zi]-1)*st
+                unsafe_store!(j+i, elem)
+            end
+        end
+    else
+        for zj = 1:length(y)
+            j = (y[zj]-1)*rs + p
+            for zi = 1:lenx
+                i = (x[zi]-1)*st
+                elem = convert(T,z[zi,zj])::T
+                unsafe_store!(j+i, elem)
+            end
         end
     end
-    return a
+    a
 end
-stride(a::MatrixStrided,i) = (i == 1 ? 1 : (i == 2 ? a.rowstride : 0))
+Base.fill!{T}(a::MatrixStrided{T},z) = setindex!(a,convert(T,z),1:width(a),1:height(a))
+#stride(a::MatrixStrided,i) = (i == 1 ? 1 : (i == 2 ? a.rowstride : 0))
 width(a::MatrixStrided) = a.width
 height(a::MatrixStrided) = a.height
 size(a::MatrixStrided,i::Integer) = (i == 1 ? width(a) : (i == 2 ? height(a) : 1))
@@ -181,7 +182,7 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
             end
             return pixbuf !== C_NULL
         end
-    elseif xmp_data !== nothing
+    elseif xpm_data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from xpm_data")
         GError() do error_check
             pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data,libgdk),Ptr{GObject},(Ptr{Ptr{Uint8}},),xpm_data)
@@ -200,7 +201,7 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
             data,0,convert(Bool,has_alpha),8,width,height,size(data,1)*sizeof(eltype(data)),
             gc_ref_closure(data),data)
     else
-        @assert(width!=-1 && height!=-1,"GdkPixbuf requires a width and height to create an uninitialized pixbuf")
+        @assert(width!=-1 && height!=-1,"GdkPixbuf requires a width, height, and has_alpha to create an uninitialized pixbuf")
         pixbuf = ccall((:gdk_pixbuf_new,libgdk),Ptr{GObject},
             (Cint,Cint,Cint,Cint,Cint),0,convert(Bool,has_alpha),8,width,height)
     end
@@ -217,20 +218,21 @@ height(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_height,libgdk),Cint,(Ptr{GObject
 size(a::GdkPixbuf,i::Integer) = (i == 1 ? width(a) : (i == 2 ? height(a) : 1))
 size(a::GdkPixbuf) = (width(a),height(a))
 Base.ndims(::GdkPixbuf) = 2
-function stride(img::GdkPixbuf,i)
-    if i == 1
-        convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk),Cint,(Ptr{GObject},),img) * 
-         ccall((:gdk_pixbuf_get_n_channels,libgdk),Cint,(Ptr{GObject},),img) + 7, 8))
-    elseif i == 2
-        ccall((:gdk_pixbuf_get_rowstride,libgdk),Cint,(Ptr{GObject},),img)
-    else
-        convert(Cint,0)
-    end
-end
-
+#function stride(img::GdkPixbuf,i)
+#    if i == 1
+#        convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk),Cint,(Ptr{GObject},),img) *
+#            ccall((:gdk_pixbuf_get_n_channels,libgdk),Cint,(Ptr{GObject},),img) + 7, 8))
+#    elseif i == 2
+#        ccall((:gdk_pixbuf_get_rowstride,libgdk),Cint,(Ptr{GObject},),img)
+#    else
+#        convert(Cint,0)
+#    end
+#end
 size(img::GdkPixbuf) = (width(img),height(img))
 function eltype(img::GdkPixbuf)
-    nbytes = stride(img,1)
+    #nbytes = stride(img,1)
+    nbytes = convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk),Cint,(Ptr{GObject},),img) *
+        ccall((:gdk_pixbuf_get_n_channels,libgdk),Cint,(Ptr{GObject},),img) + 7, 8))
     if nbytes == 3
         RGB
     elseif nbytes == 4
@@ -242,10 +244,12 @@ end
 function convert(::Type{MatrixStrided},img::GdkPixbuf)
     MatrixStrided(
         convert(Ptr{eltype(img)},ccall((:gdk_pixbuf_get_pixels,libgdk),Ptr{Void},(Ptr{GObject},),img)),
-        width=width(img), height=height(img), rowstride=stride(img,2))
+        width=width(img), height=height(img),
+        rowstride=ccall((:gdk_pixbuf_get_rowstride,libgdk),Cint,(Ptr{GObject},),img))
 end
-getindex(img::GdkPixbuf,x::RangeIndex,y::RangeIndex) = convert(MatrixStrided,img)[x,y]
-setindex!(img::GdkPixbuf,pix,x::RangeIndex,y::RangeIndex) = setindex!(convert(MatrixStrided,img),pix,x,y)
+getindex(img::GdkPixbuf,x::Index,y::Index) = convert(MatrixStrided,img)[x,y]
+setindex!(img::GdkPixbuf,pix,x::Index,y::Index) = setindex!(convert(MatrixStrided,img),pix,x,y)
+Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 
 #TODO: image transformations, rotations, compositing
 
@@ -258,7 +262,7 @@ baremodule GtkIconSize
     const DND=5
     const DIALOG=6
     get(s::Symbol) =
-        if s === :invalid
+        if     s === :invalid
             INVALID
         elseif s === :menu
             MENU

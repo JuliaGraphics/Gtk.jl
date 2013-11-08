@@ -87,6 +87,7 @@ end
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
+typealias Index Union(Integer,Ranges{TypeVar(:I,Integer)},AbstractVector{TypeVar(:I,Integer)})
 
 include("gslist.jl")
 include("gerror.jl")
