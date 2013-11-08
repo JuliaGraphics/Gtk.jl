@@ -283,7 +283,7 @@ end
 
 @GType GtkImage <: GtkWidget
 GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GtkObject},(Ptr{GtkObject},),pixbuf))
-GtkImage(filename) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(filename)))
+GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(filename)))
 
 function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size::Symbol=:invalid)
     source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing)
@@ -302,3 +302,37 @@ function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size
     return img
 end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
+
+
+@GType GtkProgressBar <: GtkWidget
+GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GtkObject},()))
+pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GtkObject},),progress)
+
+@GType GtkSpinner <: GtkWidget
+GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GtkObject},()))
+
+@GType GtkStatusbar <: GtkBox
+GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GtkObject},()))
+context_id(status::GtkStatusbar,source) =
+    ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GtkObject},Ptr{Uint8}),
+        status,bytestring(source))
+context_id(status::GtkStatusbar,source::Integer) = source
+push!(status::GtkStatusbar,context,text) =
+    (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GtkObject},Cuint,Ptr{Uint8}),
+        status,context_id(context),bytestring(text)); status)
+pop!(status::GtkStatusbar,context) =
+    ccall((:gtk_statusbar_pop,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint),
+        status,context_id(context))
+slice!(status::GtkStatusbar,context,message_id) =
+    ccall((:gtk_statusbar_remove,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint,Cuint),
+        status,context_id(context),message_id)
+empty!(status::GtkStatusbar,context) =
+    ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint,Cuint),
+        status,context_id(context),context_id(context))
+
+#@GType GtkInfoBar <: GtkBox
+#GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GtkObject},())
+
+@GType GtkStatusIcon
+GtkStatusIcon() = GtkStatusIcon(ccall((:gtk_status_icon_new,libgtk),Ptr{GtkObject},()))
+

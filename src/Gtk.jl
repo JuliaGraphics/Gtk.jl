@@ -134,7 +134,7 @@ end
 for container in subtypes(GtkContainer,true)
     @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
 end
-for orientable in (:GtkPaned, :GtkButtonBox, :GtkBox, :GtkScale)
+for orientable in tuple(:GtkPaned, :GtkButtonBox, :GtkBox, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :

@@ -92,7 +92,7 @@ GtkAspectFrame(xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspec
         (Cfloat, Cfloat, Cfloat, Cint), xalign, yalign, 1., true))
 
 ### GtkBox
-@GType GtkBox <: GtkContainer
+@GType GtkBox <: GtkBox
 if gtk_version == 3
     GtkBox(vertical::Bool, spacing=0) =
         GtkBox(ccall((:gtk_box_new, libgtk), Ptr{GtkObject},
@@ -111,7 +111,7 @@ else
 end
 
 ### GtkButtonBox
-@GType GtkButtonBox <: GtkBin
+@GType GtkButtonBox <: GtkBox
 if gtk_version == 3
     GtkButtonBox(vertical::Bool) =
         GtkButtonBox(ccall((:gtk_button_box_new, libgtk), Ptr{GtkObject},

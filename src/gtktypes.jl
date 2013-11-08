@@ -3,6 +3,7 @@ const GtkObject = GObject # deprecated
 abstract GtkWidget <: GObject
 abstract GtkContainer <: GtkWidget
 abstract GtkBin <: GtkContainer
+abstract GtkBoxI <: GtkContainer
 
 type GObjectRef{T} <: GObject
     handle::Ptr{GObject}
@@ -17,6 +18,10 @@ type GtkContainerRef{T} <: GtkContainer
     GtkContainerRef(handle::Ptr{GObject}) = gc_ref(new(handle))
 end
 type GtkBinRef{T} <: GtkBin
+    handle::Ptr{GObject}
+    GtkBinRef(handle::Ptr{GObject}) = gc_ref(new(handle))
+end
+type GtkBoxRef{T} <: GtkBoxI
     handle::Ptr{GObject}
     GtkBinRef(handle::Ptr{GObject}) = gc_ref(new(handle))
 end
