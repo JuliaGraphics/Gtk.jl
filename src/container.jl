@@ -1,4 +1,4 @@
-function push!(w::GtkContainer, child)
+function push!(w::GtkContainerI, child)
     if isa(child,String)
         child = GtkLabel(child)
     end
@@ -6,44 +6,44 @@ function push!(w::GtkContainer, child)
     show(child)
     w
 end
-function delete!(w::GtkContainer, child::GtkWidget)
+function delete!(w::GtkContainerI, child::GtkWidgetI)
     ccall((:gtk_container_remove,libgtk), Void,(Ptr{GObject},Ptr{GObject},), w, child)
     w
 end
-function empty!(w::GtkContainer)
+function empty!(w::GtkContainerI)
     for child in w
         delete!(w,child)
     end
     w
 end
 
-start(w::GtkContainer) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w), true)
-next(w::GtkContainer, list) = next(list[1],list)
-done(w::GtkContainer, list) = next(list[1],list)
-length(w::GtkContainer) = length(start(w)[2])
-getindex(w::GtkContainer, i::Integer) = convert(GtkWidget,start(w)[2][i])::GtkWidget
+start(w::GtkContainerI) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w), true)
+next(w::GtkContainerI, list) = next(list[1],list)
+done(w::GtkContainerI, list) = next(list[1],list)
+length(w::GtkContainerI) = length(start(w)[2])
+getindex(w::GtkContainerI, i::Integer) = convert(GtkWidgetI,start(w)[2][i])::GtkWidgetI
 
-function start(w::GtkBin)
+function start(w::GtkBinI)
     child = ccall((:gtk_bin_get_child,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
     if child != C_NULL
-        return convert(GtkWidget,child)
+        return convert(GtkWidgetI,child)
     else
         return false
     end
 end
-next(w::GtkBin,i) = (i,false)
-done(w::GtkBin,s::Bool) = true
-done(w::GtkBin,s::GtkWidget) = false
-length(w::GtkBin) = done(w,start(w)) ? 0 : 1
-function getindex(w::GtkBin, i::Integer)
+next(w::GtkBinI,i) = (i,false)
+done(w::GtkBinI,s::Bool) = true
+done(w::GtkBinI,s::GtkWidgetI) = false
+length(w::GtkBinI) = done(w,start(w)) ? 0 : 1
+function getindex(w::GtkBinI, i::Integer)
     i!=1 && error(BoundsError())
     c = start(w)
     c == false && error(BoundsError())
-    c::GtkWidget
+    c::GtkWidgetI
 end
  
-immutable GtkNullContainer <: GtkContainer end
-function push!(::GtkNullContainer, w::GtkWidget)
+immutable GtkNullContainer <: GtkContainerI end
+function push!(::GtkNullContainer, w::GtkWidgetI)
     p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
     if p != C_NULL
         p = ccall((:gtk_container_remove,libgtk), Ptr{GObject}, (Ptr{GObject},Ptr{GObject},), p, w)

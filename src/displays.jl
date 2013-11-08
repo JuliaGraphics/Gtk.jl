@@ -282,22 +282,22 @@ baremodule GtkIconSize
 end
 
 @GType GtkImage <: GtkWidget
-GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GtkObject},(Ptr{GtkObject},),pixbuf))
-GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(filename)))
+GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
+GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
 function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size::Symbol=:invalid)
     source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing)
-    @assert(source_count != 1,
-        "GdkPixbuf must at most one resource_path, filename, or icon_name argument")
+    @assert(source_count <= 1,
+        "GdkPixbuf must have at most one resource_path, filename, or icon_name argument")
     local img::GtkImage
     if resource_path !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_resource,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(resource_path)))
+        img = GtkImage(ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path)))
     elseif filename !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GtkObject},(Ptr{Uint8},),bytestring(filename)))
+        img = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
     elseif icon_name !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GtkObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.get(size)))
+        img = GtkImage(ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.get(size)))
     else
-        img = GtkImage(ccall((:gtk_image_new,libgtk),Ptr{GtkObject},()))
+        img = GtkImage(ccall((:gtk_image_new,libgtk),Ptr{GObject},()))
     end
     return img
 end
@@ -305,34 +305,34 @@ empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img
 
 
 @GType GtkProgressBar <: GtkWidget
-GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GtkObject},()))
-pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GtkObject},),progress)
+GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
+pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
 @GType GtkSpinner <: GtkWidget
-GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GtkObject},()))
+GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
 @GType GtkStatusbar <: GtkBox
-GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GtkObject},()))
+GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
-    ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GtkObject},Ptr{Uint8}),
+    ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
         status,bytestring(source))
 context_id(status::GtkStatusbar,source::Integer) = source
 push!(status::GtkStatusbar,context,text) =
-    (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GtkObject},Cuint,Ptr{Uint8}),
+    (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GObject},Cuint,Ptr{Uint8}),
         status,context_id(context),bytestring(text)); status)
 pop!(status::GtkStatusbar,context) =
-    ccall((:gtk_statusbar_pop,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint),
+    ccall((:gtk_statusbar_pop,libgtk),Ptr{GObject},(Ptr{GObject},Cuint),
         status,context_id(context))
 slice!(status::GtkStatusbar,context,message_id) =
-    ccall((:gtk_statusbar_remove,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint,Cuint),
+    ccall((:gtk_statusbar_remove,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
         status,context_id(context),message_id)
 empty!(status::GtkStatusbar,context) =
-    ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GtkObject},(Ptr{GtkObject},Cuint,Cuint),
+    ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
         status,context_id(context),context_id(context))
 
 #@GType GtkInfoBar <: GtkBox
-#GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GtkObject},())
+#GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
 @GType GtkStatusIcon
-GtkStatusIcon() = GtkStatusIcon(ccall((:gtk_status_icon_new,libgtk),Ptr{GtkObject},()))
+GtkStatusIcon() = GtkStatusIcon(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
 

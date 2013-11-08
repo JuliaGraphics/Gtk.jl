@@ -1,6 +1,6 @@
 #https://developer.gnome.org/gtk2/stable/MiscObjects.html
 
-#GtkAdjustment — A GtkObject representing an adjustable bounded value
+#GtkAdjustment — A GObject representing an adjustable bounded value
 #GtkArrow — Displays an arrow
 #GtkCalendar — Displays a calendar and allows the user to select a date
 #GtkDrawingArea — A widget for custom user interface elements

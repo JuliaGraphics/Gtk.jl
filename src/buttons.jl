@@ -59,18 +59,18 @@ GtkRadioButton(group::GtkRadioButton) =
 GtkRadioButton(group::GtkRadioButton,label::String) =
     GtkRadioButton(ccall((:gtk_radio_button_new_with_mnemonic_from_widget,libgtk),Ptr{GObject},
         (Ptr{GObject},Ptr{Uint8}),group,bytestring(label)))
-GtkRadioButton(group::GtkRadioButton,child::GtkWidget,vargs...) =
+GtkRadioButton(group::GtkRadioButton,child::GtkWidgetI,vargs...) =
     push!(GtkRadioButton(group,vargs...), child)
 
-type GtkRadioButtonGroup <: GtkContainer # NOT an @GType
+type GtkRadioButtonGroup <: GtkContainerI # NOT an @GType
     # when iterating/indexing elements will be in reverse / *random* order
 
     # the behavior is specified as undefined if the first
     # element is moved to a new group
     # do not rely on the current behavior, since it may change
-    handle::GtkContainer
+    handle::GtkContainerI
     anchor::GtkRadioButton
-    GtkRadioButtonGroup(layout::GtkContainer) = new(layout)
+    GtkRadioButtonGroup(layout::GtkContainerI) = new(layout)
 end
 GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBox(true))
 function GtkRadioButtonGroup(elem::Vector, active::Int=1)
@@ -136,7 +136,7 @@ function getindex(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
 end
 
 
-function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
+function gtk_toggle_button_set_active(b::GtkWidgetI, active::Bool)
     # Users are encouraged to use the syntax `b[:active] = true`. This is not a public function.
     ccall((:gtk_toggle_button_set_active,libgtk),Void,(Ptr{GObject},Cint),b,active)
     b
@@ -144,13 +144,13 @@ end
 # Append a named argument, active::Bool, to the various constructors
 # but first, resolve some conflicts
 GtkRadioButton(a::GtkRadioButton,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a),active)
-GtkRadioButton(a::GtkRadioButton,b::GtkWidget,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
+GtkRadioButton(a::GtkRadioButton,b::GtkWidgetI,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
 GtkRadioButton(a::GtkRadioButton,b,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
 for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
     @eval begin
         $btn(active::Bool) = gtk_toggle_button_set_active($btn(),active)
         $btn(a,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
-        $btn(a::GtkWidget,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
+        $btn(a::GtkWidgetI,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
         $btn(a,b,active::Bool) = gtk_toggle_button_set_active($btn(a,b),active)
         $btn(a,b,c,active::Bool) = gtk_toggle_button_set_active($btn(a,b,c),active)
     end

@@ -1,30 +1,33 @@
-abstract GObject
-const GtkObject = GObject # deprecated
-abstract GtkWidget <: GObject
-abstract GtkContainer <: GtkWidget
-abstract GtkBin <: GtkContainer
-abstract GtkBoxI <: GtkContainer
+abstract GObjectI
+typealias GObject GObjectI
+abstract GtkWidgetI <: GObjectI
+abstract GtkContainerI <: GtkWidgetI
+abstract GtkBinI <: GtkContainerI
+abstract GtkBoxI <: GtkContainerI
 
-type GObjectRef{T} <: GObject
+# Alternative object construction style. This would let us share constructors
+# by creating const aliases: `const Z = GObject{:Z}`
+type GObjectAny{Name} <: GObjectI
     handle::Ptr{GObject}
-    GObjectRef(handle::Ptr{GObject}) = gc_ref(new(handle))
+    GObjectAny(handle::Ptr{GObject}) = gc_ref(new(handle))
 end
-type GtkWidgetRef{T} <: GtkWidget
-    handle::Ptr{GObject}
-    GtkWidgetRef(handle::Ptr{GObject}) = gc_ref(new(handle))
-end
-type GtkContainerRef{T} <: GtkContainer
-    handle::Ptr{GObject}
-    GtkContainerRef(handle::Ptr{GObject}) = gc_ref(new(handle))
-end
-type GtkBinRef{T} <: GtkBin
-    handle::Ptr{GObject}
-    GtkBinRef(handle::Ptr{GObject}) = gc_ref(new(handle))
-end
-type GtkBoxRef{T} <: GtkBoxI
-    handle::Ptr{GObject}
-    GtkBinRef(handle::Ptr{GObject}) = gc_ref(new(handle))
-end
+#type GtkWidgetAny{T} <: GtkWidgetI
+#    handle::Ptr{GObject}
+#    GtkWidgetAny(handle::Ptr{GObject}) = gc_ref(new(handle))
+#end
+#type GtkContainerAny{T} <: GtkContainerI
+#    handle::Ptr{GObject}
+#    GtkContainerAny(handle::Ptr{GObject}) = gc_ref(new(handle))
+#end
+#type GtkBinAny{T} <: GtkBinI
+#    handle::Ptr{GObject}
+#    GtkBinAny(handle::Ptr{GObject}) = gc_ref(new(handle))
+#end
+#type GtkBoxAny{T} <: GtkBoxI
+#    handle::Ptr{GObject}
+#    GtkBoxAny(handle::Ptr{GObject}) = gc_ref(new(handle))
+#end
+
 macro GType(gname)
     if isa(gname,Expr)
         @assert(gname.head == :comparison && length(gname.args) == 3 && gname.args[2] == :<:, "invalid GType expr")
@@ -34,7 +37,12 @@ macro GType(gname)
         super = :GObject
     end
     gname = gname::Symbol
-    :( const $(esc(gname)) = $(symbol(string(super,"Ref"))){$(Meta.quot(gname))} )
+    quote
+        type $(esc(gname)) <: $(esc(symbol(string(super,'I'))))
+            handle::Ptr{GObjectI}
+            $(esc(gname))(handle::Ptr{GObjectI}) = gc_ref(new(handle))
+        end
+    end
 end
 
 macro quark_str(q)
@@ -43,25 +51,25 @@ end
 const jlref_quark = quark"julia_ref"
 
 # All GtkWidgets are expected to have a 'handle' field
-# of type Ptr{GObject} corresponding to the Gtk object
+# of type Ptr{GObjectI} corresponding to the Gtk object
 # and an 'all' field which has type GdkRectangle
 # corresponding to the rectangle allocated to the object,
 # or to override the size, width, and height methods
-convert(::Type{Ptr{GObject}},w::GObject) = w.handle
-convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
-function convert{T<:GObject}(::Type{T},w::Ptr{GObject})
-    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), w, jlref_quark)
+convert(::Type{Ptr{GObjectI}},w::GObjectI) = w.handle
+convert{T<:GObjectI}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObjectI},w))
+function convert{T<:GObjectI}(::Type{T},w::Ptr{GObjectI})
+    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObjectI}, (Ptr{GObjectI},Uint32), w, jlref_quark)
     x == C_NULL && error("GObject didn't have a corresponding Julia object")
     unsafe_pointer_to_objref(x)::T
 end
-convert(::Type{Ptr{GObject}},w::String) = convert(Ptr{GObject},GtkLabel(w))
+convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 
-destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
-parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
-width(w::GtkWidget) = w.all.width
-height(w::GtkWidget) = w.all.height
-size(w::GtkWidget) = (w.all.width, w.all.height)
-show(io::IO, w::GObject) = print(io,typeof(w))
+destroy(w::GtkWidgetI) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObjectI},), w)
+parent(w::GtkWidgetI) = convert(GtkWidgetI, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObjectI}, (Ptr{GObjectI},), w))
+width(w::GtkWidgetI) = w.all.width
+height(w::GtkWidgetI) = w.all.height
+size(w::GtkWidgetI) = (w.all.width, w.all.height)
+show(io::IO, w::GObjectI) = print(io,typeof(w))
 
 ### Functions and methods common to all GtkWidget objects
 #GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =
@@ -69,10 +77,10 @@ show(io::IO, w::GObject) = print(io,typeof(w))
 #        (Cdouble,Cdouble,Cdouble,Cdouble,Cdouble,Cdouble),
 #        value, lower, upper, step_increment, page_increment, page_size)
 
-visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
-visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
-show(w::GtkWidget) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w)
-showall(w::GtkWidget) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w)
+visible(w::GtkWidgetI) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObjectI},),w))
+visible(w::GtkWidgetI, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObjectI},Cint),w,state)
+show(w::GtkWidgetI) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObjectI},),w)
+showall(w::GtkWidgetI) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObjectI},),w)
 
 ### Miscellaneous types
 typealias Enum Int32
@@ -130,13 +138,13 @@ gc_ref_closure{T}(x::T) = (gc_ref(x);cfunction(gc_unref, Void, (T, Ptr{Void})))
 gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
 const gc_preserve_gtk = ObjectIdDict() # gtk objects
-function gc_ref{T<:GObject}(x::T)
+function gc_ref{T<:GObjectI}(x::T)
     global gc_preserve_gtk
     addref = function()
-        ccall((:g_object_ref,libgobject),Ptr{GObject},(Ptr{GObject},),x)
+        ccall((:g_object_ref,libgobject),Ptr{GObjectI},(Ptr{GObjectI},),x)
         finalizer(x,function(x)
                 global gc_preserve_gtk
-                ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
+                ccall((:g_object_unref,libgobject),Void,(Ptr{GObjectI},),x)
                 gc_preserve_gtk[WeakRef(x)] = x #convert to a strong-reference
             end)
         wx = WeakRef(x) # record the existence of the object, but allow the finalizer
@@ -145,8 +153,8 @@ function gc_ref{T<:GObject}(x::T)
     ref = get(gc_preserve_gtk,x,nothing)
     if isa(ref,Nothing)
         ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
-            cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
+            (Ptr{GObjectI}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
+            cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObjectI
         addref()
     elseif !isa(ref,WeakRef)
         # oops, we previously deleted the link, but now it's back
@@ -158,14 +166,14 @@ function gc_ref{T<:GObject}(x::T)
 end
 
 
-function gc_unref(x::GObject)
+function gc_unref(x::GObjectI)
     # this strongly destroys and invalidates the object
     # it is intended to be called by Gtk, not in user code function
     global gc_preserve_gtk
-    ccall((:g_object_steal_qdata,libgobject),Ptr{Any},(Ptr{GObject},Uint32),x,jlref_quark)
+    ccall((:g_object_steal_qdata,libgobject),Ptr{Any},(Ptr{GObjectI},Uint32),x,jlref_quark)
     delete!(gc_preserve_gtk, x)
     x.handle = C_NULL
     nothing
 end
-gc_unref(::Ptr{GObject}, x::GObject) = gc_unref(x)
-gc_ref_closure(x::GObject) = C_NULL
+gc_unref(::Ptr{GObjectI}, x::GObjectI) = gc_unref(x)
+gc_ref_closure(x::GObjectI) = C_NULL

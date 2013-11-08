@@ -42,7 +42,7 @@ for (pass_x,as_ctype,to_gtype,with_id) in (
     (Signed,          Int64,           :int64,           :gint64_id),
     (FloatingPoint,   Float64,         :double,          :gdouble_id),
     (Bool,            Cint,            :boolean,         :gboolean_id),
-    (GtkObject,       Ptr{GtkObject},  :object,          :gobject_id),
+    (GObject,         Ptr{GObject},    :object,          :gobject_id),
     )
    eval(quote
         # Since we aren't creating a GValue type, everything is done through the methods and the Array type
@@ -88,42 +88,42 @@ for (pass_x,as_ctype,to_gtype,with_id) in (
     end)
 end
 
-function getindex{T}(w::GtkObject, name::Union(String,Symbol), ::Type{T})
+function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
+        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
     v[T]
 end
 
-function getindex{T}(w::GtkWidget, child::GtkWidget, name::Union(String,Symbol), ::Type{T})
+function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
+        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
     v[T]
 end
 
-setindex!{T}(w::GtkObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
-function setindex!(w::GtkObject, value, name::Union(String,Symbol))
+setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
+function setindex!(w::GObject, value, name::Union(String,Symbol))
     v = gvalue(value)
     ccall((:g_object_set_property, libgobject), Void, 
-        (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
+        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue1}), w, bytestring(name), &v)
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue1},),&v)
     w
 end
 
-#setindex!{T}(w::GtkWidget, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
-setindex!{T}(w::GtkWidget, value, child::GtkWidget, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
-function setindex!(w::GtkWidget, value, child::GtkWidget, name::Union(String,Symbol))
+#setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
+setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
+function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol))
     v = gvalue(value)
     ccall((:gtk_container_child_set_property,libgtk), Void, 
-        (Ptr{GtkObject}, Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
+        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue1}), w, child, bytestring(name), &v)
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue1},),&v)
     w
 end
 
 G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{Csize_t},w))
-G_OBJECT_GET_CLASS(w::GtkObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
-G_OBJECT_CLASS_TYPE(w::GtkObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
+G_OBJECT_GET_CLASS(w::GObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
+G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 immutable GParamSpec
   g_type_instance::Ptr{Void}
@@ -133,7 +133,7 @@ immutable GParamSpec
   owner_type::Csize_t
 end
 
-function show(io::IO, w::GtkObject)
+function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
     n = Array(Cuint,1)
     props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
@@ -147,7 +147,7 @@ function show(io::IO, w::GtkObject)
                 bool(ccall((:g_value_type_transformable,libgobject),Cint,
                 (Int,Int),param.value_type,gstring_id))
             ccall((:g_object_get_property,libgobject), Void,
-                (Ptr{GtkObject}, Ptr{Uint8}, Ptr{GValue1}), w, param.name, &v)
+                (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue1}), w, param.name, &v)
             str = ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{GValue1},),&v)
             value = (str == C_NULL ? "NULL" : bytestring(str))
             ccall((:g_value_reset,libgobject),Ptr{Void},(Ptr{GValue1},), &v)

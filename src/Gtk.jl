@@ -131,10 +131,10 @@ function Base.subtypes(T::DataType, b::Bool)
         return DataType[]
     end
 end
-for container in subtypes(GtkContainer,true)
-    @eval $(symbol(string(container)))(child::GtkWidget,vargs...) = push!($container(vargs...),child)
+for container in subtypes(GtkContainerI,true)
+    @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
-for orientable in tuple(:GtkPaned, :GtkButtonBox, :GtkBox, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
+for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :

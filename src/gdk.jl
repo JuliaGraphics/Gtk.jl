@@ -10,7 +10,7 @@ immutable GdkPoint
     y::Int32
     GdkPoint(x,y) = new(x,y)
 end
-gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GtkObject},),w)
+gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
 baremodule GdkEventMask
     import Base.<<
