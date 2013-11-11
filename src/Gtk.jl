@@ -11,9 +11,9 @@ import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
 # generic interface:
-export width, height, size, #minsize, maxsize
+export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    length, add!, delete!, splice!, visible, destroy
+    visible, destroy
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
@@ -23,7 +23,9 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
     GtkToggleButton, GtkLinkButton, GtkVolumeButton,
-    GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText
+    GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
+    GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
+    GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag
 
 # Gtk3 objects
 export GtkGrid
@@ -148,7 +150,7 @@ module ShortNames
     # Gtk-specific event handling
     export width, height, size, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        length, add!, delete!, splice!, visible, destroy
+        visible, destroy
 
     # Gtk objects
     const Window = GtkWindow
@@ -174,22 +176,38 @@ module ShortNames
     const Scale = GtkScale
     const SpinButton = GtkSpinButton
     const ComboBoxText = GtkComboBoxText
+    const Pixbuf = GdkPixbuf
+    const Image = GtkImage
+    const ProgressBar = GtkProgressBar
+    const Spinner = GtkSpinner
+    const Statusbar = GtkStatusbar
+    const StatusIcon = GtkStatusIcon
+    const TextBuffer = GtkTextBuffer
+    const TextView = GtkTextView
+    const Text = GtkTextView
+    const TextMark = GtkTextMark
+    const TextTag = GtkTextTag
+
     export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton,
-        Entry, Scale, SpinButton, ComboBoxText
+        Entry, Scale, SpinButton, ComboBoxText,
+        Pixbuf, Image, ProgressBar, Spinner, Statusbar,
+        StatusIcon, TextBuffer, TextView, TextMark, TextTag 
 
     # Gtk 3
-    if Gtk.gtk_version == 3
+    if Gtk.gtk_version >= 3
         const Grid = GtkGrid
+        export Grid
     end
-    export Grid
 
     # Gtk 2
-    const Table = GtkTable
-    const Alignment = GtkAlignment
-    export Table, Aligment
+    if Gtk.gtk_version >= 2
+        const Table = GtkTable
+        const Alignment = GtkAlignment
+        export Table, Aligment
+    end
 end
 using .ShortNames
 export Canvas, Window
