@@ -84,6 +84,7 @@ else
     const libgobject = "libgobject-2.0"
     const libglib = "libglib-2.0"
 end
+ccall((:g_type_init,libgobject),Void,())
 
 # local copy, handles Symbol and easier UTF8-strings
 bytestring(s) = Base.bytestring(s)

@@ -16,8 +16,10 @@ function gtk_doevent()
     end
 end
 function init()
-    if !ccall((:gtk_init_check,libgtk), Bool, (Ptr{Void}, Ptr{Void}), C_NULL, C_NULL)
-        error( "Failed to initialize Gtk" )
+    GError() do error_check
+        ccall((:gtk_init_with_args,libgtk), Bool,
+            (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
+            C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
     global timeout
     timeout = Base.TimeoutAsyncWork(gtk_doevent)
