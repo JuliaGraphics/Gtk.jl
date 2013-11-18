@@ -83,10 +83,6 @@ end
 function on_signal_resize(resize_cb::Function, widget::GtkWidgetI, vargs...)
     signal_connect(resize_cb, widget, "size-allocate", Void, (Ptr{GdkRectangle},), vargs...)
 end
-function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkWidgetI)
-    widget.all = unsafe_load(size)
-    nothing
-end
 
 function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
     signal_connect(destroy_cb, widget, "destroy", Void, (), vargs...)
@@ -147,7 +143,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
 end
 
 function reveal(c::GtkWidgetI, immediate::Bool=true)
-    #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&c.all)
+    #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&allocation(c))
     #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
     #    gdk_window(c), region, true)
     ccall((:gtk_widget_queue_draw,libgtk), Void, (Ptr{GObject},), c)

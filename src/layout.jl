@@ -192,7 +192,7 @@ function size(layout::GtkLayout)
     sz = Array(Cuint,2)
     ccall((:gtk_layout_get_size,libgtk),Void,
         (Ptr{GObject},Ptr{Cuint},Ptr{Cuint}),layout,pointer(sz,1),pointer(sz,2))
-    sz
+    (sz[1],sz[2])
 end
 width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]

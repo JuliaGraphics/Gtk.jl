@@ -39,8 +39,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion
 
-
-# Tk-compatibility (missing):
+# Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
 #export Button
 #export Checkbutton, Radio, Combobox
@@ -57,41 +56,15 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 #       get_editable, set_editable,
 #       set_position
 
-
-const gtk_version = 2 # This is the only configuration option
-
-if gtk_version == 3
-    const libgtk = "libgtk-3"
-    const libgdk = "libgdk-3"
-elseif gtk_version == 2
-    if OS_NAME == :Darwin
-        const libgtk = "libgtk-quartz-2.0"
-        const libgdk = "libgdk-quartz-2.0"
-    elseif OS_NAME == :Windows
-        const libgtk = "libgtk-win32-2.0-0"
-        const libgdk = "libgdk-win32-2.0-0"
-    else
-        const libgtk = "libgtk-x11-2.0"
-        const libgdk = "libgdk-x11-2.0"
-    end
-else
-    error("Unsupported Gtk version $gtk_version")
-end
-if OS_NAME == :Windows
-    const libgobject = "libgobject-2.0-0"
-    const libglib = "libglib-2.0-0"
-else
-    const libgobject = "libgobject-2.0"
-    const libglib = "libglib-2.0"
-end
-ccall((:g_type_init,libgobject),Void,())
-
-# local copy, handles Symbol and easier UTF8-strings
+# local function, handles Symbol and makes UTF8-strings easier
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
-typealias Index Union(Integer,Ranges{TypeVar(:I,Integer)},AbstractVector{TypeVar(:I,Integer)})
 
+typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
+
+include(joinpath("..","deps","ext.jl"))
+ccall((:g_type_init,libgobject),Void,())
 include("gslist.jl")
 include("gerror.jl")
 include("gtktypes.jl")
@@ -110,7 +83,6 @@ include("menus.jl")
 include("selectors.jl")
 include("misc.jl")
 include("cairo.jl")
-
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -144,16 +116,24 @@ for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes
             error("invalid $($orientable) orientation $orientation"))),vargs...)
 end
 
-# Alternative Names
+export GAccessor
+open(joinpath(splitdir(@__FILE__)[1], "..", "gen",
+    "gbox$(gtk_version)_$(Sys.OS_NAME)_m$(Sys.WORD_SIZE)_julia$(VERSION.major)_$(VERSION.minor)")) do cache
+    eval(deserialize(cache))
+end
+const _ = GAccessor
+
+# Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
     using Gtk
 
-    # Gtk-specific event handling
-    export width, height, size, #minsize, maxsize
+    # generic interface (keep this synchronized with above)
+    export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
         visible, destroy
 
     # Gtk objects
+    const G_ = GAccessor
     const Window = GtkWindow
     const Canvas = GtkCanvas
     const BoxLayout = GtkBox
@@ -189,13 +169,13 @@ module ShortNames
     const TextMark = GtkTextMark
     const TextTag = GtkTextTag
 
-    export Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
+    export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton,
         Entry, Scale, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
-        StatusIcon, TextBuffer, TextView, TextMark, TextTag 
+        StatusIcon, TextBuffer, TextView, TextMark, TextTag
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -212,6 +192,7 @@ module ShortNames
 end
 using .ShortNames
 export Canvas, Window
+
 
 init()
 end

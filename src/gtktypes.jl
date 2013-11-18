@@ -66,9 +66,20 @@ convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 
 destroy(w::GtkWidgetI) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObjectI},), w)
 parent(w::GtkWidgetI) = convert(GtkWidgetI, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObjectI}, (Ptr{GObjectI},), w))
-width(w::GtkWidgetI) = w.all.width
-height(w::GtkWidgetI) = w.all.height
-size(w::GtkWidgetI) = (w.all.width, w.all.height)
+function allocation(widget::Gtk.GtkWidgetI)
+    allocation_ = Array(GdkRectangle)
+    ccall((:gtk_widget_get_allocation,libgtk), Void, (Ptr{GObject},Ptr{GdkRectangle}), widget, allocation_)
+    return allocation_[1]
+end
+if gtk_version > 3
+    width(w::GtkWidgetI) = ccall((:gtk_widget_get_allocated_width,libgtk),Cint,(Ptr{GObjectI},),w)
+    height(w::GtkWidgetI) = ccall((:gtk_widget_get_allocated_height,libgtk),Cint,(Ptr{GObjectI},),w)
+    size(w::GtkWidgetI) = (width(w),height(w))
+else
+    width(w::GtkWidgetI) = allocation(w).width
+    height(w::GtkWidgetI) = allocation(w).height
+    size(w::GtkWidgetI) = (a=allocation(w);(a.width,a.height))
+end
 show(io::IO, w::GObjectI) = print(io,typeof(w))
 
 ### Functions and methods common to all GtkWidget objects

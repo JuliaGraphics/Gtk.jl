@@ -1,7 +1,7 @@
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
 type GtkCanvas <: GtkWidgetI # NOT an @GType
     handle::Ptr{GObject}
-    all::GdkRectangle
+    has_allocation::Bool
     mouse::MouseHandler
     resize::Union(Function,Nothing)
     draw::Union(Function,Nothing)
@@ -12,7 +12,7 @@ type GtkCanvas <: GtkWidgetI # NOT an @GType
         da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GObject},())
         ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GObject},Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32), da, w, h)
-        widget = new(da, GdkRectangle(0,0,w,h), MouseHandler(), nothing, nothing)
+        widget = new(da, false, MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
         on_signal_resize(notify_resize, widget)
         if gtk_version == 3
@@ -29,7 +29,7 @@ end
 GtkCanvas() = GtkCanvas(-1,-1)
 
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
-    widget.all = unsafe_load(size)
+    widget.has_allocation = true
     widget.back = cairo_surface_for(widget)
     widget.backcc = CairoContext(widget.back)
     if isa(widget.resize,Function)
@@ -41,7 +41,7 @@ end
 
 function resize(config::Function, widget::GtkCanvas)
     widget.resize = config
-    if widget.all.width > 0 && widget.all.height > 0
+    if widget.has_allocation
         if isa(widget.resize, Function)
             widget.resize(widget)
         end
@@ -55,7 +55,7 @@ function draw(redraw::Function, widget::GtkCanvas)
 end
 
 function draw(widget::GtkCanvas, immediate::Bool=true)
-    if widget.all.width > 0 && widget.all.height > 0
+    if widget.has_allocation
         if isa(widget.draw,Function)
             widget.draw(widget)
         end
