@@ -46,6 +46,8 @@ All objects in Gtk are intended to behave uniformly. This means that all objects
     Gtk.Button("This is a button")
     Gtk.Button(Gtk.Label("Click me"))
 
+On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a GtkContainerI. Of special note is the anti-object GtkNullContainer. This is not a Gtk Object. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although the standard operations like `splice!` and `delete!` also exist, and are typically preferable).
+
 ### Objects have[:properties, with_types] = values
 
 The properties of any object can be accessed by treating the object as an Associative dictionary. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string.
@@ -87,9 +89,9 @@ Example:
     #     nothing
     # end
 
-You can remove signal handlers by their id: `signal_handler_disconnect`
+You can remove signal handlers by their id using `signal_handler_disconnect`
 
-Or temporarily block them by id: `signal_handler_block` and `signal_handler_unblock`
+Or temporarily block them by id using `signal_handler_block` and `signal_handler_unblock`
 
 ### Events can be emitted
 
@@ -104,3 +106,61 @@ Note: the return type and argument types do not need to match the spec. However,
 
 The API for accessing this has not been finalized. Current work-in-progress will auto-generate stubs for these methods.
 
+## Gtk Object Tree
+
+    +- Any
+    .  +- GObject = GObjectI
+    .  .  +- GtkWidgetI
+    .  .  .  +- SpinButton = GtkSpinButton
+    .  .  .  +- ComboBoxText = GtkComboBoxText
+    .  .  .  +- Spinner = GtkSpinner
+    .  .  .  +- ProgressBar = GtkProgressBar
+    .  .  .  +- Canvas = GtkCanvas
+    .  .  .  +- Label = GtkLabel
+    .  .  .  +- Entry = GtkEntry
+    .  .  .  +- GtkContainerI
+    .  .  .  .  +- Table = GtkTable
+    .  .  .  .  +- Paned = GtkPaned
+    .  .  .  .  +- RadioButtonGroup = GtkRadioButtonGroup
+    .  .  .  .  +- GtkBoxI
+    .  .  .  .  .  +- ButtonBox = GtkButtonBox
+    .  .  .  .  .  +- BoxLayout = GtkBox
+    .  .  .  .  .  +- Statusbar = GtkStatusbar
+    .  .  .  .  +- Layout = GtkLayout
+    .  .  .  .  +- Notebook = GtkNotebook
+    .  .  .  .  +- GtkBinI
+    .  .  .  .  .  +- GtkSwitch = GtkToggleButton
+    .  .  .  .  .  +- Window = GtkWindow
+    .  .  .  .  .  +- Button = GtkButton
+    .  .  .  .  .  +- ToggleButton = GtkToggleButton
+    .  .  .  .  .  +- Alignment = GtkAlignment
+    .  .  .  .  .  +- CheckButton = GtkCheckButton
+    .  .  .  .  .  +- RadioButton = GtkRadioButton
+    .  .  .  .  .  +- AspectFrame = GtkAspectFrame
+    .  .  .  .  .  +- Expander = GtkExpander
+    .  .  .  .  .  +- VolumeButton = GtkVolumeButton
+    .  .  .  .  .  +- Frame = GtkFrame
+    .  .  .  .  .  +- LinkButton = GtkLinkButton
+    .  .  .  .  +- GtkNullContainer
+    .  .  .  +- TextView = GtkTextView
+    .  .  .  +- Text = GtkTextView
+    .  .  .  +- Scale = GtkScale
+    .  .  .  +- Image = GtkImage
+    .  .  +- TextMark = GtkTextMark
+    .  .  +- TextTag = GtkTextTag
+    .  .  +- TextBuffer = GtkTextBuffer
+    .  .  +- Pixbuf = GdkPixbuf
+    .  .  +- StatusIcon = GtkStatusIcon
+    .  .  +- GObjectAny = GObjectAny{Name}
+    .  +- GtkTextIter
+    .  +- GdkPoint
+    .  +- GdkRectangle
+    .  +- GdkEventMotion
+    .  +- GdkEventButton
+    .  +- MouseHandler
+    .  +- AbstractArray = AbstractArray{T,1}
+    .  .  +- Ranges = Ranges{T}
+    .  .  .  +- GtkTextRange
+    .  .  +- MatrixStrided = MatrixStrided{T}
+    .  +- RGBA
+    .  +- RGB
