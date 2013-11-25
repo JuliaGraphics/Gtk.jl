@@ -117,9 +117,15 @@ for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes
 end
 
 export GAccessor
-open(joinpath(splitdir(@__FILE__)[1], "..", "gen",
-    "gbox$(gtk_version)_$(Sys.OS_NAME)_m$(Sys.WORD_SIZE)_julia$(VERSION.major)_$(VERSION.minor)")) do cache
-    eval(deserialize(cache))
+let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen", "gbox$(gtk_version)")
+    fastcachedir = "$(cachedir)_julia$(VERSION.major)_$(VERSION.minor)"
+    if isfile(fastcachedir) && true
+        open(fastcachedir) do cache
+            eval(deserialize(cache))
+        end
+    else
+        map(eval, include(cachedir).args)
+    end
 end
 const _ = GAccessor
 

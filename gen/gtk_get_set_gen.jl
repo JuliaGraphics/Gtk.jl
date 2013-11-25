@@ -1,7 +1,7 @@
 import Clang.cindex
 gtk_libdir = "/opt/local/lib"
 
-const GtkTypeMap = [
+const GtkTypeMap = (ASCIIString=>Symbol)[
     "GObject" => :GObjectI,
     "GtkWidget" => :GtkWidgetI,
     "GtkContainer" => :GtkContainerI,
@@ -65,7 +65,8 @@ cl_to_jl = [
     cindex.UInt128          => :Uint128,
     cindex.FirstBuiltin     => :Void,
     ]
-c_typdef_to_jl = [
+c_typdef_to_jl = (ASCIIString=>Any)[
+    "va_list"               => :Nothing,
     "size_t"                => :Csize_t,
     "ptrdiff_t"             => :Cptrdiff_t,
     "GdkRectangle"          => :(Gtk.GdkRectangle),
@@ -76,6 +77,29 @@ c_typdef_to_jl = [
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
 end
+const reserved_names = Set{Symbol}([symbol(x) for x in split("
+    Base Main Core Array Expr Ptr
+    type immutable module function macro ccall
+    while do for if ifelse nothing quote
+    start next end done top tuple convert
+    Gtk GAccessor
+    ")]...)
+for typsym in values(cl_to_jl)
+    push!(reserved_names, typsym)
+end
+for typsym in values(c_typdef_to_jl)
+    if isa(typsym, Symbol)
+        push!(reserved_names, typsym)
+    end
+end
+const gtklibname = (ASCIIString=>Any)[
+    "gtk" => Expr(:., :Gtk, Expr(:quote, :libgtk)),
+    "gdk" => Expr(:., :Gtk, Expr(:quote, :libgdk)),
+    "gobject" => Expr(:., :Gtk, Expr(:quote, :libgobject)),
+    "glib" => Expr(:., :Gtk, Expr(:quote, :libglib)),
+    "gdk-pixbuf" => Expr(:., :Gtk, Expr(:quote, :libgdk_pixbuf)),
+    "deprecated" => nothing,
+    ]
 
 g_type_to_jl(ctype::cindex.Invalid) = :Nothing
 g_type_to_jl(ctype::cindex.Unexposed) = :Void
@@ -154,11 +178,11 @@ function gen_get_set(body, header, args)
     fdecls = cindex.search(gtk_h, cindex.FunctionDecl)
     count = 0
     for fdecl in fdecls
-        fargs = cindex.function_args(fdecl)
+        fargs = cindex.search(fdecl, cindex.ParmDecl)
         if length(fargs) < 1
             continue
         end
-        arg1ty = g_get_gtype(fargs[1])
+        arg1ty = g_get_gtype(cindex.getCursorType(fargs[1]))
         if arg1ty === :Nothing
             continue
         end
@@ -169,15 +193,18 @@ function gen_get_set(body, header, args)
         end
         method_name = symbol(m.captures[2])
         header_file = cindex.cu_file(fdecl)
-        libname = Expr(:., :Gtk, Expr(:quote, symbol(string("lib",basename(splitdir(header_file)[1])))))
+        libname = gtklibname[basename(splitdir(header_file)[1])]
+        if libname == nothing
+            continue
+        end
         rettype = g_type_to_jl(cindex.return_type(fdecl))
-        argnames = [symbol(cindex.name(arg)) for arg in filter!((f)->isa(f,cindex.ParmDecl),[cindex.children(fdecl)...])]
+        argnames = [symbol(cindex.name(arg)) for arg in fargs]
         for i = 1:length(argnames)
-            if argnames[i] == method_name
+            if argnames[i] == method_name || argnames[i] in reserved_names
                 argnames[i] = symbol(string(argnames[i],'_'))
             end
         end
-        argtypes = [g_type_to_jl(arg) for arg in fargs]
+        argtypes = [g_type_to_jl(cindex.getCursorType(arg)) for arg in fargs]
         @assert length(argnames) == length(argtypes)
         if any(argtypes .== :Nothing) || any(argtypes .== :Void)
             continue
@@ -192,7 +219,7 @@ function gen_get_set(body, header, args)
             fargnames = Symbol[]
             multiret = false
             for i = 2:length(argnames)
-                atype = fargs[i]
+                atype = cindex.getCursorType(fargs[i])
                 if isa(atype, cindex.Pointer) && !is_gstring(atype)
                     atype = cindex.getPointeeType(atype)
                     T = g_type_to_jl(atype)
@@ -236,23 +263,27 @@ function gen_get_set(body, header, args)
 end
 
 toplevels = {}
-ARCHS = ((32,("-m32",)),(64,("-m64",)))
-for (word_size,cppflags) = ARCHS
-    for gtk_version = (2, 3)
-        body = Expr(:block,
-            Expr(:import, :., :., :Gtk),
-            Expr(:import, :., :., :Gtk, :GObject),
-            Expr(:import, :., :., :Gtk, :GObjectI),
-        )
-        toplevel = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
-        args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')..., cppflags...]
-        count = gen_get_set(body, joinpath(gtk_libdir,"..","include","gtk-$gtk_version.0","gtk","gtk.h"), args)
-        cachepath = "gbox$(gtk_version)_$(Sys.OS_NAME)_m$(word_size)_julia$(VERSION.major)_$(VERSION.minor)"
-        println("Generated $cachepath with $count function definitions")
-        open(joinpath(splitdir(@__FILE__)[1], cachepath), "w") do cache
-            serialize(cache, toplevel)
-        end
-        push!(toplevels,toplevel)
+cppargs = []
+for gtk_version = (2, 3)
+    body = Expr(:block,
+        Expr(:import, :., :., :Gtk),
+        Expr(:import, :., :., :Gtk, :GObject),
+        Expr(:import, :., :., :Gtk, :GObjectI),
+    )
+    toplevel = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
+    args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
+    count = gen_get_set(body, joinpath(gtk_libdir,"..","include","gtk-$gtk_version.0","gtk","gtk.h"), args)
+    cachepath = "gbox$(gtk_version)"
+    println("Generated $cachepath with $count function definitions")
+    open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia$(VERSION.major)_$(VERSION.minor)"), "w") do cache
+        serialize(cache, toplevel)
     end
+    open(joinpath(splitdir(@__FILE__)[1], cachepath), "w") do cache
+        Base.println(cache,"quote")
+        Base.show_unquoted(cache, toplevel)
+        println(cache)
+        Base.println(cache,"end")
+    end
+    push!(toplevels,toplevel)
 end
 toplevels

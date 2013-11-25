@@ -165,9 +165,9 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
     elseif resource_path !== nothing
         GError() do error_check
             if width == -1 && height == -1
-                pixbuf = ccall((:gdk_pixbuf_new_from_resource,libgdk),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(resource_path),error_check)
+                pixbuf = ccall((:gdk_pixbuf_new_from_resource,libgdk_pixbuf),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(resource_path),error_check)
             else
-                pixbuf = ccall((:gdk_pixbuf_new_from_resource_at_scale,libgdk),Ptr{GObject},
+                pixbuf = ccall((:gdk_pixbuf_new_from_resource_at_scale,libgdk_pixbuf),Ptr{GObject},
                     (Ptr{Uint8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(resource_path),width,height,preserve_aspect_ratio,error_check)
             end
             return pixbuf !== C_NULL
@@ -175,9 +175,9 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
     elseif filename !== nothing
         GError() do error_check
             if width == -1 && height == -1
-                pixbuf = ccall((:gdk_pixbuf_new_from_file,libgdk),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(filename),error_check)
+                pixbuf = ccall((:gdk_pixbuf_new_from_file,libgdk_pixbuf),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(filename),error_check)
             else
-                pixbuf = ccall((:gdk_pixbuf_new_from_file_at_scale,libgdk),Ptr{GObject},
+                pixbuf = ccall((:gdk_pixbuf_new_from_file_at_scale,libgdk_pixbuf),Ptr{GObject},
                     (Ptr{Uint8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(filename),width,height,preserve_aspect_ratio,error_check)
             end
             return pixbuf !== C_NULL
@@ -185,24 +185,24 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
     elseif xpm_data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from xpm_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data,libgdk),Ptr{GObject},(Ptr{Ptr{Uint8}},),xpm_data)
+            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data,libgdk_pixbuf),Ptr{GObject},(Ptr{Ptr{Uint8}},),xpm_data)
             return pixbuf !== C_NULL
         end
     elseif inline_data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from inline_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_inline,libgdk),Ptr{GObject},(Cint,Ptr{Uint8},Cint,Ptr{Ptr{GError}}),sizeof(inline_data),inline_data,true,error_check)
+            pixbuf = ccall((:gdk_pixbuf_new_from_inline,libgdk_pixbuf),Ptr{GObject},(Cint,Ptr{Uint8},Cint,Ptr{Ptr{GError}}),sizeof(inline_data),inline_data,true,error_check)
             return pixbuf !== C_NULL
         end
     elseif data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from data")
-        pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk),Ptr{GObject},
+        pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk_pixbuf),Ptr{GObject},
             (Ptr{Uint8},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Any),
             data,0,convert(Bool,has_alpha),8,width,height,size(data,1)*sizeof(eltype(data)),
             gc_ref_closure(data),data)
     else
         @assert(width!=-1 && height!=-1,"GdkPixbuf requires a width, height, and has_alpha to create an uninitialized pixbuf")
-        pixbuf = ccall((:gdk_pixbuf_new,libgdk),Ptr{GObject},
+        pixbuf = ccall((:gdk_pixbuf_new,libgdk_pixbuf),Ptr{GObject},
             (Cint,Cint,Cint,Cint,Cint),0,convert(Bool,has_alpha),8,width,height)
     end
     return GdkPixbuf(pixbuf)
@@ -210,20 +210,20 @@ end
 #GdkPixbufLoader for new with type/mimetype
 #GdkPixbuf(callback, stream, width=-1, height=-1, preserve_aspect_ratio=true)
 
-copy(img::GdkPixbuf) = GdkPixbuf(ccall((:gdk_pixbuf_copy,libgdk),Ptr{GObject},(Ptr{GObject},),img))
-slice(img::GdkPixbuf,x,y) = GdkPixbuf(ccall((:gdk_pixbuf_new_subpixbuf,libgdk),Ptr{GObject},
+copy(img::GdkPixbuf) = GdkPixbuf(ccall((:gdk_pixbuf_copy,libgdk_pixbuf),Ptr{GObject},(Ptr{GObject},),img))
+slice(img::GdkPixbuf,x,y) = GdkPixbuf(ccall((:gdk_pixbuf_new_subpixbuf,libgdk_pixbuf),Ptr{GObject},
     (Ptr{GObject},Cint,Cint,Cint,Cint),img,first(x)-1,first(y)-1,length(x),length(y)))
-width(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_width,libgdk),Cint,(Ptr{GObject},),img)
-height(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_height,libgdk),Cint,(Ptr{GObject},),img)
+width(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_width,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
+height(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_height,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
 size(a::GdkPixbuf,i::Integer) = (i == 1 ? width(a) : (i == 2 ? height(a) : 1))
 size(a::GdkPixbuf) = (width(a),height(a))
 Base.ndims(::GdkPixbuf) = 2
 #function stride(img::GdkPixbuf,i)
 #    if i == 1
-#        convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk),Cint,(Ptr{GObject},),img) *
-#            ccall((:gdk_pixbuf_get_n_channels,libgdk),Cint,(Ptr{GObject},),img) + 7, 8))
+#        convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk_pixbuf),Cint,(Ptr{GObject},),img) *
+#            ccall((:gdk_pixbuf_get_n_channels,libgdk_pixbuf),Cint,(Ptr{GObject},),img) + 7, 8))
 #    elseif i == 2
-#        ccall((:gdk_pixbuf_get_rowstride,libgdk),Cint,(Ptr{GObject},),img)
+#        ccall((:gdk_pixbuf_get_rowstride,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
 #    else
 #        convert(Cint,0)
 #    end
@@ -231,8 +231,8 @@ Base.ndims(::GdkPixbuf) = 2
 size(img::GdkPixbuf) = (width(img),height(img))
 function eltype(img::GdkPixbuf)
     #nbytes = stride(img,1)
-    nbytes = convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk),Cint,(Ptr{GObject},),img) *
-        ccall((:gdk_pixbuf_get_n_channels,libgdk),Cint,(Ptr{GObject},),img) + 7, 8))
+    nbytes = convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk_pixbuf),Cint,(Ptr{GObject},),img) *
+        ccall((:gdk_pixbuf_get_n_channels,libgdk_pixbuf),Cint,(Ptr{GObject},),img) + 7, 8))
     if nbytes == 3
         RGB
     elseif nbytes == 4
@@ -243,9 +243,9 @@ function eltype(img::GdkPixbuf)
 end
 function convert(::Type{MatrixStrided},img::GdkPixbuf)
     MatrixStrided(
-        convert(Ptr{eltype(img)},ccall((:gdk_pixbuf_get_pixels,libgdk),Ptr{Void},(Ptr{GObject},),img)),
+        convert(Ptr{eltype(img)},ccall((:gdk_pixbuf_get_pixels,libgdk_pixbuf),Ptr{Void},(Ptr{GObject},),img)),
         width=width(img), height=height(img),
-        rowstride=ccall((:gdk_pixbuf_get_rowstride,libgdk),Cint,(Ptr{GObject},),img))
+        rowstride=ccall((:gdk_pixbuf_get_rowstride,libgdk_pixbuf),Cint,(Ptr{GObject},),img))
 end
 getindex(img::GdkPixbuf,x::Index,y::Index) = convert(MatrixStrided,img)[x,y]
 setindex!(img::GdkPixbuf,pix,x::Index,y::Index) = setindex!(convert(MatrixStrided,img),pix,x,y)
