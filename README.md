@@ -102,9 +102,20 @@ In addition to listening for events, you can trigger your own:
 
 Note: the return type and argument types do not need to match the spec. However, the length of the args list MUST exactly match the length of the ArgType's list.
 
-### Objects have get and set methods
+### Objects have get and set accessor methods
 
-The API for accessing this has not been finalized. Current work-in-progress will auto-generate stubs for these methods.
+warning: this API has not been finalized
+
+``Gtk._`` (not exported), ``Gtk.G_`` (exported by ShortNames), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the GtkObjects. The difference between a get and set method is based upon the number of arguments.
+
+Example usage:
+
+    bytestring(Gtk._.title(Window("my title")))
+    G_.title(Window("my title"), "my new title")
+    GAccessor.size(Window("what size?"))
+
+Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.
+
 
 ## Gtk Object Tree
 

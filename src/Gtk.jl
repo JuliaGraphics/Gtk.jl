@@ -59,7 +59,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 # local function, handles Symbol and makes UTF8-strings easier
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own)
+bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own))
 
 typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
