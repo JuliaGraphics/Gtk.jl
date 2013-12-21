@@ -35,4 +35,7 @@ done(list::GSList,s) = true
 done(w::GSList,s::(GSList,GSList)) = false
 done(w::GSList,s::(Any,())) = true
 length(list::GSList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{typeof(list)},),&list))
-getindex(list::GSList, i::Integer) = ccall((:g_list_nth_data,libglib),eltype(list),(Ptr{typeof(list)},Cuint),&list,i-1)
+getindex{T}(list::GSList{T}, i::Integer) =
+    convert(eltype(list),
+        ccall((:g_list_nth_data,libglib),Ptr{T},(Ptr{typeof(list)},Cuint),&list,i-1))
+done(::(),::()) = true

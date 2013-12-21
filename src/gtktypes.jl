@@ -63,6 +63,7 @@ function convert{T<:GObjectI}(::Type{T},w::Ptr{GObjectI})
     unsafe_pointer_to_objref(x)::T
 end
 convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
+eltype{T<:GObjectI}(::GSList{T}) = T
 
 destroy(w::GtkWidgetI) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObjectI},), w)
 parent(w::GtkWidgetI) = convert(GtkWidgetI, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObjectI}, (Ptr{GObjectI},), w))

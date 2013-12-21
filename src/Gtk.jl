@@ -128,6 +128,10 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen", "gbox$(gtk_version)
     end
 end
 const _ = GAccessor
+function _.position(w::GtkWindow,x::Integer,y::Integer)
+    ccall((:gtk_window_move,libgtk),Void,(Ptr{GObject},Cint,Cint),w,x,y)
+    w
+end
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames

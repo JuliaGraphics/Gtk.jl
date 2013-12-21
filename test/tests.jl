@@ -1,9 +1,11 @@
 ## Tests
-using Gtk, Gtk.ShortNames
+using Gtk.ShortNames
 
 ## Window
 w = Window("Window", 400, 400)
-warn("set_position(w, 10, 10)")
+G_.gravity(w,10) #GDK_GRAVITY_STATIC
+G_.position(w, 100, 100)
+@assert G_.position(w) == (100,100)
 @assert w["title",String] == "Window"
 w[:title] = "Window 2"
 @assert w[:title,String] == "Window 2"
@@ -71,10 +73,10 @@ push!(g2, b21)
 b22 = Button("second")
 push!(g2, b22)
 
-g1[b11,:pack_type] = 0
-g1[b12,:page_type] = 0
-g2[b21,:pack_type] = 1
-g2[b22,:page_type] = 1
+g1[b11,:pack_type] = 0 #GTK_PACK_START
+g1[b12,:pack_type] = 0 #GTK_PACK_START
+g2[b21,:pack_type] = 1 #GTK_PACK_END
+g2[b22,:pack_type] = 1 #GTK_PACK_END
 ## Now shrink window
 destroy(w)
 
@@ -82,8 +84,6 @@ destroy(w)
 ## Grid
 grid = Table(3,3)
 w = Window(grid, "Grid", 400, 400)
-#grid(Slider(f, 1:10, {:orient=>"vertical"}), 1:3, 1)
-#grid(Slider(f, 1:10), 1  , 2:3, {:sticky=>"news"})
 grid[2,2] = Button("2,2")
 grid[2,3] = Button("2,3")
 grid[1,1] = "grid"
