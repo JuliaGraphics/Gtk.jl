@@ -133,7 +133,7 @@ end
 ### GtkPaned
 @GType GtkPaned <: GtkContainer
 if gtk_version == 3
-    GtkPaned(vertical::Bool) =
+    GtkPaned(vertical::Bool, spacing=0) =
         GtkPaned(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
 else
