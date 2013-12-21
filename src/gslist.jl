@@ -12,7 +12,7 @@ function gslist{T}(list::Ptr{GSList{T}},own::Bool=false)
         return ()
     end
     l = unsafe_load(list)
-    own ? finalizer(l, (l)->ccall(:g_list_free,Void,(Ptr{GSList{T}},),list)) : nothing
+    own ? finalizer(l, (l)->ccall((:g_list_free,libgtk),Void,(Ptr{GSList{T}},),list)) : nothing
     l
 end
 function gslist2{T}(list::Ptr{GSList{T}})
