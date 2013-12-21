@@ -17,7 +17,7 @@ function empty!(w::GtkContainerI)
     w
 end
 
-start(w::GtkContainerI) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w), true)
+start(w::GtkContainerI) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w))
 next(w::GtkContainerI, list) = next(list[1],list)
 done(w::GtkContainerI, list) = next(list[1],list)
 length(w::GtkContainerI) = length(start(w)[2])

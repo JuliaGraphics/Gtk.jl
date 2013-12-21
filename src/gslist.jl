@@ -12,7 +12,7 @@ function gslist{T}(list::Ptr{GSList{T}},own::Bool=false)
         return ()
     end
     l = unsafe_load(list)
-    own ? finalizer(l, (l)->ccall(:g_list_free,Void,(Ptr{GSList{T}},),list)) : nothing
+    own ? finalizer(l, (l)->ccall((:g_list_free,libgtk),Void,(Ptr{GSList{T}},),list)) : nothing
     l
 end
 function gslist2{T}(list::Ptr{GSList{T}})
@@ -36,3 +36,5 @@ done(w::GSList,s::(GSList,GSList)) = false
 done(w::GSList,s::(Any,())) = true
 length(list::GSList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{typeof(list)},),&list))
 getindex(list::GSList, i::Integer) = ccall((:g_list_nth_data,libglib),eltype(list),(Ptr{typeof(list)},Cuint),&list,i-1)
+
+done(::(), ::()) = true

@@ -1,5 +1,5 @@
 ## Tests
-using Gtk
+using Gtk, Gtk.ShortNames
 
 ## Window
 w = Window("Window", 400, 400)
