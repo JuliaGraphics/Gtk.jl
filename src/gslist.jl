@@ -36,3 +36,5 @@ done(w::GSList,s::(GSList,GSList)) = false
 done(w::GSList,s::(Any,())) = true
 length(list::GSList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{typeof(list)},),&list))
 getindex(list::GSList, i::Integer) = ccall((:g_list_nth_data,libglib),eltype(list),(Ptr{typeof(list)},Cuint),&list,i-1)
+
+done(::(), ::()) = true

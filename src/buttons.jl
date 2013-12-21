@@ -117,7 +117,10 @@ function start(grp::GtkRadioButtonGroup)
     end
     list
 end
-next(w::GtkRadioButtonGroup,s) = next(s,s)
+function next(w::GtkRadioButtonGroup,s)
+    item,s = next(s,s)
+    convert(GtkRadioButton,item), s
+end
 done(w::GtkRadioButtonGroup,s) = done(s,s) 
 length(w::GtkRadioButtonGroup) = length(start(w))
 getindex(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
