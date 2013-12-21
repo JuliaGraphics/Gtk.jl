@@ -77,7 +77,7 @@ GtkAlignment(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
 
 ### GtkFrame — A bin with a decorative frame and optional label
 @GType GtkFrame <: GtkBin
-GtkFrame(label::String) = GtkGrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
+GtkFrame(label::String) = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(label)))
 GtkFrame() = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), C_NULL))
