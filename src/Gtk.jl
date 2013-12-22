@@ -37,7 +37,8 @@ export GtkTable, GtkAlignment
 export gtk_doevent, GdkEventMask, GdkModifierType,
     signal_connect, signal_disconnect,
     on_signal_destroy, on_signal_button_press,
-    on_signal_button_release, on_signal_motion
+    on_signal_button_release, on_signal_motion,
+    add_events
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
