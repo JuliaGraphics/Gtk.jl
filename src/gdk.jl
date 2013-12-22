@@ -136,6 +136,13 @@ baremodule GdkEventType
   const GDK_TOUCH_CANCEL      = 40
 end
 
+baremodule GdkScrollDirection
+  const GDK_SCROLL_UP    = 0
+  const GDK_SCROLL_DOWN  = 1
+  const GDK_SCROLL_LEFT  = 2
+  const GDK_SCROLL_RIGHT = 3
+end
+
 immutable GdkEventButton
     event_type::Enum
     gdk_window::Ptr{Void}
