@@ -73,11 +73,12 @@ push!(g2, b21)
 b22 = Button("second")
 push!(g2, b22)
 
-## Iteration
+## Iteration and toplevel
 strs = ["first", "second"]
 i = 1
 for child in g1
     @assert child[:label,String] == strs[i]
+    @assert toplevel(child) == w
     i += 1
 end
 
