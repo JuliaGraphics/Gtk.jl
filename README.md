@@ -31,9 +31,11 @@ Try any of the following until something is successful:
 `apt-get install libgtk2.0-0 libgtk-3-0`
 `yum install gtk2 gtk3`
 
-## Basic Usage
+## Overview
 
 This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
+
+There is also a more [detailed description](doc/usage.md) in tutorial style, as well as a [function reference](doc/function_reference.md).
 
 ### Referring to Gtk.Objects
 
@@ -50,9 +52,9 @@ On the flip side, you can assign child widgets to indices, or `push!` them onto 
 
 ### Objects have[:properties, with_types] = values
 
-The properties of any object can be accessed by treating the object as an Associative dictionary. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string.
+The properties of any object can be accessed by treating the object as an Associative dictionary. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
-When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional. It is helpful to know that you can replace ``-`` with ``_`` when specifying a name, as shown below.
+When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
 
 Some Examples:
 
