@@ -90,6 +90,59 @@ baremodule GdkModifierType
     const GDK_MODIFIER_MASK = 0x5c001fff
 end
 
+baremodule GdkEventType
+  const GDK_NOTHING           = -1
+  const GDK_DELETE            = 0
+  const GDK_DESTROY           = 1
+  const GDK_EXPOSE            = 2
+  const GDK_MOTION_NOTIFY     = 3
+  const GDK_BUTTON_PRESS      = 4
+  const GDK_2BUTTON_PRESS     = 5
+  const GDK_DOUBLE_BUTTON_PRESS = GDK_2BUTTON_PRESS
+  const GDK_3BUTTON_PRESS     = 6
+  const GDK_TRIPLE_BUTTON_PRESS = GDK_3BUTTON_PRESS
+  const GDK_BUTTON_RELEASE    = 7
+  const GDK_KEY_PRESS         = 8
+  const GDK_KEY_RELEASE       = 9
+  const GDK_ENTER_NOTIFY      = 10
+  const GDK_LEAVE_NOTIFY      = 11
+  const GDK_FOCUS_CHANGE      = 12
+  const GDK_CONFIGURE         = 13
+  const GDK_MAP               = 14
+  const GDK_UNMAP             = 15
+  const GDK_PROPERTY_NOTIFY   = 16
+  const GDK_SELECTION_CLEAR   = 17
+  const GDK_SELECTION_REQUEST = 18
+  const GDK_SELECTION_NOTIFY  = 19
+  const GDK_PROXIMITY_IN      = 20
+  const GDK_PROXIMITY_OUT     = 21
+  const GDK_DRAG_ENTER        = 22
+  const GDK_DRAG_LEAVE        = 23
+  const GDK_DRAG_MOTION       = 24
+  const GDK_DRAG_STATUS       = 25
+  const GDK_DROP_START        = 26
+  const GDK_DROP_FINISHED     = 27
+  const GDK_CLIENT_EVENT      = 28
+  const GDK_VISIBILITY_NOTIFY = 29
+  const GDK_SCROLL            = 31
+  const GDK_WINDOW_STATE      = 32
+  const GDK_SETTING           = 33
+  const GDK_OWNER_CHANGE      = 34
+  const GDK_GRAB_BROKEN       = 35
+  const GDK_DAMAGE            = 36
+  const GDK_TOUCH_BEGIN       = 37
+  const GDK_TOUCH_UPDATE      = 38
+  const GDK_TOUCH_END         = 39
+  const GDK_TOUCH_CANCEL      = 40
+end
+
+baremodule GdkScrollDirection
+  const GDK_SCROLL_UP    = 0
+  const GDK_SCROLL_DOWN  = 1
+  const GDK_SCROLL_LEFT  = 2
+  const GDK_SCROLL_RIGHT = 3
+end
+
 immutable GdkEventButton
     event_type::Enum
     gdk_window::Ptr{Void}
@@ -105,6 +158,38 @@ immutable GdkEventButton
     y_root::Float64
 end
 
+immutable GdkEventScroll
+    event_type::Enum
+    gdk_window::Ptr{Void}
+    send_event::Int8
+    time::Uint32
+    x::Float64
+    y::Float64
+    state::Uint32
+    direction::Enum
+    gdk_device::Ptr{Void}
+    x_root::Float64
+    y_root::Float64
+    delta_x::Float64
+    delta_y::Float64
+end
+
+immutable GdkEventKey
+    event_type::Enum
+    gdk_window::Ptr{Void}
+    send_event::Int8
+    time::Uint32
+    state::Uint32
+    keyval::Uint32
+    length::Int32
+    string::Ptr{Void}
+    hardware_keycode::Uint16
+    group::Uint8
+    flags::Uint32
+end
+
+is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
+
 immutable GdkEventMotion
   event_type::Enum
   gdk_window::Ptr{Void}
@@ -119,4 +204,19 @@ immutable GdkEventMotion
   x_root::Float64
   y_root::Float64
 end
-    
+
+immutable GdkEventCrossing
+  event_type::Enum
+  gdk_window::Ptr{Void}
+  send_event::Int8
+  gdk_subwindow::Ptr{Void}
+  time::Uint32
+  x::Float64
+  y::Float64
+  x_root::Float64
+  y_root::Float64
+  mode::Enum
+  detail::Enum
+  focus::Cint
+  state::Uint32
+end

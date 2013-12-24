@@ -19,7 +19,7 @@ end
 
 start(w::GtkContainerI) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w))
 next(w::GtkContainerI, list) = next(list[1],list)
-done(w::GtkContainerI, list) = next(list[1],list)
+done(w::GtkContainerI, list) = done(list[1],list)
 length(w::GtkContainerI) = length(start(w)[2])
 getindex(w::GtkContainerI, i::Integer) = convert(GtkWidgetI,start(w)[2][i])::GtkWidgetI
 

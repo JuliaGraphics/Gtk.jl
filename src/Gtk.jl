@@ -13,7 +13,8 @@ import Cairo: destroy
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    visible, destroy
+    visible, destroy,
+    hasparent, toplevel
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
@@ -37,7 +38,8 @@ export GtkTable, GtkAlignment
 export gtk_doevent, GdkEventMask, GdkModifierType,
     signal_connect, signal_disconnect,
     on_signal_destroy, on_signal_button_press,
-    on_signal_button_release, on_signal_motion
+    on_signal_button_release, on_signal_motion,
+    add_events
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
@@ -140,7 +142,8 @@ module ShortNames
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        visible, destroy
+        visible, destroy,
+        hasparent, toplevel
 
     # Gtk objects
     const G_ = GAccessor

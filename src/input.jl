@@ -13,7 +13,7 @@ GtkEntry() = GtkEntry(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
 
 @GType GtkScale <: GtkWidget
 if gtk_version == 3
-    GtkScale(vertical::Bool) = GtkScale(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
+    GtkScale(vertical::Bool,min,max,step) = GtkScale(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
             (Cint,Cdouble,Cdouble,Cdouble),vertical,min,max,step))
 else
     GtkScale(vertical::Bool,min,max,step) = GtkScale(
@@ -25,7 +25,7 @@ else
                 (Cdouble,Cdouble,Cdouble),min,max,step)
         end)
 end
-GtkScale(vertical::Bool,scale::Ranges) = GtkScale(vertical,min(scale),max(scale),step(scale))
+GtkScale(vertical::Bool,scale::Ranges) = GtkScale(vertical,minimum(scale),maximum(scale),step(scale))
 function push!(scale::GtkScale, value, position::Symbol, markup::String)
     ccall((:gtk_scale_add_mark,libgtk),Void,
         (Ptr{GObject},Cdouble,Enum,Ptr{Uint8}),

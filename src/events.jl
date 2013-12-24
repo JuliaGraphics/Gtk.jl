@@ -41,6 +41,8 @@ function signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),
             gconnectflags)
 end
 
+add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Cint),widget,mask)
+
 # widget[:event, Void, ()] = function(ptr, obj)
 #    stuff
 # end
@@ -89,13 +91,11 @@ function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
 end
 
 function on_signal_button_press(press_cb::Function, widget::GtkWidgetI, vargs...)
-    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Cint),
-        widget,GdkEventMask.GDK_BUTTON_PRESS_MASK)
+    add_events(widget, GdkEventMask.GDK_BUTTON_PRESS_MASK)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 function on_signal_button_release(release_cb::Function, widget::GtkWidgetI, vargs...)
-    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Cint),
-        widget,GdkEventMask.GDK_BUTTON_RELEASE_MASK)
+    add_events(widget, GdkEventMask.GDK_BUTTON_RELEASE_MASK)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 
@@ -131,7 +131,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
     else #if 0 != include & (GdkModifierType.GDK_BUTTON4_MASK|GdkModifierType.GDK_BUTTON5_MASK)
         mask |= GdkEventMask.GDK_BUTTON_MOTION_MASK
     end
-    ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Cint), widget, mask)
+    add_events(widget, mask)
     @assert Base.isstructtype(T)
     closure = Gtk_signal_motion{T}(
         closure,

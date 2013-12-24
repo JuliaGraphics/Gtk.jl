@@ -27,8 +27,9 @@ function next(list::GSList,s::GSList)
     return (convert(eltype(s),s.data), nx)
 end
 function next(list::GSList,s::(GSList,GSList))
-    nx = s.next==C_NULL ? () : unsafe_load(s.next)
-    return (convert(eltype(s),s.data), (s[1],nx))
+    s2 = s[2]
+    nx = s2.next==C_NULL ? () : unsafe_load(s2.next)
+    return (convert(eltype(s2),s2.data), (s[1],nx))
 end
 done(list::GSList,s::GSList) = false
 done(list::GSList,s) = true

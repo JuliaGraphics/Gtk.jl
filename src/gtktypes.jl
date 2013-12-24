@@ -67,6 +67,16 @@ eltype{T<:GObjectI}(::GSList{T}) = T
 
 destroy(w::GtkWidgetI) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObjectI},), w)
 parent(w::GtkWidgetI) = convert(GtkWidgetI, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObjectI}, (Ptr{GObjectI},), w))
+hasparent(w::GtkWidgetI) = ccall((:gtk_widget_get_parent,libgtk), Ptr{Void}, (Ptr{GObjectI},), w) != C_NULL
+function toplevel(w::GtkWidgetI)
+    p = convert(Ptr{GObjectI}, w)
+    pp = p
+    while pp != C_NULL
+        p = pp
+        pp = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObjectI}, (Ptr{GObjectI},), p)
+    end
+    convert(GtkWidgetI, p)
+end
 function allocation(widget::Gtk.GtkWidgetI)
     allocation_ = Array(GdkRectangle)
     ccall((:gtk_widget_get_allocation,libgtk), Void, (Ptr{GObject},Ptr{GdkRectangle}), widget, allocation_)
