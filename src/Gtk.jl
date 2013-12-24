@@ -12,6 +12,7 @@ import Cairo: destroy
 
 # generic interface:
 export width, height, #minsize, maxsize
+    get_pointer,
     reveal, configure, draw, cairo_context,
     visible, destroy,
     hasparent, toplevel
@@ -141,6 +142,7 @@ module ShortNames
 
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
+        get_pointer,
         reveal, configure, draw, cairo_context,
         visible, destroy,
         hasparent, toplevel

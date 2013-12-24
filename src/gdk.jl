@@ -12,6 +12,16 @@ immutable GdkPoint
 end
 gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
+const _gpx = Cint[-1]
+const _gpy = Cint[-1]
+const _gpmask = Cint[-1]
+function get_pointer(w::GtkWidgetI)
+    ccall((:gdk_window_get_pointer,libgtk), Ptr{Void},
+          (Ptr{Void}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}),
+          gdk_window(w), _gpx, _gpy, _gpmask)
+    _gpx[1], _gpy[1], _gpmask[1]
+end
+
 baremodule GdkEventMask
     import Base.<<
     const GDK_EXPOSURE_MASK		    = 1 << 1
