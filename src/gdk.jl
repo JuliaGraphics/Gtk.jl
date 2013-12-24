@@ -143,6 +143,57 @@ baremodule GdkScrollDirection
   const GDK_SCROLL_RIGHT = 3
 end
 
+baremodule GdkKeySyms
+  const GDK_KEY_VoidSymbol = 0xffffff
+  const GDK_KEY_BackSpace = 0xff08
+  const GDK_KEY_Tab = 0xff09
+  const GDK_KEY_Linefeed = 0xff0a
+  const GDK_KEY_Clear = 0xff0b
+  const GDK_KEY_Return = 0xff0d
+  const GDK_KEY_Pause = 0xff13
+  const GDK_KEY_Scroll_Lock = 0xff14
+  const GDK_KEY_Sys_Req = 0xff15
+  const GDK_KEY_Escape = 0xff1b
+  const GDK_KEY_Delete = 0xffff
+  const GDK_KEY_Home = 0xff50
+  const GDK_KEY_Left = 0xff51
+  const GDK_KEY_Up = 0xff52
+  const GDK_KEY_Right = 0xff53
+  const GDK_KEY_Down = 0xff54
+  const GDK_KEY_Page_Up = 0xff55
+  const GDK_KEY_Next = 0xff56
+  const GDK_KEY_Page_Down = 0xff56
+  const GDK_KEY_End = 0xff57
+  const GDK_KEY_Insert = 0xff63
+  const GDK_KEY_Num_Lock = 0xff7f
+  const GDK_KEY_F1 = 0xffbe
+  const GDK_KEY_F2 = 0xffbf
+  const GDK_KEY_F3 = 0xffc0
+  const GDK_KEY_F4 = 0xffc1
+  const GDK_KEY_F5 = 0xffc2
+  const GDK_KEY_F6 = 0xffc3
+  const GDK_KEY_F7 = 0xffc4
+  const GDK_KEY_F8 = 0xffc5
+  const GDK_KEY_F9 = 0xffc6
+  const GDK_KEY_F10 = 0xffc7
+  const GDK_KEY_F11 = 0xffc8
+  const GDK_KEY_F12 = 0xffc9
+  const GDK_KEY_Shift_L = 0xffe1
+  const GDK_KEY_Shift_R = 0xffe2
+  const GDK_KEY_Control_L = 0xffe3
+  const GDK_KEY_Control_R = 0xffe4
+  const GDK_KEY_Caps_Lock = 0xffe5
+  const GDK_KEY_Shift_Lock = 0xffe6
+  const GDK_KEY_Meta_L = 0xffe7
+  const GDK_KEY_Meta_R = 0xffe8
+  const GDK_KEY_Alt_L = 0xffe9
+  const GDK_KEY_Alt_R = 0xffea
+  const GDK_KEY_Super_L = 0xffeb
+  const GDK_KEY_Super_R = 0xffec
+  const GDK_KEY_Hyper_L = 0xffed
+  const GDK_KEY_Hyper_R = 0xffee
+end
+
 immutable GdkEventButton
     event_type::Enum
     gdk_window::Ptr{Void}
@@ -182,7 +233,7 @@ immutable GdkEventKey
     state::Uint32
     keyval::Uint32
     length::Int32
-    string::Ptr{Void}
+    string::Ptr{Uint8}
     hardware_keycode::Uint16
     group::Uint8
     flags::Uint32
