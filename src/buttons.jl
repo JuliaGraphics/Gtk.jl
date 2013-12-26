@@ -18,6 +18,15 @@ GtkButton() = GtkButton(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
 GtkButton(title::String) =
     GtkButton(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
+function GtkButton(icon::GdkPixbuf)
+    btn = GtkButton()
+    img = GtkImage(icon)
+    ccall((:gtk_button_set_image,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), btn, img)
+#     btn[:relief] = 2 # GTK_RELIEF_NONE
+    btn[:width_request] = img[:width_request] = size(icon, 1)
+    btn[:height_request] = img[:height_request] = size(icon, 2)
+    btn
+end
 
 @GType GtkCheckButton <: GtkBin
 GtkCheckButton() = GtkCheckButton(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))

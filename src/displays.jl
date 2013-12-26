@@ -195,7 +195,8 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
             return pixbuf !== C_NULL
         end
     elseif data !== nothing
-        @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from data")
+        width = size(data,1)
+        height = size(data,2)
         pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk_pixbuf),Ptr{GObject},
             (Ptr{Uint8},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Any),
             data,0,convert(Bool,has_alpha),8,width,height,size(data,1)*sizeof(eltype(data)),
@@ -302,6 +303,14 @@ function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size
     return img
 end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
+
+function GdkPixbuf(img::GtkImage)
+    p = ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img)
+    if p == C_NULL
+        error("empty image")
+    end
+    GdkPixbuf(p)
+end
 
 
 @GType GtkProgressBar <: GtkWidget
