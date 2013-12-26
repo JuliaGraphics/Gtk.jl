@@ -12,6 +12,16 @@ immutable GdkPoint
 end
 gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
+const _gpx = Cint[-1]
+const _gpy = Cint[-1]
+const _gpmask = Cint[-1]
+function get_pointer(w::GtkWidgetI)
+    ccall((:gdk_window_get_pointer,libgtk), Ptr{Void},
+          (Ptr{Void}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}),
+          gdk_window(w), _gpx, _gpy, _gpmask)
+    _gpx[1], _gpy[1], _gpmask[1]
+end
+
 baremodule GdkEventMask
     import Base.<<
     const GDK_EXPOSURE_MASK		    = 1 << 1
@@ -143,7 +153,60 @@ baremodule GdkScrollDirection
   const GDK_SCROLL_RIGHT = 3
 end
 
-immutable GdkEventButton
+baremodule GdkKeySyms
+  const GDK_KEY_VoidSymbol = 0xffffff
+  const GDK_KEY_BackSpace = 0xff08
+  const GDK_KEY_Tab = 0xff09
+  const GDK_KEY_Linefeed = 0xff0a
+  const GDK_KEY_Clear = 0xff0b
+  const GDK_KEY_Return = 0xff0d
+  const GDK_KEY_Pause = 0xff13
+  const GDK_KEY_Scroll_Lock = 0xff14
+  const GDK_KEY_Sys_Req = 0xff15
+  const GDK_KEY_Escape = 0xff1b
+  const GDK_KEY_Delete = 0xffff
+  const GDK_KEY_Home = 0xff50
+  const GDK_KEY_Left = 0xff51
+  const GDK_KEY_Up = 0xff52
+  const GDK_KEY_Right = 0xff53
+  const GDK_KEY_Down = 0xff54
+  const GDK_KEY_Page_Up = 0xff55
+  const GDK_KEY_Next = 0xff56
+  const GDK_KEY_Page_Down = 0xff56
+  const GDK_KEY_End = 0xff57
+  const GDK_KEY_Insert = 0xff63
+  const GDK_KEY_Num_Lock = 0xff7f
+  const GDK_KEY_F1 = 0xffbe
+  const GDK_KEY_F2 = 0xffbf
+  const GDK_KEY_F3 = 0xffc0
+  const GDK_KEY_F4 = 0xffc1
+  const GDK_KEY_F5 = 0xffc2
+  const GDK_KEY_F6 = 0xffc3
+  const GDK_KEY_F7 = 0xffc4
+  const GDK_KEY_F8 = 0xffc5
+  const GDK_KEY_F9 = 0xffc6
+  const GDK_KEY_F10 = 0xffc7
+  const GDK_KEY_F11 = 0xffc8
+  const GDK_KEY_F12 = 0xffc9
+  const GDK_KEY_Shift_L = 0xffe1
+  const GDK_KEY_Shift_R = 0xffe2
+  const GDK_KEY_Control_L = 0xffe3
+  const GDK_KEY_Control_R = 0xffe4
+  const GDK_KEY_Caps_Lock = 0xffe5
+  const GDK_KEY_Shift_Lock = 0xffe6
+  const GDK_KEY_Meta_L = 0xffe7
+  const GDK_KEY_Meta_R = 0xffe8
+  const GDK_KEY_Alt_L = 0xffe9
+  const GDK_KEY_Alt_R = 0xffea
+  const GDK_KEY_Super_L = 0xffeb
+  const GDK_KEY_Super_R = 0xffec
+  const GDK_KEY_Hyper_L = 0xffed
+  const GDK_KEY_Hyper_R = 0xffee
+end
+
+abstract GdkEventI
+
+immutable GdkEventButton <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -158,7 +221,7 @@ immutable GdkEventButton
     y_root::Float64
 end
 
-immutable GdkEventScroll
+immutable GdkEventScroll <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -174,7 +237,7 @@ immutable GdkEventScroll
     delta_y::Float64
 end
 
-immutable GdkEventKey
+immutable GdkEventKey <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -182,15 +245,15 @@ immutable GdkEventKey
     state::Uint32
     keyval::Uint32
     length::Int32
-    string::Ptr{Void}
+    string::Ptr{Uint8}
     hardware_keycode::Uint16
     group::Uint8
     flags::Uint32
 end
 
-is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
+is_modifier(evt::GdkEventKey) = (evt.flags & uint32(1)) > 0
 
-immutable GdkEventMotion
+immutable GdkEventMotion <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -205,7 +268,7 @@ immutable GdkEventMotion
   y_root::Float64
 end
 
-immutable GdkEventCrossing
+immutable GdkEventCrossing <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -219,4 +282,19 @@ immutable GdkEventCrossing
   detail::Enum
   focus::Cint
   state::Uint32
+end
+
+# Expand this dictionary as more event types get added
+const eventTdict = [
+    "button-press-event" => GdkEventButton,
+    "button-release-event" => GdkEventButton,
+    "enter-notify-event" => GdkEventCrossing,
+    "key-press-event" => GdkEventKey,
+    "key-release-event" => GdkEventKey,
+    "leave-notify-event" => GdkEventCrossing,
+    "motion-notify-event" => GdkEventMotion,
+    "scroll-event" => GdkEventScroll]
+kv = collect(eventTdict)
+for (k,v) in kv
+    eventTdict[replace(k, "-", "_")] = v
 end

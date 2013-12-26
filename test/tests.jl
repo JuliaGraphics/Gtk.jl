@@ -107,19 +107,25 @@ f = BoxLayout(:v); push!(w,f)
 l = Label("label"); push!(f,l)
 b = Button("button"); push!(f,b)
 
+# Callbacks
+ctr = 0
+function cb(obj)
+    global ctr
+    ctr = ctr + 1
+end
+
+id = connect(b, "clicked", cb)
+Gtk.signal_emit(b, "clicked", Void)
+@assert ctr == 1
+Gtk.signal_handler_disconnect(b, id)
+connect(b, "clicked", obj->nothing)
+Gtk.signal_emit(b, "clicked", Void)
+@assert ctr == 1
+
 l[:label] = "new label"
 @assert l[:label,String] == "new label"
 b[:label] = "new label"
 @assert b[:label,String] == "new label"
-#local ctr = 0
-#function cb(path)
-#    global ctr
-#    ctr = ctr + 1
-#end
-#end
-#tk_bind(b, "command", cb)
-#tcl(b, "invoke")
-#@assert ctr == 2
 #img = Image(Pkg.dir("Tk", "examples", "weather-overcast.gif"))
 #map(u-> tk_configure(u, {:image=>img, :compound=>"left"}), (l,b))
 destroy(w)
@@ -131,10 +137,11 @@ check[:active] = true
 @assert check[:active,Bool] == true
 check[:label] = "new label"
 @assert check[:label,String] == "new label"
-#ctr = 0
-#tk_bind(check, "command", cb)
-#tcl(check, "invoke")
-#@assert ctr == 1
+
+ctr = 0
+connect(check, "clicked", cb)
+Gtk.signal_emit(check, "clicked", Void)
+@assert ctr == 1
 destroy(w)
 
 ## radio
