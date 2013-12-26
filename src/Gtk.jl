@@ -41,6 +41,9 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
     on_signal_button_release, on_signal_motion,
     add_events
 
+# Constants
+export GdkKeySyms, GdkScrollDirection
+
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
 #export Button
@@ -181,6 +184,7 @@ module ShortNames
     const Text = GtkTextView
     const TextMark = GtkTextMark
     const TextTag = GtkTextTag
+    const Key = GdkKeySyms
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -188,7 +192,7 @@ module ShortNames
         ToggleButton, LinkButton, VolumeButton,
         Entry, Scale, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
-        StatusIcon, TextBuffer, TextView, TextMark, TextTag
+        StatusIcon, TextBuffer, TextView, TextMark, TextTag, Key
 
     # Gtk 3
     if Gtk.gtk_version >= 3

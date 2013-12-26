@@ -143,6 +143,57 @@ baremodule GdkScrollDirection
   const GDK_SCROLL_RIGHT = 3
 end
 
+baremodule GdkKeySyms
+  const VoidSymbol = 0xffffff
+  const BackSpace = 0xff08
+  const Tab = 0xff09
+  const Linefeed = 0xff0a
+  const Clear = 0xff0b
+  const Return = 0xff0d
+  const Pause = 0xff13
+  const Scroll_Lock = 0xff14
+  const Sys_Req = 0xff15
+  const Escape = 0xff1b
+  const Delete = 0xffff
+  const Home = 0xff50
+  const Left = 0xff51
+  const Up = 0xff52
+  const Right = 0xff53
+  const Down = 0xff54
+  const Page_Up = 0xff55
+  const Next = 0xff56
+  const Page_Down = 0xff56
+  const End = 0xff57
+  const Insert = 0xff63
+  const Num_Lock = 0xff7f
+  const F1 = 0xffbe
+  const F2 = 0xffbf
+  const F3 = 0xffc0
+  const F4 = 0xffc1
+  const F5 = 0xffc2
+  const F6 = 0xffc3
+  const F7 = 0xffc4
+  const F8 = 0xffc5
+  const F9 = 0xffc6
+  const F10 = 0xffc7
+  const F11 = 0xffc8
+  const F12 = 0xffc9
+  const Shift_L = 0xffe1
+  const Shift_R = 0xffe2
+  const Control_L = 0xffe3
+  const Control_R = 0xffe4
+  const Caps_Lock = 0xffe5
+  const Shift_Lock = 0xffe6
+  const Meta_L = 0xffe7
+  const Meta_R = 0xffe8
+  const Alt_L = 0xffe9
+  const Alt_R = 0xffea
+  const Super_L = 0xffeb
+  const Super_R = 0xffec
+  const Hyper_L = 0xffed
+  const Hyper_R = 0xffee
+end
+
 immutable GdkEventButton
     event_type::Enum
     gdk_window::Ptr{Void}
@@ -182,7 +233,7 @@ immutable GdkEventKey
     state::Uint32
     keyval::Uint32
     length::Int32
-    string::Ptr{Void}
+    string::Ptr{Uint8}
     hardware_keycode::Uint16
     group::Uint8
     flags::Uint32
