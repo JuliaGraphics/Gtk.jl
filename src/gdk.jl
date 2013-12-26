@@ -204,7 +204,9 @@ baremodule GdkKeySyms
   const GDK_KEY_Hyper_R = 0xffee
 end
 
-immutable GdkEventButton
+abstract GdkEventI
+
+immutable GdkEventButton <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -219,7 +221,7 @@ immutable GdkEventButton
     y_root::Float64
 end
 
-immutable GdkEventScroll
+immutable GdkEventScroll <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -235,7 +237,7 @@ immutable GdkEventScroll
     delta_y::Float64
 end
 
-immutable GdkEventKey
+immutable GdkEventKey <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -249,9 +251,9 @@ immutable GdkEventKey
     flags::Uint32
 end
 
-is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
+is_modifier(evt::GdkEventKey) = (evt.flags & uint32(1)) > 0
 
-immutable GdkEventMotion
+immutable GdkEventMotion <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -266,7 +268,7 @@ immutable GdkEventMotion
   y_root::Float64
 end
 
-immutable GdkEventCrossing
+immutable GdkEventCrossing <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -280,4 +282,19 @@ immutable GdkEventCrossing
   detail::Enum
   focus::Cint
   state::Uint32
+end
+
+# Expand this dictionary as more event types get added
+const eventTdict = [
+    "button-press-event" => GdkEventButton,
+    "button-release-event" => GdkEventButton,
+    "enter-notify-event" => GdkEventCrossing,
+    "key-press-event" => GdkEventKey,
+    "key-release-event" => GdkEventKey,
+    "leave-notify-event" => GdkEventCrossing,
+    "motion-notify-event" => GdkEventMotion,
+    "scroll-event" => GdkEventScroll]
+kv = collect(eventTdict)
+for (k,v) in kv
+    eventTdict[replace(k, "-", "_")] = v
 end

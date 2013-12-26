@@ -37,7 +37,7 @@ export GtkTable, GtkAlignment
 
 # Gtk-specific event handling
 export gtk_doevent, GdkEventMask, GdkModifierType,
-    signal_connect, signal_disconnect,
+    connect, signal_connect, signal_disconnect,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion,
     add_events
@@ -145,7 +145,8 @@ module ShortNames
         get_pointer,
         reveal, configure, draw, cairo_context,
         visible, destroy,
-        hasparent, toplevel
+        hasparent, toplevel,
+        connect
 
     # Gtk objects
     const G_ = GAccessor

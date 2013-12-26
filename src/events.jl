@@ -60,13 +60,13 @@ add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,li
 
 
 signal_handler_disconnect(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_disconnect, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_disconnect,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 signal_handler_block(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_block, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_block,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 signal_handler_unblock(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_unblock, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_unblock,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
     i = isa(sig, String) ? search(sig, "::") : (0:-1)
@@ -201,4 +201,23 @@ function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
         this.button1motion(this.widget, event.x, event.y)
     end
     int32(false)
+end
+
+function connect(widget::GtkWidgetI, signal::String, func::Function, gconnectflags=0)
+    strs = split(signal, "::")
+    ret = endswith(strs[1], "event") ?
+        signal_connect(cbeventhandler,widget,signal,Cint,(Ptr{eventTdict[strs[1]]},),gconnectflags,func) :
+        signal_connect(cbhandler,widget,signal,Void,(),gconnectflags,func)
+end
+connect(widget::GtkWidgetI, signal::Symbol, func::Function, gconnectflags=0) =
+    connect(widget, string(signal), func, gconnectflags)
+
+function cbhandler(ptr::Ptr, func::Function)
+    func(convert(GtkWidgetI, ptr))
+    nothing
+end
+
+function cbeventhandler(ptr::Ptr, eventp::Ptr, func::Function)
+    handled::Bool = func(convert(GtkWidgetI, ptr), unsafe_load(eventp))
+    int32(handled)::Cint
 end
