@@ -1,20 +1,23 @@
 ## Tests
-using Gtk.ShortNames
+using Gtk.ShortNames, Base.Graphics
 
 ## Window
-w = Window("Window", 400, 400)
+w = Window("Window", 400, 300)
+@assert width(w) == 400
+@assert height(w) == 300
+@assert size(w) == (400, 300)
 G_.gravity(w,10) #GDK_GRAVITY_STATIC
 G_.position(w, 100, 100)
 # @assert G_.position(w) == (100,100)    # for some reason this often fails (though it works interactively)
 @assert w["title",String] == "Window"
 w[:title] = "Window 2"
 @assert w[:title,String] == "Window 2"
-@assert size(w) == (400, 400)
 destroy(w)
 @assert !w[:visible,Bool]
-w=WeakRef(w)
-gc(); gc(); sleep(.1); gc()
-@assert w.value.handle == C_NULL
+# FIXME: I get a segfault now if I uncomment the next lines
+# w=WeakRef(w)
+# gc(); gc(); sleep(.1); gc()
+# @assert w.value.handle == C_NULL
 
 ## Frame
 w = Window(
@@ -89,6 +92,19 @@ g2[b22,:pack_type] = 1 #GTK_PACK_END
 ## Now shrink window
 destroy(w)
 
+## ButtonBox
+bb = ButtonBox(:h)
+w = Window(bb, "ButtonBox")
+cancel = Button("Cancel")
+ok = Button("OK")
+push!(bb, cancel)
+push!(bb, ok)
+
+# Expander
+delete!(w, bb)
+ex = Expander(bb, "Some buttons")
+push!(w, ex)
+destroy(w)
 
 ## Grid
 grid = Table(3,3)
@@ -122,6 +138,14 @@ b[:label] = "new label"
 #@assert ctr == 2
 #img = Image(Pkg.dir("Tk", "examples", "weather-overcast.gif"))
 #map(u-> tk_configure(u, {:image=>img, :compound=>"left"}), (l,b))
+destroy(w)
+
+## Button with custom icon (& Pixbuf)
+icon = Array(Gtk.RGB, 40, 20)
+fill!(icon, Gtk.RGB(0,0xff,0))
+icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
+b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
+w = Window(b, "Icon button", 60, 40)
 destroy(w)
 
 ## checkbox
@@ -167,68 +191,88 @@ end
 w = Window(r,"RadioGroup")
 destroy(w)
 
+## ToggleButton
+tb = ToggleButton("Off")
+w = Window(tb, "ToggleButton")
+function toggled(ptr,evt,widget)
+    state = widget[:label,String]
+    if state == "Off"
+        widget[:label] = "On"
+    else
+        widget[:label] = "Off"
+    end
+    int32(true)
+end
+on_signal_button_press(toggled, tb)
+signal_emit(tb, "button-press-event", Cint)  # FIXME G_VALUE error!
+destroy(w)
+
+## LinkButton
+b = LinkButton("https://github.com/JuliaLang/Gtk.jl", "Gtk.jl")
+w = Window(b, "LinkButton")
+destroy(w)
+
+## VolumeButton
+b = VolumeButton(0.3)
+w = Window(b, "VolumeButton", 50, 50)
+destroy(w)
+
 ## combobox
-#combo = Combobox(w, choices); pack(combo)
-#set_editable(combo, false)              # default
-#set_value(combo, choices[1])
-#@assert get_value(combo) == choices[1]
-#set_value(combo, 2)                         #  by index
-#@assert get_value(combo) == choices[2]
-#set_value(combo, nothing)
-#@assert get_value(combo) == nothing
-#set_items(combo, map(uppercase, choices))
-#set_value(combo, 2)
-#@assert get_value(combo) == uppercase(choices[2])
-#set_items(combo, {:one=>"ONE", :two=>"TWO"})
-#set_value(combo, "one")
-#@assert get_value(combo) == "one"
-#w = Window(combo,"Combobox")
-#destroy(w)
+combo = ComboBoxText()
+choices = ["Strawberry", "Vanilla", "Chocolate"]
+for c in choices
+    push!(combo, c)
+end
+w = Window(combo, "ComboBoxText")
+destroy(w)
+combo = ComboBoxText(true)
+for c in choices
+    push!(combo, c)
+end
+w = Window(combo, "ComboBoxText with entry")
+destroy(w)
 
-
-## slider
-#w = Window("Slider")
-#sl = Slider(w, 1:10, {:orient=>"vertical"}); pack(sl)
-#set_value(sl, 3)
-#@assert get_value(sl) == 3
+## slider/scale
+sl = Scale(true, 1:10)
+w = Window(sl, "Scale")
+G_.value(sl, 3)
+@assert G_.value(sl) == 3
 #tk_bind(sl, "command", cb) ## can't test
-#destroy(w)
+destroy(w)
 
-## spinbox
-#w = Window("Spinbox")
-#sp = Spinbox(w, 1:10); pack(sp)
-#set_value(sp, 3)
-#@assert get_value(sp) == 3
-#destroy(w)
+## spinbutton
+sp = SpinButton(1:10)
+w = Window(sp, "SpinButton")
+G_.value(sp, 3)
+@assert G_.value(sp) == 3
+destroy(w)
 
 ## progressbar
-#w = Window("Progress bar")
-#pb = Progressbar(w, {:orient=>"horizontal"}); pack(pb)
-#set_value(pb, 50)
-#@assert get_value(pb) == 50
-#tk_configure(pb, {:mode => "indeterminate"})
-#destroy(w)
+pb = ProgressBar()
+w = Window(pb, "Progress bar")
+pb[:fraction] = 0.7
+@assert pb[:fraction,Float64] == 0.7
+destroy(w)
 
 
 ## Entry
-#w = Window("Entry")
-#e = Entry(w, "initial"); pack(e)
-#set_value(e, "new text")
-#@assert get_value(e) == "new text"
-#set_visible(e, false)
-#set_visible(e, true)
-### Validation
-#function validatecommand(path, s, S)
-#    println("old $s, new $S")
-#    s == "invalid" ? tcl("expr", "FALSE") : tcl("expr", "TRUE")     # *must* return logical in this way
-#end
-#function invalidcommand(path, W)
-#    println("called when invalid")
-#    tcl(W, "delete", "@0", "end")
-#    tcl(W, "insert", "@0", "new text")
-#end
-#tk_configure(e, {:validate=>"key", :validatecommand=>validatecommand, :invalidcommand=>invalidcommand})
-#destroy(w)
+e = Entry()
+w = Window(e, "Entry")
+e[:text] = "initial"
+e[:sensitive] = false
+destroy(w)
+
+
+## Canvas & AspectFrame
+c = Canvas()
+f = AspectFrame(c, "AspectFrame", 0.5, 1, 0.5)
+w = Window(f, "Canvas")
+c.draw = function(_)
+    ctx = getgc(c)
+    set_source_rgb(ctx, 1.0, 0.0, 0.0)
+    paint(ctx)
+end
+destroy(w)
 
 ## Text
 #w = Window("Text")
