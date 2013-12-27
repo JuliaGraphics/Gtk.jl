@@ -263,3 +263,9 @@ destroy(w)
 #set_value(tr, 2)
 #@assert get_value(tr)[1] == choices[2]
 #destroy(w)
+
+## Selectors
+dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
+                        Stock.CANCEL, Response.CANCEL,
+                        Stock.OPEN, Response.ACCEPT)
+destroy(dlg)

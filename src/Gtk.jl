@@ -3,7 +3,7 @@
 module Gtk
 using Cairo
 
-import Base: convert, show, showall, size, length, getindex, setindex!,
+import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy
@@ -26,7 +26,8 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkToggleButton, GtkLinkButton, GtkVolumeButton,
     GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
-    GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag
+    GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
+    GtkFileChooserDialog, GtkNullContainer
 
 # Gtk3 objects
 export GtkGrid
@@ -40,6 +41,9 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion,
     add_events
+
+# Selectors
+export GtkFileChooserAction, GtkStock, GtkResponse
 
 # Constants
 export GdkKeySyms, GdkScrollDirection
@@ -185,6 +189,11 @@ module ShortNames
     const TextMark = GtkTextMark
     const TextTag = GtkTextTag
     const Key = GdkKeySyms
+    const FileChooserDialog = GtkFileChooserDialog
+    const FileChooserAction = GtkFileChooserAction
+    const Stock = GtkStock
+    const Response = GtkResponse
+    const NullContainer = GtkNullContainer
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -192,7 +201,8 @@ module ShortNames
         ToggleButton, LinkButton, VolumeButton,
         Entry, Scale, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
-        StatusIcon, TextBuffer, TextView, TextMark, TextTag, Key
+        StatusIcon, TextBuffer, TextView, TextMark, TextTag,
+        NullContainer, Key
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -206,6 +216,9 @@ module ShortNames
         const Alignment = GtkAlignment
         export Table, Aligment
     end
+
+    # Selectors
+    export FileChooserDialog, FileChooserAction, Stock, Response
 end
 using .ShortNames
 export Canvas, Window
