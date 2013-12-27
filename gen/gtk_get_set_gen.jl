@@ -19,6 +19,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkLabel" => :GtkLabel,
     "GtkProgressBar" => :GtkProgressBar,
     "GtkScale" => :GtkScale,
+    "GtkRange" => :GtkScale, #GtkRangeI,
     "GtkSpinButton" => :GtkSpinButton,
     "GtkSpinner" => :GtkSpinner,
     "GtkTextView" => :GtkTextView,
@@ -187,6 +188,9 @@ function gen_get_set(body, header, args)
             continue
         end
         spell = cindex.spelling(fdecl)
+        if beginswith(spell,"gtk_test_") || beginswith(spell,"_")
+            continue
+        end
         m = match(r"g.+_(get|set)_(.+)", spell)
         if m === nothing
             continue
