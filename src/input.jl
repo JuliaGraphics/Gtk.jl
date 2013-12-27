@@ -44,5 +44,5 @@ empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObjec
 @GType GtkSpinButton <: GtkWidget
 GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},
     (Cdouble,Cdouble,Cdouble),min,max,step))
-GtkSpinButton(scale::Ranges) = GtkSpinButton(min(scale),max(scale),step(scale))
+GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(scale))
 
