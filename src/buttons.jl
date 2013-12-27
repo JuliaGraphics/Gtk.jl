@@ -178,9 +178,9 @@ end
 #TODO: @GType GtkScaleButton
 
 @GType GtkVolumeButton <: GtkBin
-GtkLinkButton() = GtkLinkButton(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
+GtkVolumeButton() = GtkVolumeButton(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
 function GtkVolumeButton(value::Real) # 0<=value<=1
     b = GtkVolumeButton()
-    ccall((:gtk_scale_button_set_value,libgtk),Void,(Ptr{Uint8},Cdouble),b,value)
+    ccall((:gtk_scale_button_set_value,libgtk),Void,(Ptr{GObject},Cdouble),b,value)
     b
 end
