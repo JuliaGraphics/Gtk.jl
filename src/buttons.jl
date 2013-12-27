@@ -159,7 +159,7 @@ end
 
 @GType GtkLinkButton <: GtkBin
 GtkLinkButton(uri::String) =
-    GtkLinkButton(ccall((:gtk_switch_new,libgtk),Ptr{GObject},
+    GtkLinkButton(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
         (Ptr{Uint8},),bytestring(uri)))
 GtkLinkButton(uri::String,label::String) =
     GtkLinkButton(ccall((:gtk_link_button_new_with_label,libgtk),Ptr{GObject},
