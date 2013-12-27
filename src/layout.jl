@@ -84,12 +84,12 @@ GtkFrame() = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
 
 ### GtkAspectFrame
 @GType GtkAspectFrame <: GtkBin
-GtkAspectFrame(label::String, xalign, yalign, ratio) = # % of available space, 0<=a<=1
+GtkAspectFrame(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
     GtkAspectFrame(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), label, xalign, yalign, ratio, false))
-GtkAspectFrame(label::String, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
+        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
+GtkAspectFrame(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
     GtkAspectFrame(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), label, xalign, yalign, 1., true))
+        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
 @GType GtkBox <: GtkBox
