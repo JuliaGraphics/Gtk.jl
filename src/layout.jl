@@ -24,13 +24,13 @@ if gtk_version == 3
     @GType GtkGrid <: GtkContainer
     GtkGrid() = GtkGrid(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
-    function getindex(grid::GtkGrid, j::Integer, i::Integer)
+    function getindex(grid::GtkGrid, i::Integer, j::Integer)
         x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GObject}, (Ptr{GObject}, Cint, Cint), grid, i-1, j-1)
         x == C_NULL && error("tried to get non-existent child at [$i $j]")
         return convert(GtkWidgetI, x)
     end
 
-    setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
+    setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
     #TODO:
     # setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child::Array, j::Union(T,Range1{T}), i::Union(R,Range1{R})) = ccall((:gtk_grid_attach, libgtk), Void,
@@ -50,8 +50,8 @@ if gtk_version == 3
         end
     end
 
-    function insert!(grid::GtkGrid, i, side::Symbol)
-        ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GObject}, Cint), grid, i-1)
+    function insert!(grid::GtkGrid, sibling, side::Symbol)
+        ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.get(side))
     end
 else
     GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")
