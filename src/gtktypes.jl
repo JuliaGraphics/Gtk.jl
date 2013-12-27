@@ -9,7 +9,7 @@ abstract GtkBoxI <: GtkContainerI
 # by creating const aliases: `const Z = GObject{:Z}`
 type GObjectAny{Name} <: GObjectI
     handle::Ptr{GObject}
-    GObjectAny(handle::Ptr{GObject}) = gc_ref(new(handle))
+    GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
 #type GtkWidgetAny{T} <: GtkWidgetI
 #    handle::Ptr{GObject}
@@ -40,7 +40,7 @@ macro GType(gname)
     quote
         type $(esc(gname)) <: $(esc(symbol(string(super,'I'))))
             handle::Ptr{GObjectI}
-            $(esc(gname))(handle::Ptr{GObjectI}) = gc_ref(new(handle))
+            $(esc(gname))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
         end
     end
 end
