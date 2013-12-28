@@ -262,6 +262,14 @@ pb[:fraction] = 0.7
 @assert pb[:fraction,Float64] == 0.7
 destroy(w)
 
+## spinner
+s = Spinner()
+w = Window(s, "Spinner")
+s[:active] = true
+@assert s[:active,Bool] == true
+s[:active] = false
+@assert s[:active,Bool] == false
+destroy(w)
 
 ## Entry
 e = Entry()
@@ -270,6 +278,30 @@ e[:text] = "initial"
 e[:sensitive] = false
 destroy(w)
 
+## Statusbar
+vbox = BoxLayout(:v)
+w = Window(vbox, "Statusbar")
+sb = Statusbar()
+push!(vbox, sb)
+ctxid = Gtk.context_id(sb, "Statusbar example")
+bpush = Button("push item")
+bpop = Button("pop item")
+push!(vbox, bpush)
+push!(vbox, bpop)
+sb_count = 1
+function cb_sbpush(ptr,evt,id)
+    global sb_count
+    push!(sb, id, string("Item ", sb_count))
+    sb_count += 1
+    int32(false)
+end
+function cb_sbpop(ptr,evt,id)
+    pop!(sb, id)
+    int32(false)
+end
+on_signal_button_press(cb_sbpush, bpush, 0, ctxid)
+on_signal_button_press(cb_sbpop, bpop, 0, ctxid)
+destroy(w)
 
 ## Canvas & AspectFrame
 c = Canvas()
