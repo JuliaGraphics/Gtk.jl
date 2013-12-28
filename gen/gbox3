@@ -456,7 +456,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return widget
         end
         function tooltip_window(widget::Gtk.GtkWidgetI)
-            return convert(Gtk.GtkWindow,$(Expr(:ccall, :(:gtk_widget_get_tooltip_window,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :widget)))
+            return convert(Gtk.GtkWindowI,$(Expr(:ccall, :(:gtk_widget_get_tooltip_window,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :widget)))
         end
         function tooltip_text(widget::Gtk.GtkWidgetI,text)
             $(Expr(:ccall, :(:gtk_widget_set_tooltip_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :widget, :text))
@@ -557,199 +557,199 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function child(bin::Gtk.GtkBinI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_bin_get_child,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :bin)))
         end
-        function title(window::Gtk.GtkWindow,title_)
+        function title(window::Gtk.GtkWindowI,title_)
             $(Expr(:ccall, :(:gtk_window_set_title,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :window, :title_))
             return window
         end
-        function title(window::Gtk.GtkWindow)
+        function title(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_title,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :window))
         end
-        function wmclass(window::Gtk.GtkWindow,wmclass_name,wmclass_class)
+        function wmclass(window::Gtk.GtkWindowI,wmclass_name,wmclass_class)
             $(Expr(:ccall, :(:gtk_window_set_wmclass,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Uint8}), :window, :wmclass_name, :wmclass_class))
             return window
         end
-        function role(window::Gtk.GtkWindow,role_)
+        function role(window::Gtk.GtkWindowI,role_)
             $(Expr(:ccall, :(:gtk_window_set_role,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :window, :role_))
             return window
         end
-        function startup_id(window::Gtk.GtkWindow,startup_id_)
+        function startup_id(window::Gtk.GtkWindowI,startup_id_)
             $(Expr(:ccall, :(:gtk_window_set_startup_id,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :window, :startup_id_))
             return window
         end
-        function role(window::Gtk.GtkWindow)
+        function role(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_role,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :window))
         end
-        function position(window::Gtk.GtkWindow,position_)
+        function position(window::Gtk.GtkWindowI,position_)
             $(Expr(:ccall, :(:gtk_window_set_position,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :position_))
             return window
         end
-        function focus(window::Gtk.GtkWindow,focus_)
+        function focus(window::Gtk.GtkWindowI,focus_)
             $(Expr(:ccall, :(:gtk_window_set_focus,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :focus_))
             return window
         end
-        function focus(window::Gtk.GtkWindow)
+        function focus(window::Gtk.GtkWindowI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_window_get_focus,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
         end
-        function default(window::Gtk.GtkWindow,default_widget)
+        function default(window::Gtk.GtkWindowI,default_widget)
             $(Expr(:ccall, :(:gtk_window_set_default,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :default_widget))
             return window
         end
-        function default_widget(window::Gtk.GtkWindow)
+        function default_widget(window::Gtk.GtkWindowI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_window_get_default_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
         end
-        function transient_for(window::Gtk.GtkWindow,parent)
+        function transient_for(window::Gtk.GtkWindowI,parent)
             $(Expr(:ccall, :(:gtk_window_set_transient_for,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :parent))
             return window
         end
-        function transient_for(window::Gtk.GtkWindow)
-            return convert(Gtk.GtkWindow,$(Expr(:ccall, :(:gtk_window_get_transient_for,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
+        function transient_for(window::Gtk.GtkWindowI)
+            return convert(Gtk.GtkWindowI,$(Expr(:ccall, :(:gtk_window_get_transient_for,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
         end
-        function attached_to(window::Gtk.GtkWindow,attach_widget)
+        function attached_to(window::Gtk.GtkWindowI,attach_widget)
             $(Expr(:ccall, :(:gtk_window_set_attached_to,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :attach_widget))
             return window
         end
-        function attached_to(window::Gtk.GtkWindow)
+        function attached_to(window::Gtk.GtkWindowI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_window_get_attached_to,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
         end
-        function opacity(window::Gtk.GtkWindow,opacity_)
+        function opacity(window::Gtk.GtkWindowI,opacity_)
             $(Expr(:ccall, :(:gtk_window_set_opacity,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :window, :opacity_))
             return window
         end
-        function opacity(window::Gtk.GtkWindow)
+        function opacity(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_opacity,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :window))
         end
-        function type_hint(window::Gtk.GtkWindow,hint)
+        function type_hint(window::Gtk.GtkWindowI,hint)
             $(Expr(:ccall, :(:gtk_window_set_type_hint,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :hint))
             return window
         end
-        function type_hint(window::Gtk.GtkWindow)
+        function type_hint(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_type_hint,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window))
         end
-        function skip_taskbar_hint(window::Gtk.GtkWindow,setting)
+        function skip_taskbar_hint(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_skip_taskbar_hint,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function skip_taskbar_hint(window::Gtk.GtkWindow)
+        function skip_taskbar_hint(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_skip_taskbar_hint,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function skip_pager_hint(window::Gtk.GtkWindow,setting)
+        function skip_pager_hint(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_skip_pager_hint,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function skip_pager_hint(window::Gtk.GtkWindow)
+        function skip_pager_hint(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_skip_pager_hint,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function urgency_hint(window::Gtk.GtkWindow,setting)
+        function urgency_hint(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_urgency_hint,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function urgency_hint(window::Gtk.GtkWindow)
+        function urgency_hint(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_urgency_hint,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function accept_focus(window::Gtk.GtkWindow,setting)
+        function accept_focus(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_accept_focus,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function accept_focus(window::Gtk.GtkWindow)
+        function accept_focus(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_accept_focus,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function focus_on_map(window::Gtk.GtkWindow,setting)
+        function focus_on_map(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_focus_on_map,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function focus_on_map(window::Gtk.GtkWindow)
+        function focus_on_map(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_focus_on_map,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function destroy_with_parent(window::Gtk.GtkWindow,setting)
+        function destroy_with_parent(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_destroy_with_parent,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function destroy_with_parent(window::Gtk.GtkWindow)
+        function destroy_with_parent(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_destroy_with_parent,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function hide_titlebar_when_maximized(window::Gtk.GtkWindow,setting)
+        function hide_titlebar_when_maximized(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_hide_titlebar_when_maximized,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function hide_titlebar_when_maximized(window::Gtk.GtkWindow)
+        function hide_titlebar_when_maximized(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_hide_titlebar_when_maximized,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function mnemonics_visible(window::Gtk.GtkWindow,setting)
+        function mnemonics_visible(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_mnemonics_visible,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function mnemonics_visible(window::Gtk.GtkWindow)
+        function mnemonics_visible(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_mnemonics_visible,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function focus_visible(window::Gtk.GtkWindow,setting)
+        function focus_visible(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_focus_visible,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function focus_visible(window::Gtk.GtkWindow)
+        function focus_visible(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_focus_visible,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function resizable(window::Gtk.GtkWindow,resizable_)
+        function resizable(window::Gtk.GtkWindowI,resizable_)
             $(Expr(:ccall, :(:gtk_window_set_resizable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :resizable_))
             return window
         end
-        function resizable(window::Gtk.GtkWindow)
+        function resizable(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_resizable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function gravity(window::Gtk.GtkWindow,gravity_)
+        function gravity(window::Gtk.GtkWindowI,gravity_)
             $(Expr(:ccall, :(:gtk_window_set_gravity,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :gravity_))
             return window
         end
-        function gravity(window::Gtk.GtkWindow)
+        function gravity(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_gravity,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window))
         end
-        function geometry_hints(window::Gtk.GtkWindow,geometry_widget,geometry,geom_mask)
+        function geometry_hints(window::Gtk.GtkWindowI,geometry_widget,geometry,geom_mask)
             $(Expr(:ccall, :(:gtk_window_set_geometry_hints,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Void},Cint), :window, :geometry_widget, :geometry, :geom_mask))
             return window
         end
-        function screen(window::Gtk.GtkWindow,screen_)
+        function screen(window::Gtk.GtkWindowI,screen_)
             $(Expr(:ccall, :(:gtk_window_set_screen,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :window, :screen_))
             return window
         end
-        function screen(window::Gtk.GtkWindow)
+        function screen(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_screen,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :window))
         end
-        function decorated(window::Gtk.GtkWindow,setting)
+        function decorated(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_decorated,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function decorated(window::Gtk.GtkWindow)
+        function decorated(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_decorated,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function deletable(window::Gtk.GtkWindow,setting)
+        function deletable(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_deletable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function deletable(window::Gtk.GtkWindow)
+        function deletable(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_deletable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function icon_list(window::Gtk.GtkWindow,list)
+        function icon_list(window::Gtk.GtkWindowI,list)
             $(Expr(:ccall, :(:gtk_window_set_icon_list,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :window, :list))
             return window
         end
-        function icon_list(window::Gtk.GtkWindow)
+        function icon_list(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_icon_list,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :window))
         end
-        function icon(window::Gtk.GtkWindow,icon_)
+        function icon(window::Gtk.GtkWindowI,icon_)
             $(Expr(:ccall, :(:gtk_window_set_icon,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :icon_))
             return window
         end
-        function icon_name(window::Gtk.GtkWindow,name)
+        function icon_name(window::Gtk.GtkWindowI,name)
             $(Expr(:ccall, :(:gtk_window_set_icon_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :window, :name))
             return window
         end
-        function icon_from_file(window::Gtk.GtkWindow,filename,err)
+        function icon_from_file(window::Gtk.GtkWindowI,filename,err)
             $(Expr(:ccall, :(:gtk_window_set_icon_from_file,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Ptr{Void}}), :window, :filename, :err))
             return window
         end
-        function icon(window::Gtk.GtkWindow)
+        function icon(window::Gtk.GtkWindowI)
             return convert(Gtk.GdkPixbuf,$(Expr(:ccall, :(:gtk_window_get_icon,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :window)))
         end
-        function icon_name(window::Gtk.GtkWindow)
+        function icon_name(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_icon_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :window))
         end
         function default_icon(icon::Gtk.GdkPixbuf)
@@ -760,85 +760,114 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_window_set_auto_startup_notification,Gtk.libgtk), :Void, :(Cint,), :setting))
             return setting
         end
-        function modal(window::Gtk.GtkWindow,modal_)
+        function modal(window::Gtk.GtkWindowI,modal_)
             $(Expr(:ccall, :(:gtk_window_set_modal,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :modal_))
             return window
         end
-        function modal(window::Gtk.GtkWindow)
+        function modal(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_modal,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function has_user_ref_count(window::Gtk.GtkWindow,setting)
+        function has_user_ref_count(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_has_user_ref_count,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function mnemonic_modifier(window::Gtk.GtkWindow,modifier)
+        function mnemonic_modifier(window::Gtk.GtkWindowI,modifier)
             $(Expr(:ccall, :(:gtk_window_set_mnemonic_modifier,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :modifier))
             return window
         end
-        function mnemonic_modifier(window::Gtk.GtkWindow)
+        function mnemonic_modifier(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_mnemonic_modifier,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window))
         end
-        function keep_above(window::Gtk.GtkWindow,setting)
+        function keep_above(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_keep_above,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function keep_below(window::Gtk.GtkWindow,setting)
+        function keep_below(window::Gtk.GtkWindowI,setting)
             $(Expr(:ccall, :(:gtk_window_set_keep_below,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :setting))
             return window
         end
-        function default_size(window::Gtk.GtkWindow,width,height)
+        function default_size(window::Gtk.GtkWindowI,width,height)
             $(Expr(:ccall, :(:gtk_window_set_default_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :window, :width, :height))
             return window
         end
-        function default_size(window::Gtk.GtkWindow)
+        function default_size(window::Gtk.GtkWindowI)
             height = Array(Cint)
             width = Array(Cint)
             $(Expr(:ccall, :(:gtk_window_get_default_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :window, :width, :height))
             return (width[1],height[1])
         end
-        function size(window::Gtk.GtkWindow)
+        function size(window::Gtk.GtkWindowI)
             height = Array(Cint)
             width = Array(Cint)
             $(Expr(:ccall, :(:gtk_window_get_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :window, :width, :height))
             return (width[1],height[1])
         end
-        function position(window::Gtk.GtkWindow)
+        function position(window::Gtk.GtkWindowI)
             root_y = Array(Cint)
             root_x = Array(Cint)
             $(Expr(:ccall, :(:gtk_window_get_position,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :window, :root_x, :root_y))
             return (root_x[1],root_y[1])
         end
-        function default_geometry(window::Gtk.GtkWindow,width,height)
+        function default_geometry(window::Gtk.GtkWindowI,width,height)
             $(Expr(:ccall, :(:gtk_window_set_default_geometry,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :window, :width, :height))
             return window
         end
-        function group(window::Gtk.GtkWindow)
+        function group(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_group,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :window))
         end
-        function window_type(window::Gtk.GtkWindow)
+        function window_type(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_window_type,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window))
         end
-        function application(window::Gtk.GtkWindow)
+        function application(window::Gtk.GtkWindowI)
             return $(Expr(:ccall, :(:gtk_window_get_application,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :window))
         end
-        function application(window::Gtk.GtkWindow,application_)
+        function application(window::Gtk.GtkWindowI,application_)
             $(Expr(:ccall, :(:gtk_window_set_application,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :window, :application_))
             return window
         end
-        function has_resize_grip(window::Gtk.GtkWindow,value)
+        function has_resize_grip(window::Gtk.GtkWindowI,value)
             $(Expr(:ccall, :(:gtk_window_set_has_resize_grip,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :window, :value))
             return window
         end
-        function has_resize_grip(window::Gtk.GtkWindow)
+        function has_resize_grip(window::Gtk.GtkWindowI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_window_get_has_resize_grip,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :window)))
         end
-        function resize_grip_area(window::Gtk.GtkWindow)
+        function resize_grip_area(window::Gtk.GtkWindowI)
             rect = Array(Gtk.GdkRectangle)
             return (convert(Bool,$(Expr(:ccall, :(:gtk_window_get_resize_grip_area,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle}), :window, :rect))),rect[1])
         end
-        function titlebar(window::Gtk.GtkWindow,titlebar_)
+        function titlebar(window::Gtk.GtkWindowI,titlebar_)
             $(Expr(:ccall, :(:gtk_window_set_titlebar,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :window, :titlebar_))
             return window
+        end
+        function response_sensitive(dialog::Gtk.GtkDialogI,response_id,setting)
+            $(Expr(:ccall, :(:gtk_dialog_set_response_sensitive,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :dialog, :response_id, :setting))
+            return dialog
+        end
+        function default_response(dialog::Gtk.GtkDialogI,response_id)
+            $(Expr(:ccall, :(:gtk_dialog_set_default_response,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :dialog, :response_id))
+            return dialog
+        end
+        function widget_for_response(dialog::Gtk.GtkDialogI,response_id)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_dialog_get_widget_for_response,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Cint), :dialog, :response_id)))
+        end
+        function response_for_widget(dialog::Gtk.GtkDialogI)
+            widget = Array(Gtk.GObject)
+            return ($(Expr(:ccall, :(:gtk_dialog_get_response_for_widget,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :dialog, :widget)),widget[1])
+        end
+        function alternative_button_order(dialog::Gtk.GtkDialogI,first_response_id)
+            $(Expr(:ccall, :(:gtk_dialog_set_alternative_button_order,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :dialog, :first_response_id))
+            return dialog
+        end
+        function alternative_button_order_from_array(dialog::Gtk.GtkDialogI,n_params,new_order)
+            $(Expr(:ccall, :(:gtk_dialog_set_alternative_button_order_from_array,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Cint}), :dialog, :n_params, :new_order))
+            return dialog
+        end
+        function action_area(dialog::Gtk.GtkDialogI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_dialog_get_action_area,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :dialog)))
+        end
+        function content_area(dialog::Gtk.GtkDialogI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_dialog_get_content_area,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :dialog)))
         end
         function for_attach_widget(widget::Gtk.GtkWidgetI)
             return $(Expr(:ccall, :(:gtk_menu_get_for_attach_widget,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
@@ -1595,6 +1624,150 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function resize_toplevel(expander::Gtk.GtkExpander)
             return convert(Bool,$(Expr(:ccall, :(:gtk_expander_get_resize_toplevel,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :expander)))
+        end
+        function action(chooser::Gtk.GtkFileChooserDialog,action_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_action,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :action_))
+            return chooser
+        end
+        function action(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_action,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function local_only(chooser::Gtk.GtkFileChooserDialog,local_only_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_local_only,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :local_only_))
+            return chooser
+        end
+        function local_only(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_local_only,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function select_multiple(chooser::Gtk.GtkFileChooserDialog,select_multiple_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_select_multiple,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :select_multiple_))
+            return chooser
+        end
+        function select_multiple(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_select_multiple,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function show_hidden(chooser::Gtk.GtkFileChooserDialog,show_hidden_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_show_hidden,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :show_hidden_))
+            return chooser
+        end
+        function show_hidden(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_show_hidden,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function do_overwrite_confirmation(chooser::Gtk.GtkFileChooserDialog,do_overwrite_confirmation_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_do_overwrite_confirmation,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :do_overwrite_confirmation_))
+            return chooser
+        end
+        function do_overwrite_confirmation(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_do_overwrite_confirmation,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function create_folders(chooser::Gtk.GtkFileChooserDialog,create_folders_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_create_folders,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :create_folders_))
+            return chooser
+        end
+        function create_folders(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_create_folders,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function current_name(chooser::Gtk.GtkFileChooserDialog,name)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_current_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :chooser, :name))
+            return chooser
+        end
+        function current_name(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_current_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function filename(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_filename,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function filename(chooser::Gtk.GtkFileChooserDialog,filename_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_filename,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8}), :chooser, :filename_))
+            return chooser
+        end
+        function filenames(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_filenames,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function current_folder(chooser::Gtk.GtkFileChooserDialog,filename)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_current_folder,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8}), :chooser, :filename))
+            return chooser
+        end
+        function current_folder(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_current_folder,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function uri(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_uri,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function uri(chooser::Gtk.GtkFileChooserDialog,uri_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_uri,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8}), :chooser, :uri_))
+            return chooser
+        end
+        function uris(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_uris,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function current_folder_uri(chooser::Gtk.GtkFileChooserDialog,uri)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_current_folder_uri,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8}), :chooser, :uri))
+            return chooser
+        end
+        function current_folder_uri(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_current_folder_uri,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function file(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_file,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function file(chooser::Gtk.GtkFileChooserDialog,file_,error)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_file,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Ptr{Void}}), :chooser, :file_, :error))
+            return chooser
+        end
+        function files(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_files,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function current_folder_file(chooser::Gtk.GtkFileChooserDialog,file,error)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_current_folder_file,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Ptr{Void}}), :chooser, :file, :error))
+            return chooser
+        end
+        function current_folder_file(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_current_folder_file,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function preview_widget(chooser::Gtk.GtkFileChooserDialog,preview_widget_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_preview_widget,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :chooser, :preview_widget_))
+            return chooser
+        end
+        function preview_widget(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_file_chooser_get_preview_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function preview_widget_active(chooser::Gtk.GtkFileChooserDialog,active)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_preview_widget_active,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :active))
+            return chooser
+        end
+        function preview_widget_active(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_preview_widget_active,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function use_preview_label(chooser::Gtk.GtkFileChooserDialog,use_label)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_use_preview_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :chooser, :use_label))
+            return chooser
+        end
+        function use_preview_label(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_file_chooser_get_use_preview_label,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function preview_filename(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_preview_filename,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function preview_uri(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_preview_uri,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function preview_file(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_preview_file,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function extra_widget(chooser::Gtk.GtkFileChooserDialog,extra_widget_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_extra_widget,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :chooser, :extra_widget_))
+            return chooser
+        end
+        function extra_widget(chooser::Gtk.GtkFileChooserDialog)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_file_chooser_get_extra_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :chooser)))
+        end
+        function filter(chooser::Gtk.GtkFileChooserDialog,filter_)
+            $(Expr(:ccall, :(:gtk_file_chooser_set_filter,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :chooser, :filter_))
+            return chooser
+        end
+        function filter(chooser::Gtk.GtkFileChooserDialog)
+            return $(Expr(:ccall, :(:gtk_file_chooser_get_filter,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
         end
         function bin_window(layout::Gtk.GtkLayout)
             return $(Expr(:ccall, :(:gtk_layout_get_bin_window,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :layout))

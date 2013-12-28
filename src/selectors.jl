@@ -14,28 +14,25 @@
 #GtkFontSelectionDialog — A dialog box for selecting fonts
 #GtkInputDialog — Configure devices for the XInput extension
 
-add_button(widget, text::String, response::Integer) =
+push!(widget::GtkDialogI, text::String, response::Integer) =
     ccall((:gtk_dialog_add_button,libgtk), Ptr{GObject},
           (Ptr{GObject},Ptr{Uint8},Cint), widget, text, response)
 
-type GtkFileChooserDialog <: GtkDialogI
-    handle::Ptr{GObject}
-    function GtkFileChooserDialog(title::String, parent::GtkContainerI, action::Integer, button_text_response...)
-        n = length(button_text_response)
-        if !iseven(n)
-            error("button_text_response must consist of text/response pairs")
-        end
-        hnd = ccall((:gtk_file_chooser_dialog_new,libgtk), Ptr{GObject},
-                    (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
-                    title, parent, action, C_NULL)
-        for i = 1:2:n
-            add_button(hnd, button_text_response[i], button_text_response[i+1])
-        end
-        widget = gc_ref(new(hnd))
-        gtk_doevent()
-        show(widget)
-        widget
+@GType GtkFileChooserDialog <: GtkDialog
+function GtkFileChooserDialog(title::String, parent::GtkContainerI, action::Integer, button_text_response...)
+    n = length(button_text_response)
+    if !iseven(n)
+        error("button_text_response must consist of text/response pairs")
     end
+    hnd = ccall((:gtk_file_chooser_dialog_new,libgtk), Ptr{GObject},
+                (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
+                title, parent, action, C_NULL)
+    for i = 1:2:n
+        push!(hnd, button_text_response[i], button_text_response[i+1])
+    end
+    widget = GtkFileChooserDialog(hnd)
+    show(widget)
+    widget
 end
 
 run(widget::GtkDialogI) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)

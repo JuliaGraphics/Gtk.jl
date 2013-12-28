@@ -3,7 +3,8 @@ typealias GObject GObjectI
 abstract GtkWidgetI <: GObjectI
 abstract GtkContainerI <: GtkWidgetI
 abstract GtkBinI <: GtkContainerI
-abstract GtkDialogI <: GtkBinI
+abstract GtkWindowI <: GtkBinI
+abstract GtkDialogI <: GtkWindowI
 abstract GtkBoxI <: GtkContainerI
 
 # Alternative object construction style. This would let us share constructors
