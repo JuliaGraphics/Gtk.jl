@@ -9,6 +9,7 @@ const gint64_id = g_type_from_name("gint64")
 const guint64_id = g_type_from_name("guint64")
 const gboolean_id = g_type_from_name("gboolean")
 const gobject_id = g_type_from_name("GObject")
+const gpointer_id = g_type_from_name("gpointer")
 
 immutable GValue
     field1::Csize_t
@@ -42,7 +43,9 @@ for (pass_x,as_ctype,to_gtype,with_id) in (
     (Signed,          Int64,           :int64,           :gint64_id),
     (FloatingPoint,   Float64,         :double,          :gdouble_id),
     (Bool,            Cint,            :boolean,         :gboolean_id),
+    (Ptr,             Ptr{Void},       :pointer,         :gpointer_id),
     (GObject,         Ptr{GObject},    :object,          :gobject_id),
+    (GdkEventI,       Ptr{Void},       :boxed,           :(ccall((:gdk_event_get_type,libgdk),Int,()))),
     )
    eval(quote
         # Since we aren't creating a GValue type, everything is done through the methods and the Array type

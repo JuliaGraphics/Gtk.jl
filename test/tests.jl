@@ -7,17 +7,19 @@ w = Window("Window", 400, 300)
 @assert height(w) == 300
 @assert size(w) == (400, 300)
 G_.gravity(w,10) #GDK_GRAVITY_STATIC
+pos = G_.position(w)
+@assert G_.position(w) == pos
 G_.position(w, 100, 100)
-# @assert G_.position(w) == (100,100)    # for some reason this often fails (though it works interactively)
+@assert G_.position(w) != pos # for some reason this often fails (though it works interactively)
 @assert w["title",String] == "Window"
 w[:title] = "Window 2"
 @assert w[:title,String] == "Window 2"
 destroy(w)
 @assert !w[:visible,Bool]
 # FIXME: I get a segfault now if I uncomment the next lines
-# w=WeakRef(w)
-# gc(); gc(); sleep(.1); gc()
-# @assert w.value.handle == C_NULL
+w=WeakRef(w)
+gc(); gc(); sleep(.1); gc()
+@assert w.value.handle == C_NULL
 
 ## Frame
 w = Window(
@@ -204,7 +206,11 @@ function toggled(ptr,evt,widget)
     int32(true)
 end
 on_signal_button_press(toggled, tb)
-signal_emit(tb, "button-press-event", Cint)  # FIXME G_VALUE error!
+press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-press-event", Bool, press)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-release-event", Bool, release)
+## next time just use "gtk_button_clicked", mkay?
 destroy(w)
 
 ## LinkButton

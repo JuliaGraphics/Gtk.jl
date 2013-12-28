@@ -194,7 +194,10 @@ baremodule GdkKeySyms
   const Hyper_R = 0xffee
 end
 
-immutable GdkEventButton
+abstract GdkEventI
+convert(::Type{Ptr{Void}}, evt::GdkEventI) = ccall(:jl_value_ptr,Ptr{Void},(Ptr{Any},),&evt)
+
+immutable GdkEventButton <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -209,7 +212,7 @@ immutable GdkEventButton
     y_root::Float64
 end
 
-immutable GdkEventScroll
+immutable GdkEventScroll <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -225,7 +228,7 @@ immutable GdkEventScroll
     delta_y::Float64
 end
 
-immutable GdkEventKey
+immutable GdkEventKey <: GdkEventI
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -241,7 +244,7 @@ end
 
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
-immutable GdkEventMotion
+immutable GdkEventMotion <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
