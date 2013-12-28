@@ -7,10 +7,12 @@ w = Window("Window", 400, 300)
 @assert height(w) == 300
 @assert size(w) == (400, 300)
 G_.gravity(w,10) #GDK_GRAVITY_STATIC
+sleep(0.1)
 pos = G_.position(w)
 @assert G_.position(w) == pos
 G_.position(w, 100, 100)
-@assert G_.position(w) != pos # for some reason this often fails (though it works interactively)
+sleep(0.1)
+@assert G_.position(w) != pos
 @assert w["title",String] == "Window"
 w[:title] = "Window 2"
 @assert w[:title,String] == "Window 2"
