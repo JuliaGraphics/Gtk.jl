@@ -37,10 +37,11 @@ export GtkTable, GtkAlignment
 
 # Gtk-specific event handling
 export gtk_doevent, GdkEventMask, GdkModifierType,
-    signal_connect, signal_disconnect,
+    signal_connect, signal_handler_disconnect,
+    signal_handler_block, signal_handler_unblock,
+    add_events, signal_emit,
     on_signal_destroy, on_signal_button_press,
-    on_signal_button_release, on_signal_motion,
-    add_events
+    on_signal_button_release, on_signal_motion
 
 # Selectors
 export GtkFileChooserAction, GtkStock, GtkResponse
@@ -219,6 +220,14 @@ module ShortNames
 
     # Selectors
     export FileChooserDialog, FileChooserAction, Stock, Response
+
+    # Events
+    export gtk_doevent, GdkEventMask, GdkModifierType,
+        signal_connect, signal_handler_disconnect,
+        signal_handler_block, signal_handler_unblock,
+        add_events, signal_emit,
+        on_signal_destroy, on_signal_button_press,
+        on_signal_button_release, on_signal_motion
 end
 using .ShortNames
 export Canvas, Window
