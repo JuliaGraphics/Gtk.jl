@@ -77,8 +77,8 @@ function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
         detail = uint32(0)
     end
     signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{Uint8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
-    return_value = gvalue(RT)
-    ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue1}),gvalues(w, args...),signal_id,detail,&return_value)
+    return_value = mutable(gvalue(RT))
+    ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
     return_value[RT]
 end
 

@@ -2,6 +2,8 @@
 
 module Gtk
 using Cairo
+include("MutableTypes.jl")
+using Gtk.MutableTypes
 
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
@@ -145,7 +147,8 @@ end
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
-    using Gtk
+    using ..Gtk
+    export Gtk
 
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
