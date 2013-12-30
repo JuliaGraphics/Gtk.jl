@@ -20,9 +20,9 @@ type GtkCanvas <: GtkWidgetI # NOT an @GType
         else
             signal_connect(canvas_on_expose_event,widget,"expose-event",Void,(Ptr{Void},))
         end
-        on_signal_button_press(mousedown_cb, widget, 0, widget.mouse)
-        on_signal_button_release(mouseup_cb, widget, 0, widget.mouse)
-        on_signal_motion(mousemove_cb, widget, 0, 0, 0, widget.mouse)
+        on_signal_button_press(mousedown_cb, widget, false, widget.mouse)
+        on_signal_button_release(mouseup_cb, widget, false, widget.mouse)
+        on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse)
         gc_ref(widget)
     end
 end

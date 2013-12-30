@@ -5,11 +5,16 @@ immutable GdkRectangle
     height::Int32
     GdkRectangle(x,y,w,h) = new(x,y,w,h)
 end
+make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle,:libgdk))
+convert(::Type{GdkRectangle}, rect::Ptr{GdkRectangle}) = unsafe_load(rect)
+
 immutable GdkPoint
     x::Int32
     y::Int32
     GdkPoint(x,y) = new(x,y)
 end
+# GdkPoint is not a GBoxed type
+
 gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
 baremodule GdkEventMask
@@ -195,7 +200,7 @@ baremodule GdkKeySyms
 end
 
 abstract GdkEventI
-make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, :(ccall((:gdk_event_get_type,libgdk),Int,())))
+make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, (:gdk_event,:libgdk))
 function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
     e = unsafe_load(convert(Ptr{GdkEventAny},evt))
     if     e.event_type == GdkEventType.GDK_KEY_PRESS ||
@@ -286,7 +291,7 @@ immutable GdkEventMotion <: GdkEventI
   y_root::Float64
 end
 
-immutable GdkEventCrossing
+immutable GdkEventCrossing <: GdkEventI
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8

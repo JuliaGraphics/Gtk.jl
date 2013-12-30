@@ -199,7 +199,6 @@ destroy(w)
 tb = ToggleButton("Off")
 w = Window(tb, "ToggleButton")
 function toggled(ptr,evt,widget)
-    println(evt)
     state = widget[:label,String]
     if state == "Off"
         widget[:label] = "On"

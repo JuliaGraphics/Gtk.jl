@@ -115,8 +115,11 @@ function GClosureMarshal(closuref, return_value, n_param_values,
             end
         end
         retval = cb(params...) # widget, args...
-        if unsafe_load(return_value).g_type != gvoid_id && retval !== nothing
-            return_value[] = gvalue(retval)
+        if return_value != C_NULL && retval !== nothing
+            g_type = unsafe_load(return_value).g_type
+            if g_type != gvoid_id && g_type != 0
+                return_value[] = gvalue(retval)
+            end
         end
     catch e
         Base.display_error(e,catch_backtrace())
@@ -162,7 +165,7 @@ function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
         detail = uint32(0)
     end
     signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{Uint8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
-    return_value = gvalue(RT)
+    return_value = RT===Void ? C_NULL : gvalue(RT)
     ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
     return_value[RT]
 end
