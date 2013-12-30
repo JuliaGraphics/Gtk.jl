@@ -3,7 +3,7 @@
 module Gtk
 using Cairo
 include("MutableTypes.jl")
-using Gtk.MutableTypes
+using .MutableTypes
 
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
@@ -80,8 +80,8 @@ ccall((:g_type_init,libgobject),Void,())
 include("gslist.jl")
 include("gerror.jl")
 include("gtktypes.jl")
-include("gdk.jl")
 include("gvalues.jl")
+include("gdk.jl")
 include("events.jl")
 include("container.jl")
 include("windows.jl")

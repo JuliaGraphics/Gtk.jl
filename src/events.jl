@@ -15,40 +15,125 @@ function gtk_doevent()
         println()
     end
 end
+
+sizeof_gclosure = 0
 function init()
     GError() do error_check
         ccall((:gtk_init_with_args,libgtk), Bool,
             (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
+    global sizeof_gclosure = WORD_SIZE
+    closure = C_NULL
+    while closure == C_NULL
+        sizeof_gclosure += WORD_SIZE
+        closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
+    end
+    ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
     global timeout
     timeout = Base.TimeoutAsyncWork(gtk_doevent)
     Base.start_timer(timeout,.1,.005)
 end
 
-# id = signal_connect(widget, :event, Void, ()) do ptr, obj
+# id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
 function signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),
-        RT::Type,param_types::Tuple,gconnectflags=0,closure=w) #TODO: assert that length(param_types) is correct
-    ccall((:g_signal_connect_data,libgobject), Culong,
-        (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
-            w,
-            bytestring(sig),
-            cfunction(cb,RT,tuple(Ptr{GObject},param_types...,typeof(closure))),
-            closure,
-            gc_ref_closure(closure),
-            gconnectflags)
+        RT::Type,param_types::Tuple,after::Bool=false,closure=w) #TODO: assert that length(param_types) is correct
+    if isgeneric(cb)
+        callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,typeof(closure)))
+        return ccall((:g_signal_connect_data,libgobject), Culong,
+            (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
+                w,
+                bytestring(sig),
+                callback,
+                closure,
+                gc_ref_closure(closure),
+                after*GConnectFlags.AFTER)
+    end
+    # oops, Julia doesn't support this natively yet -- fake it instead
+    return _signal_connect(cb, w, sig, after, true,param_types,closure)
 end
 
-add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Cint),widget,mask)
-
-# widget[:event, Void, ()] = function(ptr, obj)
+# id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-#function setindex!(w::GObject,cb::Function,
-#        sig::Union(String,Symbol),RT::Type,param_types::Tuple,vargs...)
-#    signal_connect(w,sig,cb,RT,param_types,vargs...)
+function signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),after::Bool=false)
+    _signal_connect(cb, w, sig, after, false,nothing,nothing)
+end
+function _signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),after::Bool,gtk_call_conv::Bool,param_types,closure)
+    closuref = ccall((:g_closure_new_object,libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+WORD_SIZE*2, w)
+    closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
+    unsafe_store!(closure_env, cb, 1)
+    if gtk_call_conv
+        env = Any[param_types,closure]
+        unsafe_store!(closure_env, env, 2)
+        ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
+            (Ptr{Void}, Any, Ptr{Void}), closuref, env, gc_ref_closure(env))
+    else
+        unsafe_store!(convert(Ptr{Int},closure_env), 0, 2)
+    end
+    ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
+        (Ptr{Void}, Any, Ptr{Void}), closuref, cb, gc_ref_closure(cb))
+    ccall((:g_closure_set_marshal,libgobject), Void,
+        (Ptr{Void}, Ptr{Void}), closuref, JuliaClosureMarshal)
+    return ccall((:g_signal_connect_closure,libgobject), Culong,
+        (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Cint), w, bytestring(sig), closuref, after)
+end
+function GClosureMarshal(closuref, return_value, n_param_values,
+                         param_values, invocation_hint, marshal_data)
+    try
+        closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
+        cb = unsafe_load(closure_env, 1)
+        gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
+        params = Array(Any, n_param_values)
+        if gtk_calling_convention
+            # compatibility mode, if we must
+            param_types,closure = unsafe_load(closure_env, 2)::Array{Any,1}
+            length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
+            for i = 1:n_param_values
+                gv = mutable(param_values,i)
+                g_type = unsafe_load(gv).g_type
+                # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
+                if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gobject_id))
+                    params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
+                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gboxed_id))
+                    params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gstring_id))
+                    params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+                else
+                    params[i] = gv[]
+                end
+                if i > 1
+                    params[i] = convert(param_types[i-1], params[i])
+                end
+            end
+            push!(params, closure)
+        else
+            for i = 1:n_param_values
+                params[i] = mutable(param_values,i)[]
+            end
+        end
+        retval = cb(params...) # widget, args...
+        if unsafe_load(return_value).g_type != gvoid_id && retval !== nothing
+            return_value[] = gvalue(retval)
+        end
+    catch e
+        Base.display_error(e,catch_backtrace())
+    end
+    return nothing
+end
+JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
+    (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
+
+
+add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Enum),widget,mask)
+
+# widget[:event] = function(ptr, obj)
+#    stuff
+# end
+#function setindex!(w::GObject,cb::Function,sig::Union(String,Symbol),vargs...)
+#    signal_connect(cb,w,sig,vargs...)
 #end
 
 # Signals API for the cb pointer
@@ -77,7 +162,7 @@ function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
         detail = uint32(0)
     end
     signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{Uint8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
-    return_value = mutable(gvalue(RT))
+    return_value = gvalue(RT)
     ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
     return_value[RT]
 end
@@ -117,7 +202,7 @@ function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gt
     ret
 end
 function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
-        include=0, exclude=GdkModifierType.GDK_BUTTONS_MASK, gconnectflags=0,closure::T=w)
+        include=0, exclude=GdkModifierType.GDK_BUTTONS_MASK, after::Bool=false, closure::T=w)
     exclude &= ~include
     mask = GdkEventMask.GDK_POINTER_MOTION_HINT_MASK
     if     0 == include & GdkModifierType.GDK_BUTTONS_MASK
@@ -139,7 +224,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
         uint32(include),
         uint32(exclude)
         )
-    signal_connect(notify_motion, widget, "motion-notify-event", Cint, (Ptr{GdkEventMotion},), gconnectflags, closure)
+    signal_connect(notify_motion, widget, "motion-notify-event", Cint, (Ptr{GdkEventMotion},), after, closure)
 end
 
 function reveal(c::GtkWidgetI, immediate::Bool=true)

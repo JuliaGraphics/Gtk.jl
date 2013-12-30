@@ -199,6 +199,7 @@ destroy(w)
 tb = ToggleButton("Off")
 w = Window(tb, "ToggleButton")
 function toggled(ptr,evt,widget)
+    println(evt)
     state = widget[:label,String]
     if state == "Off"
         widget[:label] = "On"
@@ -208,6 +209,44 @@ function toggled(ptr,evt,widget)
     int32(true)
 end
 on_signal_button_press(toggled, tb)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-press-event", Bool, press)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-release-event", Bool, release)
+## next time just use "gtk_button_clicked", mkay?
+destroy(w)
+
+## ToggleButton repeat 1
+tb = ToggleButton("Off")
+w = Window(tb, "ToggleButton")
+on_signal_button_press(tb) do ptr, evt, widget
+    state = widget[:label,String]
+    if state == "Off"
+        widget[:label] = "On"
+    else
+        widget[:label] = "Off"
+    end
+    true
+end
+press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-press-event", Bool, press)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+signal_emit(tb, "button-release-event", Bool, release)
+## next time just use "gtk_button_clicked", mkay?
+destroy(w)
+
+## ToggleButton repeat 2
+tb = ToggleButton("Off")
+w = Window(tb, "ToggleButton")
+signal_connect(tb, :button_press_event) do widget, evt
+    state = widget[:label,String]
+    if state == "Off"
+        widget[:label] = "On"
+    else
+        widget[:label] = "Off"
+    end
+    true
+end
 press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
 release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)

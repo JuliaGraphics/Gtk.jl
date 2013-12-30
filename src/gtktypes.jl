@@ -165,7 +165,7 @@ const gc_preserve_gtk = ObjectIdDict() # gtk objects
 function gc_ref{T<:GObjectI}(x::T)
     global gc_preserve_gtk
     addref = function()
-        ccall((:g_object_ref,libgobject),Ptr{GObjectI},(Ptr{GObjectI},),x)
+        ccall((:g_object_ref_sink,libgobject),Ptr{GObjectI},(Ptr{GObjectI},),x)
         finalizer(x,function(x)
                 global gc_preserve_gtk
                 ccall((:g_object_unref,libgobject),Void,(Ptr{GObjectI},),x)

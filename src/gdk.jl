@@ -195,7 +195,34 @@ baremodule GdkKeySyms
 end
 
 abstract GdkEventI
-convert(::Type{Ptr{Void}}, evt::GdkEventI) = ccall(:jl_value_ptr,Ptr{Void},(Ptr{Any},),&evt)
+make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, :(ccall((:gdk_event_get_type,libgdk),Int,())))
+function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
+    e = unsafe_load(convert(Ptr{GdkEventAny},evt))
+    if     e.event_type == GdkEventType.GDK_KEY_PRESS ||
+           e.event_type == GdkEventType.GDK_KEY_RELEASE
+        return unsafe_load(convert(Ptr{GdkEventKey},evt))
+    elseif e.event_type == GdkEventType.GDK_BUTTON_PRESS ||
+           e.event_type == GdkEventType.GDK_2BUTTON_PRESS ||
+           e.event_type == GdkEventType.GDK_3BUTTON_PRESS ||
+           e.event_type == GdkEventType.GDK_BUTTON_RELEASE
+        return unsafe_load(convert(Ptr{GdkEventButton},evt))
+    elseif e.event_type == GdkEventType.GDK_SCROLL
+        return unsafe_load(convert(Ptr{GdkEventScroll},evt))
+    elseif e.event_type == GdkEventType.GDK_MOTION_NOTIFY
+        return unsafe_load(convert(Ptr{GdkEventMotion},evt))
+    elseif e.event_type == GdkEventType.GDK_ENTER_NOTIFY ||
+           e.event_type == GdkEventType.GDK_LEAVE_NOTIFY
+        return unsafe_load(convert(Ptr{GdkEventCrossing},evt))
+    else
+        return unsafe_load(convert(Ptr{GdkEventAny},evt))
+    end
+end
+
+immutable GdkEventAny <: GdkEventI
+    event_type::Enum
+    gdk_window::Ptr{Void}
+    send_event::Int8
+end
 
 immutable GdkEventButton <: GdkEventI
     event_type::Enum
