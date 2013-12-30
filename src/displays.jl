@@ -325,16 +325,16 @@ context_id(status::GtkStatusbar,source) =
 context_id(status::GtkStatusbar,source::Integer) = source
 push!(status::GtkStatusbar,context,text) =
     (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GObject},Cuint,Ptr{Uint8}),
-        status,context_id(context),bytestring(text)); status)
+        status,context_id(status,context),bytestring(text)); status)
 pop!(status::GtkStatusbar,context) =
     ccall((:gtk_statusbar_pop,libgtk),Ptr{GObject},(Ptr{GObject},Cuint),
-        status,context_id(context))
+        status,context_id(status,context))
 slice!(status::GtkStatusbar,context,message_id) =
     ccall((:gtk_statusbar_remove,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
-        status,context_id(context),message_id)
+        status,context_id(status,context),message_id)
 empty!(status::GtkStatusbar,context) =
     ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
-        status,context_id(context),context_id(context))
+        status,context_id(status,context),context_id(context))
 
 #@GType GtkInfoBar <: GtkBox
 #GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
