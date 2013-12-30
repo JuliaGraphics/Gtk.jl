@@ -5,18 +5,19 @@ abstract GITypelib
 
 abstract GIBaseInfo
 # a GIBaseInfo we own a reference to
-type GIInfo#{Name} 
+type GIInfo{Typeid} 
     handle::Ptr{GIBaseInfo}
-    function GIInfo(h::Ptr{GIBaseInfo}) 
-        if h == C_NULL 
-            error("Cannot constrct GIInfo from NULL")
-        end
-        info = new(h)
-        finalizer(info, info_unref)
-        info
-    end
 end
 
+function GIInfo(h::Ptr{GIBaseInfo}) 
+    if h == C_NULL 
+        error("Cannot constrct GIInfo from NULL")
+    end
+    typeid = int(ccall((:g_base_info_get_type, libgi), Cint, (Ptr{GIBaseInfo},), h))
+    info = GIInfo{typeid}(h)
+    finalizer(info, info_unref)
+    info
+end
 # don't call directly, called by gc
 function info_unref(info::GIInfo) 
     ccall((:g_base_info_unref, libgi), Void, (Ptr{GIBaseInfo},), info.handle)
@@ -25,19 +26,38 @@ end
 
 convert(::Type{Ptr{GIBaseInfo}},w::GIInfo) = w.handle
 
-function info_get_name(info::GIInfo) 
+const GIInfoTypes = (:Invalid, :Function, :Callback, :Struct, :Boxed, :Enum, :Flags, :Object, :Interface, :Constant, :Unknown, :Union, :Value, :Signal, :VFunc, :Property, :Field, :Arg, :Type, :Unresolved)
+const GIInfoTypeNames = [ Base.symbol("GI$(name)Info") for name in GIInfoTypes]
+baremodule GIInfoType 
+end    
+
+for (i,itype) in enumerate(GIInfoTypes)
+    let uppername = symbol(uppercase(string(itype)))
+        eval(GIInfoType,:(const $uppername = $i))
+        @eval typealias $(GIInfoTypeNames[i]) GIInfo{$i}
+    end
+end
+
+typealias GICallableInfo Union(GIFunctionInfo,GIVFuncInfo, GICallbackInfo, GISignalInfo)
+typealias GIRegisteredTypeInfo Union(GIEnumInfo,GIInterfaceInfo, GIObjectInfo, GIStructInfo, GIUnionInfo)
+
+function get_name(info::GIInfo) 
     str = ccall((:g_base_info_get_name, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
     bytestring(str) # can assume non-NULL?
 end
 
-function info_get_namespace(info::GIInfo) 
+function get_namespace(info::GIInfo) 
     str = ccall((:g_base_info_get_namespace, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
     bytestring(str) # can assume non-NULL?
 end
 
-function show(io::IO, info::GIInfo) 
-    print(io, "GIInfo(:", info_get_namespace(info), ", :", info_get_name(info), ")")
+show{Typeid}(io::IO, ::Type{GIInfo{Typeid}}) = print(io, GIInfoTypeNames[Typeid])
+
+function show(io::IO, info::GIInfo)
+    show(io, typeof(info)) 
+    print(io,"(:$(get_namespace(info)), :$(get_name(info)))")
 end
+
 
 immutable GINamespace
     name::Symbol
@@ -74,7 +94,7 @@ function gi_find_by_name(namespace, name)
     GIInfo(info) #TODO: Infer type
 end
 
-GIInfo(namespace, name::Symbol) = gi_find_by_name(namespace, name)
+#GIInfo(namespace, name::Symbol) = gi_find_by_name(namespace, name)
 
 #TODO: make ns behave more like Array and/or Dict{Symbol,GIInfo}?
 length(ns::GINamespace) = int(ccall((:g_irepository_get_n_infos, libgi), Cint, (Ptr{GObject}, Ptr{Uint8}), girepo, ns))
