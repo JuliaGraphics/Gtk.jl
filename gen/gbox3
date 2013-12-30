@@ -2,33 +2,32 @@ quote
 $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote 
         $(Expr(:import, :., :., :Gtk))
         $(Expr(:import, :., :., :Gtk, :GObject))
-        $(Expr(:import, :., :., :Gtk, :GObjectI))
-        function property(object::Gtk.GObjectI,property_name,value)
+        function property(object::Gtk.GObject,property_name,value)
             $(Expr(:ccall, :(:g_object_set_property,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :object, :property_name, :value))
             return object
         end
-        function property(object::Gtk.GObjectI,property_name,value)
+        function property(object::Gtk.GObject,property_name,value)
             return $(Expr(:ccall, :(:g_object_get_property,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :object, :property_name, :value))
         end
-        function qdata(object::Gtk.GObjectI,quark)
+        function qdata(object::Gtk.GObject,quark)
             return $(Expr(:ccall, :(:g_object_get_qdata,Gtk.libgobject), :(Ptr{Void}), :(Ptr{Gtk.GObject},Uint32), :object, :quark))
         end
-        function qdata(object::Gtk.GObjectI,quark,data)
+        function qdata(object::Gtk.GObject,quark,data)
             $(Expr(:ccall, :(:g_object_set_qdata,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Uint32,Ptr{Void}), :object, :quark, :data))
             return object
         end
-        function qdata_full(object::Gtk.GObjectI,quark,data,destroy)
+        function qdata_full(object::Gtk.GObject,quark,data,destroy)
             $(Expr(:ccall, :(:g_object_set_qdata_full,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Uint32,Ptr{Void},Ptr{Void}), :object, :quark, :data, :destroy))
             return object
         end
-        function data(object::Gtk.GObjectI,key)
+        function data(object::Gtk.GObject,key)
             return $(Expr(:ccall, :(:g_object_get_data,Gtk.libgobject), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Uint8}), :object, :key))
         end
-        function data(object::Gtk.GObjectI,key,data_)
+        function data(object::Gtk.GObject,key,data_)
             $(Expr(:ccall, :(:g_object_set_data,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :object, :key, :data_))
             return object
         end
-        function data_full(object::Gtk.GObjectI,key,data,destroy)
+        function data_full(object::Gtk.GObject,key,data,destroy)
             $(Expr(:ccall, :(:g_object_set_data_full,Gtk.libgobject), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void},Ptr{Void}), :object, :key, :data, :destroy))
             return object
         end
@@ -489,7 +488,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_widget_get_modifier_mask,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Cint), :widget, :intent))
         end
         function template_child(widget::Gtk.GtkWidgetI,widget_type,name)
-            return convert(Gtk.GObjectI,$(Expr(:ccall, :(:gtk_widget_get_template_child,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Culong,Ptr{Uint8}), :widget, :widget_type, :name)))
+            return convert(Gtk.GObject,$(Expr(:ccall, :(:gtk_widget_get_template_child,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Culong,Ptr{Uint8}), :widget, :widget_type, :name)))
         end
         function border_width(container::Gtk.GtkContainerI,border_width_)
             $(Expr(:ccall, :(:gtk_container_set_border_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Uint32), :container, :border_width_))
@@ -545,14 +544,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_container_child_set_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :container, :child, :property_name, :value))
             return container
         end
-        function property(container::Gtk.GtkContainerI,property_name,value)
-            child = Gtk.mutable(Gtk.GObject)
-            $(Expr(:ccall, :(:gtk_container_child_get_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :container, :child, :property_name, :value))
-            return child[]
+        function property(container::Gtk.GtkContainerI,child,property_name,value)
+            return $(Expr(:ccall, :(:gtk_container_child_get_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :container, :child, :property_name, :value))
         end
-        function path_for_child(container::Gtk.GtkContainerI)
-            child = Gtk.mutable(Gtk.GObject)
-            return ($(Expr(:ccall, :(:gtk_container_get_path_for_child,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :container, :child)),child[])
+        function path_for_child(container::Gtk.GtkContainerI,child)
+            return $(Expr(:ccall, :(:gtk_container_get_path_for_child,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :container, :child))
         end
         function child(bin::Gtk.GtkBinI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_bin_get_child,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :bin)))
@@ -851,9 +847,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function widget_for_response(dialog::Gtk.GtkDialogI,response_id)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_dialog_get_widget_for_response,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Cint), :dialog, :response_id)))
         end
-        function response_for_widget(dialog::Gtk.GtkDialogI)
-            widget = Gtk.mutable(Gtk.GObject)
-            return ($(Expr(:ccall, :(:gtk_dialog_get_response_for_widget,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :dialog, :widget)),widget[])
+        function response_for_widget(dialog::Gtk.GtkDialogI,widget)
+            return $(Expr(:ccall, :(:gtk_dialog_get_response_for_widget,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :dialog, :widget))
         end
         function alternative_button_order(dialog::Gtk.GtkDialogI,first_response_id)
             $(Expr(:ccall, :(:gtk_dialog_set_alternative_button_order,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :dialog, :first_response_id))
@@ -1460,17 +1455,15 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_button_box_set_layout,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :widget, :layout_style))
             return widget
         end
-        function child_secondary(widget::Gtk.GtkButtonBox)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_button_box_get_child_secondary,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :widget, :child))),child[])
+        function child_secondary(widget::Gtk.GtkButtonBox,child)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_button_box_get_child_secondary,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :widget, :child)))
         end
         function child_secondary(widget::Gtk.GtkButtonBox,child,is_secondary)
             $(Expr(:ccall, :(:gtk_button_box_set_child_secondary,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :widget, :child, :is_secondary))
             return widget
         end
-        function child_non_homogeneous(widget::Gtk.GtkButtonBox)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_button_box_get_child_non_homogeneous,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :widget, :child))),child[])
+        function child_non_homogeneous(widget::Gtk.GtkButtonBox,child)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_button_box_get_child_non_homogeneous,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :widget, :child)))
         end
         function child_non_homogeneous(widget::Gtk.GtkButtonBox,child,non_homogeneous)
             $(Expr(:ccall, :(:gtk_button_box_set_child_non_homogeneous,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :widget, :child, :non_homogeneous))
@@ -1867,9 +1860,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function tab_vborder(notebook::Gtk.GtkNotebook)
             return $(Expr(:ccall, :(:gtk_notebook_get_tab_vborder,Gtk.libgtk), :Uint16, :(Ptr{Gtk.GObject},), :notebook))
         end
-        function tab_label(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_notebook_get_tab_label,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))),child[])
+        function tab_label(notebook::Gtk.GtkNotebook,child)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_notebook_get_tab_label,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)))
         end
         function tab_label(notebook::Gtk.GtkNotebook,child,tab_label_)
             $(Expr(:ccall, :(:gtk_notebook_set_tab_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child, :tab_label_))
@@ -1879,13 +1871,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_notebook_set_tab_label_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}), :notebook, :child, :tab_text))
             return notebook
         end
-        function tab_label_text(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return ($(Expr(:ccall, :(:gtk_notebook_get_tab_label_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)),child[])
+        function tab_label_text(notebook::Gtk.GtkNotebook,child)
+            return $(Expr(:ccall, :(:gtk_notebook_get_tab_label_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))
         end
-        function menu_label(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_notebook_get_menu_label,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))),child[])
+        function menu_label(notebook::Gtk.GtkNotebook,child)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_notebook_get_menu_label,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)))
         end
         function menu_label(notebook::Gtk.GtkNotebook,child,menu_label_)
             $(Expr(:ccall, :(:gtk_notebook_set_menu_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child, :menu_label_))
@@ -1895,21 +1885,18 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_notebook_set_menu_label_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}), :notebook, :child, :menu_text))
             return notebook
         end
-        function menu_label_text(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return ($(Expr(:ccall, :(:gtk_notebook_get_menu_label_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)),child[])
+        function menu_label_text(notebook::Gtk.GtkNotebook,child)
+            return $(Expr(:ccall, :(:gtk_notebook_get_menu_label_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))
         end
-        function tab_reorderable(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_notebook_get_tab_reorderable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))),child[])
+        function tab_reorderable(notebook::Gtk.GtkNotebook,child)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_notebook_get_tab_reorderable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)))
         end
         function tab_reorderable(notebook::Gtk.GtkNotebook,child,reorderable)
             $(Expr(:ccall, :(:gtk_notebook_set_tab_reorderable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :notebook, :child, :reorderable))
             return notebook
         end
-        function tab_detachable(notebook::Gtk.GtkNotebook)
-            child = Gtk.mutable(Gtk.GObject)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_notebook_get_tab_detachable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child))),child[])
+        function tab_detachable(notebook::Gtk.GtkNotebook,child)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_notebook_get_tab_detachable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :notebook, :child)))
         end
         function tab_detachable(notebook::Gtk.GtkNotebook,child,detachable)
             $(Expr(:ccall, :(:gtk_notebook_set_tab_detachable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :notebook, :child, :detachable))
@@ -2369,10 +2356,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function bounds(buffer::Gtk.GtkTextBuffer,start_,end_)
             return $(Expr(:ccall, :(:gtk_text_buffer_get_bounds,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :buffer, :start_, :end_))
         end
-        function iter_at_mark(buffer::Gtk.GtkTextBuffer,iter)
-            mark = Gtk.mutable(Gtk.GObject)
-            $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_mark,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GObject}), :buffer, :iter, :mark))
-            return mark[]
+        function iter_at_mark(buffer::Gtk.GtkTextBuffer,iter,mark)
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_mark,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GObject}), :buffer, :iter, :mark))
         end
         function iter_at_child_anchor(buffer::Gtk.GtkTextBuffer,iter,anchor)
             return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_child_anchor,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :buffer, :iter, :anchor))

@@ -2,7 +2,7 @@ import Clang.cindex
 gtk_libdir = "/opt/local/lib"
 
 const GtkTypeMap = (ASCIIString=>Symbol)[
-    "GObject" => :GObjectI,
+    "GObject" => :GObject,
     "GtkWidget" => :GtkWidgetI,
     "GtkContainer" => :GtkContainerI,
     "GtkBin" => :GtkBinI,
@@ -235,7 +235,7 @@ function gen_get_set(body, header, args)
                 if isa(atype, cindex.Pointer) && !is_gstring(atype)
                     atype = cindex.getPointeeType(atype)
                     T = g_type_to_jl(atype)
-                    if T !== :Nothing && T !== :Void && T !== :GObject
+                    if T !== :Nothing && T !== :Void && T != :(Gtk.GObject)
                         retval = argnames[i]
                         unshift!(fbody.args, :( $retval = Gtk.mutable($T) ))
                         retval = :( $retval[] )
@@ -280,7 +280,6 @@ for gtk_version = (2, 3)
     body = Expr(:block,
         Expr(:import, :., :., :Gtk),
         Expr(:import, :., :., :Gtk, :GObject),
-        Expr(:import, :., :., :Gtk, :GObjectI),
     )
     toplevel = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
     args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
