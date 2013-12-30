@@ -356,6 +356,9 @@ destroy(w)
 file = MenuItem("_File")
 filemenu = Menu(file)
 new_ = MenuItem("New")
+idnew = signal_connect(new_, :activate) do widget
+    println("New!")
+end
 push!(filemenu, new_)
 open_ = MenuItem("Open")
 push!(filemenu, open_)
