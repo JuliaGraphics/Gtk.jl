@@ -35,4 +35,14 @@ Base.cconvert{P<:Ptr,T,N}(::Type{P}, b::MutableA{T,N}) = convert(P, pointer(b.x,
 
 Base.unsafe_load(b::MutableX) = b.x
 Base.unsafe_load(b::MutableA) = b.x[b.i]
+
+Base.unsafe_store!(b::MutableX, x) = (b.x = x)
+Base.unsafe_store!(b::MutableA, x) = (b.x[b.i] = x)
+
+Base.getindex(b::MutableX) = b.x
+Base.getindex(b::MutableA) = b.x[b.i]
+
+Base.setindex!(b::MutableX, x) = (b.x = x)
+Base.setindex!(b::MutableA, x) = (b.x[b.i] = x)
+
 end

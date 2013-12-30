@@ -73,10 +73,15 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "va_list"               => :Nothing,
     "size_t"                => :Csize_t,
     "ptrdiff_t"             => :Cptrdiff_t,
+    "GError"                => :(Gtk.GError),
     "GdkRectangle"          => :(Gtk.GdkRectangle),
     "GdkPoint"              => :(Gtk.GdkPoint),
+    "GdkEventAny"           => :(Gtk.GdkEventAny),
     "GdkEventButton"        => :(Gtk.GdkEventButton),
+    "GdkEventScroll"        => :(Gtk.GdkEventScroll),
+    "GdkEventKey"           => :(Gtk.GdkEventKey),
     "GdkEventMotion"        => :(Gtk.GdkEventMotion),
+    "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
@@ -86,7 +91,7 @@ const reserved_names = Set{Symbol}([symbol(x) for x in split("
     type immutable module function macro ccall
     while do for if ifelse nothing quote
     start next end done top tuple convert
-    Gtk GAccessor
+    Gtk GAccessor GValue
     ")]...)
 for typsym in values(cl_to_jl)
     push!(reserved_names, typsym)
@@ -232,8 +237,8 @@ function gen_get_set(body, header, args)
                     T = g_type_to_jl(atype)
                     if T !== :Nothing && T !== :Void && T !== :GObject
                         retval = argnames[i]
-                        unshift!(fbody.args, :( $retval = Array($T) ))
-                        retval = :( $retval[1] )
+                        unshift!(fbody.args, :( $retval = Gtk.mutable($T) ))
+                        retval = :( $retval[] )
                         gtype = g_get_gtype(atype)
                         if gtype !== :Nothing
                             retval = :( convert($gtype, $retval) )
