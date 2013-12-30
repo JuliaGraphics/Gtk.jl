@@ -33,8 +33,8 @@ end
 
 for (i,itype) in enumerate(GIInfoTypes)
     let uppername = symbol(uppercase(string(itype)))
-        eval(GIInfoType,:(const $uppername = $i))
-        @eval typealias $(GIInfoTypeNames[i]) GIInfo{$i}
+        eval(GIInfoType,:(const $uppername = $(i-1)))
+        @eval typealias $(GIInfoTypeNames[i]) GIInfo{$(i-1)}
     end
 end
 
@@ -51,7 +51,7 @@ function get_namespace(info::GIInfo)
     bytestring(str) # can assume non-NULL?
 end
 
-show{Typeid}(io::IO, ::Type{GIInfo{Typeid}}) = print(io, GIInfoTypeNames[Typeid])
+show{Typeid}(io::IO, ::Type{GIInfo{Typeid}}) = print(io, GIInfoTypeNames[Typeid+1])
 
 function show(io::IO, info::GIInfo)
     show(io, typeof(info)) 
@@ -105,6 +105,18 @@ function getindex(ns::GINamespace, name::Symbol)
     gi_find_by_name(ns, name)
 end
 
-function gi_get_infos(namespace::Symbol) 
-    [ns[i] for i=length(ns)]
+# Registered types
+const _typemap = [:method => GIFunctionInfo, 
+        :signal => GISignalInfo,
+        :vfunc => GIVFuncInfo,
+        :object => GIObjectInfo,
+        :interface => GIInterfaceInfo] 
+
+for (owner, property) in [
+    (:object, :method), (:object, :signal), (:object, :interface),
+    (:interface, :method), (:interface, :signal)]
+    @eval function $(symbol("get_$(property)s"))(info::$(_typemap[owner]))
+        n = int(ccall(($("g_$(owner)_info_get_n_$(property)s"), libgi), Cint, (Ptr{GIBaseInfo},), info))
+        $(_typemap[property])[ GIInfo( ccall(($("g_$(owner)_info_get_$property"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo}, Cint), info, i)) for i=0:n-1]
+    end
 end
