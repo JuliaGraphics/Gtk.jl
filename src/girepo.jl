@@ -43,12 +43,12 @@ typealias GIRegisteredTypeInfo Union(GIEnumInfo,GIInterfaceInfo, GIObjectInfo, G
 
 function get_name(info::GIInfo) 
     str = ccall((:g_base_info_get_name, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
-    bytestring(str) # can assume non-NULL?
+    symbol(bytestring(str)) 
 end
 
 function get_namespace(info::GIInfo) 
     str = ccall((:g_base_info_get_namespace, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
-    bytestring(str) # can assume non-NULL?
+    symbol(bytestring(str)) 
 end
 
 show{Typeid}(io::IO, ::Type{GIInfo{Typeid}}) = print(io, GIInfoTypeNames[Typeid+1])
@@ -71,7 +71,6 @@ convert(::Type{Symbol}, ns::GINamespace) = ns.name
 convert(::Type{Ptr{Uint8}}, ns::GINamespace) = convert(Ptr{Uint8}, ns.name)
 
 function gi_require(namespace, version=nothing)
-    #local typelib::Ptr{GITypelib}
     if version==nothing
         version = C_NULL
     end
@@ -81,8 +80,6 @@ function gi_require(namespace, version=nothing)
             girepo, namespace, version, 0, error_check)
         return  typelib !== C_NULL
     end
-    #transfer none
-    #return GITypelib(typelib)
 end
 
 function gi_find_by_name(namespace, name)
@@ -91,7 +88,7 @@ function gi_find_by_name(namespace, name)
     if info == C_NULL
         error("Name $name not found in $namespace")
     end
-    GIInfo(info) #TODO: Infer type
+    GIInfo(info) 
 end
 
 #GIInfo(namespace, name::Symbol) = gi_find_by_name(namespace, name)
@@ -106,15 +103,19 @@ function getindex(ns::GINamespace, name::Symbol)
 end
 
 # Registered types
-const _typemap = [:method => GIFunctionInfo, 
-        :signal => GISignalInfo,
-        :vfunc => GIVFuncInfo,
-        :object => GIObjectInfo,
-        :interface => GIInterfaceInfo] 
+const _typemap = [
+    :callable => GICallableInfo, 
+    :method => GIFunctionInfo, 
+    :signal => GISignalInfo,
+    :vfunc => GIVFuncInfo,
+    :object => GIObjectInfo,
+    :interface => GIInterfaceInfo,
+    :arg => GIArgInfo
+] 
 
 for (owner, property) in [
     (:object, :method), (:object, :signal), (:object, :interface),
-    (:interface, :method), (:interface, :signal)]
+    (:interface, :method), (:interface, :signal), (:callable, :arg)]
     @eval function $(symbol("get_$(property)s"))(info::$(_typemap[owner]))
         n = int(ccall(($("g_$(owner)_info_get_n_$(property)s"), libgi), Cint, (Ptr{GIBaseInfo},), info))
         $(_typemap[property])[ GIInfo( ccall(($("g_$(owner)_info_get_$property"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo}, Cint), info, i)) for i=0:n-1]
