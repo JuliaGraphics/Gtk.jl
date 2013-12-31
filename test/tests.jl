@@ -352,6 +352,32 @@ c.draw = function(_)
 end
 destroy(w)
 
+## Menus
+file = MenuItem("_File")
+filemenu = Menu(file)
+new_ = MenuItem("New")
+idnew = signal_connect(new_, :activate) do widget
+    println("New!")
+end
+push!(filemenu, new_)
+open_ = MenuItem("Open")
+push!(filemenu, open_)
+push!(filemenu, SeparatorMenuItem())
+quit = MenuItem("Quit")
+push!(filemenu, quit)
+mb = MenuBar()
+push!(mb, file)  # notice this is the "File" item, not filemenu
+win = Window(mb, "Menus", 200, 40)
+destroy(win)
+
+## Popup menu
+contrast = MenuItem("Adjust contrast...")
+popupmenu = Menu()
+push!(popupmenu, contrast)
+c = Canvas()
+win = Window(c, "Popup")
+c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+
 ## Text
 #w = Window("Text")
 #pack_stop_propagate(w)
