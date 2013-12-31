@@ -20,7 +20,8 @@ function GIInfo(h::Ptr{GIBaseInfo})
 end
 # don't call directly, called by gc
 function info_unref(info::GIInfo) 
-    ccall((:g_base_info_unref, libgi), Void, (Ptr{GIBaseInfo},), info.handle)
+    #core dumps on reload("GTK.jl"), 
+    #ccall((:g_base_info_unref, libgi), Void, (Ptr{GIBaseInfo},), info.handle)
     info.handle = C_NULL
 end
 
@@ -60,6 +61,10 @@ function show(io::IO, info::GIInfo)
     show(io, typeof(info)) 
     print(io,"(:$(get_namespace(info)), :$(get_name(info)))")
 end
+
+show(io::IO, info::GITypeInfo) = print(io,"GITypeInfo($(extract_type(info)))")
+show(io::IO, info::GIArgInfo) = print(io,"GIArgInfo(:$(get_name(info)),$(extract_type(info)))")
+showcompact(io::IO, info::GIArgInfo) = show(io,info) # bug in show.jl ?
 
 
 immutable GINamespace
@@ -107,6 +112,7 @@ end
 
 GIInfoTypes[:method] = GIFunctionInfo
 GIInfoTypes[:callable] = GICallableInfo
+GIInfoTypes[:base] = GIInfo
 
 # one-> many relationships
 for (owner, property) in [
@@ -126,9 +132,14 @@ end
 
 # one->one
 _unit(x) = x
-_types = [GIInfo=>(Ptr{GIBaseInfo},GIInfo)]
+# reuse gvalues.jl instead?
+# FIXME: memory management of GIInfo:s
+_types = [GIInfo=>(Ptr{GIBaseInfo},GIInfo),
+          Symbol=>(Ptr{Uint8}, (x -> symbol(bytestring(x))))]
 for (owner,property,typ) in [
+    (:base, :container, GIInfo),
     (:callable, :return_type, GIInfo), (:callable, :caller_owns, Enum),
+    (:function, :flags, Enum), (:function, :symbol, Symbol),
     (:arg, :type, GIInfo), (:arg, :direction, Enum),
     (:type, :tag, Enum), (:type, :interface, GIInfo)]
     ctype, conv = get(_types, typ, (typ,_unit))
@@ -160,12 +171,15 @@ extract_type(info::GIArgInfo) = extract_type(get_type(info))
 function extract_type(info::GITypeInfo)
     tag = get_tag(info)
     if tag <= TAG_BASIC_MAX
-        basetype = typetag_primitive[tag-1]
+        basetype = typetag_primitive[tag+1]
     elseif tag == TAG_INTERFACE
         # Object Types n such
         iface = get_interface(info)
         basetype = extract_type(iface)
+    else
+        return Nothing
     end
+    # GObjects are implicit pointers
     if is_pointer(info)
         Ptr{basetype}
     else
@@ -176,3 +190,33 @@ end
 function extract_type(info::GIObjectInfo) 
     GObjectI # TODO: specialize
 end
+
+extract_type(info::GIEnumInfo) = Enum 
+
+const IS_METHOD = 1 << 0
+
+# for testing only, we will generate native
+# bindings later on
+function test_call(meth::GIFunctionInfo, args...)
+    object = get_container(meth)
+    argtypes = Type[extract_type(a) for a in get_args(meth)]
+    flags = get_flags(meth)
+    if flags & IS_METHOD != 0
+        push!(argtypes, Ptr{GObjectI})
+    end
+    rettype = extract_type(get_return_type(meth))
+    print(rettype," ",argtypes,"\n")
+    symbol = get_symbol(meth)
+    argtypes = Expr(:tuple, argtypes...)
+    #FIXME: use correct library name
+    @eval retval = ccall(($(string(symbol)), libgtk), $rettype, $argtypes, ($args)[1])
+    if rettype == Ptr{GObjectI}
+        # Testing only
+        GObjectAny(retval)
+    else
+        retval
+    end
+end
+
+    
+

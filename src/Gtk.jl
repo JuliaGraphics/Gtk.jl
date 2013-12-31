@@ -5,7 +5,7 @@ using Cairo
 include("MutableTypes.jl")
 using .MutableTypes
 
-import Base: convert, show, showall, run, size, length, getindex, setindex!,
+import Base: convert, show, showall, showcompact, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy

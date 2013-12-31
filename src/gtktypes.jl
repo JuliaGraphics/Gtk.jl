@@ -9,7 +9,7 @@ abstract GtkBoxI <: GtkContainerI
 
 # Alternative object construction style. This would let us share constructors
 # by creating const aliases: `const Z = GObject{:Z}`
-type GObjectAny{Name} <: GObjectI
+type GObjectAny <: GObjectI
     handle::Ptr{GObject}
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
