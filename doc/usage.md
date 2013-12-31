@@ -186,3 +186,36 @@ for child in hbox
     println(child[:label,String])
 end
 ```
+
+## Additional graphical elements
+
+### Menus
+
+In Gtk, the core element is the `MenuItem`.
+Let's say we want to create a file menu; we might begin by creating the item:
+```
+file = MenuItem("_File")
+```
+The underscore in front of the "F" means that we will be able to select this item using `Alt+F`.
+The file menu will have items inside of it, of course, so let's create a submenu associated with this item:
+```
+filemenu = Menu(file)
+```
+Now let's populate it with entries:
+```
+new_ = MenuItem("New")
+push!(filemenu, new_)
+open_ = MenuItem("Open")
+push!(filemenu, open_)
+push!(filemenu, SeparatorMenuItem())
+quit = MenuItem("Quit")
+push!(filemenu, quit)
+```
+Finally, let's place our file item inside another type of menu, the `MenuBar`:
+```
+mb = MenuBar()
+push!(mb, file)  # notice this is the "File" item, not filemenu
+win = Window(mb, "Menus", 200, 40)
+```
+![menu](figures/menu.png)
+

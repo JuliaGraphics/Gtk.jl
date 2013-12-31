@@ -29,6 +29,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
+    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
     GtkFileChooserDialog, GtkNullContainer
 
 # Gtk3 objects
@@ -43,7 +44,8 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
     signal_handler_block, signal_handler_unblock,
     add_events, signal_emit,
     on_signal_destroy, on_signal_button_press,
-    on_signal_button_release, on_signal_motion
+    on_signal_button_release, on_signal_motion,
+    popup
 
 # Selectors
 export GtkFileChooserAction, GtkStock, GtkResponse
@@ -193,9 +195,13 @@ module ShortNames
     const Text = GtkTextView
     const TextMark = GtkTextMark
     const TextTag = GtkTextTag
-    const Key = GdkKeySyms
+    const MenuItem = GtkMenuItem
+    const SeparatorMenuItem = GtkSeparatorMenuItem
+    const Menu = GtkMenu
+    const MenuBar = GtkMenuBar
     const FileChooserDialog = GtkFileChooserDialog
     const FileChooserAction = GtkFileChooserAction
+    const Key = GdkKeySyms
     const Stock = GtkStock
     const Response = GtkResponse
     const NullContainer = GtkNullContainer
@@ -207,6 +213,7 @@ module ShortNames
         Entry, Scale, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
+        MenuItem, SeparatorMenuItem, Menu, MenuBar,
         NullContainer, Key
 
     # Gtk 3
@@ -231,7 +238,8 @@ module ShortNames
         signal_handler_block, signal_handler_unblock,
         add_events, signal_emit,
         on_signal_destroy, on_signal_button_press,
-        on_signal_button_release, on_signal_motion
+        on_signal_button_release, on_signal_motion,
+        popup
 end
 using .ShortNames
 export Canvas, Window

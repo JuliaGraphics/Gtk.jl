@@ -6,6 +6,8 @@ abstract GtkBinI <: GtkContainerI
 abstract GtkWindowI <: GtkBinI
 abstract GtkDialogI <: GtkWindowI
 abstract GtkBoxI <: GtkContainerI
+abstract GtkMenuShellI <: GtkContainerI
+abstract GtkMenuItemI <: GtkMenuShellI
 
 # Alternative object construction style. This would let us share constructors
 # by creating const aliases: `const Z = GObject{:Z}`

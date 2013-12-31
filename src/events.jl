@@ -240,7 +240,7 @@ function reveal(c::GtkWidgetI, immediate::Bool=true)
     end
 end
 
-const default_mouse_cb = (w, x, y)->nothing
+const default_mouse_cb = (w, event)->nothing
 
 type MouseHandler
     button1press::Function
@@ -261,11 +261,11 @@ end
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
     if event.button == 1
-        this.button1press(this.widget, event.x, event.y)
+        this.button1press(this.widget, event)
     elseif event.button == 2
-        this.button2press(this.widget, event.x, event.y)
+        this.button2press(this.widget, event)
     elseif event.button == 3
-        this.button3press(this.widget, event.x, event.y)
+        this.button3press(this.widget, event)
     end
     int32(false)
 end
@@ -273,20 +273,20 @@ end
 function mouseup_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
     if event.button == 1
-        this.button1release(this.widget, event.x, event.y)
+        this.button1release(this.widget, event)
     elseif event.button == 2
-        this.button2release(this.widget, event.x, event.y)
+        this.button2release(this.widget, event)
     elseif event.button == 3
-        this.button3release(this.widget, event.x, event.y)
+        this.button3release(this.widget, event)
     end
     int32(false)
 end
 
 function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
-    this.motion(this.widget, event.x, event.y)
+    this.motion(this.widget, event)
     if event.state & GdkModifierType.GDK_BUTTON1_MASK != 0
-        this.button1motion(this.widget, event.x, event.y)
+        this.button1motion(this.widget, event)
     end
     int32(false)
 end
