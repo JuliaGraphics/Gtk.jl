@@ -9,15 +9,18 @@ Prior to using this library, you must install a version of libgtk on your comput
 ### Windows
 
 The easiest method of installation is to use `WinRPM.jl`:
+
 1. Pkg.add("WinRPM")
 2. WinRPM.install("gtk2")
 3. RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
 4. ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
+
 You may need to repeat steps 3 and 4 every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
 
 ### OS X
 
 I use MacPorts:
+
 1. `port install gtk2 +quartz -x11 gtk3 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything to minimize conflicts)
 2. push!(DL_LOAD_PATH,"/opt/local/lib")
 You will need to repeat step 2 every time you restart julia, or put this line in your ~/.juliarc.jl file.
@@ -27,9 +30,10 @@ If you want to use Homebrew, the built-in formula is deficient (it does not supp
 ### Linux
 
 Try any of the following until something is successful:
-`aptitude install libgtk2.0-0 libgtk-3-0`
-`apt-get install libgtk2.0-0 libgtk-3-0`
-`yum install gtk2 gtk3`
+
+     aptitude install libgtk2.0-0 libgtk-3-0
+     apt-get install libgtk2.0-0 libgtk-3-0
+     yum install gtk2 gtk3
 
 ## Overview
 
@@ -81,7 +85,7 @@ Upon entry to the signal handler, Julia will unpack the arguments it received in
         nothing
     end
 
-See section on Extending Gtk's Functionality with new GValue-to-Julia conversions at the end of this document for details on the auto-unpacking implementation.
+See section on [Extending Gtk's Functionality with new GValue-to-Julia conversions](#extending-gtks-functionality) at the end of this document for details on the auto-unpacking implementation.
 
 #### Fast Event Handlers
 
