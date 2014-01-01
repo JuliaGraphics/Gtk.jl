@@ -283,7 +283,9 @@ sl = Scale(true, 1:10)
 w = Window(sl, "Scale")
 G_.value(sl, 3)
 @assert G_.value(sl) == 3
-#tk_bind(sl, "command", cb) ## can't test
+adj = Adjustment(sl)
+@assert adj[:value,Float64] == 3
+adj[:upper] = 11
 destroy(w)
 
 ## spinbutton

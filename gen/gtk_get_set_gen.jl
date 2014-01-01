@@ -20,6 +20,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkProgressBar" => :GtkProgressBar,
     "GtkScale" => :GtkScale,
     "GtkRange" => :GtkScale, #GtkRangeI,
+    "GtkAdjustment" => :GtkAdjustment,
     "GtkSpinButton" => :GtkSpinButton,
     "GtkSpinner" => :GtkSpinner,
     "GtkTextView" => :GtkTextView,
