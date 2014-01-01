@@ -142,8 +142,10 @@ for (owner,property,typ) in [
 end
 
 
-#Bug in gobject
 get_name(info::GITypeInfo) = symbol("<gtype>")
+get_name(info::GIInvalidInfo) = symbol("<INVALID>")
+
+qual_name(info::GIRegisteredTypeInfo) = (get_namespace(info),get_name(info))
 
 for (owner,flag) in [ (:type, :is_pointer) ]
     @eval function $flag(info::$(GIInfoTypes[owner]))
@@ -177,7 +179,7 @@ function extract_type(info::GITypeInfo)
         return Nothing
     end
     # GObjects are implicit pointers
-    if is_pointer(info)
+    if is_pointer(info) && !(basetype <: GObjectI)
         Ptr{basetype}
     else
         basetype
@@ -185,13 +187,17 @@ function extract_type(info::GITypeInfo)
 end
 
 function extract_type(info::GIObjectInfo) 
-    GObjectI # TODO: specialize
+    get( _gi_objects, qual_name(info), GObjectAny)
+end
+abstract GStruct #placeholder
+function extract_type(info::GIStructInfo) 
+    GStruct # TODO: specialize
 end
 
 extract_type(info::GIEnumInfo) = Enum 
 
 const IS_METHOD = 1 << 0
-
+const IS_CONSTRUCTOR = 1 << 1
 # for testing only, we will generate native
 # bindings later on
 const _loaded = Set{Symbol}()
@@ -213,12 +219,12 @@ function test_call(meth::GIFunctionInfo, args...)
     rettype = extract_type(get_return_type(meth))
     print(rettype," ",argtypes,"\n")
     symbol = get_symbol(meth)
-    argtypes = Expr(:tuple, argtypes...)
+    argtypes = Expr(:tuple, Any[c_type(a) for a in argtypes]...)
     #specify library name? (a namespace might supply more than one)
-    call = :(ccall($(string(symbol)), $rettype, $argtypes))
+    call = :(ccall($(string(symbol)), $(c_type(rettype)), $argtypes))
     append!(call.args, Any[Expr(:quote,arg) for arg in args])
     retval = eval(call)
-    if rettype == Ptr{GObjectI}
+    if rettype == GObjectI
         # Testing only
         GObjectAny(retval)
     else
