@@ -40,6 +40,14 @@ function push!(scale::GtkScale, value, position::Symbol)
 end
 empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObject},),scale)
 
+@GType GtkAdjustment <: GObject
+GtkAdjustment(value,lower,upper,step_increment,page_increment,page_size) =
+    GtkAdjustment(ccall((:gtk_adjustment_new,libgtk), Ptr{GObject},
+          (Float64,Float64,Float64,Float64,Float64,Float64),
+          value,lower,upper,step_increment,page_increment,page_size))
+
+GtkAdjustment(scale::GtkScale) = GtkAdjustment(ccall((:gtk_range_get_adjustment,libgtk),
+                                                      Ptr{GObject},(Ptr{GObject},), scale))
 
 @GType GtkSpinButton <: GtkWidget
 GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},

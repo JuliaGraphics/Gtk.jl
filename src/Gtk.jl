@@ -26,7 +26,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
     GtkToggleButton, GtkLinkButton, GtkVolumeButton,
-    GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
+    GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
@@ -181,6 +181,7 @@ module ShortNames
     const VolumeButton = GtkVolumeButton
     const Entry = GtkEntry
     const Scale = GtkScale
+    const Adjustment = GtkAdjustment
     const SpinButton = GtkSpinButton
     const ComboBoxText = GtkComboBoxText
     const Pixbuf = GdkPixbuf
@@ -209,7 +210,7 @@ module ShortNames
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton,
-        Entry, Scale, SpinButton, ComboBoxText,
+        Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
