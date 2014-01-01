@@ -1,5 +1,5 @@
-@GType GIRepository
-const girepo = GIRepository(ccall((:g_irepository_get_default, libgi), Ptr{GObject}, () ))
+abstract GIRepository
+const girepo = ccall((:g_irepository_get_default, libgi), Ptr{GIRepository}, () )
 
 abstract GITypelib
 
@@ -42,19 +42,6 @@ end
 typealias GICallableInfo Union(GIFunctionInfo,GIVFuncInfo, GICallbackInfo, GISignalInfo)
 typealias GIRegisteredTypeInfo Union(GIEnumInfo,GIInterfaceInfo, GIObjectInfo, GIStructInfo, GIUnionInfo)
 
-function get_name(info::GIInfo) 
-    str = ccall((:g_base_info_get_name, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
-    symbol(bytestring(str)) 
-end
-
-#Bug in gobject
-get_name(info::GITypeInfo) = symbol("<gtype>")
-
-function get_namespace(info::GIInfo) 
-    str = ccall((:g_base_info_get_namespace, libgi), Ptr{Uint8}, (Ptr{GIBaseInfo},), info)
-    symbol(bytestring(str)) 
-end
-
 show{Typeid}(io::IO, ::Type{GIInfo{Typeid}}) = print(io, GIInfoTypeNames[Typeid+1])
 
 function show(io::IO, info::GIInfo)
@@ -84,7 +71,7 @@ function gi_require(namespace, version=nothing)
     end
     GError() do error_check
         typelib = ccall((:g_irepository_require, libgi), Ptr{GITypelib}, 
-            (Ptr{GObject}, Ptr{Uint8}, Ptr{Uint8}, Cint, Ptr{Ptr{GError}}), 
+            (Ptr{GIRepository}, Ptr{Uint8}, Ptr{Uint8}, Cint, Ptr{Ptr{GError}}), 
             girepo, namespace, version, 0, error_check)
         return  typelib !== C_NULL
     end
@@ -92,7 +79,7 @@ end
 
 function gi_find_by_name(namespace, name)
     info = ccall((:g_irepository_find_by_name, libgi), Ptr{GIBaseInfo}, 
-           (Ptr{GObject}, Ptr{Uint8}, Ptr{Uint8}), girepo, namespace, name)
+           (Ptr{GIRepository}, Ptr{Uint8}, Ptr{Uint8}), girepo, namespace, name)
     if info == C_NULL
         error("Name $name not found in $namespace")
     end
@@ -102,13 +89,17 @@ end
 #GIInfo(namespace, name::Symbol) = gi_find_by_name(namespace, name)
 
 #TODO: make ns behave more like Array and/or Dict{Symbol,GIInfo}?
-length(ns::GINamespace) = int(ccall((:g_irepository_get_n_infos, libgi), Cint, (Ptr{GObject}, Ptr{Uint8}), girepo, ns))
+length(ns::GINamespace) = int(ccall((:g_irepository_get_n_infos, libgi), Cint, (Ptr{GIRepository}, Ptr{Uint8}), girepo, ns))
 function getindex(ns::GINamespace, i::Integer) 
-    GIInfo(ccall((:g_irepository_get_info, libgi), Ptr{GIBaseInfo}, (Ptr{GObject}, Ptr{Uint8}, Cint), girepo, ns, i ))
+    GIInfo(ccall((:g_irepository_get_info, libgi), Ptr{GIBaseInfo}, (Ptr{GIRepository}, Ptr{Uint8}, Cint), girepo, ns, i ))
 end
-function getindex(ns::GINamespace, name::Symbol) 
-    gi_find_by_name(ns, name)
+getindex(ns::GINamespace, name::Symbol) = gi_find_by_name(ns, name)
+
+function get_shlibs(ns)
+    names = bytestring(ccall((:g_irepository_get_shared_library, libgi), Ptr{Uint8}, (Ptr{GIRepository}, Ptr{Uint8}), girepo, ns))
+    split(names,",")
 end
+get_shlibs(info::GIInfo) = get_shlibs(get_namespace(info))
 
 GIInfoTypes[:method] = GIFunctionInfo
 GIInfoTypes[:callable] = GICallableInfo
@@ -129,6 +120,7 @@ for (owner, property) in [
         end
     end
 end
+getindex(info::GIRegisteredTypeInfo, name::Symbol) = find_method(info, name)
 
 # one->one
 _unit(x) = x
@@ -137,7 +129,8 @@ _unit(x) = x
 _types = [GIInfo=>(Ptr{GIBaseInfo},GIInfo),
           Symbol=>(Ptr{Uint8}, (x -> symbol(bytestring(x))))]
 for (owner,property,typ) in [
-    (:base, :container, GIInfo),
+    (:base, :name, Symbol), (:base, :namespace, Symbol),
+    (:base, :container, GIInfo), (:object, :parent, GIInfo),
     (:callable, :return_type, GIInfo), (:callable, :caller_owns, Enum),
     (:function, :flags, Enum), (:function, :symbol, Symbol),
     (:arg, :type, GIInfo), (:arg, :direction, Enum),
@@ -147,6 +140,10 @@ for (owner,property,typ) in [
         $conv(ccall(($("g_$(owner)_info_get_$(property)"), libgi), $ctype, (Ptr{GIBaseInfo},), info))
     end
 end
+
+
+#Bug in gobject
+get_name(info::GITypeInfo) = symbol("<gtype>")
 
 for (owner,flag) in [ (:type, :is_pointer) ]
     @eval function $flag(info::$(GIInfoTypes[owner]))
@@ -197,19 +194,30 @@ const IS_METHOD = 1 << 0
 
 # for testing only, we will generate native
 # bindings later on
+const _loaded = Set{Symbol}()
+function ensure_dl(ns)  
+    if !(ns in _loaded ) 
+        [dlopen(name,RTLD_GLOBAL) for name=get_shlibs(ns) ]
+        push!(_loaded,ns) 
+    end
+end
 function test_call(meth::GIFunctionInfo, args...)
+    ns = get_namespace(meth)
+    ensure_dl(ns)
     object = get_container(meth)
     argtypes = Type[extract_type(a) for a in get_args(meth)]
     flags = get_flags(meth)
     if flags & IS_METHOD != 0
-        push!(argtypes, Ptr{GObjectI})
+        unshift!(argtypes, Ptr{GObjectI})
     end
     rettype = extract_type(get_return_type(meth))
     print(rettype," ",argtypes,"\n")
     symbol = get_symbol(meth)
     argtypes = Expr(:tuple, argtypes...)
-    #FIXME: use correct library name
-    @eval retval = ccall(($(string(symbol)), libgtk), $rettype, $argtypes, ($args)[1])
+    #specify library name? (a namespace might supply more than one)
+    call = :(ccall($(string(symbol)), $rettype, $argtypes))
+    append!(call.args, Any[Expr(:quote,arg) for arg in args])
+    retval = eval(call)
     if rettype == Ptr{GObjectI}
         # Testing only
         GObjectAny(retval)
@@ -218,5 +226,6 @@ function test_call(meth::GIFunctionInfo, args...)
     end
 end
 
+test_call(obj, mname, args...) = test_call(find_method(obj,mname), args...)
     
 

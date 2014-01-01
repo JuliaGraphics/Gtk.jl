@@ -15,8 +15,9 @@ argx = args[1]
 @assert Gtk.get_name(argx) == :x
 @assert Gtk.extract_type(argx) == Int32
 
-window = Gtk.test_call(wnew, 0)
+w = Gtk.test_call(wnew, 0)
 
 wshow = Gtk.find_method(gtk[:Widget], :show)
 
-Gtk.test_call(wshow, window)
+Gtk.test_call(wshow, w)
+Gtk.test_call(move, w, 100, 300)
