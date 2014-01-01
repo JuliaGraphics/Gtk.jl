@@ -58,8 +58,8 @@ _gi_objects[(:GObject,:Object)] = GObjectAny #FIXME
 _gi_obj_ifaces[(:GObject,:Object)] = GObjectI 
 peval(mod, expr) = (print(expr,'\n'); eval(mod,expr))
 
-function extract_type(info::GIObjectInfo) 
-    get( _gi_objects, qual_name(info), GObjectAny)
+function extract_type(info::GIObjectInfo,ret=false) 
+    get( (ret ? _gi_obj_ifaces : _gi_objects), qual_name(info), (ret ? GObjectAny : GObjectI))
 end
 
 function create_type(info::GIObjectInfo)
@@ -122,7 +122,7 @@ function create_method(info::GIFunctionInfo)
     if flags & IS_CONSTRUCTOR != 0
         name = get_name(get_container(info))
     end
-    rettype = extract_type(get_return_type(info))
+    rettype = extract_type(get_return_type(info),true)
     cargtypes = Expr(:tuple, Any[c_type(a) for a in argtypes]...)
     crettype = c_type(rettype)
     symb = get_symbol(info)
@@ -132,8 +132,7 @@ function create_method(info::GIFunctionInfo)
     if rettype == None
         #pass
     elseif rettype <: GObjectI 
-        #TODO: returned value may be a subtype
-        c_call = :( $rettype($c_call) )
+        c_call = :( Gtk._GSubType($rettype,$c_call) )
     elseif rettype <: ByteString
         c_call = :( bytestring($c_call) )
     end
@@ -142,9 +141,17 @@ function create_method(info::GIFunctionInfo)
 end
     
 
-#function _GObject{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
-#    constr, iface = 
-#end
+function _GSubType{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
+    if hnd == C_NULL
+        error("can't handle NULL returns yet!")
+    end
+    h1 = convert(Ptr{Ptr{Csize_t}}, hnd)
+    class = unsafe_load(h1) #class is first in gobject
+    gtypeid = unsafe_load(class)#GType is first in class
+    info = find_by_gtype(gtypeid)
+    constr, iface = create_type(info)
+    return constr(hnd)::T
+end
 
 #some convenience macros, just for the show
 macro gimport(ns, names)

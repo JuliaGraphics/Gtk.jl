@@ -18,8 +18,6 @@ argx = args[1]
 @gimport Gtk Window(move,set_title,get_title), Widget(show)
 w = Window(0)
 show(w) #NB: currently doesn't extend Base.show
-# bug: subtype return not implemented yet
-w = Window(w.handle)
 move(w,100,100)
 
 #string passing

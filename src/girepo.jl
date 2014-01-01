@@ -101,6 +101,10 @@ function get_shlibs(ns)
 end
 get_shlibs(info::GIInfo) = get_shlibs(get_namespace(info))
 
+function find_by_gtype(gtypeid::Csize_t)
+    GIInfo(ccall((:g_irepository_find_by_gtype, libgi), Ptr{GIBaseInfo}, (Ptr{GIRepository}, Csize_t), girepo, gtypeid))
+end
+
 GIInfoTypes[:method] = GIFunctionInfo
 GIInfoTypes[:callable] = GICallableInfo
 GIInfoTypes[:base] = GIInfo
@@ -166,16 +170,16 @@ const typetag_primitive = [
 const TAG_BASIC_MAX = 13
 const TAG_INTERFACE = 16 
 
-extract_type(info::GIArgInfo) = extract_type(get_type(info))
+extract_type(info::GIArgInfo,ret=false) = extract_type(get_type(info),ret)
 
-function extract_type(info::GITypeInfo)
+function extract_type(info::GITypeInfo,ret=false)
     tag = get_tag(info)
     if tag <= TAG_BASIC_MAX
         basetype = typetag_primitive[tag+1]
     elseif tag == TAG_INTERFACE
         # Object Types n such
         iface = get_interface(info)
-        basetype = extract_type(iface)
+        basetype = extract_type(iface,ret)
     else
         return Nothing
     end
@@ -188,11 +192,11 @@ function extract_type(info::GITypeInfo)
 end
 
 abstract GStruct #placeholder
-function extract_type(info::GIStructInfo) 
+function extract_type(info::GIStructInfo,ret) 
     GStruct # TODO: specialize
 end
 
-extract_type(info::GIEnumInfo) = Enum 
+extract_type(info::GIEnumInfo,ret) = Enum 
 
 const IS_METHOD = 1 << 0
 const IS_CONSTRUCTOR = 1 << 1
