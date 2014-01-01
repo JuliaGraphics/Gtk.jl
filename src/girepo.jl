@@ -160,7 +160,7 @@ const typetag_primitive = [
     Int16,Uint16,Int32,Uint32,
     Int64,Uint64,Cfloat,Cdouble,
     Csize_t, # FIXME: Gtype
-    UTF8String
+    ByteString
     ]
 const TAG_BASIC_MAX = 13
 const TAG_INTERFACE = 16 
@@ -179,7 +179,7 @@ function extract_type(info::GITypeInfo)
         return Nothing
     end
     # GObjects are implicit pointers
-    if is_pointer(info) && !(basetype <: GObjectI)
+    if is_pointer(info) && !(basetype <: GObjectI) && !(basetype <: ByteString)
         Ptr{basetype}
     else
         basetype

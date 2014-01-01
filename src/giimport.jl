@@ -38,8 +38,6 @@ function ensure_name(ns::GINamespace, name::Symbol)
     _gi_modsyms[(ns.name,name)] = load_name(ns,name,ns[name])
 end
 
-
-
 function load_name(ns,name,info::GIObjectInfo)
     otype, oiface = create_type(info)
     ensure_method(ns,name,:new) #FIXME: new might not exist
@@ -72,7 +70,7 @@ function create_type(info::GIObjectInfo)
         abstract ($iname) <: ($piface)
         type ($name) <: ($iname)
             handle::Ptr{Gtk.GObjectI}
-            $name(handle::Ptr{Gtk.GObjectI}) = (handle != C_NULL ? Gtk.gc_ref(new(handle)) : error("Cannot construct $name with a NULL pointer"))
+            $name(handle::Ptr{Gtk.GObjectI}) = (handle != C_NULL ? Gtk.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
         end #FIXME
         ($name, $iname)
     end)
@@ -95,6 +93,7 @@ end
     
 c_type(t) = t
 c_type{T<:GObjectI}(t::Type{T}) = Ptr{GObjectI}
+c_type{T<:ByteString}(t::Type{T}) = Ptr{Uint8}
 
 j_type(t) = t
 j_type{T<:Integer}(::Type{T}) = Integer
@@ -122,10 +121,13 @@ function create_method(info::GIFunctionInfo)
     j_call = Expr(:call, name, [ :($(argnames[i])::$(j_type(argtypes[i]))) for i=1:length(argtypes) ]... )
     c_call = :(ccall($(string(symb)), $(c_type(rettype)), $cargtypes))
     append!(c_call.args, argnames)
-    (j_call,c_call)
-    if rettype <: GObjectI && rettype != None
+    if rettype == None
+        #pass
+    elseif rettype <: GObjectI 
         #TODO: returned value may be a subtype
         c_call = :( $rettype($c_call) )
+    elseif rettype <: ByteString
+        c_call = :( bytestring($c_call) )
     end
     peval(NS, Expr(:function, j_call, quote $c_call end))
 
