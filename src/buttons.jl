@@ -146,6 +146,7 @@ end
 GtkRadioButton(a::GtkRadioButton,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a),active)
 GtkRadioButton(a::GtkRadioButton,b::GtkWidgetI,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
 GtkRadioButton(a::GtkRadioButton,b,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
+GtkWidgetI
 for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
     @eval begin
         $btn(active::Bool) = gtk_toggle_button_set_active($btn(),active)

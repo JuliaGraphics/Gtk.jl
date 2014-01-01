@@ -2,6 +2,14 @@
 const _gi_modules = Dict{Symbol,Module}()
 const _gi_modsyms = Dict{(Symbol,Symbol),Any}()
 
+module GI
+    #eval quote module seems to mess the parent module, isolate
+    function create_module(modname::Symbol)
+        eval(quote module ($modname) end; $modname end)
+    end
+end
+
+
 function init_ns(name::Symbol)
     if haskey(_gi_modules,name)
         return
@@ -12,8 +20,7 @@ function init_ns(name::Symbol)
     end
     # use submodules to GI module later
     modname = symbol("_$name")
-    eval(quote module ($modname) end end)
-    mod = eval(modname)
+    mod = GI.create_module(modname)
     setconst(mod,:_gi_ns,gns) #eval(quote module const) didn't seem to work
     setconst(mod,:Gtk,Gtk) 
     _gi_modules[name] = mod
@@ -45,6 +52,11 @@ const _gi_obj_ifaces = Dict{(Symbol,Symbol),Type}()
 _gi_objects[(:GObject,:Object)] = GObjectAny #FIXME
 _gi_obj_ifaces[(:GObject,:Object)] = GObjectI 
 peval(mod, expr) = (print(expr,'\n'); eval(mod,expr))
+
+function extract_type(info::GIObjectInfo) 
+    get( _gi_objects, qual_name(info), GObjectAny)
+end
+
 function create_type(info::GIObjectInfo)
     ns = get_namespace(info)
     name = get_name(info)
@@ -83,6 +95,9 @@ end
     
 c_type(t) = t
 c_type{T<:GObjectI}(t::Type{T}) = Ptr{GObjectI}
+
+j_type(t) = t
+j_type{T<:Integer}(::Type{T}) = Integer
 function create_method(info::GIFunctionInfo)
     ns = get_namespace(info)
     NS = _ns(ns)
@@ -94,7 +109,7 @@ function create_method(info::GIFunctionInfo)
     if flags & IS_METHOD != 0
         object = get_container(info)
         t, iface = create_type(object)
-        unshift!(argtypes, Ptr{iface})
+        unshift!(argtypes, iface)
         unshift!(argnames, :__instance)
     end
     if flags & IS_CONSTRUCTOR != 0
@@ -103,12 +118,12 @@ function create_method(info::GIFunctionInfo)
     rettype = extract_type(get_return_type(info))
     cargtypes = Expr(:tuple, Any[c_type(a) for a in argtypes]...)
     crettype = c_type(rettype)
-    symbol = get_symbol(info)
-    j_call = Expr(:call, name, [ :($(argnames[i])::$(argtypes[i])) for i=1:length(argtypes) ]... )
-    c_call = :(ccall($(string(symbol)), $(c_type(rettype)), $cargtypes))
+    symb = get_symbol(info)
+    j_call = Expr(:call, name, [ :($(argnames[i])::$(j_type(argtypes[i]))) for i=1:length(argtypes) ]... )
+    c_call = :(ccall($(string(symb)), $(c_type(rettype)), $cargtypes))
     append!(c_call.args, argnames)
     (j_call,c_call)
-    if rettype <: GObjectI
+    if rettype <: GObjectI && rettype != None
         #TODO: returned value may be a subtype
         c_call = :( $rettype($c_call) )
     end

@@ -186,9 +186,6 @@ function extract_type(info::GITypeInfo)
     end
 end
 
-function extract_type(info::GIObjectInfo) 
-    get( _gi_objects, qual_name(info), GObjectAny)
-end
 abstract GStruct #placeholder
 function extract_type(info::GIStructInfo) 
     GStruct # TODO: specialize
@@ -198,40 +195,4 @@ extract_type(info::GIEnumInfo) = Enum
 
 const IS_METHOD = 1 << 0
 const IS_CONSTRUCTOR = 1 << 1
-# for testing only, we will generate native
-# bindings later on
-const _loaded = Set{Symbol}()
-function ensure_dl(ns)  
-    if !(ns in _loaded ) 
-        [dlopen(name,RTLD_GLOBAL) for name=get_shlibs(ns) ]
-        push!(_loaded,ns) 
-    end
-end
-function test_call(meth::GIFunctionInfo, args...)
-    ns = get_namespace(meth)
-    ensure_dl(ns)
-    object = get_container(meth)
-    argtypes = Type[extract_type(a) for a in get_args(meth)]
-    flags = get_flags(meth)
-    if flags & IS_METHOD != 0
-        unshift!(argtypes, Ptr{GObjectI})
-    end
-    rettype = extract_type(get_return_type(meth))
-    print(rettype," ",argtypes,"\n")
-    symbol = get_symbol(meth)
-    argtypes = Expr(:tuple, Any[c_type(a) for a in argtypes]...)
-    #specify library name? (a namespace might supply more than one)
-    call = :(ccall($(string(symbol)), $(c_type(rettype)), $argtypes))
-    append!(call.args, Any[Expr(:quote,arg) for arg in args])
-    retval = eval(call)
-    if rettype == GObjectI
-        # Testing only
-        GObjectAny(retval)
-    else
-        retval
-    end
-end
-
-test_call(obj, mname, args...) = test_call(find_method(obj,mname), args...)
-    
 
