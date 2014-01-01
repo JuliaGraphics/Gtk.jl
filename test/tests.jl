@@ -377,6 +377,7 @@ push!(popupmenu, contrast)
 c = Canvas()
 win = Window(c, "Popup")
 c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+destroy(win)
 
 ## Text
 #w = Window("Text")

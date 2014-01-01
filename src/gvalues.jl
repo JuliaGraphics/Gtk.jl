@@ -184,7 +184,7 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
 end
 
 function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
-    v = gvulue(T)
+    v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
     val = v[T]

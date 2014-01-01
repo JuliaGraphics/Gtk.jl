@@ -203,3 +203,11 @@ function gc_unref(x::GObjectI)
 end
 gc_unref(::Ptr{GObjectI}, x::GObjectI) = gc_unref(x)
 gc_ref_closure(x::GObjectI) = C_NULL
+
+
+baremodule GtkJustification
+    const LEFT   = 0
+    const RIGHT  = 1
+    const CENTER = 2
+    const FILL   = 3
+end
