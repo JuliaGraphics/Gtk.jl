@@ -1,7 +1,6 @@
 using Gtk;
-Clutter = Gtk._ns(:Clutter);  
-Gtk.ensure_name(Clutter, :Actor); 
+@gimport Clutter Actor
 actor = Clutter.Actor()
+display(actor)
 @assert isa(actor,Gtk.GObject)
-show(actor)
 

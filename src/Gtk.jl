@@ -12,6 +12,9 @@ import Base: convert, show, showall, showcompact, run, size, length, getindex, s
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
+# gimport interface (not final in any way)
+export @gimport
+
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,

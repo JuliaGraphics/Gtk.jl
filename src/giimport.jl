@@ -9,6 +9,9 @@ module GI
     end
 end
 
+# QuoteNode is not instantiable
+#but there probably is a builtin that does this:
+quot(val) = Expr(:quote, val)
 
 function init_ns(name::Symbol)
     if haskey(_gi_modules,name)
@@ -25,7 +28,7 @@ function init_ns(name::Symbol)
     setconst(mod,:Gtk,Gtk) 
     _gi_modules[name] = mod
 end
-setconst(mod,name,val) = eval(mod, :(const $name = $(Expr(:quote,val))))
+setconst(mod,name,val) = eval(mod, :(const $name = $(quot(val))))
 
 init_ns(:GObject)
 _ns(name) = (init_ns(name); _gi_modules[name])
@@ -33,14 +36,18 @@ _ns(name) = (init_ns(name); _gi_modules[name])
 ensure_name(mod::Module, name) = ensure_name(mod._gi_ns, name)
 function ensure_name(ns::GINamespace, name::Symbol)
     if haskey(_gi_modsyms,(ns.name, name))
-        return 
+        return  _gi_modsyms[(ns.name, name)]
     end
-    _gi_modsyms[(ns.name,name)] = load_name(ns,name,ns[name])
+    sym = load_name(ns,name,ns[name])
+    _gi_modsyms[(ns.name,name)] = sym
+    sym
 end
 
 function load_name(ns,name,info::GIObjectInfo)
     otype, oiface = create_type(info)
-    ensure_method(ns,name,:new) #FIXME: new might not exist
+    if find_method(ns[name], :new) != nothing
+        ensure_method(ns,name,:new) #FIXME: new might not exist
+    end
     otype
 end
 
@@ -79,16 +86,17 @@ function create_type(info::GIObjectInfo)
     (otype,oiface)
 end
 
-const _gi_methods = Set{(Symbol,Symbol,Symbol)}()
+const _gi_methods = Dict{(Symbol,Symbol,Symbol),Any}()
 ensure_method(mod::Module, rtype, method) = ensure_method(mod._gi_ns,rtype,method)
 
 function ensure_method(ns::GINamespace, rtype::Symbol, method::Symbol)
     qname = (ns.name,rtype,method)
-    if qname in _gi_methods
-        return
+    if haskey( _gi_methods, qname)
+        return _gi_methods[qname]
     end
-    create_method(ns[rtype][method])
-    push!(_gi_methods,qname)
+    meth = create_method(ns[rtype][method])
+    _gi_methods[qname] = meth
+    return meth
 end
     
 c_type(t) = t
@@ -130,6 +138,36 @@ function create_method(info::GIFunctionInfo)
         c_call = :( bytestring($c_call) )
     end
     peval(NS, Expr(:function, j_call, quote $c_call end))
-
+    return eval(NS, name)
 end
     
+
+#function _GObject{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
+#    constr, iface = 
+#end
+
+#some convenience macros, just for the show
+macro gimport(ns, names)
+    _name = (ns == :Gtk) ? :_Gtk : ns
+    q = quote  $(esc(_name)) = Gtk._ns($(quot(ns))) end
+    if isa(names,Expr)  && names.head == :tuple
+        names = names.args
+    else 
+        names = [names]
+    end
+    for item in names
+        if isa(item,Symbol)
+            name = item; meths = []
+        else 
+            name = item.args[1]
+            meths = item.args[2:end]
+        end
+        push!(q.args, :( $(esc(name)) = Gtk.ensure_name($(esc(_name)), $(quot(name)))))
+        for meth in meths
+            push!(q.args, :( $(esc(meth)) = Gtk.ensure_method($(esc(_name)), $(quot(name)), $(quot(meth)))))
+        end
+    end
+    print(q)
+    q
+end
+

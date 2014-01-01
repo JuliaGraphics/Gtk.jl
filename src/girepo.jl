@@ -116,7 +116,8 @@ for (owner, property) in [
     end
     if property == :method
         @eval function $(symbol("find_$(property)"))(info::$(GIInfoTypes[owner]), name)
-            GIInfo(ccall(($("g_$(owner)_info_find_$(property)"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo},Ptr{Uint8}), info, name))
+            ptr = ccall(($("g_$(owner)_info_find_$(property)"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo},Ptr{Uint8}), info, name)
+            (ptr == C_NULL) ? nothing : GIInfo(ptr)
         end
     end
 end
