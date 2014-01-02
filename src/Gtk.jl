@@ -39,7 +39,7 @@ export GtkGrid
 export GtkTable, GtkAlignment
 
 # Gtk-specific event handling
-export gtk_doevent, GdkEventMask, GdkModifierType,
+export gtk_doevent, GdkEventMask, GdkModifierType, GdkEventType,
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     add_events, signal_emit,
@@ -51,7 +51,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 export GtkFileChooserAction, GtkStock, GtkResponse
 
 # Constants
-export GdkKeySyms, GdkScrollDirection
+export GdkKeySyms, GdkScrollDirection, GtkJustification
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
@@ -204,6 +204,11 @@ module ShortNames
     const Key = GdkKeySyms
     const Stock = GtkStock
     const Response = GtkResponse
+    const EventMask = GdkEventMask
+    const ModifierType = GdkModifierType
+    const EventType = GdkEventType
+    const ScrollDirection = GdkScrollDirection
+    const Justification = GtkJustification
     const NullContainer = GtkNullContainer
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
@@ -214,7 +219,7 @@ module ShortNames
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key
+        NullContainer, Key, ScrollDirection, Justification
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -233,7 +238,7 @@ module ShortNames
     export FileChooserDialog, FileChooserAction, Stock, Response
 
     # Events
-    export gtk_doevent, GdkEventMask, GdkModifierType,
+    export gtk_doevent, EventMask, ModifierType, EventType,
         signal_connect, signal_handler_disconnect,
         signal_handler_block, signal_handler_unblock,
         add_events, signal_emit,

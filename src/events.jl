@@ -179,11 +179,11 @@ function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
 end
 
 function on_signal_button_press(press_cb::Function, widget::GtkWidgetI, vargs...)
-    add_events(widget, GdkEventMask.GDK_BUTTON_PRESS_MASK)
+    add_events(widget, GdkEventMask.BUTTON_PRESS)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 function on_signal_button_release(release_cb::Function, widget::GtkWidgetI, vargs...)
-    add_events(widget, GdkEventMask.GDK_BUTTON_RELEASE_MASK)
+    add_events(widget, GdkEventMask.BUTTON_RELEASE)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 
@@ -205,19 +205,19 @@ function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gt
     ret
 end
 function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
-        include=0, exclude=GdkModifierType.GDK_BUTTONS_MASK, after::Bool=false, closure::T=w)
+        include=0, exclude=GdkModifierType.BUTTONS, after::Bool=false, closure::T=w)
     exclude &= ~include
-    mask = GdkEventMask.GDK_POINTER_MOTION_HINT_MASK
-    if     0 == include & GdkModifierType.GDK_BUTTONS_MASK
-        mask |= GdkEventMask.GDK_POINTER_MOTION_MASK
-    elseif 0 != include & GdkModifierType.GDK_BUTTON1_MASK
-        mask |= GdkEventMask.GDK_BUTTON1_MOTION_MASK
-    elseif 0 != include & GdkModifierType.GDK_BUTTON2_MASK
-        mask |= GdkEventMask.GDK_BUTTON2_MOTION_MASK
-    elseif 0 != include & GdkModifierType.GDK_BUTTON3_MASK
-        mask |= GdkEventMask.GDK_BUTTON3_MOTION_MASK
-    else #if 0 != include & (GdkModifierType.GDK_BUTTON4_MASK|GdkModifierType.GDK_BUTTON5_MASK)
-        mask |= GdkEventMask.GDK_BUTTON_MOTION_MASK
+    mask = GdkEventMask.POINTER_MOTION_HINT
+    if     0 == include & GdkModifierType.BUTTONS
+        mask |= GdkEventMask.POINTER_MOTION
+    elseif 0 != include & GdkModifierType.BUTTON1
+        mask |= GdkEventMask.BUTTON1_MOTION
+    elseif 0 != include & GdkModifierType.BUTTON2
+        mask |= GdkEventMask.BUTTON2_MOTION
+    elseif 0 != include & GdkModifierType.BUTTON3
+        mask |= GdkEventMask.BUTTON3_MOTION
+    else #if 0 != include & (GdkModifierType.BUTTON4|GdkModifierType.BUTTON5)
+        mask |= GdkEventMask.BUTTON_MOTION
     end
     add_events(widget, mask)
     @assert Base.isstructtype(T)
@@ -285,7 +285,7 @@ end
 function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
     this.motion(this.widget, event)
-    if event.state & GdkModifierType.GDK_BUTTON1_MASK != 0
+    if event.state & GdkModifierType.BUTTON1 != 0
         this.button1motion(this.widget, event)
     end
     int32(false)
