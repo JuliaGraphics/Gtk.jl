@@ -10,7 +10,6 @@ type GtkCanvas <: GtkWidgetI # NOT an @GType
 
     function GtkCanvas(w, h)
         da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GObject},())
-        ccall((:gtk_widget_set_double_buffered,libgtk),Void,(Ptr{GObject},Int32), da, false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32), da, w, h)
         widget = new(da, false, MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
