@@ -20,8 +20,8 @@ destroy(w)
 @assert !w[:visible,Bool]
 # FIXME: I get a segfault now if I uncomment the next lines
 w=WeakRef(w)
-gc(); gc(); sleep(.1); gc()
-@assert w.value.handle == C_NULL
+gc(); gc(); sleep(.1); gc(); gc()
+@assert w.value === nothing || w.value.handle == C_NULL
 
 ## Frame
 w = Window(
@@ -377,6 +377,7 @@ push!(popupmenu, contrast)
 c = Canvas()
 win = Window(c, "Popup")
 c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+destroy(win)
 
 ## Text
 #w = Window("Text")

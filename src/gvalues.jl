@@ -215,6 +215,10 @@ G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
+    if convert(Ptr{GObjectI},w) == C_NULL
+        print(io,"<NULL>)")
+        return
+    end
     n = mutable(Cuint)
     props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
         (Ptr{Void},Ptr{Cuint}),G_OBJECT_GET_CLASS(w),n)
