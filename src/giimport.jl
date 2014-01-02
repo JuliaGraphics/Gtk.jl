@@ -2,13 +2,6 @@
 const _gi_modules = Dict{Symbol,Module}()
 const _gi_modsyms = Dict{(Symbol,Symbol),Any}()
 
-module GI
-    #eval quote module seems to mess the parent module, isolate
-    function create_module(modname::Symbol)
-        eval(quote module ($modname) end; $modname end)
-    end
-end
-
 # QuoteNode is not instantiable
 #but there probably is a builtin that does this:
 quot(val) = Expr(:quote, val)
@@ -23,12 +16,12 @@ function init_ns(name::Symbol)
     end
     # use submodules to GI module later
     modname = symbol("_$name")
-    mod = GI.create_module(modname)
-    setconst(mod,:_gi_ns,gns) #eval(quote module const) didn't seem to work
-    setconst(mod,:Gtk,Gtk) 
+    mod = eval(Expr(:toplevel, :(module ($modname) 
+        const _gi_ns = $gns
+        const Gtk = $Gtk
+    end), modname))
     _gi_modules[name] = mod
 end
-setconst(mod,name,val) = eval(mod, :(const $name = $(quot(val))))
 
 init_ns(:GObject)
 _ns(name) = (init_ns(name); _gi_modules[name])
