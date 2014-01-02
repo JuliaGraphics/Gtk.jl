@@ -5,6 +5,14 @@ const _gi_modsyms = Dict{(Symbol,Symbol),Any}()
 # QuoteNode is not instantiable
 #but there probably is a builtin that does this:
 quot(val) = Expr(:quote, val)
+module GI
+    function create_module(modname,gns,gtk)
+        mod = eval(Expr(:toplevel, :(module ($modname) 
+            const _gi_ns = $gns
+            const Gtk = $gtk
+        end), modname))
+    end
+end
 
 function init_ns(name::Symbol)
     if haskey(_gi_modules,name)
@@ -16,21 +24,18 @@ function init_ns(name::Symbol)
     end
     # use submodules to GI module later
     modname = symbol("_$name")
-    mod = eval(Expr(:toplevel, :(module ($modname) 
-        const _gi_ns = $gns
-        const Gtk = $Gtk
-    end), modname))
+    mod = GI.create_module(modname,gns,Gtk)
     _gi_modules[name] = mod
+    mod
 end
 
+
 init_ns(:GObject)
+init_ns(:Gtk)
 _ns(name) = (init_ns(name); _gi_modules[name])
 #TODO: separate GLib.jl and Gtk.jl
-_gi_ns = GINamespace(:Gtk)
-for path=get_shlibs(_gi_ns) 
-    dlopen(path,RTLD_GLOBAL) 
-end
-_gi_modules[:Gtk] = Gtk
+
+gtk_ns = GI._Gtk._gi_ns
 
 ensure_name(mod::Module, name) = ensure_name(mod._gi_ns, name)
 function ensure_name(ns::GINamespace, name::Symbol)
@@ -137,7 +142,7 @@ function create_method(info::GIFunctionInfo)
     elseif rettype <: ByteString
         c_call = :( bytestring($c_call) )
     end
-    peval(NS, Expr(:function, j_call, quote $c_call end))
+    eval(NS, Expr(:function, j_call, quote $c_call end))
     return eval(NS, name)
 end
     
@@ -146,10 +151,8 @@ function _GSubType{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI})
     if hnd == C_NULL
         error("can't handle NULL returns yet!")
     end
-    h1 = convert(Ptr{Ptr{Csize_t}}, hnd)
-    class = unsafe_load(h1) #class is first in gobject
-    gtypeid = unsafe_load(class)#GType is first in class
-    info = find_by_gtype(gtypeid)
+    g_type = G_OBJECT_CLASS_TYPE(hnd)
+    info = find_by_gtype(g_type)
     constr, iface = create_type(info)
     return constr(hnd)::T
 end
@@ -185,11 +188,11 @@ macro gtktype(name)
     pname = symbol("Gtk$name")
     piname = symbol("Gtk$(name)I")
     _Gtk = _ns(:Gtk)
-    ensure_name(_ns(:Gtk),name)
     quote
-        const $(esc(pname)) = $(esc(name))
-        const $(esc(piname)) = $(esc(symbol("$(name)I")))
+        const $(esc(pname)) = $(ensure_name(_Gtk,name))
+        const $(esc(piname)) = $(_gi_obj_ifaces[(:Gtk,name)])
     end
+    
 end
         
 # temporary solution
@@ -199,8 +202,10 @@ macro gtkmethods(obj, names)
     else 
         names = [names]
     end
-    for name in names
-        Gtk.ensure_method(_gi_ns, obj, name)
+        
+    ex = Expr(:block, [:(const $(esc(name)) = $(ensure_method(gtk_ns, obj, name)) ) for name in names])
+    if haskey(_gi_methods, (:Gtk, obj, :new)) 
+        push!(ex.args, [:(const $(esc(symbol("$(obj)_new"))) = _gi_methods[(:Gtk, obj, :new)])])
     end
 end
 

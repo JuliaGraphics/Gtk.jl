@@ -7,6 +7,8 @@
 @gtktype MenuShell
 @gtktype MenuItem
 
+typealias Widget GtkWidget
+
 convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 eltype{T<:GObjectI}(::GSList{T}) = T
 

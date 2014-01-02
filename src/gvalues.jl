@@ -1,10 +1,11 @@
 ### Getting and Setting Properties
+typealias GType Csize_t
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{Uint8}
   flags::Cint
-  value_type::Csize_t
-  owner_type::Csize_t
+  value_type::GType
+  owner_type::GType
 end
 
 const fundamental_types = (
@@ -36,13 +37,17 @@ const fundamental_types = (
 # NOTE: in general do not cache ids, except for the fundamental values
 g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
 # these constants are used elsewhere
+
 const gvoid_id = g_type_from_name(:void)
 const gboxed_id = g_type_from_name(:GBoxed)
 const gobject_id = g_type_from_name(:GObject)
 const gstring_id = g_type_from_name(:gchararray)
 
+g_type_parent(child::GType ) = ccall(:g_type_parent, GType, (GType,), child)
+g_type_name(g_type::GType) = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type))
+
 immutable GValue
-    g_type::Csize_t
+    g_type::GType
     field2::Uint64
     field3::Uint64
     GValue() = new(0,0,0)
@@ -82,7 +87,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     if pass_x !== None
         eval(quote
             function Base.setindex!{T<:$pass_x}(v::Gtk.GV, ::Type{T})
-                ccall((:g_value_init,Gtk.libgobject),Void,(Ptr{Gtk.GValue},Csize_t), v, $with_id)
+                ccall((:g_value_init,Gtk.libgobject),Void,(Ptr{Gtk.GValue},GType), v, $with_id)
                 v
             end
             function Base.setindex!{T<:$pass_x}(v::Gtk.GV, x::T)
@@ -158,7 +163,7 @@ function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
             return fundamental_fns[i](gv)
         end
     end
-    typename = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(Int,),g_type))
+    typename = g_type_name(g_type)
     error("Could not convert GValue of type $typename to Julia type")
 end
 #end
@@ -192,9 +197,10 @@ function setindex!(w::GObject, value, name::Union(String,Symbol))
     w
 end
 
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{Csize_t},w))
-G_OBJECT_GET_CLASS(w::GObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
-G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
+G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType},w))
+G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
+G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
+G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
