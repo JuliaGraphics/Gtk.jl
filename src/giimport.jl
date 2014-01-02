@@ -71,9 +71,6 @@ function create_type(info::GIObjectInfo)
     ptype, piface = create_type(get_parent(info))
     #convention from gtktypes, but maybe not good in general?
     NS = _ns(ns)
-    if NS == Gtk # a hack really, we need to decide a consistent naming scheme
-        name = symbol("Gtk$name")
-    end
     iname = symbol("$(name)I")
     otype, oiface = eval(NS, quote
         abstract ($iname) <: ($piface)
@@ -171,9 +168,9 @@ macro gimport(ns, names)
             name = item.args[1]
             meths = item.args[2:end]
         end
-        push!(q.args, :( $(esc(name)) = Gtk.ensure_name($(esc(_name)), $(quot(name)))))
+        push!(q.args, :(const $(esc(name)) = Gtk.ensure_name($(esc(_name)), $(quot(name)))))
         for meth in meths
-            push!(q.args, :( $(esc(meth)) = Gtk.ensure_method($(esc(_name)), $(quot(name)), $(quot(meth)))))
+            push!(q.args, :(const $(esc(meth)) = Gtk.ensure_method($(esc(_name)), $(quot(name)), $(quot(meth)))))
         end
     end
     print(q)
@@ -186,7 +183,10 @@ macro gtktype(name)
     piname = symbol("Gtk$(name)I")
     _Gtk = _ns(:Gtk)
     ensure_name(_ns(:Gtk),name)
-    nothing
+    quote
+        const $(esc(pname)) = $(esc(name))
+        const $(esc(piname)) = $(esc(symbol("$(name)I")))
+    end
 end
         
 
