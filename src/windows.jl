@@ -1,4 +1,4 @@
-@GType GtkWindow <: GtkWindow
+@gtktype Window 
 function GtkWindow(title=nothing, w=-1, h=-1, resizable=true, toplevel=true)
     hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(Enum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)

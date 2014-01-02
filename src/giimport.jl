@@ -25,6 +25,12 @@ end
 
 init_ns(:GObject)
 _ns(name) = (init_ns(name); _gi_modules[name])
+#TODO: separate GLib.jl and Gtk.jl
+_gi_ns = GINamespace(:Gtk)
+for path=get_shlibs(_gi_ns) 
+    dlopen(path,RTLD_GLOBAL) 
+end
+_gi_modules[:Gtk] = Gtk
 
 ensure_name(mod::Module, name) = ensure_name(mod._gi_ns, name)
 function ensure_name(ns::GINamespace, name::Symbol)
@@ -39,7 +45,7 @@ end
 function load_name(ns,name,info::GIObjectInfo)
     otype, oiface = create_type(info)
     if find_method(ns[name], :new) != nothing
-        ensure_method(ns,name,:new) #FIXME: new might not exist
+        ensure_method(ns,name,:new) 
     end
     otype
 end
@@ -64,9 +70,12 @@ function create_type(info::GIObjectInfo)
     end
     ptype, piface = create_type(get_parent(info))
     #convention from gtktypes, but maybe not good in general?
-    iname = symbol("$(name)I")
     NS = _ns(ns)
-    otype, oiface = peval(NS, quote
+    if NS == Gtk # a hack really, we need to decide a consistent naming scheme
+        name = symbol("Gtk$name")
+    end
+    iname = symbol("$(name)I")
+    otype, oiface = eval(NS, quote
         abstract ($iname) <: ($piface)
         type ($name) <: ($iname)
             handle::Ptr{Gtk.GObjectI}
@@ -170,4 +179,14 @@ macro gimport(ns, names)
     print(q)
     q
 end
+
+# a ugly hack, before organizing things properly
+macro gtktype(name)
+    pname = symbol("Gtk$name")
+    piname = symbol("Gtk$(name)I")
+    _Gtk = _ns(:Gtk)
+    ensure_name(_ns(:Gtk),name)
+    nothing
+end
+        
 

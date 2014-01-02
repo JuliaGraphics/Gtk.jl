@@ -183,29 +183,12 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     return val
 end
 
-function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
-    v = gvulue(T)
-    ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    val = v[T]
-    ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
-    return val
-end
 
 setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
 function setindex!(w::GObject, value, name::Union(String,Symbol))
     v = gvalue(value)
     ccall((:g_object_set_property, libgobject), Void, 
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
-    w
-end
-
-#setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
-setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
-function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol))
-    v = gvalue(value)
-    ccall((:gtk_container_child_set_property,libgtk), Void, 
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
     w
 end
 

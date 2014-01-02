@@ -83,11 +83,12 @@ typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 include(joinpath("..","deps","ext.jl"))
 ccall((:g_type_init,libgobject),Void,())
 include("gslist.jl")
-include("gtktypes.jl")
+include("gobject.jl")
 include("gvalues.jl")
 include("gerror.jl")
 include("girepo.jl")
 include("giimport.jl")
+include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
 include("container.jl")
@@ -129,6 +130,7 @@ for container in subtypes(GtkContainerI,true)
     @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
 for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
+    if endswith(string(orientable),"I") continue end # Sorry :(
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :

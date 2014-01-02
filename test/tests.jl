@@ -97,7 +97,7 @@ g2[b22,:pack_type] = 1 #GTK_PACK_END
 destroy(w)
 
 ## ButtonBox
-bb = ButtonBox(:h)
+bb = ButtonBox(false)
 w = Window(bb, "ButtonBox")
 cancel = Button("Cancel")
 ok = Button("OK")
