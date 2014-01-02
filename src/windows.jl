@@ -1,19 +1,21 @@
 @gtktype Window 
+# probably want to auto generate property accessors
+@gtkmethods Window set_title, set_default_size, set_resizable
+@gtkmethods Widget set_size_request
 function GtkWindow(title=nothing, w=-1, h=-1, resizable=true, toplevel=true)
-    hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(Enum,),
+    window = Window(
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
-        ccall((:gtk_window_set_title,libgtk),Void,(Ptr{GObject},Ptr{Uint8}),hnd,title)
+        set_title(window,title)
     end
     if resizable
-        ccall((:gtk_window_set_default_size,libgtk),Void,(Ptr{GObject},Int32,Int32),hnd,w,h)
+        set_default_size(window,w,h)
     else
-        ccall((:gtk_window_set_resizable,libgtk),Void,(Ptr{GObject},Bool),hnd,false)
-        ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32),hnd,w,h)
+        set_resizable(window, false)
+        set_size_request(window, w,h)
     end
-    widget = GtkWindow(hnd)
-    show(widget)
-    widget
+    show(window)
+    window
 end
 
 #GtkScrolledWindow

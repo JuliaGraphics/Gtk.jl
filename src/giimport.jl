@@ -177,6 +177,7 @@ macro gimport(ns, names)
     q
 end
 
+
 # a ugly hack, before organizing things properly
 macro gtktype(name)
     pname = symbol("Gtk$name")
@@ -189,4 +190,16 @@ macro gtktype(name)
     end
 end
         
+# temporary solution
+macro gtkmethods(obj, names)
+    if isa(names,Expr)  && names.head == :tuple
+        names = names.args
+    else 
+        names = [names]
+    end
+    for name in names
+        Gtk.ensure_method(_gi_ns, obj, name)
+    end
+end
+
 
