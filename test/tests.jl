@@ -6,7 +6,7 @@ w = Window("Window", 400, 300)
 @assert width(w) == 400
 @assert height(w) == 300
 @assert size(w) == (400, 300)
-G_.gravity(w,10) #GDK_GRAVITY_STATIC
+G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
 pos = G_.position(w)
 @assert G_.position(w) == pos
@@ -208,9 +208,9 @@ function toggled(ptr,evt,widget)
     int32(true)
 end
 on_signal_button_press(toggled, tb)
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -227,9 +227,9 @@ on_signal_button_press(tb) do ptr, evt, widget
     end
     true
 end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -246,9 +246,9 @@ signal_connect(tb, :button_press_event) do widget, evt
     end
     true
 end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)

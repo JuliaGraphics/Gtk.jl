@@ -19,80 +19,80 @@ gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr
 
 baremodule GdkEventMask
     import Base.<<
-    const EXPOSURE_MASK          = 1 << 1
-    const POINTER_MOTION_MASK    = 1 << 2
-    const POINTER_MOTION_HINT_MASK = 1 << 3
-    const BUTTON_MOTION_MASK     = 1 << 4
-    const BUTTON1_MOTION_MASK    = 1 << 5
-    const BUTTON2_MOTION_MASK    = 1 << 6
-    const BUTTON3_MOTION_MASK    = 1 << 7
-    const BUTTON_PRESS_MASK      = 1 << 8
-    const BUTTON_RELEASE_MASK    = 1 << 9
-    const KEY_PRESS_MASK         = 1 << 10
-    const KEY_RELEASE_MASK       = 1 << 11
-    const ENTER_NOTIFY_MASK      = 1 << 12
-    const LEAVE_NOTIFY_MASK      = 1 << 13
-    const FOCUS_CHANGE_MASK      = 1 << 14
-    const STRUCTURE_MASK         = 1 << 15
-    const PROPERTY_CHANGE_MASK   = 1 << 16
-    const VISIBILITY_NOTIFY_MASK = 1 << 17
-    const PROXIMITY_IN_MASK      = 1 << 18
-    const PROXIMITY_OUT_MASK     = 1 << 19
-    const SUBSTRUCTURE_MASK      = 1 << 20
-    const SCROLL_MASK            = 1 << 21
-    const ALL_EVENTS_MASK        = 0x3FFFFE
+    const EXPOSURE          = 1 << 1
+    const POINTER_MOTION    = 1 << 2
+    const POINTER_MOTION_HINT = 1 << 3
+    const BUTTON_MOTION     = 1 << 4
+    const BUTTON1_MOTION    = 1 << 5
+    const BUTTON2_MOTION    = 1 << 6
+    const BUTTON3_MOTION    = 1 << 7
+    const BUTTON_PRESS      = 1 << 8
+    const BUTTON_RELEASE    = 1 << 9
+    const KEY_PRESS         = 1 << 10
+    const KEY_RELEASE       = 1 << 11
+    const ENTER_NOTIFY      = 1 << 12
+    const LEAVE_NOTIFY      = 1 << 13
+    const FOCUS_CHANGE      = 1 << 14
+    const STRUCTURE         = 1 << 15
+    const PROPERTY_CHANGE   = 1 << 16
+    const VISIBILITY_NOTIFY = 1 << 17
+    const PROXIMITY_IN      = 1 << 18
+    const PROXIMITY_OUT     = 1 << 19
+    const SUBSTRUCTURE      = 1 << 20
+    const SCROLL            = 1 << 21
+    const ALL_EVENTS        = 0x3FFFFE
 end
 
 baremodule GdkModifierType
     import Base: <<, |
-    const SHIFT_MASK    = 1 << 0
-    const LOCK_MASK     = 1 << 1
-    const CONTROL_MASK  = 1 << 2
-    const MOD1_MASK     = 1 << 3
-    const MOD2_MASK     = 1 << 4
-    const MOD3_MASK     = 1 << 5
-    const MOD4_MASK     = 1 << 6
-    const MOD5_MASK     = 1 << 7
-    const BUTTON1_MASK  = 1 << 8
-    const BUTTON2_MASK  = 1 << 9
-    const BUTTON3_MASK  = 1 << 10
-    const BUTTON4_MASK  = 1 << 11
-    const BUTTON5_MASK  = 1 << 12
-    const BUTTONS_MASK  =
-            GdkModifierType.BUTTON1_MASK |
-            GdkModifierType.BUTTON2_MASK |
-            GdkModifierType.BUTTON3_MASK |
-            GdkModifierType.BUTTON4_MASK |
-            GdkModifierType.BUTTON5_MASK
+    const SHIFT    = 1 << 0
+    const LOCK     = 1 << 1
+    const CONTROL  = 1 << 2
+    const MOD1     = 1 << 3
+    const MOD2     = 1 << 4
+    const MOD3     = 1 << 5
+    const MOD4     = 1 << 6
+    const MOD5     = 1 << 7
+    const BUTTON1  = 1 << 8
+    const BUTTON2  = 1 << 9
+    const BUTTON3  = 1 << 10
+    const BUTTON4  = 1 << 11
+    const BUTTON5  = 1 << 12
+    const BUTTONS  =
+            GdkModifierType.BUTTON1 |
+            GdkModifierType.BUTTON2 |
+            GdkModifierType.BUTTON3 |
+            GdkModifierType.BUTTON4 |
+            GdkModifierType.BUTTON5
 
-    const MODIFIER_RESERVED_13_MASK  = 1 << 13
-    const MODIFIER_RESERVED_14_MASK  = 1 << 14
-    const MODIFIER_RESERVED_15_MASK  = 1 << 15
-    const MODIFIER_RESERVED_16_MASK  = 1 << 16
-    const MODIFIER_RESERVED_17_MASK  = 1 << 17
-    const MODIFIER_RESERVED_18_MASK  = 1 << 18
-    const MODIFIER_RESERVED_19_MASK  = 1 << 19
-    const MODIFIER_RESERVED_20_MASK  = 1 << 20
-    const MODIFIER_RESERVED_21_MASK  = 1 << 21
-    const MODIFIER_RESERVED_22_MASK  = 1 << 22
-    const MODIFIER_RESERVED_23_MASK  = 1 << 23
-    const MODIFIER_RESERVED_24_MASK  = 1 << 24
-    const MODIFIER_RESERVED_25_MASK  = 1 << 25
+    const MODIFIER_RESERVED_13  = 1 << 13
+    const MODIFIER_RESERVED_14  = 1 << 14
+    const MODIFIER_RESERVED_15  = 1 << 15
+    const MODIFIER_RESERVED_16  = 1 << 16
+    const MODIFIER_RESERVED_17  = 1 << 17
+    const MODIFIER_RESERVED_18  = 1 << 18
+    const MODIFIER_RESERVED_19  = 1 << 19
+    const MODIFIER_RESERVED_20  = 1 << 20
+    const MODIFIER_RESERVED_21  = 1 << 21
+    const MODIFIER_RESERVED_22  = 1 << 22
+    const MODIFIER_RESERVED_23  = 1 << 23
+    const MODIFIER_RESERVED_24  = 1 << 24
+    const MODIFIER_RESERVED_25  = 1 << 25
 
     # The next few modifiers are used by XKB, so we skip to the end.
     # Bits 15 - 25 are currently unused. Bit 29 is used internally.
 
-    const SUPER_MASK    = 1 << 26
-    const HYPER_MASK    = 1 << 27
-    const META_MASK     = 1 << 28
+    const SUPER    = 1 << 26
+    const HYPER    = 1 << 27
+    const META     = 1 << 28
 
-    const MODIFIER_RESERVED_29_MASK  = 1 << 29
+    const MODIFIER_RESERVED_29  = 1 << 29
 
-    const RELEASE_MASK  = 1 << 30
+    const RELEASE  = 1 << 30
 
-    # Combination of SHIFT_MASK..BUTTON5_MASK + SUPER_MASK
-    # + HYPER_MASK + META_MASK + RELEASE_MASK */
-    const MODIFIER_MASK = 0x5c001fff
+    # Combination of SHIFT..BUTTON5 + SUPER
+    # + HYPER + META + RELEASE */
+    const MODIFIER = 0x5c001fff
 end
 
 baremodule GdkEventType
