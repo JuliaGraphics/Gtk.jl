@@ -119,7 +119,9 @@ function create_method(info::GIFunctionInfo)
         unshift!(argnames, :__instance)
     end
     if flags & IS_CONSTRUCTOR != 0
-        name = get_name(get_container(info))
+        if name == :new
+            name = symbol("$(get_name(get_container(info)))_new")
+        end
     end
     rettype = extract_type(get_return_type(info),true)
     cargtypes = Expr(:tuple, Any[c_type(a) for a in argtypes]...)

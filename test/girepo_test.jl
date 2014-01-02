@@ -16,7 +16,7 @@ argx = args[1]
 @assert Gtk.extract_type(argx) == Int32
 
 @gimport Gtk Window(move,set_title,get_title), Widget(show)
-w = Window(0)
+w = Window_new(0)
 show(w) #NB: currently doesn't extend Base.show
 move(w,100,100)
 

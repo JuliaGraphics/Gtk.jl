@@ -36,7 +36,7 @@ else
     height(w::GtkWidgetI) = allocation(w).height
     size(w::GtkWidgetI) = (a=allocation(w);(a.width,a.height))
 end
-show(io::IO, w::GObjectI) = print(io,typeof(w))
+#show(io::IO, w::GObjectI) = print(io,typeof(w))
 
 ### Functions and methods common to all GtkWidget objects
 #GtkAdjustment(lower,upper,value=lower,step_increment=0,page_increment=0,page_size=0) =

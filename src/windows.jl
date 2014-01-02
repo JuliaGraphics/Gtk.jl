@@ -3,7 +3,7 @@
 @gtkmethods Window set_title, set_default_size, set_resizable
 @gtkmethods Widget set_size_request
 function GtkWindow(title=nothing, w=-1, h=-1, resizable=true, toplevel=true)
-    window = Window(
+    window = Window_new(
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
         set_title(window,title)
