@@ -131,17 +131,28 @@ l[:label] = "new label"
 @assert l[:label,String] == "new label"
 b[:label] = "new label"
 @assert b[:label,String] == "new label"
-#local ctr = 0
-#function cb(path)
-#    global ctr
-#    ctr = ctr + 1
-#end
-#end
-#tk_bind(b, "command", cb)
-#tcl(b, "invoke")
-#@assert ctr == 2
-#img = Image(Pkg.dir("Tk", "examples", "weather-overcast.gif"))
-#map(u-> tk_configure(u, {:image=>img, :compound=>"left"}), (l,b))
+
+counter = 0
+id = signal_connect(b, "clicked") do widget
+    global counter
+    counter::Int += 1
+end
+# For testing callbacks
+click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Void,(Ptr{Gtk.GObject},),b)
+
+@assert counter == 0
+click(b)
+@assert counter == 1
+signal_handler_block(b, id)
+click(b)
+@assert counter == 1
+signal_handler_unblock(b, id)
+click(b)
+@assert counter == 2
+signal_handler_disconnect(b, id)
+click(b)
+@assert counter == 2
+
 destroy(w)
 
 ## Button with custom icon (& Pixbuf)

@@ -148,13 +148,13 @@ add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,li
 
 
 signal_handler_disconnect(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_disconnect, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_disconnect,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 signal_handler_block(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_block, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_block,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 signal_handler_unblock(w::GObject, handler_id::Culong) =
-    ccall(:g_signal_handler_unblock, Void, (Ptr{GObject}, Culong), w, handler_id)
+    ccall((:g_signal_handler_unblock,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
 function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
     i = isa(sig, String) ? search(sig, "::") : (0:-1)
