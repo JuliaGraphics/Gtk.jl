@@ -181,18 +181,6 @@ macro gimport(ns, names)
 end
 
 
-# a ugly hack, before organizing things properly
-macro gtktype(name)
-    pname = symbol("Gtk$name")
-    piname = symbol("Gtk$(name)I")
-    _Gtk = _ns(:Gtk)
-    quote
-        const $(esc(pname)) = $(ensure_name(_Gtk,name))
-        const $(esc(piname)) = $(_gi_obj_ifaces[(:Gtk,name)])
-    end
-    
-end
-        
 # temporary solution
 macro gtkmethods(obj, names)
     if isa(names,Expr)  && names.head == :tuple

@@ -1,5 +1,5 @@
-### Getting and Setting Properties
 typealias GType Csize_t
+### Getting and Setting Properties
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{Uint8}
@@ -35,7 +35,7 @@ const fundamental_types = (
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for the fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
+g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
 # these constants are used elsewhere
 
 const gvoid_id = g_type_from_name(:void)
@@ -43,8 +43,14 @@ const gboxed_id = g_type_from_name(:GBoxed)
 const gobject_id = g_type_from_name(:GObject)
 const gstring_id = g_type_from_name(:gchararray)
 
-g_type_parent(child::GType ) = ccall(:g_type_parent, GType, (GType,), child)
+g_type_parent(child::GType ) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
 g_type_name(g_type::GType) = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type))
+
+g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
+const G_TYPE_FLAG_CLASSED           = 1 << 0
+const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
+const G_TYPE_FLAG_DERIVABLE         = 1 << 2
+const G_TYPE_FLAG_DEEP_DERIVABLE    = 1 << 3
 
 immutable GValue
     g_type::GType
@@ -202,6 +208,7 @@ G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
 G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
+
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
     n = mutable(Cuint)
@@ -234,6 +241,60 @@ function show(io::IO, w::GObject)
     ccall((:g_value_unset,libgobject),Ptr{Void},(Ptr{GValue},), v)
 end
 
+#this should probably be merged with gtype_values
+immutable RegisteredType
+    iface::Type
+    wrapper::Type
+end
+const registered_gtypes = Dict{GType,RegisteredType}()
+registered_gtypes[gobject_id] = RegisteredType(GObjectI, GObjectAny)
+
+function register_gtype(typename::Symbol)
+    gtype = g_type_from_name(typename)
+    if gtype == C_NULL
+        error("no such GType: $typename")
+    end
+    register_gtype(gtype)
+end
+
+peval(q) = (print(q); eval(q))
+function register_gtype(g_type::GType)
+    if haskey(registered_gtypes,g_type)
+        return registered_gtypes[g_type]
+    end
+    #if g_type_test_flags(g_type, G_TYPE_FLAG_CLASSED)
+    #    error("not implemented yet")
+    #end
+    print(g_type)
+    name = symbol(g_type_name(g_type))
+    iname = symbol("$(name)I")
+    pgtype = g_type_parent(g_type) # TODO: For struct types this may be zero
+    parent = register_gtype(pgtype)
+
+    regtype = peval(quote
+        abstract ($iname) <: $(parent.iface)
+        #TODO: check if instantiable
+        #this could also be used for structs
+        #that are not GOBjocts
+        type ($name) <: ($iname)
+            handle::Ptr{GObjectI}
+            $name(handle::Ptr{GObjectI}) = (handle != C_NULL ? Gtk.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        end #FIXME
+        RegisteredType($iname, $name)
+    end)
+    registered_gtypes[g_type] = regtype
+    regtype
+end
+
+macro GType(name)
+    iname = symbol("$(name)I")
+    print(name)
+    regtype = register_gtype(name) # TODO: For struct types this may be zero
+    quote
+        const $(esc(name)) = $(regtype.wrapper)
+        const $(esc(iname)) = $(regtype.iface)
+    end
+end
 #immutable GTypeQuery
 #  g_type::Int
 #  type_name::Ptr{Uint8}

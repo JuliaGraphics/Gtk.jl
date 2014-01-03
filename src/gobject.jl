@@ -8,6 +8,7 @@ type GObjectAny <: GObjectI
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
 
+
 macro quark_str(q)
     :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), bytestring($q)) )
 end

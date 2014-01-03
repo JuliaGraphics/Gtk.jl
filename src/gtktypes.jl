@@ -1,11 +1,12 @@
-@gtktype Widget
-@gtktype Container
-@gtktype Bin
-@gtktype Window
-@gtktype Dialog
-@gtktype Box
-@gtktype MenuShell
-@gtktype MenuItem
+ccall((:gtk_test_register_all_types,libgtk), Void, ())
+@GType GtkWidget
+@GType GtkContainer
+@GType GtkBin
+@GType GtkWindow
+@GType GtkDialog
+@GType GtkBox
+@GType GtkMenuShell
+@GType GtkMenuItem
 
 typealias Widget GtkWidget
 

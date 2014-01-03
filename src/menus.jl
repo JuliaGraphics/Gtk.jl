@@ -19,18 +19,18 @@
 #GtkToggleToolButton — A GtkToolItem containing a toggle button
 #GtkRadioToolButton — A toolbar item that contains a radio button
 
-@gtktype MenuItem
+@GType GtkMenuItem
 GtkMenuItem() = GtkMenuItem(ccall((:gtk_menu_item_new,libgtk),Ptr{GObject},()))
 GtkMenuItem(label::String) =
     GtkMenuItem(ccall((:gtk_menu_item_new_with_mnemonic,libgtk),Ptr{GObject},
                 (Ptr{Uint8},), bytestring(label)))
 
 
-@gtktype SeparatorMenuItem
+@GType GtkSeparatorMenuItem
 GtkSeparatorMenuItem() = GtkSeparatorMenuItem(ccall((:gtk_separator_menu_item_new,libgtk),Ptr{GObject},()))
 
 
-@gtktype Menu
+@GType GtkMenu
 GtkMenu() = GtkMenu(ccall((:gtk_menu_new,libgtk),Ptr{GObject},()))
 function GtkMenu(item::GtkMenuItem)
     menu = GtkMenu()
@@ -41,7 +41,7 @@ function GtkMenu(item::GtkMenuItem)
 end
 
 
-@gtktype MenuBar
+@GType GtkMenuBar
 GtkMenuBar() = GtkMenuBar(ccall((:gtk_menu_bar_new,libgtk),Ptr{GObject},()))
 
 

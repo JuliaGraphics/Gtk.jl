@@ -293,7 +293,7 @@ baremodule GtkIconSize
         end
 end
 
-@gtktype Image 
+@GType GtkImage 
 GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GdkPixbuf},),pixbuf))
 GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
@@ -316,14 +316,14 @@ end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
 GdkPixbuf(img::GtkImage) = GdkPixbuf(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
 
-@gtktype ProgressBar 
+@GType GtkProgressBar 
 GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
 pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
-@gtktype Spinner 
+@GType GtkSpinner 
 GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
-@gtktype Statusbar 
+@GType GtkStatusbar 
 GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
     ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
@@ -345,6 +345,6 @@ empty!(status::GtkStatusbar,context) =
 #@GType GtkInfoBar <: GtkBox
 #GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
-@gtktype StatusIcon
+@GType GtkStatusIcon
 
 

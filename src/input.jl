@@ -8,10 +8,10 @@
 #GtkSpinButton — Retrieve an integer or floating-point number from the user
 #GtkEditable — Interface for text-editing widgets
 
-@gtktype Entry
+@GType GtkEntry
 GtkEntry() = GtkEntry(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
 
-@gtktype Scale
+@GType GtkScale
 if gtk_version == 3
     GtkScale(vertical::Bool,min,max,step) = GtkScale(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
             (Cint,Cdouble,Cdouble,Cdouble),vertical,min,max,step))
@@ -41,7 +41,7 @@ end
 empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObject},),scale)
 
 
-@gtktype SpinButton
+@GType GtkSpinButton
 GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},
     (Cdouble,Cdouble,Cdouble),min,max,step))
 GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(scale))
