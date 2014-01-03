@@ -115,3 +115,15 @@ function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
     return_value[RT]
 end
 
+baremodule GConnectFlags
+    const AFTER = 1
+    const SWAPPED = 2
+    get(s::Symbol) =
+        if s === :after
+            AFTER
+        elseif s === :swapped
+            SWAPPED
+        else
+            Main.Base.error(Main.Base.string("invalid GConnectFlag ",s))
+        end
+end

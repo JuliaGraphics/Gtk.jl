@@ -57,18 +57,6 @@ baremodule GtkWindowType
     const TOPLEVEL = 0
     const POPUP = 1
 end
-baremodule GConnectFlags
-    const AFTER = 1
-    const SWAPPED = 2
-    get(s::Symbol) =
-        if s === :after
-            AFTER
-        elseif s === :swapped
-            SWAPPED
-        else
-            Main.Base.error(Main.Base.string("invalid GConnectFlag ",s))
-        end
-end
 baremodule GtkPositionType
     const LEFT = 0
     const RIGHT = 1

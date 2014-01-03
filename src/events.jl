@@ -16,20 +16,12 @@ function gtk_doevent()
     end
 end
 
-sizeof_gclosure = 0
 function init()
     GError() do error_check
         ccall((:gtk_init_with_args,libgtk), Bool,
             (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
-    global sizeof_gclosure = WORD_SIZE
-    closure = C_NULL
-    while closure == C_NULL
-        sizeof_gclosure += WORD_SIZE
-        closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
-    end
-    ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
     global timeout
     timeout = Base.TimeoutAsyncWork(gtk_doevent)
     Base.start_timer(timeout,.1,.005)
