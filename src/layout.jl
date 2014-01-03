@@ -21,7 +21,7 @@
 
 if gtk_version == 3
     ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-    @GType GtkGrid <: GtkContainer
+    @GType GtkGrid 
     GtkGrid() = GtkGrid(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
     function getindex(grid::GtkGrid, i::Integer, j::Integer)
@@ -58,7 +58,7 @@ else
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
-@GType GtkTable <: GtkContainer
+@GType GtkTable 
 GtkTable(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTable(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
 GtkTable(homogeneous::Bool=false) = GtkTable(0,0,homogeneous)
 setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) =
@@ -70,20 +70,20 @@ setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j
 #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
-@GType GtkAlignment <: GtkBin
+@GType GtkAlignment 
 GtkAlignment(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
     GtkAlignment(ccall((:gtk_alignment_new, libgtk), Ptr{GObject},
         (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale))
 
 ### GtkFrame — A bin with a decorative frame and optional label
-@GType GtkFrame <: GtkBin
+@GType GtkFrame 
 GtkFrame(label::String) = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(label)))
 GtkFrame() = GtkFrame(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), C_NULL))
 
 ### GtkAspectFrame
-@GType GtkAspectFrame <: GtkBin
+@GType GtkAspectFrame 
 GtkAspectFrame(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
     GtkAspectFrame(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
@@ -92,7 +92,7 @@ GtkAspectFrame(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses th
         (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
-@GType GtkBox <: GtkBox
+@GType GtkBox 
 if gtk_version == 3
     GtkBox(vertical::Bool, spacing=0) =
         GtkBox(ccall((:gtk_box_new, libgtk), Ptr{GObject},
@@ -111,7 +111,7 @@ else
 end
 
 ### GtkButtonBox
-@GType GtkButtonBox <: GtkBox
+@GType GtkButtonBox 
 if gtk_version == 3
     GtkButtonBox(vertical::Bool) =
         GtkButtonBox(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
@@ -131,7 +131,7 @@ end
 # this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-@GType GtkPaned <: GtkContainer
+@GType GtkPaned 
 if gtk_version == 3
     GtkPaned(vertical::Bool, spacing=0) =
         GtkPaned(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
@@ -179,7 +179,7 @@ function setindex(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=
 end
 
 ### GtkLayout
-@GType GtkLayout <: GtkContainer
+@GType GtkLayout 
 function GtkLayout(width, height)
     layout = ccall((:gtk_layout_new, libgtk), Ptr{GObject},
         (Ptr{Void},Ptr{Void}), C_NULL, C_NULL)
@@ -198,13 +198,13 @@ width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
-@GType GtkExpander <: GtkBin
+@GType GtkExpander 
 GtkExpander(title) =
     GtkExpander(ccall((:gtk_expander_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 ### GtkNotebook
-@GType GtkNotebook <: GtkContainer
+@GType GtkNotebook 
 GtkNotebook() = GtkNotebook(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
 function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::String)
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
@@ -233,7 +233,7 @@ end
 
 ### GtkOverlay
 if gtk_version == 3
-    @GType GtkOverlay <: GtkContainer #technically, this is a GtkBin, except it behaves more like a container
+    @GType GtkOverlay #technically, this is a GtkBin, except it behaves more like a container
     GtkOverlay() = GtkOverlay(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
     GtkOverlay(w::GtkWidgetI) = invoke(push!, (GtkContainer,), GtkOverlay(), w)

@@ -13,7 +13,7 @@
 
 #TODO: GtkAccel manager objects
 
-@GType GtkLabel <: GtkWidget
+@GType GtkLabel
 GtkLabel(title) = GtkLabel(
     ccall((:gtk_label_new,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(title)))
 
@@ -21,7 +21,7 @@ GtkLabel(title) = GtkLabel(
 GtkTextBuffer() = GtkTextBuffer(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
 
-@GType GtkTextView <: GtkWidget
+@GType GtkTextView
 GtkTextView(buffer=GtkTextBuffer()) = GtkTextView(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 

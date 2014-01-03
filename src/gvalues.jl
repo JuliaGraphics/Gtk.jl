@@ -1,10 +1,11 @@
+typealias GType Csize_t
 ### Getting and Setting Properties
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{Uint8}
   flags::Cint
-  value_type::Csize_t
-  owner_type::Csize_t
+  value_type::GType
+  owner_type::GType
 end
 
 const fundamental_types = (
@@ -34,15 +35,25 @@ const fundamental_types = (
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for the fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
+g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
 # these constants are used elsewhere
+
 const gvoid_id = g_type_from_name(:void)
 const gboxed_id = g_type_from_name(:GBoxed)
 const gobject_id = g_type_from_name(:GObject)
 const gstring_id = g_type_from_name(:gchararray)
 
+g_type_parent(child::GType ) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
+g_type_name(g_type::GType) = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type))
+
+g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
+const G_TYPE_FLAG_CLASSED           = 1 << 0
+const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
+const G_TYPE_FLAG_DERIVABLE         = 1 << 2
+const G_TYPE_FLAG_DEEP_DERIVABLE    = 1 << 3
+
 immutable GValue
-    g_type::Csize_t
+    g_type::GType
     field2::Uint64
     field3::Uint64
     GValue() = new(0,0,0)
@@ -81,16 +92,16 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     end
     if pass_x !== None
         eval(quote
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, ::Type{T})
-                ccall((:g_value_init,Gtk.libgobject),Void,(Ptr{Gtk.GValue},Csize_t), v, $with_id)
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
+                ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},GType), v, $with_id)
                 v
             end
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, x::T)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
-                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = Gtk.mutable(x)) end)
-                ccall(($(string("g_value_set_",to_gtype)),Gtk.libgobject),Void,(Ptr{Gtk.GValue},$as_ctype), v, x)
-                if isa(v, Gtk.MutableTypes.MutableX)
-                    finalizer(v, (v::Gtk.MutableTypes.MutableX)->ccall((:g_value_unset,Gtk.libgobject),Void,(Ptr{Gtk.GValue},), v))
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, x::T)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
+                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = GLib.mutable(x)) end)
+                ccall(($(string("g_value_set_",to_gtype)),GLib.libgobject),Void,(Ptr{GLib.GValue},$as_ctype), v, x)
+                if isa(v, GLib.MutableTypes.MutableX)
+                    finalizer(v, (v::GLib.MutableTypes.MutableX)->ccall((:g_value_unset,GLib.libgobject),Void,(Ptr{GLib.GValue},), v))
                 end
                 v
             end
@@ -99,9 +110,9 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             to_gtype = :string
         end
         eval(quote
-            function Base.getindex{T<:$pass_x}(v::Gtk.GV,::Type{T})
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+            function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x == Symbol; :(x = symbol(x)) end)
                 return Base.convert(T,x)
             end
@@ -112,9 +123,9 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             to_gtype = :string
         end
         fn = eval(quote
-            function(v::Gtk.GV)
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+            function(v::GLib.GV)
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x !== None
                     :(return Base.convert($pass_x,x))
                 else
@@ -158,7 +169,7 @@ function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
             return fundamental_fns[i](gv)
         end
     end
-    typename = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(Int,),g_type))
+    typename = g_type_name(g_type)
     error("Could not convert GValue of type $typename to Julia type")
 end
 #end
@@ -183,15 +194,6 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     return val
 end
 
-function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
-    v = gvalue(T)
-    ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    val = v[T]
-    ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
-    return val
-end
-
 setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
 function setindex!(w::GObject, value, name::Union(String,Symbol))
     v = gvalue(value)
@@ -200,18 +202,11 @@ function setindex!(w::GObject, value, name::Union(String,Symbol))
     w
 end
 
-#setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
-setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
-function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol))
-    v = gvalue(value)
-    ccall((:gtk_container_child_set_property,libgtk), Void, 
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    w
-end
+G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType},w))
+G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
+G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
+G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{Csize_t},w))
-G_OBJECT_GET_CLASS(w::GObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
-G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
@@ -249,6 +244,57 @@ function show(io::IO, w::GObject)
     ccall((:g_value_unset,libgobject),Ptr{Void},(Ptr{GValue},), v)
 end
 
+#this should probably be merged with gtype_values
+immutable RegisteredType
+    iface::Type
+    wrapper::Type
+end
+const registered_gtypes = Dict{GType,RegisteredType}()
+registered_gtypes[gobject_id] = RegisteredType(GObjectI, GObjectAny)
+
+function register_gtype(typename::Symbol)
+    gtype = g_type_from_name(typename)
+    if gtype == C_NULL
+        error("no such GType: $typename")
+    end
+    register_gtype(gtype)
+end
+
+function register_gtype(g_type::GType)
+    if haskey(registered_gtypes,g_type)
+        return registered_gtypes[g_type]
+    end
+    #if g_type_test_flags(g_type, G_TYPE_FLAG_CLASSED)
+    #    error("not implemented yet")
+    #end
+    name = symbol(g_type_name(g_type))
+    iname = symbol("$(name)I")
+    pgtype = g_type_parent(g_type) # TODO: For struct types this may be zero
+    parent = register_gtype(pgtype)
+
+    regtype = eval(quote
+        abstract ($iname) <: $(parent.iface)
+        #TODO: check if instantiable
+        #this could also be used for structs
+        #that are not GOBjocts
+        type ($name) <: ($iname)
+            handle::Ptr{GObjectI}
+            $name(handle::Ptr{GObjectI}) = (handle != C_NULL ? GLib.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        end #FIXME
+        RegisteredType($iname, $name)
+    end)
+    registered_gtypes[g_type] = regtype
+    regtype
+end
+
+macro GType(name)
+    iname = symbol("$(name)I")
+    regtype = register_gtype(name) # TODO: For struct types this may be zero
+    quote
+        const $(esc(name)) = $(regtype.wrapper)
+        const $(esc(iname)) = $(regtype.iface)
+    end
+end
 #immutable GTypeQuery
 #  g_type::Int
 #  type_name::Ptr{Uint8}

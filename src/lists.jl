@@ -28,7 +28,7 @@
 #GtkComboBox — A widget used to choose from a list of items
 #GtkComboBoxText — A simple, text-only combo box
 
-@GType GtkComboBoxText <: GtkWidget
+@GType GtkComboBoxText
 GtkComboBoxText(with_entry::Bool=false) = GtkComboBoxText(
         if with_entry
             ccall((:gtk_combo_box_text_new_with_entry,libgtk),Ptr{GObject},())

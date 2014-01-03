@@ -21,8 +21,10 @@ if OS_NAME == :Windows
     const libgobject = "libgobject-2.0-0"
     const libglib = "libglib-2.0-0"
     const libgdk_pixbuf = "libgdk_pixbuf-2.0-0"
+    const libgi = "libgirepository-1.0-0" # unverifie
 else
     const libgobject = "libgobject-2.0"
     const libglib = "libglib-2.0"
     const libgdk_pixbuf = "libgdk_pixbuf-2.0"
+    const libgi = "libgirepository-1.0"
 end
