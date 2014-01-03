@@ -257,7 +257,6 @@ function register_gtype(typename::Symbol)
     register_gtype(gtype)
 end
 
-peval(q) = (print(q); eval(q))
 function register_gtype(g_type::GType)
     if haskey(registered_gtypes,g_type)
         return registered_gtypes[g_type]
@@ -271,7 +270,7 @@ function register_gtype(g_type::GType)
     pgtype = g_type_parent(g_type) # TODO: For struct types this may be zero
     parent = register_gtype(pgtype)
 
-    regtype = peval(quote
+    regtype = eval(quote
         abstract ($iname) <: $(parent.iface)
         #TODO: check if instantiable
         #this could also be used for structs

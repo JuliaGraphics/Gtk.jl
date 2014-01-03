@@ -82,12 +82,18 @@ typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
 include(joinpath("..","deps","ext.jl"))
 ccall((:g_type_init,libgobject),Void,())
+
+#module GObject
 include("gslist.jl")
 include("gobject.jl")
 include("gvalues.jl")
 include("gerror.jl")
+include("signals.jl")
+#end 
+#module GI
 #include("girepo.jl")
 #include("giimport.jl")
+#end
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
