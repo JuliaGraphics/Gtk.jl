@@ -19,133 +19,131 @@ gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr
 
 baremodule GdkEventMask
     import Base.<<
-    const GDK_EXPOSURE_MASK		    = 1 << 1
-    const GDK_POINTER_MOTION_MASK   = 1 << 2
-    const GDK_POINTER_MOTION_HINT_MASK = 1 << 3
-    const GDK_BUTTON_MOTION_MASK    = 1 << 4
-    const GDK_BUTTON1_MOTION_MASK   = 1 << 5
-    const GDK_BUTTON2_MOTION_MASK   = 1 << 6
-    const GDK_BUTTON3_MOTION_MASK   = 1 << 7
-    const GDK_BUTTON_PRESS_MASK		= 1 << 8
-    const GDK_BUTTON_RELEASE_MASK   = 1 << 9
-    const GDK_KEY_PRESS_MASK		= 1 << 10
-    const GDK_KEY_RELEASE_MASK		= 1 << 11
-    const GDK_ENTER_NOTIFY_MASK		= 1 << 12
-    const GDK_LEAVE_NOTIFY_MASK		= 1 << 13
-    const GDK_FOCUS_CHANGE_MASK		= 1 << 14
-    const GDK_STRUCTURE_MASK		= 1 << 15
-    const GDK_PROPERTY_CHANGE_MASK  = 1 << 16
-    const GDK_VISIBILITY_NOTIFY_MASK = 1 << 17
-    const GDK_PROXIMITY_IN_MASK	 	= 1 << 18
-    const GDK_PROXIMITY_OUT_MASK    = 1 << 19
-    const GDK_SUBSTRUCTURE_MASK		= 1 << 20
-    const GDK_SCROLL_MASK           = 1 << 21
-    const GDK_ALL_EVENTS_MASK		= 0x3FFFFE
+    const EXPOSURE          = 1 << 1
+    const POINTER_MOTION    = 1 << 2
+    const POINTER_MOTION_HINT = 1 << 3
+    const BUTTON_MOTION     = 1 << 4
+    const BUTTON1_MOTION    = 1 << 5
+    const BUTTON2_MOTION    = 1 << 6
+    const BUTTON3_MOTION    = 1 << 7
+    const BUTTON_PRESS      = 1 << 8
+    const BUTTON_RELEASE    = 1 << 9
+    const KEY_PRESS         = 1 << 10
+    const KEY_RELEASE       = 1 << 11
+    const ENTER_NOTIFY      = 1 << 12
+    const LEAVE_NOTIFY      = 1 << 13
+    const FOCUS_CHANGE      = 1 << 14
+    const STRUCTURE         = 1 << 15
+    const PROPERTY_CHANGE   = 1 << 16
+    const VISIBILITY_NOTIFY = 1 << 17
+    const PROXIMITY_IN      = 1 << 18
+    const PROXIMITY_OUT     = 1 << 19
+    const SUBSTRUCTURE      = 1 << 20
+    const SCROLL            = 1 << 21
+    const ALL_EVENTS        = 0x3FFFFE
 end
 
 baremodule GdkModifierType
     import Base: <<, |
-    const GDK_SHIFT_MASK    = 1 << 0
-    const GDK_LOCK_MASK     = 1 << 1
-    const GDK_CONTROL_MASK  = 1 << 2
-    const GDK_MOD1_MASK     = 1 << 3
-    const GDK_MOD2_MASK     = 1 << 4
-    const GDK_MOD3_MASK     = 1 << 5
-    const GDK_MOD4_MASK     = 1 << 6
-    const GDK_MOD5_MASK     = 1 << 7
-    const GDK_BUTTON1_MASK  = 1 << 8
-    const GDK_BUTTON2_MASK  = 1 << 9
-    const GDK_BUTTON3_MASK  = 1 << 10
-    const GDK_BUTTON4_MASK  = 1 << 11
-    const GDK_BUTTON5_MASK  = 1 << 12
-    const GDK_BUTTONS_MASK  =
-            GdkModifierType.GDK_BUTTON1_MASK |
-            GdkModifierType.GDK_BUTTON2_MASK |
-            GdkModifierType.GDK_BUTTON3_MASK |
-            GdkModifierType.GDK_BUTTON4_MASK |
-            GdkModifierType.GDK_BUTTON5_MASK
+    const SHIFT    = 1 << 0
+    const LOCK     = 1 << 1
+    const CONTROL  = 1 << 2
+    const MOD1     = 1 << 3
+    const MOD2     = 1 << 4
+    const MOD3     = 1 << 5
+    const MOD4     = 1 << 6
+    const MOD5     = 1 << 7
+    const BUTTON1  = 1 << 8
+    const BUTTON2  = 1 << 9
+    const BUTTON3  = 1 << 10
+    const BUTTON4  = 1 << 11
+    const BUTTON5  = 1 << 12
+    const BUTTONS  =
+            GdkModifierType.BUTTON1 |
+            GdkModifierType.BUTTON2 |
+            GdkModifierType.BUTTON3 |
+            GdkModifierType.BUTTON4 |
+            GdkModifierType.BUTTON5
 
-    const GDK_MODIFIER_RESERVED_13_MASK  = 1 << 13
-    const GDK_MODIFIER_RESERVED_14_MASK  = 1 << 14
-    const GDK_MODIFIER_RESERVED_15_MASK  = 1 << 15
-    const GDK_MODIFIER_RESERVED_16_MASK  = 1 << 16
-    const GDK_MODIFIER_RESERVED_17_MASK  = 1 << 17
-    const GDK_MODIFIER_RESERVED_18_MASK  = 1 << 18
-    const GDK_MODIFIER_RESERVED_19_MASK  = 1 << 19
-    const GDK_MODIFIER_RESERVED_20_MASK  = 1 << 20
-    const GDK_MODIFIER_RESERVED_21_MASK  = 1 << 21
-    const GDK_MODIFIER_RESERVED_22_MASK  = 1 << 22
-    const GDK_MODIFIER_RESERVED_23_MASK  = 1 << 23
-    const GDK_MODIFIER_RESERVED_24_MASK  = 1 << 24
-    const GDK_MODIFIER_RESERVED_25_MASK  = 1 << 25
+    const MODIFIER_RESERVED_13  = 1 << 13
+    const MODIFIER_RESERVED_14  = 1 << 14
+    const MODIFIER_RESERVED_15  = 1 << 15
+    const MODIFIER_RESERVED_16  = 1 << 16
+    const MODIFIER_RESERVED_17  = 1 << 17
+    const MODIFIER_RESERVED_18  = 1 << 18
+    const MODIFIER_RESERVED_19  = 1 << 19
+    const MODIFIER_RESERVED_20  = 1 << 20
+    const MODIFIER_RESERVED_21  = 1 << 21
+    const MODIFIER_RESERVED_22  = 1 << 22
+    const MODIFIER_RESERVED_23  = 1 << 23
+    const MODIFIER_RESERVED_24  = 1 << 24
+    const MODIFIER_RESERVED_25  = 1 << 25
 
     # The next few modifiers are used by XKB, so we skip to the end.
     # Bits 15 - 25 are currently unused. Bit 29 is used internally.
 
-    const GDK_SUPER_MASK    = 1 << 26
-    const GDK_HYPER_MASK    = 1 << 27
-    const GDK_META_MASK     = 1 << 28
+    const SUPER    = 1 << 26
+    const HYPER    = 1 << 27
+    const META     = 1 << 28
 
-    const GDK_MODIFIER_RESERVED_29_MASK  = 1 << 29
+    const MODIFIER_RESERVED_29  = 1 << 29
 
-    const GDK_RELEASE_MASK  = 1 << 30
+    const RELEASE  = 1 << 30
 
-    # Combination of GDK_SHIFT_MASK..GDK_BUTTON5_MASK + GDK_SUPER_MASK
-    # + GDK_HYPER_MASK + GDK_META_MASK + GDK_RELEASE_MASK */
-    const GDK_MODIFIER_MASK = 0x5c001fff
+    # Combination of SHIFT..BUTTON5 + SUPER
+    # + HYPER + META + RELEASE */
+    const MODIFIER = 0x5c001fff
 end
 
 baremodule GdkEventType
-  const GDK_NOTHING           = -1
-  const GDK_DELETE            = 0
-  const GDK_DESTROY           = 1
-  const GDK_EXPOSE            = 2
-  const GDK_MOTION_NOTIFY     = 3
-  const GDK_BUTTON_PRESS      = 4
-  const GDK_2BUTTON_PRESS     = 5
-  const GDK_DOUBLE_BUTTON_PRESS = GDK_2BUTTON_PRESS
-  const GDK_3BUTTON_PRESS     = 6
-  const GDK_TRIPLE_BUTTON_PRESS = GDK_3BUTTON_PRESS
-  const GDK_BUTTON_RELEASE    = 7
-  const GDK_KEY_PRESS         = 8
-  const GDK_KEY_RELEASE       = 9
-  const GDK_ENTER_NOTIFY      = 10
-  const GDK_LEAVE_NOTIFY      = 11
-  const GDK_FOCUS_CHANGE      = 12
-  const GDK_CONFIGURE         = 13
-  const GDK_MAP               = 14
-  const GDK_UNMAP             = 15
-  const GDK_PROPERTY_NOTIFY   = 16
-  const GDK_SELECTION_CLEAR   = 17
-  const GDK_SELECTION_REQUEST = 18
-  const GDK_SELECTION_NOTIFY  = 19
-  const GDK_PROXIMITY_IN      = 20
-  const GDK_PROXIMITY_OUT     = 21
-  const GDK_DRAG_ENTER        = 22
-  const GDK_DRAG_LEAVE        = 23
-  const GDK_DRAG_MOTION       = 24
-  const GDK_DRAG_STATUS       = 25
-  const GDK_DROP_START        = 26
-  const GDK_DROP_FINISHED     = 27
-  const GDK_CLIENT_EVENT      = 28
-  const GDK_VISIBILITY_NOTIFY = 29
-  const GDK_SCROLL            = 31
-  const GDK_WINDOW_STATE      = 32
-  const GDK_SETTING           = 33
-  const GDK_OWNER_CHANGE      = 34
-  const GDK_GRAB_BROKEN       = 35
-  const GDK_DAMAGE            = 36
-  const GDK_TOUCH_BEGIN       = 37
-  const GDK_TOUCH_UPDATE      = 38
-  const GDK_TOUCH_END         = 39
-  const GDK_TOUCH_CANCEL      = 40
+  const NOTHING           = -1
+  const DELETE            = 0
+  const DESTROY           = 1
+  const EXPOSE            = 2
+  const MOTION_NOTIFY     = 3
+  const BUTTON_PRESS      = 4
+  const DOUBLE_BUTTON_PRESS = 5
+  const TRIPLE_BUTTON_PRESS = 6
+  const BUTTON_RELEASE    = 7
+  const KEY_PRESS         = 8
+  const KEY_RELEASE       = 9
+  const ENTER_NOTIFY      = 10
+  const LEAVE_NOTIFY      = 11
+  const FOCUS_CHANGE      = 12
+  const CONFIGURE         = 13
+  const MAP               = 14
+  const UNMAP             = 15
+  const PROPERTY_NOTIFY   = 16
+  const SELECTION_CLEAR   = 17
+  const SELECTION_REQUEST = 18
+  const SELECTION_NOTIFY  = 19
+  const PROXIMITY_IN      = 20
+  const PROXIMITY_OUT     = 21
+  const DRAG_ENTER        = 22
+  const DRAG_LEAVE        = 23
+  const DRAG_MOTION       = 24
+  const DRAG_STATUS       = 25
+  const DROP_START        = 26
+  const DROP_FINISHED     = 27
+  const CLIENT_EVENT      = 28
+  const VISIBILITY_NOTIFY = 29
+  const SCROLL            = 31
+  const WINDOW_STATE      = 32
+  const SETTING           = 33
+  const OWNER_CHANGE      = 34
+  const GRAB_BROKEN       = 35
+  const DAMAGE            = 36
+  const TOUCH_BEGIN       = 37
+  const TOUCH_UPDATE      = 38
+  const TOUCH_END         = 39
+  const TOUCH_CANCEL      = 40
 end
 
 baremodule GdkScrollDirection
-  const GDK_SCROLL_UP    = 0
-  const GDK_SCROLL_DOWN  = 1
-  const GDK_SCROLL_LEFT  = 2
-  const GDK_SCROLL_RIGHT = 3
+  const UP    = 0
+  const DOWN  = 1
+  const LEFT  = 2
+  const RIGHT = 3
 end
 
 baremodule GdkKeySyms
@@ -203,20 +201,20 @@ abstract GdkEventI
 make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, (:gdk_event,:libgdk))
 function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
     e = unsafe_load(convert(Ptr{GdkEventAny},evt))
-    if     e.event_type == GdkEventType.GDK_KEY_PRESS ||
-           e.event_type == GdkEventType.GDK_KEY_RELEASE
+    if     e.event_type == GdkEventType.KEY_PRESS ||
+           e.event_type == GdkEventType.KEY_RELEASE
         return unsafe_load(convert(Ptr{GdkEventKey},evt))
-    elseif e.event_type == GdkEventType.GDK_BUTTON_PRESS ||
-           e.event_type == GdkEventType.GDK_2BUTTON_PRESS ||
-           e.event_type == GdkEventType.GDK_3BUTTON_PRESS ||
-           e.event_type == GdkEventType.GDK_BUTTON_RELEASE
+    elseif e.event_type == GdkEventType.BUTTON_PRESS ||
+           e.event_type == GdkEventType.DOUBLE_BUTTON_PRESS ||
+           e.event_type == GdkEventType.TRIPLE_BUTTON_PRESS ||
+           e.event_type == GdkEventType.BUTTON_RELEASE
         return unsafe_load(convert(Ptr{GdkEventButton},evt))
-    elseif e.event_type == GdkEventType.GDK_SCROLL
+    elseif e.event_type == GdkEventType.SCROLL
         return unsafe_load(convert(Ptr{GdkEventScroll},evt))
-    elseif e.event_type == GdkEventType.GDK_MOTION_NOTIFY
+    elseif e.event_type == GdkEventType.MOTION_NOTIFY
         return unsafe_load(convert(Ptr{GdkEventMotion},evt))
-    elseif e.event_type == GdkEventType.GDK_ENTER_NOTIFY ||
-           e.event_type == GdkEventType.GDK_LEAVE_NOTIFY
+    elseif e.event_type == GdkEventType.ENTER_NOTIFY ||
+           e.event_type == GdkEventType.LEAVE_NOTIFY
         return unsafe_load(convert(Ptr{GdkEventCrossing},evt))
     else
         return unsafe_load(convert(Ptr{GdkEventAny},evt))

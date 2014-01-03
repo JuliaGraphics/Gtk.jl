@@ -89,13 +89,14 @@ baremodule GtkPositionType
 end
 
 function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
-    v = gvulue(T)
+    v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
     val = v[T]
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
     return val
 end
+
 #setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
 setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
 function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol))
@@ -103,4 +104,12 @@ function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,S
     ccall((:gtk_container_child_set_property,libgtk), Void, 
         (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
     w
+end
+
+
+baremodule GtkJustification
+    const LEFT   = 0
+    const RIGHT  = 1
+    const CENTER = 2
+    const FILL   = 3
 end

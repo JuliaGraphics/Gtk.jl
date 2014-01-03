@@ -85,7 +85,7 @@ Upon entry to the signal handler, Julia will unpack the arguments it received in
         nothing
     end
 
-See section on [Extending Gtk's Functionality with new GValue-to-Julia conversions](#extending-gtks-functionality) at the end of this document for details on the auto-unpacking implementation.
+See section on [Extending Gtk's Functionality with new GValue<->Julia auto-conversions](#new-gvalue-julia-auto-conversions) at the end of this document for details on the auto-unpacking implementation.
 
 #### Fast Event Handlers
 
@@ -214,7 +214,30 @@ Note that because these are auto-generated, you will often need to do your own g
 
 ### Extending Gtk's functionality
 
-New GValue-to-Julia conversions can be implemented via the `Gtk.make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true)` function. This adds all of the appropriate methods to getindex, setindex!, and gvalue to handle converting this value to and from a GValue. `pass_x` is the Julia type, `as_ctype` is the type for ccall, `to_gtype` is the name of the `g_value_get_*` `g_value_set_*` method to use, `with_id` specifies the type identifier (must resolve to an integer, can either be a variable, and Integer, or a tuple of the type name and library where the `_get_type` function can be called), `allow_reverse` specifies whether this entry should be used for auto-unpacking. Note that this calls eval on its arguments in the current module, so if you want to use a symbol from Gtk (such as `Gtk.libgtk`, make sure you give the fully qualified name). For example:
+#### New Gtk Types
+
+New Gtk types can be most easily added by using the Gtk.@GTypes macro:
+     
+     Gtk.@GTypes GTypeName <: GParentName
+     
+and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+
+#### New GValue<->Julia auto-conversions
+
+New GValue-to-Julia conversions can be implemented via the `Gtk.make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true)` function. This adds all of the appropriate methods to getindex, setindex!, and gvalue to handle converting this value to and from a GValue.
+
+- `pass_x` is the Julia type
+- `as_ctype` is the type for ccall
+- `to_gtype` is the name of the `g_value_get_*` `g_value_set_*` method to use
+- `with_id` specifies the type identifier. It must resolve to an Int, but can either be a variable, and Integer, or a tuple of the type name and library where the `_get_type` function can be called
+- `allow_reverse` specifies whether this entry should be used for auto-unpacking
+
+Note that this calls eval on its arguments in the current module, so if you want to use a symbol from Gtk (such as `Gtk.libgtk`, make sure you give the fully qualified name). You will also need to ensure the appropriate convert methods exist to translate from `pass_x` to `as_ctype` and back. `make_gvalue` does a few automatic transformations:
+
+- if the `to_gtype` is `:string` or `:static_string`, make_gvalue will insert calls to bytestring
+- if the `to_gtype` is `:pointer` or `:boxed`, make_gvalue will insert code (a call to `Gtk.mutable`) that converts from `Type` -> `Ptr{Type}` in the `setindex!` method. Providing a conversion from `Ptr{Type}` -> `Type` must be handled by the user.
+
+For example:
 
     Gtk.make_gvalue(Gtk.GdkRectangle, Ptr{Gtk.GdkRectangle}, :boxed, (:gdk_rectangle,:(Gtk.libgdk)))
     Base.convert(::Type{Gtk.GdkRectangle}, rect::Ptr{Gtk.GdkRectangle}) = unsafe_load(rect)

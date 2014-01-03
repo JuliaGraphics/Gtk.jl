@@ -6,7 +6,7 @@ w = Window("Window", 400, 300)
 @assert width(w) == 400
 @assert height(w) == 300
 @assert size(w) == (400, 300)
-G_.gravity(w,10) #GDK_GRAVITY_STATIC
+G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
 pos = G_.position(w)
 @assert G_.position(w) == pos
@@ -20,8 +20,8 @@ destroy(w)
 @assert !w[:visible,Bool]
 # FIXME: I get a segfault now if I uncomment the next lines
 w=WeakRef(w)
-gc(); gc(); sleep(.1); gc()
-@assert w.value.handle == C_NULL
+gc(); gc(); sleep(.1); gc(); gc()
+@assert w.value === nothing || w.value.handle == C_NULL
 
 ## Frame
 w = Window(
@@ -208,9 +208,9 @@ function toggled(ptr,evt,widget)
     int32(true)
 end
 on_signal_button_press(toggled, tb)
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -227,9 +227,9 @@ on_signal_button_press(tb) do ptr, evt, widget
     end
     true
 end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -246,9 +246,9 @@ signal_connect(tb, :button_press_event) do widget, evt
     end
     true
 end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.GDK_BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 0, 0, 0, 0, C_NULL, 0, 1, C_NULL, 0, 0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -283,7 +283,9 @@ sl = Scale(true, 1:10)
 w = Window(sl, "Scale")
 G_.value(sl, 3)
 @assert G_.value(sl) == 3
-#tk_bind(sl, "command", cb) ## can't test
+adj = Adjustment(sl)
+@assert adj[:value,Float64] == 3
+adj[:upper] = 11
 destroy(w)
 
 ## spinbutton
@@ -377,6 +379,7 @@ push!(popupmenu, contrast)
 c = Canvas()
 win = Window(c, "Popup")
 c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+destroy(win)
 
 ## Text
 #w = Window("Text")

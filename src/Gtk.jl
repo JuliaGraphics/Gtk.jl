@@ -29,7 +29,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
     GtkToggleButton, GtkLinkButton, GtkVolumeButton,
-    GtkEntry, GtkScale, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
+    GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
@@ -42,7 +42,7 @@ export GtkGrid
 export GtkTable, GtkAlignment
 
 # Gtk-specific event handling
-export gtk_doevent, GdkEventMask, GdkModifierType,
+export gtk_doevent, GdkEventMask, GdkModifierType, GdkEventType,
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     add_events, signal_emit,
@@ -54,7 +54,7 @@ export gtk_doevent, GdkEventMask, GdkModifierType,
 export GtkFileChooserAction, GtkStock, GtkResponse
 
 # Constants
-export GdkKeySyms, GdkScrollDirection
+export GdkKeySyms, GdkScrollDirection, GtkJustification
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
@@ -194,6 +194,7 @@ module ShortNames
     const VolumeButton = GtkVolumeButton
     const Entry = GtkEntry
     const Scale = GtkScale
+    const Adjustment = GtkAdjustment
     const SpinButton = GtkSpinButton
     const ComboBoxText = GtkComboBoxText
     const Pixbuf = GdkPixbuf
@@ -216,17 +217,22 @@ module ShortNames
     const Key = GdkKeySyms
     const Stock = GtkStock
     const Response = GtkResponse
+    const EventMask = GdkEventMask
+    const ModifierType = GdkModifierType
+    const EventType = GdkEventType
+    const ScrollDirection = GdkScrollDirection
+    const Justification = GtkJustification
     const NullContainer = GtkNullContainer
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
         ToggleButton, LinkButton, VolumeButton,
-        Entry, Scale, SpinButton, ComboBoxText,
+        Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key
+        NullContainer, Key, ScrollDirection, Justification
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -245,7 +251,7 @@ module ShortNames
     export FileChooserDialog, FileChooserAction, Stock, Response
 
     # Events
-    export gtk_doevent, GdkEventMask, GdkModifierType,
+    export gtk_doevent, EventMask, ModifierType, EventType,
         signal_connect, signal_handler_disconnect,
         signal_handler_block, signal_handler_unblock,
         add_events, signal_emit,

@@ -194,7 +194,6 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     return val
 end
 
-
 setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
 function setindex!(w::GObject, value, name::Union(String,Symbol))
     v = gvalue(value)
@@ -211,6 +210,10 @@ G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
+    if convert(Ptr{GObjectI},w) == C_NULL
+        print(io,"<NULL>)")
+        return
+    end
     n = mutable(Cuint)
     props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
         (Ptr{Void},Ptr{Cuint}),G_OBJECT_GET_CLASS(w),n)
@@ -264,7 +267,6 @@ function register_gtype(g_type::GType)
     #if g_type_test_flags(g_type, G_TYPE_FLAG_CLASSED)
     #    error("not implemented yet")
     #end
-    print(g_type)
     name = symbol(g_type_name(g_type))
     iname = symbol("$(name)I")
     pgtype = g_type_parent(g_type) # TODO: For struct types this may be zero
@@ -287,7 +289,6 @@ end
 
 macro GType(name)
     iname = symbol("$(name)I")
-    print(name)
     regtype = register_gtype(name) # TODO: For struct types this may be zero
     quote
         const $(esc(name)) = $(regtype.wrapper)
