@@ -2,9 +2,6 @@
 const _gi_modules = Dict{Symbol,Module}()
 const _gi_modsyms = Dict{(Symbol,Symbol),Any}()
 
-# QuoteNode is not instantiable
-#but there probably is a builtin that does this:
-quot(val) = Expr(:quote, val)
 module GI
     function create_module(modname,gns,gtk)
         mod = eval(Expr(:toplevel, :(module ($modname) 
@@ -160,7 +157,8 @@ end
 #some convenience macros, just for the show
 macro gimport(ns, names)
     _name = (ns == :Gtk) ? :_Gtk : ns
-    q = quote  $(esc(_name)) = Gtk._ns($(quot(ns))) end
+    NS = _ns(ns)
+    q = quote  $(esc(_name)) = $(NS) end
     if isa(names,Expr)  && names.head == :tuple
         names = names.args
     else 
@@ -173,9 +171,9 @@ macro gimport(ns, names)
             name = item.args[1]
             meths = item.args[2:end]
         end
-        push!(q.args, :(const $(esc(name)) = Gtk.ensure_name($(esc(_name)), $(quot(name)))))
+        push!(q.args, :(const $(esc(name)) = $(ensure_name(NS, name))))
         for meth in meths
-            push!(q.args, :(const $(esc(meth)) = Gtk.ensure_method($(esc(_name)), $(quot(name)), $(quot(meth)))))
+            push!(q.args, :(const $(esc(meth)) = $(Gtk.ensure_method(NS, name, meth))))
         end
     end
     print(q)
