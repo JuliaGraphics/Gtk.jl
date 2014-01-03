@@ -10,7 +10,7 @@ using Gtk.ShortNames
 ```
 For example, `GtkWindow` becomes `Window`, `GtkFrame` becomes `Frame`, etc. In the remainder of the documentation, we'll use the short names.
 
-In addition to this expository document, there is a [function reference](function_reference.md).
+In addition to this expository document, there is a [property/hierarchy browser](doc/properties.md) and a [function reference](function_reference.md).
 
 ## Creating and destroying a window
 
@@ -75,6 +75,8 @@ julia> visible(win, true)
 ```
 This sequence makes the window disappear and then reappear.
 
+The properties of common objects are linked on the [properties page](properties.md).
+
 
 ## Adding and removing objects
 
@@ -105,6 +107,14 @@ delete!(f, ok)
 ```
 (You can verify that it doesn't show in the window anymore.) However, `ok` still exists, and you can put it somewhere else if you wish.
 
+"Container" objects can also be initialized to contain a child:
+```
+ok = Button("OK")
+frame = Frame(ok, "A frame")
+win = Window(frame, "My window")
+```
+This only works to add a single (or the first) child of a container.
+
 ## Layout
 
 A frame can contain only one child widget. If we want several buttons inside the frame, we have to create a layout that can hold multiple objects. Layouts also organize the arrangement of widgets in a specified geometry.
@@ -121,7 +131,19 @@ You might see something like this:
 
 ![window](figures/twobuttons1.png)
 
-This may not be exactly what you'd like. Perhaps you'd like the `ok` button to fill the available space, and to insert some blank space between them:
+We can address individual "slots" in this container:
+```
+julia> length(hbox)
+2
+
+julia> hbox[1][:label,String]
+"Cancel"
+
+julia> hbox[2][:label,String]
+"OK"
+```
+
+This layout may not be exactly what you'd like. Perhaps you'd like the `ok` button to fill the available space, and to insert some blank space between them:
 
 ```
 hbox[ok,:expand] = true
@@ -129,7 +151,7 @@ hbox[:spacing] = 10
 ```
 The first line sets the `expand` property of the `ok` button within the `hbox` container.
 
-Note that these aren't even, and that's true even if we set the `cancel` button's `expand` property to `true`. `ButtonBox` is created specifically for this purpose, so let's use it instead:
+Note that these aren't evenly-sized, and that doesn't change if we set the `cancel` button's `expand` property to `true`. `ButtonBox` is created specifically for this purpose, so let's use it instead:
 
 ```
 destroy(hbox)
@@ -151,24 +173,27 @@ More generally, you can arrange items in a grid:
 ```
 win = Window("A new window")
 g = Grid()   # gtk3-only (use Table() for gtk2)
-a = Entry()
+a = Entry()  # a widget for entering text
 a[:text] = "This is Gtk!"
 b = CheckButton("Check me!")
-c = Scale(false, 0:11)
-g[1,1] = a
-g[1,2] = b
-g[2,1:2] = c
+c = Scale(false, 0:10)     # a slider
+# Now let's place these graphical elements into the Grid:
+g[1,1] = a    # cartesian coordinates, g[x,y]
+g[2,1] = b
+g[1:2,2] = c  # spans both columns
 g[:column_homogeneous] = true  # g[:homogeoneous] for gtk2
-g[:column_spacing] = 15
+g[:column_spacing] = 15  # introduce a 15-pixel gap between columns
 push!(win, g)
-showall(win)
+showall(win)   # essential for indicating that it's time to show the layout
 ```
 ![window](figures/grid.png)
 
-The `g[r,c] = x` assigns the location to the indicated row(s) and column(s).
+The `g[x,y] = obj` assigns the location to the indicated `x,y` positions in the grid
+(note that indexing is cartesian rather than row/column; most graphics packages address the screen using
+cartesian coordinates where 0,0 is in the upper left).
 A range is used to indicate a span of grid cells.
-By default, each row/column will use only as much space as required,
-but you can force them to be of the same size as shown.
+By default, each row/column will use only as much space as required to contain the objects,
+but you can force them to be of the same size by setting properties like `column_homogeneous`.
 
 ### Inspecting and manipulating the graphics hierarchy
 
@@ -187,7 +212,89 @@ for child in hbox
 end
 ```
 
-## Additional graphical elements
+## Callbacks and signals
+
+A button is not much use if it doesn't do anything.
+Gtk+ uses _signals_ as a method for communicating that something of interest has happened.
+Most signals will be _emitted_ as a consequence of user interaction: clicking on a button,
+closing a window, or just moving the mouse. You _connect_ your signals to particular functions
+to make something happen.
+
+Let's do a simple example:
+```
+b = Button("Press me")
+win = Window(b, "Callbacks")
+id = signal_connect(b, "clicked") do widget
+    println(widget, " was clicked!")
+end
+```
+`signal_connect` specifies that a callback function should be run when the `"clicked"`
+signal is received. In this case, we used the `do` syntax to define the function, but
+we could alternatively have passed the function as `id = signal_connect(func, b, "clicked")`.
+
+If you try this, and click on the button, you should see something like the following:
+```
+julia> GtkButton(action-name=NULL, action-target, related-action, use-action-appearance=TRUE, name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=TRUE, has-focus=TRUE, is-focus=TRUE, can-default=FALSE, has-default=FALSE, receives-default=TRUE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_PARENT, child, label="Press me", image, relief=GTK_RELIEF_NORMAL, use-underline=TRUE, use-stock=FALSE, focus-on-click=TRUE, xalign=0.500000, yalign=0.500000, image-position=GTK_POS_LEFT, ) was clicked!
+```
+That's quite a lot of output; let's just print the label of the button:
+```
+id2 = signal_connect(b, "clicked") do widget
+    println("\"", widget[:label,String], "\" was clicked!")
+end
+```
+Now you get something like this:
+```
+julia> GtkButton(action-name=NULL, action-target, related-action, use-action-appearance=TRUE, name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=TRUE, has-focus=TRUE, is-focus=TRUE, can-default=FALSE, has-default=FALSE, receives-default=TRUE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_PARENT, child, label="Press me", image, relief=GTK_RELIEF_NORMAL, use-underline=TRUE, use-stock=FALSE, focus-on-click=TRUE, xalign=0.500000, yalign=0.500000, image-position=GTK_POS_LEFT, ) was clicked!
+"Press me" was clicked!
+```
+Notice that _both_ of the callback functions executed.
+Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://developer.gnome.org/gobject/stable/gobject-Signals.html#gobject-Signals.description).
+Callbacks for some [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
+
+The `"clicked"` signal doesn't provide a return value, so other callbacks will always be run.
+However, we can disconnect the first signal handler:
+```
+signal_handler_disconnect(b, id)
+```
+Now clicking on the button just yields
+```
+julia> "Press me" was clicked!
+```
+Alternatively, you can temporarily enable or disable individual handlers with `signal_handler_block` and `signal_handler_unblock`.
+
+The arguments of the callback depend on the signal type.
+For example, instead of using the `"clicked"` signal---for which the Julia handler should be defined with just a single argument---we could have used `"button-press-event"`:
+```
+b = Button("Pick a mouse button")
+win = Window(b, "Callbacks")
+id = signal_connect(b, "button-press-event") do widget, event
+    println("You pressed button ", event.button)
+end
+```
+Note that this signal requires two arguments, here `widget` and `event`, and that `event` contained useful information.
+Arguments and their meaning are described along with their corresponding [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed).
+Note that you should omit the final `user_data` argument described in the Gtk documentation;
+keep in mind that you can always address other variables from inside your function block, or define the callback in terms of an anonymous function:
+```
+id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
+```
+
+## Specific graphical elements
+
+### Scales
+
+Above we showed how to create a `Scale` (slider) object.
+If you examine the `Scale`'s [properties](https://developer.gnome.org/gtk3/stable/GtkScale.html#GtkScale.properties),
+you might be surprised to not see any that deal with its value or range of acceptable values.
+This is because a `Scale` contains another more basic type, `Adjustment`, responsible for holding these properties:
+```
+sc = Scale(false,0:10)   # range in integer steps, from 0 to 10
+adj = Adjustment(sc)
+adj[:upper] = 11         # now this scale goes to 11!
+adj[:value] = 7
+win = Window(sc,"Scale")
+```
+![scale](figures/scale.png)
 
 ### Menus
 
@@ -219,3 +326,30 @@ win = Window(mb, "Menus", 200, 40)
 ```
 ![menu](figures/menu.png)
 
+### Canvases
+
+Generic drawing is done on a `Canvas`. You control what appears on this canvas by defining a `draw` function:
+
+```
+using Gtk.ShortNames, Base.Graphics
+c = Canvas()
+win = Window(c, "Canvas")
+draw(c) do widget
+    ctx = getgc(c)
+    h = height(c)
+    w = width(c)
+    # Paint red rectangle
+    rectangle(ctx, 0, 0, w, h/2)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+    # Paint blue rectangle
+    rectangle(ctx, 0, 3h/4, w, h/4)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+end
+```
+This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
+
+![canvas](figures/canvas.png)
+
+See Julia's standard-library documentation for more information on graphics.

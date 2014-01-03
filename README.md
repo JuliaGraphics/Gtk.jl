@@ -35,11 +35,13 @@ Try any of the following until something is successful:
      apt-get install libgtk2.0-0 libgtk-3-0
      yum install gtk2 gtk3
 
+On some distributions you can also install a `devhelp` package to have a local copy of the Gtk documentation.
+
 ## Overview
 
 This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
 
-There is also a more [detailed description](doc/usage.md) in tutorial style, as well as a [function reference](doc/function_reference.md).
+There is also a more [detailed description](doc/usage.md) in tutorial style, as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
 
 ### Referring to Gtk.Objects
 
