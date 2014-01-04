@@ -1,5 +1,4 @@
 using GI
-require("Gtk") # for gtk_init
 
 gtk = GI.GINamespace(:Gtk)
 
@@ -19,7 +18,8 @@ argx = args[1]
 GI.ensure_name(gtk, :Window)
 GI.ensure_method(gtk, :Window, :move)
 
-@gimport Gtk Window(move,set_title,get_title), Widget(show)
+@gimport Gtk init, main, Window(move,set_title,get_title), Widget(show)
+init(0,C_NULL)
 w = Window_new(0)
 show(w) #NB: currently doesn't extend Base.show
 move(w,100,100)
@@ -27,3 +27,4 @@ move(w,100,100)
 #string passing
 set_title(w,"GI test")
 @assert get_title(w) == "GI test"
+main()

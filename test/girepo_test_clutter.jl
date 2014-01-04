@@ -1,5 +1,6 @@
 using GI
-@gimport Clutter Actor
+@gimport Clutter init, Actor
+Clutter.init(0, C_NULL)
 actor = Clutter.Actor_new()
 display(actor)
 @assert isa(actor,GI.GObject)

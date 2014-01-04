@@ -41,9 +41,14 @@ end
 function load_name(ns,name,info::GIObjectInfo)
     rt = create_type(info)
     if find_method(ns[name], :new) != nothing
+        #create_type might not do this, as there will be mutual dependency
         ensure_method(ns,name,:new) 
     end
     rt.wrapper
+end
+
+function load_name(ns,name,info::GIFunctionInfo)
+    create_method(info)
 end
 
 peval(mod, expr) = (print(expr,'\n'); eval(mod,expr))
@@ -132,6 +137,7 @@ end
 macro gimport(ns, names)
     _name = (ns == :Gtk) ? :_Gtk : ns
     NS = _ns(ns)
+    ns = GINamespace(ns)
     q = quote  $(esc(_name)) = $(NS) end
     if isa(names,Expr)  && names.head == :tuple
         names = names.args
@@ -145,11 +151,12 @@ macro gimport(ns, names)
             name = item.args[1]
             meths = item.args[2:end]
         end
+        info = NS._gi_ns[name]
         push!(q.args, :(const $(esc(name)) = $(ensure_name(NS, name))))
         for meth in meths
             push!(q.args, :(const $(esc(meth)) = $(GI.ensure_method(NS, name, meth))))
         end
-        if find_method(NS._gi_ns[name], :new) != nothing
+        if isa(ns[name], GIObjectInfo) && find_method(ns[name], :new) != nothing
             push!(q.args, :(const $(esc(symbol("$(name)_new"))) = $(GI.ensure_method(NS, name, :new))))
         end
     end

@@ -53,6 +53,14 @@ show(io::IO, info::GITypeInfo) = print(io,"GITypeInfo($(extract_type(info)))")
 show(io::IO, info::GIArgInfo) = print(io,"GIArgInfo(:$(get_name(info)),$(extract_type(info)))")
 showcompact(io::IO, info::GIArgInfo) = show(io,info) # bug in show.jl ?
 
+function show(io::IO, info::GIFunctionInfo) 
+    print(io, "$(get_namespace(info)).$(get_name(info))(")
+    for arg in get_args(info)
+        print(io, "$(get_name(arg))::$(extract_type(arg)), ")
+    end
+    print(io,")\n")
+end
+
 
 immutable GINamespace
     name::Symbol
@@ -91,9 +99,21 @@ end
 #TODO: make ns behave more like Array and/or Dict{Symbol,GIInfo}?
 length(ns::GINamespace) = int(ccall((:g_irepository_get_n_infos, libgi), Cint, (Ptr{GIRepository}, Ptr{Uint8}), girepo, ns))
 function getindex(ns::GINamespace, i::Integer) 
-    GIInfo(ccall((:g_irepository_get_info, libgi), Ptr{GIBaseInfo}, (Ptr{GIRepository}, Ptr{Uint8}, Cint), girepo, ns, i ))
+    GIInfo(ccall((:g_irepository_get_info, libgi), Ptr{GIBaseInfo}, (Ptr{GIRepository}, Ptr{Uint8}, Cint), girepo, ns, i-1 ))
 end
 getindex(ns::GINamespace, name::Symbol) = gi_find_by_name(ns, name)
+
+function get_all{T<:GIInfo}(ns::GINamespace, t::Type{T})
+    all = GIInfo[]
+    for i=1:length(ns)
+        info = ns[i]
+        if isa(info,t)
+            push!(all,info)
+        end
+    end
+    all
+end
+
 
 function get_shlibs(ns)
     names = bytestring(ccall((:g_irepository_get_shared_library, libgi), Ptr{Uint8}, (Ptr{GIRepository}, Ptr{Uint8}), girepo, ns))
@@ -117,7 +137,7 @@ for (owner, property) in [
     (:interface, :method), (:interface, :signal), (:callable, :arg)]
     @eval function $(symbol("get_$(property)s"))(info::$(GIInfoTypes[owner]))
         n = int(ccall(($("g_$(owner)_info_get_n_$(property)s"), libgi), Cint, (Ptr{GIBaseInfo},), info))
-        $(GIInfoTypes[property])[ GIInfo( ccall(($("g_$(owner)_info_get_$property"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo}, Cint), info, i)) for i=0:n-1]
+        GIInfo[ GIInfo( ccall(($("g_$(owner)_info_get_$property"), libgi), Ptr{GIBaseInfo}, (Ptr{GIBaseInfo}, Cint), info, i)) for i=0:n-1]
     end
     if property == :method
         @eval function $(symbol("find_$(property)"))(info::$(GIInfoTypes[owner]), name)
@@ -166,10 +186,11 @@ const typetag_primitive = [
     Void,Bool,Int8,Uint8,
     Int16,Uint16,Int32,Uint32,
     Int64,Uint64,Cfloat,Cdouble,
-    Csize_t, # FIXME: Gtype
+    GType, 
     ByteString
     ]
 const TAG_BASIC_MAX = 13
+const TAG_ARRAY = 15
 const TAG_INTERFACE = 16 
 
 extract_type(info::GIArgInfo,ret=false) = extract_type(get_type(info),ret)
@@ -182,11 +203,14 @@ function extract_type(info::GITypeInfo,ret=false)
         # Object Types n such
         iface = get_interface(info)
         basetype = extract_type(iface,ret)
+    elseif tag == TAG_ARRAY
+        basetype = Void
     else
+        print(tag)
         return Nothing
     end
     # GObjects are implicit pointers
-    if is_pointer(info) && !(basetype <: GObjectI) && !(basetype <: ByteString)
+    if is_pointer(info) && (!(basetype <: Union(GObjectI,ByteString))  || basetype == Void)
         Ptr{basetype}
     else
         basetype
