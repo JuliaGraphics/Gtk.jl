@@ -1,4 +1,4 @@
-using GI;
+using GI
 @gimport Clutter Actor
 actor = Clutter.Actor_new()
 display(actor)

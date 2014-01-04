@@ -1,4 +1,5 @@
-using GI;
+using GI
+require("Gtk") # for gtk_init
 
 gtk = GI.GINamespace(:Gtk)
 
@@ -18,7 +19,7 @@ argx = args[1]
 GI.ensure_name(gtk, :Window)
 GI.ensure_method(gtk, :Window, :move)
 
-GI.@gimport Gtk Window(move,set_title,get_title), Widget(show)
+@gimport Gtk Window(move,set_title,get_title), Widget(show)
 w = Window_new(0)
 show(w) #NB: currently doesn't extend Base.show
 move(w,100,100)
