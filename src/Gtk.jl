@@ -35,7 +35,9 @@ function init()
     ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
 end
 init()
-end 
+end
+
+
 
 module Gtk
 using Cairo
