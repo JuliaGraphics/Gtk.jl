@@ -1,7 +1,7 @@
-using Gtk;
+using GI;
 @gimport Clutter Actor
 actor = Clutter.Actor_new()
 display(actor)
-@assert isa(actor,Gtk.GObject)
-@assert isa(actor,Clutter.Actor)
+@assert isa(actor,GI.GObject)
+@assert isa(actor,Actor)
 

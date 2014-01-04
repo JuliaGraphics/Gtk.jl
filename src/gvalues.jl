@@ -287,6 +287,7 @@ function register_gtype(g_type::GType)
     regtype
 end
 
+
 macro GType(name)
     iname = symbol("$(name)I")
     regtype = register_gtype(name) # TODO: For struct types this may be zero

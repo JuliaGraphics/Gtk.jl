@@ -6,7 +6,7 @@ import Base: convert, show, showall, showcompact, run, size, length, getindex, s
              start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy
 import Base.Graphics: width, height, getgc
-export GObject, GObjectI, @GType, make_gvalue
+export GObject, GObjectI, GType, @GType, make_gvalue
 export Enum, GError, GValue, gvalue
 export GSList, gslist,gslist2, gc_ref, gc_ref_closure
 export signal_connect, signal_emit
@@ -50,9 +50,6 @@ import Base: convert, show, showall, showcompact, run, size, length, getindex, s
              eltype, copy
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
-
-# gimport interface (not final in any way)
-export @gimport
 
 # generic interface:
 export width, height, #minsize, maxsize
@@ -117,10 +114,6 @@ typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
 include(joinpath("..","deps","ext.jl"))
 
-#module GI
-#include("girepo.jl")
-#include("giimport.jl")
-#end
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
@@ -291,4 +284,17 @@ export Canvas, Window
 
 
 init()
+end
+
+module GI
+    using GLib
+    using GLib.MutableTypes
+    import Base: convert, show, showcompact, length, getindex, setindex!
+
+    # gimport interface (not final in any way)
+    export @gimport
+
+    include(joinpath("..","deps","ext.jl"))
+    include("girepo.jl")
+    include("giimport.jl")
 end

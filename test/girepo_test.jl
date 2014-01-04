@@ -1,21 +1,24 @@
-using Gtk;
+using GI;
 
-gtk = Gtk.GINamespace(:Gtk)
+gtk = GI.GINamespace(:Gtk)
 
 window = gtk[:Window]
-@assert isa(window, Gtk.GIObjectInfo)
+@assert isa(window, GI.GIObjectInfo)
 
-wnew = Gtk.find_method(window,:new)
-move = Gtk.find_method(window,:move)
+wnew = GI.find_method(window,:new)
+wmove = GI.find_method(window,:move)
 
-args = Gtk.get_args(move)
+args = GI.get_args(wmove)
 @assert length(args) == 2
 
 argx = args[1]
-@assert Gtk.get_name(argx) == :x
-@assert Gtk.extract_type(argx) == Int32
+@assert GI.get_name(argx) == :x
+@assert GI.extract_type(argx) == Int32
 
-@gimport Gtk Window(move,set_title,get_title), Widget(show)
+GI.ensure_name(gtk, :Window)
+GI.ensure_method(gtk, :Window, :move)
+
+GI.@gimport Gtk Window(move,set_title,get_title), Widget(show)
 w = Window_new(0)
 show(w) #NB: currently doesn't extend Base.show
 move(w,100,100)

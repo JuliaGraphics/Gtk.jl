@@ -2,13 +2,11 @@
 const _gi_modules = Dict{Symbol,Module}()
 const _gi_modsyms = Dict{(Symbol,Symbol),Any}()
 
-module GI
-    function create_module(modname,gns,gtk)
-        mod = eval(Expr(:toplevel, :(module ($modname) 
-            const _gi_ns = $gns
-            const Gtk = $gtk
-        end), modname))
-    end
+function create_module(modname,gns)
+    mod = eval(Expr(:toplevel, :(module ($modname) 
+        const _gi_ns = $gns
+        const GI = $GI
+    end), modname))
 end
 
 function init_ns(name::Symbol)
@@ -21,18 +19,14 @@ function init_ns(name::Symbol)
     end
     # use submodules to GI module later
     modname = symbol("_$name")
-    mod = GI.create_module(modname,gns,Gtk)
+    mod = GI.create_module(modname,gns)
     _gi_modules[name] = mod
     mod
 end
 
 
 init_ns(:GObject)
-init_ns(:Gtk)
 _ns(name) = (init_ns(name); _gi_modules[name])
-#TODO: separate GLib.jl and Gtk.jl
-
-gtk_ns = GI._Gtk._gi_ns
 
 ensure_name(mod::Module, name) = ensure_name(mod._gi_ns, name)
 function ensure_name(ns::GINamespace, name::Symbol)
@@ -45,46 +39,23 @@ function ensure_name(ns::GINamespace, name::Symbol)
 end
 
 function load_name(ns,name,info::GIObjectInfo)
-    otype, oiface = create_type(info)
+    rt = create_type(info)
     if find_method(ns[name], :new) != nothing
         ensure_method(ns,name,:new) 
     end
-    otype
+    rt.wrapper
 end
 
-#can probably  be merged into the modsym dict
-const _gi_objects = Dict{(Symbol,Symbol),Type}()
-const _gi_obj_ifaces = Dict{(Symbol,Symbol),Type}()
-_gi_objects[(:GObject,:Object)] = GObjectAny #FIXME
-_gi_obj_ifaces[(:GObject,:Object)] = GObjectI 
 peval(mod, expr) = (print(expr,'\n'); eval(mod,expr))
 
 function extract_type(info::GIObjectInfo,ret=false) 
-    get( (ret ? _gi_obj_ifaces : _gi_objects), qual_name(info), (ret ? GObjectAny : GObjectI))
+    rt =  create_type(info)
+    ret ? rt.iface : rt.wrapper
 end
 
 function create_type(info::GIObjectInfo)
-    ns = get_namespace(info)
-    name = get_name(info)
-    qname =(ns,name) # this should be unique in the GObject-o-sphere?
-    if haskey(_gi_objects,qname )
-        return _gi_objects[qname], _gi_obj_ifaces[qname]
-    end
-    ptype, piface = create_type(get_parent(info))
-    #convention from gtktypes, but maybe not good in general?
-    NS = _ns(ns)
-    iname = symbol("$(name)I")
-    otype, oiface = eval(NS, quote
-        abstract ($iname) <: ($piface)
-        type ($name) <: ($iname)
-            handle::Ptr{Gtk.GObjectI}
-            $name(handle::Ptr{Gtk.GObjectI}) = (handle != C_NULL ? Gtk.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
-        end #FIXME
-        ($name, $iname)
-    end)
-    _gi_objects[qname] =  otype
-    _gi_obj_ifaces[qname] =  oiface
-    (otype,oiface)
+    g_type = get_g_type(info)
+    GLib.register_gtype(g_type)
 end
 
 const _gi_methods = Dict{(Symbol,Symbol,Symbol),Any}()
@@ -95,7 +66,8 @@ function ensure_method(ns::GINamespace, rtype::Symbol, method::Symbol)
     if haskey( _gi_methods, qname)
         return _gi_methods[qname]
     end
-    meth = create_method(ns[rtype][method])
+    info = ns[rtype][method]
+    meth = create_method(info)
     _gi_methods[qname] = meth
     return meth
 end
@@ -116,8 +88,8 @@ function create_method(info::GIFunctionInfo)
     argnames = [symbol("_$(get_name(a))") for a in args]
     if flags & IS_METHOD != 0
         object = get_container(info)
-        t, iface = create_type(object)
-        unshift!(argtypes, iface)
+        rt = create_type(object)
+        unshift!(argtypes, rt.iface)
         unshift!(argnames, :__instance)
     end
     if flags & IS_CONSTRUCTOR != 0
@@ -135,7 +107,7 @@ function create_method(info::GIFunctionInfo)
     if rettype == None
         #pass
     elseif rettype <: GObjectI 
-        c_call = :( Gtk._GSubType($rettype,$c_call) )
+        c_call = :( GI.GSubType($rettype,$c_call) )
     elseif rettype <: ByteString
         c_call = :( bytestring($c_call) )
     end
@@ -144,15 +116,17 @@ function create_method(info::GIFunctionInfo)
 end
     
 
-function _GSubType{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
+# used when returning gobject 
+function GSubType{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
     if hnd == C_NULL
         error("can't handle NULL returns yet!")
     end
-    g_type = G_OBJECT_CLASS_TYPE(hnd)
-    info = find_by_gtype(g_type)
-    constr, iface = create_type(info)
-    return constr(hnd)::T
+    g_type = GLib.G_OBJECT_CLASS_TYPE(hnd)
+    rt = GLib.register_gtype(g_type)
+    #TODO: lookup existing julia wrapper first
+    return rt.wrapper(hnd)::T
 end
+
 
 #some convenience macros, just for the show
 macro gimport(ns, names)
@@ -173,26 +147,14 @@ macro gimport(ns, names)
         end
         push!(q.args, :(const $(esc(name)) = $(ensure_name(NS, name))))
         for meth in meths
-            push!(q.args, :(const $(esc(meth)) = $(Gtk.ensure_method(NS, name, meth))))
+            push!(q.args, :(const $(esc(meth)) = $(GI.ensure_method(NS, name, meth))))
+        end
+        if find_method(NS._gi_ns[name], :new) != nothing
+            push!(q.args, :(const $(esc(symbol("$(name)_new"))) = $(GI.ensure_method(NS, name, :new))))
         end
     end
     print(q)
     q
-end
-
-
-# temporary solution
-macro gtkmethods(obj, names)
-    if isa(names,Expr)  && names.head == :tuple
-        names = names.args
-    else 
-        names = [names]
-    end
-        
-    ex = Expr(:block, [:(const $(esc(name)) = $(ensure_method(gtk_ns, obj, name)) ) for name in names])
-    if haskey(_gi_methods, (:Gtk, obj, :new)) 
-        push!(ex.args, [:(const $(esc(symbol("$(obj)_new"))) = _gi_methods[(:Gtk, obj, :new)])])
-    end
 end
 
 

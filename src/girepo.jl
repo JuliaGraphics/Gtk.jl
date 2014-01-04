@@ -107,6 +107,7 @@ end
 
 GIInfoTypes[:method] = GIFunctionInfo
 GIInfoTypes[:callable] = GICallableInfo
+GIInfoTypes[:registered_type] = GIRegisteredTypeInfo
 GIInfoTypes[:base] = GIInfo
 
 # one-> many relationships
@@ -135,11 +136,12 @@ _types = [GIInfo=>(Ptr{GIBaseInfo},GIInfo),
           Symbol=>(Ptr{Uint8}, (x -> symbol(bytestring(x))))]
 for (owner,property,typ) in [
     (:base, :name, Symbol), (:base, :namespace, Symbol),
-    (:base, :container, GIInfo), (:object, :parent, GIInfo),
+    (:base, :container, GIInfo), (:registered_type, :g_type, GType), (:object, :parent, GIInfo),
     (:callable, :return_type, GIInfo), (:callable, :caller_owns, Enum),
     (:function, :flags, Enum), (:function, :symbol, Symbol),
     (:arg, :type, GIInfo), (:arg, :direction, Enum),
     (:type, :tag, Enum), (:type, :interface, GIInfo)]
+
     ctype, conv = get(_types, typ, (typ,_unit))
     @eval function $(symbol("get_$(property)"))(info::$(GIInfoTypes[owner]))
         $conv(ccall(($("g_$(owner)_info_get_$(property)"), libgi), $ctype, (Ptr{GIBaseInfo},), info))
