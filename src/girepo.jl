@@ -160,7 +160,7 @@ for (owner,property,typ) in [
     (:callable, :return_type, GIInfo), (:callable, :caller_owns, Enum),
     (:function, :flags, Enum), (:function, :symbol, Symbol),
     (:arg, :type, GIInfo), (:arg, :direction, Enum),
-    (:type, :tag, Enum), (:type, :interface, GIInfo)]
+    (:type, :tag, Enum), (:type, :interface, GIInfo), (:constant, :type, GIInfo)]
 
     ctype, conv = get(_types, typ, (typ,_unit))
     @eval function $(symbol("get_$(property)"))(info::$(GIInfoTypes[owner]))
@@ -168,9 +168,9 @@ for (owner,property,typ) in [
     end
 end
 
-
 get_name(info::GITypeInfo) = symbol("<gtype>")
 get_name(info::GIInvalidInfo) = symbol("<INVALID>")
+
 
 qual_name(info::GIRegisteredTypeInfo) = (get_namespace(info),get_name(info))
 
@@ -193,7 +193,7 @@ const TAG_BASIC_MAX = 13
 const TAG_ARRAY = 15
 const TAG_INTERFACE = 16 
 
-extract_type(info::GIArgInfo,ret=false) = extract_type(get_type(info),ret)
+extract_type(info::Union(GIArgInfo,GIConstantInfo),ret=false) = extract_type(get_type(info),ret)
 
 function extract_type(info::GITypeInfo,ret=false)
     tag = get_tag(info)
@@ -227,3 +227,18 @@ extract_type(info::GIEnumInfo,ret) = Enum
 const IS_METHOD = 1 << 0
 const IS_CONSTRUCTOR = 1 << 1
 
+function get_value(info::GIConstantInfo)
+    typ = extract_type(info)
+    x = Array(Int64,1) #or mutable
+    size = ccall((:g_constant_info_get_value,libgi),Cint,(Ptr{GIBaseInfo}, Ptr{Void}), info, x) 
+    if typ <: Number
+        unsafe_load(Base.cconvert(Ptr{typ}, x))
+    elseif typ == ByteString
+        #val = bytestring(unsafe_load(Base.cconvert(Ptr{Uint8},x)))
+        #ccall((:g_constant_info_free_value,libgi), Void, (Ptr{GIBaseInfo}, Ptr{Void}), info, x)
+        #val
+        nothing
+    else
+        nothing#unimplemented
+    end
+end
