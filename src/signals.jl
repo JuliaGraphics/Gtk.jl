@@ -1,5 +1,5 @@
 sizeof_gclosure = 0
-function glib_init()
+function init()
     global sizeof_gclosure = WORD_SIZE
     closure = C_NULL
     while closure == C_NULL
@@ -8,7 +8,6 @@ function glib_init()
     end
     ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
 end
-glib_init()
 
 # id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff

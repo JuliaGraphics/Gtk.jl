@@ -40,16 +40,16 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     end
     if pass_x !== None
         eval(quote
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, ::Type{T})
-                ccall((:g_value_init,Gtk.libgobject),Void,(Ptr{Gtk.GValue},Csize_t), v, $with_id)
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
+                ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},Csize_t), v, $with_id)
                 v
             end
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, x::T)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
-                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = Gtk.mutable(x)) end)
-                ccall(($(string("g_value_set_",to_gtype)),Gtk.libgobject),Void,(Ptr{Gtk.GValue},$as_ctype), v, x)
-                if isa(v, Gtk.MutableTypes.MutableX)
-                    finalizer(v, (v::Gtk.MutableTypes.MutableX)->ccall((:g_value_unset,Gtk.libgobject),Void,(Ptr{Gtk.GValue},), v))
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, x::T)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
+                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = GLib.mutable(x)) end)
+                ccall(($(string("g_value_set_",to_gtype)),GLib.libgobject),Void,(Ptr{GLib.GValue},$as_ctype), v, x)
+                if isa(v, GLib.MutableTypes.MutableX)
+                    finalizer(v, (v::GLib.MutableTypes.MutableX)->ccall((:g_value_unset,GLib.libgobject),Void,(Ptr{GLib.GValue},), v))
                 end
                 v
             end
@@ -58,9 +58,9 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             to_gtype = :string
         end
         eval(quote
-            function Base.getindex{T<:$pass_x}(v::Gtk.GV,::Type{T})
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+            function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x == Symbol; :(x = symbol(x)) end)
                 return Base.convert(T,x)
             end
@@ -71,9 +71,9 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             to_gtype = :string
         end
         fn = eval(quote
-            function(v::Gtk.GV)
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+            function(v::GLib.GV)
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x !== None
                     :(return Base.convert($pass_x,x))
                 else
