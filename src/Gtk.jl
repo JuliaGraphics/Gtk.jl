@@ -117,8 +117,7 @@ end
 for container in subtypes(GtkContainerI,true)
     @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
-for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
-    if !isleaftype(eval(orientable)); continue; end
+for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI,true)]...)
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :
