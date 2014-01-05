@@ -13,11 +13,8 @@ end
 @gtkabstract GtkWidgetI 
 @gtkabstract GtkContainerI 
 @gtkabstract GtkBinI 
-@gtkabstract GtkWindowI 
 @gtkabstract GtkDialogI 
-@gtkabstract GtkBoxI 
 @gtkabstract GtkMenuShellI 
-@gtkabstract GtkMenuItemI 
 
 convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 

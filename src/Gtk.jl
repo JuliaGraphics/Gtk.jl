@@ -70,7 +70,6 @@ export GdkKeySyms, GdkScrollDirection, GtkJustification
 #       get_editable, set_editable,
 #       set_position
 
-# local function, handles Symbol and makes UTF8-strings easier
 import GLib: bytestring
 
 typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
