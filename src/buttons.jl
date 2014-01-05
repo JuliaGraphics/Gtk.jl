@@ -13,26 +13,26 @@
 #GtkSwitch — A "light switch" style toggle
 #GtkLockButton — A widget to unlock or lock privileged operations
 
-@GType GtkButton <: GtkBin
+@gtktype GtkButton
 GtkButton() = GtkButton(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
 GtkButton(title::String) =
     GtkButton(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
-@GType GtkCheckButton <: GtkBin
+@gtktype GtkCheckButton
 GtkCheckButton() = GtkCheckButton(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))
 GtkCheckButton(title::String) =
     GtkCheckButton(ccall((:gtk_check_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
-@GType GtkToggleButton <: GtkBin
+@gtktype GtkToggleButton
 GtkToggleButton() = GtkToggleButton(ccall((:gtk_toggle_button_new,libgtk),Ptr{GObject},()))
 GtkToggleButton(title::String) =
     GtkToggleButton(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 if gtk_version >= 3
-@GType GtkSwitch <: GtkWidget
+@gtktype GtkSwitch
     GtkSwitch() = GtkSwitch(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
     function GtkSwitch(active::Bool)
         b = GtkSwitch()
@@ -43,7 +43,7 @@ else
     const GtkSwitch = GtkToggleButton
 end
 
-@GType GtkRadioButton <: GtkBin
+@gtktype GtkRadioButton
 GtkRadioButton(group::Ptr{Void}=C_NULL) =
     GtkRadioButton(ccall((:gtk_radio_button_new,libgtk),Ptr{GObject},
         (Ptr{Void},),group))
@@ -157,7 +157,7 @@ for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
 end
 
 
-@GType GtkLinkButton <: GtkBin
+@gtktype GtkLinkButton
 GtkLinkButton(uri::String) =
     GtkLinkButton(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
         (Ptr{Uint8},),bytestring(uri)))
@@ -175,9 +175,9 @@ function GtkLinkButton(uri::String,visited::Bool)
     b
 end
 
-#TODO: @GType GtkScaleButton
+#TODO: @gtktype GtkScaleButton
 
-@GType GtkVolumeButton <: GtkBin
+@gtktype GtkVolumeButton
 GtkVolumeButton() = GtkVolumeButton(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
 function GtkVolumeButton(value::Real) # 0<=value<=1
     b = GtkVolumeButton()

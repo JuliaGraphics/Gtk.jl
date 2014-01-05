@@ -1,6 +1,63 @@
 abstract GObjectI
 typealias GObject GObjectI
 
+typealias Enum Int32
+typealias GType Csize_t
+immutable GParamSpec
+  g_type_instance::Ptr{Void}
+  name::Ptr{Uint8}
+  flags::Cint
+  value_type::GType
+  owner_type::GType
+end
+
+const fundamental_types = (
+    #(:name,      Ctype,      JuliaType,     g_value_fn)
+    #(:invalid,    Void,       Void,          :error),
+    #(:void,       Nothing,    Nothing,       :error),
+    #(:GInterface, Ptr{Void},        None,           :???),
+    (:gchar,      Int8,             Int8,           :schar),
+    (:guchar,     Uint8,            Uint8,          :uchar),
+    (:gboolean,   Cint,             Bool,           :boolean),
+    (:gint,       Cint,             None,           :int),
+    (:guint,      Cuint,            None,           :uint),
+    (:glong,      Clong,            None,           :long),
+    (:gulong,     Culong,           None,           :ulong),
+    (:gint64,     Int64,            Signed,         :int64),
+    (:guint64,    Uint64,           Unsigned,       :uint64),
+    (:GEnum,      Enum,             None,           :enum),
+    (:GFlags,     Enum,             None,           :flags),
+    (:gfloat,     Float32,          Float32,        :float),
+    (:gdouble,    Float64,          FloatingPoint,  :double),
+    (:gchararray, Ptr{Uint8},       String,         :string),
+    (:gpointer,   Ptr{Void},        Ptr,            :pointer),
+    (:GBoxed,     Ptr{Void},        None,           :boxed),
+    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
+    (:GObject,    Ptr{GObject},     GObject,        :object),
+    (:GType,      Int,              None,           :gtype),
+    #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
+    )
+# NOTE: in general do not cache ids, except for the fundamental values
+g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
+# these constants are used elsewhere
+const gvoid_id = g_type_from_name(:void)
+const gboxed_id = g_type_from_name(:GBoxed)
+const gobject_id = g_type_from_name(:GObject)
+const gstring_id = g_type_from_name(:gchararray)
+
+G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType},w))
+G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
+G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
+G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
+
+g_type_parent(child::GType ) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
+g_type_name(g_type::GType) = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type))
+
+g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
+const G_TYPE_FLAG_CLASSED           = 1 << 0
+const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
+const G_TYPE_FLAG_DERIVABLE         = 1 << 2
+const G_TYPE_FLAG_DEEP_DERIVABLE    = 1 << 3
 # Alternative object construction style. This would let us share constructors
 # by creating const aliases: `const Z = GObject{:Z}`
 type GObjectAny{Name} <: GObjectI
@@ -11,33 +68,61 @@ end
 #    handle::Ptr{GObject}
 #    GtkWidgetAny(handle::Ptr{GObject}) = gc_ref(new(handle))
 #end
-#type GtkContainerAny{T} <: GtkContainerI
-#    handle::Ptr{GObject}
-#    GtkContainerAny(handle::Ptr{GObject}) = gc_ref(new(handle))
-#end
-#type GtkBinAny{T} <: GtkBinI
-#    handle::Ptr{GObject}
-#    GtkBinAny(handle::Ptr{GObject}) = gc_ref(new(handle))
-#end
-#type GtkBoxAny{T} <: GtkBoxI
-#    handle::Ptr{GObject}
-#    GtkBoxAny(handle::Ptr{GObject}) = gc_ref(new(handle))
-#end
 
-macro GType(gname)
-    if isa(gname,Expr)
-        @assert(gname.head == :comparison && length(gname.args) == 3 && gname.args[2] == :<:, "invalid GType expr")
-        super = gname.args[3]
-        gname = gname.args[1]
-    else
-        super = :GObject
+const gtype_ifaces = Dict{Symbol,Type}()
+const gtype_wrappers = Dict{Symbol,Type}()
+
+gtype_ifaces[:GObject] = GObjectI
+
+function get_iface(name::Symbol,g_type)
+    if haskey(gtype_ifaces,name)
+        return gtype_ifaces[name]
     end
-    gname = gname::Symbol
-    quote
-        type $(esc(gname)) <: $(esc(symbol(string(super,'I'))))
+    parent =  g_type_parent(g_type)
+    pname = g_type_name(parent)
+    piface = get_iface(symbol(pname),parent)
+    iname = symbol("$(name)I")
+    iface = eval(:(abstract ($iname) <: $(piface); $iname))
+    gtype_ifaces[name] = iface
+    iface
+end
+
+function get_wrapper(name,g_type)
+    if haskey(gtype_wrappers,name)
+        return gtype_wrappers[name]
+    end
+    if !g_type_test_flags(g_type, G_TYPE_FLAG_CLASSED)
+        error("not implemented yet")
+    end
+    iface = get_iface(name,g_type)
+
+    wrapper = eval(quote
+        #TODO: check if instantiable
+        type ($name) <: ($iface)
             handle::Ptr{GObjectI}
-            $(esc(gname))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
-        end
+            $name(handle::Ptr{GObjectI}) = (handle != C_NULL ? GLib.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        end #FIXME
+        $name
+    end)
+    gtype_wrappers[name] = wrapper
+    wrapper
+end
+
+macro Gtype(name,lib,symname)
+    iname = symbol("$(name)I")
+    quote
+         g_type = ccall(($("$(symname)_get_type"), $lib), GType, ())
+         const $(esc(iname)) = get_iface($(Meta.quot(name)),g_type)
+         const $(esc(name)) = get_wrapper($(Meta.quot(name)),g_type)
+    end
+end
+
+macro Gabstract(name,lib,symname)
+    @assert endswith(string(name),"I")
+    typename = symbol(string(name)[1:end-1])
+    quote
+        g_type = ccall(($("$(symname)_get_type"), $lib), GType, ())
+        const $(esc(name)) = get_iface($(Meta.quot(typename)),g_type)
     end
 end
 
@@ -64,7 +149,6 @@ show(io::IO, w::GObjectI) = print(io,typeof(w))
 
 
 ### Miscellaneous types
-typealias Enum Int32
 baremodule GConnectFlags
     const AFTER = 1
     const SWAPPED = 2

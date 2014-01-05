@@ -80,10 +80,11 @@ typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 include(joinpath("..","deps","ext.jl"))
 ccall((:g_type_init,libgobject),Void,())
 include("gslist.jl")
-include("gobject.jl")
+include("gtype.jl")
 include("gvalues.jl")
 include("gerror.jl")
 include("signals.jl")
+
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")
@@ -126,6 +127,7 @@ for container in subtypes(GtkContainerI,true)
     @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
 for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
+    if !isleaftype(eval(orientable)); continue; end
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :

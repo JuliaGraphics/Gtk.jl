@@ -1,12 +1,23 @@
+macro gtkabstract(name)
+    groups = split(string(name), r"(?=[A-Z])")
+    @assert groups[end] == "I"
+    symname = join([lowercase(s) for s in groups[1:end-1]],"_")
+    (: @Gabstract $(esc(name)) libgtk $(esc(symname)))
+end
 
-abstract GtkWidgetI <: GObjectI
-abstract GtkContainerI <: GtkWidgetI
-abstract GtkBinI <: GtkContainerI
-abstract GtkWindowI <: GtkBinI
-abstract GtkDialogI <: GtkWindowI
-abstract GtkBoxI <: GtkContainerI
-abstract GtkMenuShellI <: GtkContainerI
-abstract GtkMenuItemI <: GtkMenuShellI
+macro gtktype(name)
+    groups = split(string(name), r"(?=[A-Z])")
+    symname = join([lowercase(s) for s in groups],"_")
+    (: @Gtype $(esc(name)) libgtk $(esc(symname)))
+end
+@gtkabstract GtkWidgetI 
+@gtkabstract GtkContainerI 
+@gtkabstract GtkBinI 
+@gtkabstract GtkWindowI 
+@gtkabstract GtkDialogI 
+@gtkabstract GtkBoxI 
+@gtkabstract GtkMenuShellI 
+@gtkabstract GtkMenuItemI 
 
 convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 

@@ -1,45 +1,4 @@
 ### Getting and Setting Properties
-immutable GParamSpec
-  g_type_instance::Ptr{Void}
-  name::Ptr{Uint8}
-  flags::Cint
-  value_type::Csize_t
-  owner_type::Csize_t
-end
-
-const fundamental_types = (
-    #(:name,      Ctype,      JuliaType,     g_value_fn)
-    #(:invalid,    Void,       Void,          :error),
-    #(:void,       Nothing,    Nothing,       :error),
-    #(:GInterface, Ptr{Void},        None,           :???),
-    (:gchar,      Int8,             Int8,           :schar),
-    (:guchar,     Uint8,            Uint8,          :uchar),
-    (:gboolean,   Cint,             Bool,           :boolean),
-    (:gint,       Cint,             None,           :int),
-    (:guint,      Cuint,            None,           :uint),
-    (:glong,      Clong,            None,           :long),
-    (:gulong,     Culong,           None,           :ulong),
-    (:gint64,     Int64,            Signed,         :int64),
-    (:guint64,    Uint64,           Unsigned,       :uint64),
-    (:GEnum,      Enum,             None,           :enum),
-    (:GFlags,     Enum,             None,           :flags),
-    (:gfloat,     Float32,          Float32,        :float),
-    (:gdouble,    Float64,          FloatingPoint,  :double),
-    (:gchararray, Ptr{Uint8},       String,         :string),
-    (:gpointer,   Ptr{Void},        Ptr,            :pointer),
-    (:GBoxed,     Ptr{Void},        None,           :boxed),
-    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
-    (:GObject,    Ptr{GObject},     GObject,        :object),
-    (:GType,      Int,              None,           :gtype),
-    #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
-    )
-# NOTE: in general do not cache ids, except for the fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
-# these constants are used elsewhere
-const gvoid_id = g_type_from_name(:void)
-const gboxed_id = g_type_from_name(:GBoxed)
-const gobject_id = g_type_from_name(:GObject)
-const gstring_id = g_type_from_name(:gchararray)
 
 immutable GValue
     g_type::Csize_t
@@ -191,10 +150,6 @@ function setindex!(w::GObject, value, name::Union(String,Symbol))
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
     w
 end
-
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{Csize_t},w))
-G_OBJECT_GET_CLASS(w::GObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
-G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
