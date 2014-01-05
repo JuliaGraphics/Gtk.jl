@@ -51,7 +51,7 @@ G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd)
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 g_type_parent(child::GType ) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
-g_type_name(g_type::GType) = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type))
+g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type),false))
 
 g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
 const G_TYPE_FLAG_CLASSED           = 1 << 0
@@ -80,7 +80,7 @@ function get_iface(name::Symbol,g_type)
     end
     parent =  g_type_parent(g_type)
     pname = g_type_name(parent)
-    piface = get_iface(symbol(pname),parent)
+    piface = get_iface(pname,parent)
     iname = symbol("$(name)I")
     iface = eval(:(abstract ($iname) <: $(piface); $iname))
     gtype_ifaces[name] = iface
@@ -138,14 +138,26 @@ const jlref_quark = quark"julia_ref"
 # or to override the size, width, and height methods
 convert(::Type{Ptr{GObjectI}},w::GObjectI) = w.handle
 convert{T<:GObjectI}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObjectI},w))
-function convert{T<:GObjectI}(::Type{T},w::Ptr{GObjectI})
-    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObjectI}, (Ptr{GObjectI},Uint32), w, jlref_quark)
-    x == C_NULL && error("GObject didn't have a corresponding Julia object")
-    unsafe_pointer_to_objref(x)::T
-end
 eltype{T<:GObjectI}(::GSList{T}) = T
 
 show(io::IO, w::GObjectI) = print(io,typeof(w))
+
+# this could be used for gtk methods returing widgets of unknown type
+# and/or might have been wrapped by julia before
+function convert{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
+    if hnd == C_NULL
+        error("cannot convert null pointer to GObject")
+    end
+    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObjectI}, (Ptr{GObjectI},Uint32), hnd, jlref_quark)
+    if x != C_NULL
+        return unsafe_pointer_to_objref(x)::T
+    end
+
+    g_type =G_OBJECT_CLASS_TYPE(hnd)
+    name = g_type_name(g_type)
+    wrapper = get_wrapper(name,g_type)
+    return wrapper(hnd)::T
+end
 
 
 ### Miscellaneous types

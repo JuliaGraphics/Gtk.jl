@@ -117,7 +117,7 @@ function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
             return fundamental_fns[i](gv)
         end
     end
-    typename = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(Int,),g_type))
+    typename = g_type_name(g_type)
     error("Could not convert GValue of type $typename to Julia type")
 end
 #end
