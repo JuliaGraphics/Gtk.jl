@@ -7,7 +7,7 @@ export GSList, gslist,gslist2, gc_ref, gc_unref, gc_ref_closure
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export GConnectFlags
-include(joinpath("..","deps","ext.jl"))
+include(joinpath("..","deps","ext_glib.jl"))
 
 # local function, handles Symbol and makes UTF8-strings easier
 bytestring(s) = Base.bytestring(s)
@@ -22,7 +22,6 @@ include("gtype.jl")
 include("gvalues.jl")
 include("gerror.jl")
 include("signals.jl")
-sizeof_gclosure = 0
 init()
 end
 

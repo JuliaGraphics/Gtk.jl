@@ -111,7 +111,7 @@ end
 macro Gtype(name,lib,symname)
     iname = symbol("$(name)I")
     quote
-         g_type = ccall(($("$(symname)_get_type"), $lib), GType, ())
+         g_type = ccall(($("$(symname)_get_type"), $(esc(lib))), GType, ())
          const $(esc(iname)) = get_iface($(Meta.quot(name)),g_type)
          const $(esc(name)) = get_wrapper($(Meta.quot(name)),g_type)
     end
@@ -121,7 +121,7 @@ macro Gabstract(name,lib,symname)
     @assert endswith(string(name),"I")
     typename = symbol(string(name)[1:end-1])
     quote
-        g_type = ccall(($("$(symname)_get_type"), $lib), GType, ())
+        g_type = ccall(($("$(symname)_get_type"), $(esc(lib))), GType, ())
         const $(esc(name)) = get_iface($(Meta.quot(typename)),g_type)
     end
 end

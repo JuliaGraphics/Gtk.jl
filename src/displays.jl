@@ -144,7 +144,7 @@ convert{P<:Ptr}(::Type{P}, a::MatrixStrided) = convert(P, a.p)
 bstride(a::MatrixStrided,i) = (i == 1 ? sizeof(eltype(a)) : (i == 2 ? a.rowstride : 0))
 bstride(a,i) = stride(a,i)*sizeof(eltype(a))
 
-@Gtype GdkPixbuf libgtk gdk_pixbuf
+@Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
 
 # Example constructors:
 #GdkPixbuf(filename="", width=-1, height=-1, preserve_aspect_ratio=true)
