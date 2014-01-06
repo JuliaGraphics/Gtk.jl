@@ -144,7 +144,7 @@ convert{P<:Ptr}(::Type{P}, a::MatrixStrided) = convert(P, a.p)
 bstride(a::MatrixStrided,i) = (i == 1 ? sizeof(eltype(a)) : (i == 2 ? a.rowstride : 0))
 bstride(a,i) = stride(a,i)*sizeof(eltype(a))
 
-@GType GdkPixbuf
+@Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
 
 # Example constructors:
 #GdkPixbuf(filename="", width=-1, height=-1, preserve_aspect_ratio=true)
@@ -287,7 +287,7 @@ baremodule GtkIconSize
         end
 end
 
-@GType GtkImage <: GtkWidget
+@gtktype GtkImage
 GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
 GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
@@ -310,14 +310,14 @@ end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
 GdkPixbuf(img::GtkImage) = GdkPixbuf(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
 
-@GType GtkProgressBar <: GtkWidget
+@gtktype GtkProgressBar
 GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
 pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
-@GType GtkSpinner <: GtkWidget
+@gtktype GtkSpinner
 GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
-@GType GtkStatusbar <: GtkBox
+@gtktype GtkStatusbar
 GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
     ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
@@ -336,9 +336,9 @@ empty!(status::GtkStatusbar,context) =
     ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
         status,context_id(status,context),context_id(context))
 
-#@GType GtkInfoBar <: GtkBox
+#@gtktype GtkInfoBar
 #GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
-@GType GtkStatusIcon
+@gtktype GtkStatusIcon
 GtkStatusIcon() = GtkStatusIcon(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
 

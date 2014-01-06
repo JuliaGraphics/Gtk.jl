@@ -18,7 +18,7 @@ push!(widget::GtkDialogI, text::String, response::Integer) =
     ccall((:gtk_dialog_add_button,libgtk), Ptr{GObject},
           (Ptr{GObject},Ptr{Uint8},Cint), widget, text, response)
 
-@GType GtkFileChooserDialog <: GtkDialog
+@gtktype GtkFileChooserDialog
 function GtkFileChooserDialog(title::String, parent::GtkContainerI, action::Integer, button_text_response...)
     n = length(button_text_response)
     if !iseven(n)
