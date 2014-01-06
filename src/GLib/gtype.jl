@@ -165,11 +165,12 @@ end
 function wrap_gobject(hnd::Ptr{GObjectI})
     gtyp = G_OBJECT_CLASS_TYPE(hnd)
     typname = g_type_name(gtyp)
-    while !(typname in gtype_wrappers)
+    while !(typname in keys(gtype_wrappers))
         gtyp = g_type_parent(gtyp)
+        @assert gtyp != 0
         typname = g_type_name(gtyp)
     end
-    T = gtype_wrapper[typname]
+    T = gtype_wrappers[typname]
     return T(hnd)
 end
 

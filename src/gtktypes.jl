@@ -1,20 +1,13 @@
-macro gtkabstract(name)
-    groups = split(string(name), r"(?=[A-Z])")
-    @assert groups[end] == "I"
-    symname = symbol(join([lowercase(s) for s in groups[1:end-1]],"_"))
-    :( @Gabstract $(esc(name)) libgtk $(esc(symname)))
-end
-
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = symbol(join([lowercase(s) for s in groups],"_"))
     :( @Gtype $(esc(name)) libgtk $(esc(symname)))
 end
-@gtkabstract GtkWidgetI 
-@gtkabstract GtkContainerI 
-@gtkabstract GtkBinI 
-@gtkabstract GtkDialogI 
-@gtkabstract GtkMenuShellI 
+@gtktype GtkWidget
+@gtktype GtkContainer
+@gtktype GtkBin
+@gtktype GtkDialog
+@gtktype GtkMenuShell
 
 convert(::Type{Ptr{GObjectI}},w::String) = convert(Ptr{GObjectI},GtkLabel(w))
 
