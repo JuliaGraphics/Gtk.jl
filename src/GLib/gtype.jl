@@ -82,29 +82,48 @@ function g_type(name::Symbol, lib, symname::Symbol)
     libptr = dlopen(lib)
     fnptr = dlsym(libptr, string(symname,"_get_type"))
     typ = ccall(fnptr, GType, ())
-    dlclose(libptr)
+    #dlclose(libptr)
     typ
 end
 
 function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     if name in keys(gtype_ifaces)
-        return nothing
+        return :( const $(esc(iname)) = $(gtype_ifaces[name] ) )
     end
     parent = g_type_parent(gtyp)
     @assert parent != 0
     pname = g_type_name(parent)
     piname = symbol(string(pname,'I'))
-    piface_decl = get_iface_decl(pname, piname, parent)
+    if pname in keys(gtype_ifaces)
+        piface_decl = nothing
+        pdecl = gtype_ifaces[pname]
+    else
+        piface_decl = get_iface_decl(pname, piname, parent)
+        pdecl = esc(piname)
+    end
     quote
         $piface_decl
-        abstract $(esc(iname)) <: $(esc(piname))
+        abstract $(esc(iname)) <: $(pdecl)
         gtype_ifaces[$(Meta.quot(name))] = $(esc(iname))
     end
 end
 
 function get_gtype_decl(name::Symbol, lib, symname::Symbol)
     quote
-        GLib.g_type(::Type{$(esc(name))}) = ccall(($(symbol(string(symname,"_get_type"))), $(esc(lib))), GType, ())
+        GLib.g_type(::Type{$(esc(name))}) = ccall(($(string(symname,"_get_type")), $(esc(lib))), GType, ())
+    end
+end
+
+function get_wrapper_decl(name::Symbol, iname::Symbol, gtyp::GType)
+    if name in keys(gtype_wrappers)
+        return :( const $(esc(name)) = $(gtype_wrappers[name] ) )
+    end
+    quote 
+        type $(esc(name)) <: $(esc(iname))
+            handle::Ptr{GObjectI}
+            $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        end
+        gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
     end
 end
 
@@ -115,14 +134,11 @@ macro Gtype(name,lib,symname)
         error("not implemented yet")
     end
     iname = symbol(string(name,'I'))
+    newtype = !(name in keys(gtype_wrappers))
     quote
         $(get_iface_decl(name, iname, gtyp))
-        type $(esc(name)) <: $(esc(iname))
-            handle::Ptr{GObjectI}
-            $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
-        end
-        gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
-        $(get_gtype_decl(name, lib, symname))
+        $(get_wrapper_decl(name, iname, gtyp))
+        $(newtype && get_gtype_decl(name, lib, symname))
     end
 end
 
@@ -131,9 +147,8 @@ macro Gabstract(iname,lib,symname)
     name = symbol(string(iname)[1:end-1])
     gtyp = g_type(name, lib, symname)
     @assert name === g_type_name(gtyp)
-    iface_decl = get_iface_decl(name, iname, gtyp)
     quote
-        $iface_decl
+        $(get_iface_decl(name, iname, gtyp))
         $(get_gtype_decl(iname, lib, symname))
     end
 end
