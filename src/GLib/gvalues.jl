@@ -81,7 +81,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
                 end)
             end
         end)
-        allow_reverse && unshift!(gvalue_types, [pass_x, eval(:(()->$with_id)), fn])
+        allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(),:(()->$with_id)), fn])
         return fn
     end
 end

@@ -58,67 +58,83 @@ const G_TYPE_FLAG_CLASSED           = 1 << 0
 const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
 const G_TYPE_FLAG_DERIVABLE         = 1 << 2
 const G_TYPE_FLAG_DEEP_DERIVABLE    = 1 << 3
-# Alternative object construction style. This would let us share constructors
-# by creating const aliases: `const Z = GObject{:Z}`
-type GObjectAny{Name} <: GObjectI
+type GObjectAny <: GObjectI
     handle::Ptr{GObject}
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
+g_type(::Type{GObjectI}) = gobject_id
+g_type(::Type{GObject}) = gobject_id
+g_type(::Type{GObjectAny}) = gobject_id
 
 const gtype_ifaces = Dict{Symbol,Type}()
 const gtype_wrappers = Dict{Symbol,Type}()
 
 gtype_ifaces[:GObject] = GObjectI
+gtype_wrappers[:GObject] = GObjectAny
 
-function get_iface(name::Symbol,g_type)
-    if haskey(gtype_ifaces,name)
-        return gtype_ifaces[name]
+function g_type(name::Symbol, lib, symname::Symbol)
+    if name in keys(gtype_wrappers)
+        return g_type(gtype_wrappers[name])
     end
-    parent =  g_type_parent(g_type)
-    pname = g_type_name(parent)
-    piface = get_iface(pname,parent)
-    iname = symbol("$(name)I")
-    iface = eval(:(abstract ($iname) <: $(piface); $iname))
-    gtype_ifaces[name] = iface
-    iface
+    if !isa(lib,String)
+        lib = eval(current_module(),lib)
+    end
+    libptr = dlopen(lib)
+    fnptr = dlsym(libptr, string(symname,"_get_type"))
+    typ = ccall(fnptr, GType, ())
+    dlclose(libptr)
+    typ
 end
 
-function get_wrapper(name,g_type)
-    if haskey(gtype_wrappers,name)
-        return gtype_wrappers[name]
+function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
+    if name in keys(gtype_ifaces)
+        return nothing
     end
-    if !g_type_test_flags(g_type, G_TYPE_FLAG_CLASSED)
-        error("not implemented yet")
+    parent = g_type_parent(gtyp)
+    @assert parent != 0
+    pname = g_type_name(parent)
+    piname = symbol(string(pname,'I'))
+    piface_decl = get_iface_decl(pname, piname, parent)
+    quote
+        $piface_decl
+        abstract $(esc(iname)) <: $(esc(piname))
+        gtype_ifaces[$(Meta.quot(name))] = $(esc(iname))
     end
-    iface = get_iface(name,g_type)
+end
 
-    wrapper = eval(quote
-        #TODO: check if instantiable
-        type ($name) <: ($iface)
-            handle::Ptr{GObjectI}
-            $name(handle::Ptr{GObjectI}) = (handle != C_NULL ? GLib.gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
-        end #FIXME
-        $name
-    end)
-    gtype_wrappers[name] = wrapper
-    wrapper
+function get_gtype_decl(name::Symbol, lib, symname::Symbol)
+    quote
+        GLib.g_type(::Type{$(esc(name))}) = ccall(($(symbol(string(symname,"_get_type"))), $(esc(lib))), GType, ())
+    end
 end
 
 macro Gtype(name,lib,symname)
-    iname = symbol("$(name)I")
+    gtyp = g_type(name, lib, symname)
+    @assert name === g_type_name(gtyp)
+    if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
+        error("not implemented yet")
+    end
+    iname = symbol(string(name,'I'))
     quote
-         g_type = ccall(($("$(symname)_get_type"), $(esc(lib))), GType, ())
-         const $(esc(iname)) = get_iface($(Meta.quot(name)),g_type)
-         const $(esc(name)) = get_wrapper($(Meta.quot(name)),g_type)
+        $(get_iface_decl(name, iname, gtyp))
+        type $(esc(name)) <: $(esc(iname))
+            handle::Ptr{GObjectI}
+            $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        end
+        gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
+        $(get_gtype_decl(name, lib, symname))
     end
 end
 
-macro Gabstract(name,lib,symname)
-    @assert endswith(string(name),"I")
-    typename = symbol(string(name)[1:end-1])
+macro Gabstract(iname,lib,symname)
+    @assert endswith(string(iname),"I")
+    name = symbol(string(iname)[1:end-1])
+    gtyp = g_type(name, lib, symname)
+    @assert name === g_type_name(gtyp)
+    iface_decl = get_iface_decl(name, iname, gtyp)
     quote
-        g_type = ccall(($("$(symname)_get_type"), $(esc(lib))), GType, ())
-        const $(esc(name)) = get_iface($(Meta.quot(typename)),g_type)
+        $iface_decl
+        $(get_gtype_decl(iname, lib, symname))
     end
 end
 
@@ -143,11 +159,18 @@ function convert{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI})
     if x != C_NULL
         return unsafe_pointer_to_objref(x)::T
     end
+    wrap_gobject(hnd)::T
+end
 
-    g_type =G_OBJECT_CLASS_TYPE(hnd)
-    name = g_type_name(g_type)
-    wrapper = get_wrapper(name,g_type)
-    return wrapper(hnd)::T
+function wrap_gobject(hnd::Ptr{GObjectI})
+    gtyp = G_OBJECT_CLASS_TYPE(hnd)
+    typname = g_type_name(gtyp)
+    while !(typname in gtype_wrappers)
+        gtyp = g_type_parent(gtyp)
+        typname = g_type_name(gtyp)
+    end
+    T = gtype_wrapper[typname]
+    return T(hnd)
 end
 
 
