@@ -208,7 +208,7 @@ GtkExpander(title) =
 GtkNotebook() = GtkNotebook(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
 function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::String)
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
+        (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Int),
         w, x, label, position-1)+1
     w
 end
