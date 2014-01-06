@@ -34,7 +34,7 @@ const fundamental_types = (
     (:GBoxed,     Ptr{Void},        None,           :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
-    (:GType,      Int,              None,           :gtype),
+    #(:GType,      Int,              None,           :gtype), # this isn't a fundamental type
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for the fundamental values
@@ -50,7 +50,7 @@ G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
 G_OBJECT_GET_CLASS(hnd::Ptr{GObjectI}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
-g_type_parent(child::GType ) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
+g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
 g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type),false))
 
 g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
@@ -64,10 +64,6 @@ type GObjectAny{Name} <: GObjectI
     handle::Ptr{GObject}
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
-#type GtkWidgetAny{T} <: GtkWidgetI
-#    handle::Ptr{GObject}
-#    GtkWidgetAny(handle::Ptr{GObject}) = gc_ref(new(handle))
-#end
 
 const gtype_ifaces = Dict{Symbol,Type}()
 const gtype_wrappers = Dict{Symbol,Type}()
@@ -133,18 +129,13 @@ const jlref_quark = quark"julia_ref"
 
 # All GtkWidgets are expected to have a 'handle' field
 # of type Ptr{GObjectI} corresponding to the Gtk object
-# and an 'all' field which has type GdkRectangle
-# corresponding to the rectangle allocated to the object,
-# or to override the size, width, and height methods
 convert(::Type{Ptr{GObjectI}},w::GObjectI) = w.handle
 convert{T<:GObjectI}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObjectI},w))
 eltype{T<:GObjectI}(::GSList{T}) = T
 
-show(io::IO, w::GObjectI) = print(io,typeof(w))
-
 # this could be used for gtk methods returing widgets of unknown type
 # and/or might have been wrapped by julia before
-function convert{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI}) 
+function convert{T<:GObjectI}(::Type{T}, hnd::Ptr{GObjectI})
     if hnd == C_NULL
         error("cannot convert null pointer to GObject")
     end
@@ -207,7 +198,7 @@ function gc_ref{T<:GObjectI}(x::T)
     ref = get(gc_preserve_gtk,x,nothing)
     if isa(ref,Nothing)
         ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GObjectI}, Uint32, Any, Ptr{Void}), x, jlref_quark, x, 
+            (Ptr{GObjectI}, Uint32, Any, Ptr{Void}), x, jlref_quark, x,
             cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObjectI
         addref()
     elseif !isa(ref,WeakRef)

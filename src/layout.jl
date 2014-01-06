@@ -233,11 +233,11 @@ end
 
 ### GtkOverlay
 if gtk_version == 3
-    @gtktype GtkOverlay #technically, this is a GtkBin, except it behaves more like a container
+    @gtktype GtkOverlay # this is a GtkBin, except it behaves more like a container
     GtkOverlay() = GtkOverlay(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
     GtkOverlay(w::GtkWidgetI) = invoke(push!, (GtkContainer,), GtkOverlay(), w)
-    function push!(w::GtkNotebook, x::GtkWidgetI)
+    function push!(w::GtkOverlay, x::GtkWidgetI)
         ccall((:gtk_overlay_add_overlay,libgtk), Cint,
             (Ptr{GObject}, Ptr{GObject}), w, x)
     end

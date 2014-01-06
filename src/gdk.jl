@@ -5,7 +5,7 @@ immutable GdkRectangle
     height::Int32
     GdkRectangle(x,y,w,h) = new(x,y,w,h)
 end
-make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle,libgdk))
+make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle,:libgdk))
 convert(::Type{GdkRectangle}, rect::Ptr{GdkRectangle}) = unsafe_load(rect)
 
 immutable GdkPoint
@@ -198,7 +198,7 @@ baremodule GdkKeySyms
 end
 
 abstract GdkEventI
-make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, (:gdk_event,libgdk))
+make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, (:gdk_event,:libgdk))
 function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
     e = unsafe_load(convert(Ptr{GdkEventAny},evt))
     if     e.event_type == GdkEventType.KEY_PRESS ||

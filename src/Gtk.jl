@@ -1,10 +1,13 @@
 # julia Gtk interface
 
 module Gtk
-using GLib
-using GLib.MutableTypes
+
+include("GLib/GLib.jl")
+using .GLib
+using .GLib.MutableTypes
 using Cairo
 
+import .GLib: bytestring
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -69,8 +72,6 @@ export GdkKeySyms, GdkScrollDirection, GtkJustification
 #       get_items, set_items,
 #       get_editable, set_editable,
 #       set_position
-
-import GLib: bytestring
 
 typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
