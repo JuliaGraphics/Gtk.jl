@@ -8,10 +8,10 @@
 #GtkSpinButton — Retrieve an integer or floating-point number from the user
 #GtkEditable — Interface for text-editing widgets
 
-@GType GtkEntry <: GtkWidget
+@gtktype GtkEntry
 GtkEntry() = GtkEntry(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
 
-@GType GtkScale <: GtkWidget
+@gtktype GtkScale
 if gtk_version == 3
     GtkScale(vertical::Bool,min,max,step) = GtkScale(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
             (Cint,Cdouble,Cdouble,Cdouble),vertical,min,max,step))
@@ -40,7 +40,7 @@ function push!(scale::GtkScale, value, position::Symbol)
 end
 empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObject},),scale)
 
-@GType GtkAdjustment <: GObject
+@gtktype GtkAdjustment
 GtkAdjustment(value,lower,upper,step_increment,page_increment,page_size) =
     GtkAdjustment(ccall((:gtk_adjustment_new,libgtk), Ptr{GObject},
           (Float64,Float64,Float64,Float64,Float64,Float64),
@@ -49,7 +49,7 @@ GtkAdjustment(value,lower,upper,step_increment,page_increment,page_size) =
 GtkAdjustment(scale::GtkScale) = GtkAdjustment(ccall((:gtk_range_get_adjustment,libgtk),
                                                       Ptr{GObject},(Ptr{GObject},), scale))
 
-@GType GtkSpinButton <: GtkWidget
+@gtktype GtkSpinButton
 GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},
     (Cdouble,Cdouble,Cdouble),min,max,step))
 GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(scale))

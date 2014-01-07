@@ -1,10 +1,13 @@
 # julia Gtk interface
 
 module Gtk
-using Cairo
-include("MutableTypes.jl")
-using .MutableTypes
 
+include("GLib/GLib.jl")
+using .GLib
+using .GLib.MutableTypes
+using Cairo
+
+import .GLib: bytestring
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -70,19 +73,11 @@ export GdkKeySyms, GdkScrollDirection, GtkJustification
 #       get_editable, set_editable,
 #       set_position
 
-# local function, handles Symbol and makes UTF8-strings easier
-bytestring(s) = Base.bytestring(s)
-bytestring(s::Symbol) = s
-bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own))
-
 typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
 include(joinpath("..","deps","ext.jl"))
-ccall((:g_type_init,libgobject),Void,())
-include("gslist.jl")
+
 include("gtktypes.jl")
-include("gvalues.jl")
-include("gerror.jl")
 include("gdk.jl")
 include("events.jl")
 include("container.jl")
@@ -123,7 +118,7 @@ end
 for container in subtypes(GtkContainerI,true)
     @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
-for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI)]...)
+for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI,true)]...)
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :

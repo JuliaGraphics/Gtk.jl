@@ -1,45 +1,4 @@
 ### Getting and Setting Properties
-immutable GParamSpec
-  g_type_instance::Ptr{Void}
-  name::Ptr{Uint8}
-  flags::Cint
-  value_type::Csize_t
-  owner_type::Csize_t
-end
-
-const fundamental_types = (
-    #(:name,      Ctype,      JuliaType,     g_value_fn)
-    #(:invalid,    Void,       Void,          :error),
-    #(:void,       Nothing,    Nothing,       :error),
-    #(:GInterface, Ptr{Void},        None,           :???),
-    (:gchar,      Int8,             Int8,           :schar),
-    (:guchar,     Uint8,            Uint8,          :uchar),
-    (:gboolean,   Cint,             Bool,           :boolean),
-    (:gint,       Cint,             None,           :int),
-    (:guint,      Cuint,            None,           :uint),
-    (:glong,      Clong,            None,           :long),
-    (:gulong,     Culong,           None,           :ulong),
-    (:gint64,     Int64,            Signed,         :int64),
-    (:guint64,    Uint64,           Unsigned,       :uint64),
-    (:GEnum,      Enum,             None,           :enum),
-    (:GFlags,     Enum,             None,           :flags),
-    (:gfloat,     Float32,          Float32,        :float),
-    (:gdouble,    Float64,          FloatingPoint,  :double),
-    (:gchararray, Ptr{Uint8},       String,         :string),
-    (:gpointer,   Ptr{Void},        Ptr,            :pointer),
-    (:GBoxed,     Ptr{Void},        None,           :boxed),
-    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
-    (:GObject,    Ptr{GObject},     GObject,        :object),
-    (:GType,      Int,              None,           :gtype),
-    #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
-    )
-# NOTE: in general do not cache ids, except for the fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
-# these constants are used elsewhere
-const gvoid_id = g_type_from_name(:void)
-const gboxed_id = g_type_from_name(:GBoxed)
-const gobject_id = g_type_from_name(:GObject)
-const gstring_id = g_type_from_name(:gchararray)
 
 immutable GValue
     g_type::Csize_t
@@ -80,17 +39,17 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),Int,()))
     end
     if pass_x !== None
-        eval(quote
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, ::Type{T})
-                ccall((:g_value_init,Gtk.libgobject),Void,(Ptr{Gtk.GValue},Csize_t), v, $with_id)
+        eval(current_module(),quote
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
+                ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},Csize_t), v, $with_id)
                 v
             end
-            function Base.setindex!{T<:$pass_x}(v::Gtk.GV, x::T)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
-                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = Gtk.mutable(x)) end)
-                ccall(($(string("g_value_set_",to_gtype)),Gtk.libgobject),Void,(Ptr{Gtk.GValue},$as_ctype), v, x)
-                if isa(v, Gtk.MutableTypes.MutableX)
-                    finalizer(v, (v::Gtk.MutableTypes.MutableX)->ccall((:g_value_unset,Gtk.libgobject),Void,(Ptr{Gtk.GValue},), v))
+            function Base.setindex!{T<:$pass_x}(v::GLib.GV, x::T)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
+                $(if to_gtype == :pointer || to_gtype == :boxed; :(x = GLib.mutable(x)) end)
+                ccall(($(string("g_value_set_",to_gtype)),GLib.libgobject),Void,(Ptr{GLib.GValue},$as_ctype), v, x)
+                if isa(v, GLib.MutableTypes.MutableX)
+                    finalizer(v, (v::GLib.MutableTypes.MutableX)->ccall((:g_value_unset,GLib.libgobject),Void,(Ptr{GLib.GValue},), v))
                 end
                 v
             end
@@ -98,10 +57,10 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         if to_gtype == :static_string
             to_gtype = :string
         end
-        eval(quote
-            function Base.getindex{T<:$pass_x}(v::Gtk.GV,::Type{T})
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+        eval(current_module(),quote
+            function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x == Symbol; :(x = symbol(x)) end)
                 return Base.convert(T,x)
             end
@@ -111,10 +70,10 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         if to_gtype == :static_string
             to_gtype = :string
         end
-        fn = eval(quote
-            function(v::Gtk.GV)
-                x = ccall(($(string("g_value_get_",to_gtype)),Gtk.libgobject),$as_ctype,(Ptr{Gtk.GValue},), v)
-                $(if to_gtype == :string; :(x = Gtk.bytestring(x)) end)
+        fn = eval(current_module(),quote
+            function(v::GLib.GV)
+                x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
+                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
                 $(if pass_x !== None
                     :(return Base.convert($pass_x,x))
                 else
@@ -122,7 +81,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
                 end)
             end
         end)
-        allow_reverse && unshift!(gvalue_types, [pass_x, eval(:(()->$with_id)), fn])
+        allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(),:(()->$with_id)), fn])
         return fn
     end
 end
@@ -158,7 +117,7 @@ function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
             return fundamental_fns[i](gv)
         end
     end
-    typename = bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(Int,),g_type))
+    typename = g_type_name(g_type)
     error("Could not convert GValue of type $typename to Julia type")
 end
 #end
@@ -183,14 +142,6 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     return val
 end
 
-function getindex{T}(w::GtkWidgetI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
-    v = gvalue(T)
-    ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    val = v[T]
-    ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
-    return val
-end
 
 setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
 function setindex!(w::GObject, value, name::Union(String,Symbol))
@@ -199,19 +150,6 @@ function setindex!(w::GObject, value, name::Union(String,Symbol))
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
     w
 end
-
-#setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
-setindex!{T}(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
-function setindex!(w::GtkWidgetI, value, child::GtkWidgetI, name::Union(String,Symbol))
-    v = gvalue(value)
-    ccall((:gtk_container_child_set_property,libgtk), Void, 
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    w
-end
-
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{Csize_t},w))
-G_OBJECT_GET_CLASS(w::GObject) = unsafe_load(convert(Ptr{Ptr{Void}},w.handle))
-G_OBJECT_CLASS_TYPE(w::GObject) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
