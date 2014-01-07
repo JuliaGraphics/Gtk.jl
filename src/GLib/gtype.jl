@@ -83,7 +83,7 @@ function g_type(name::Symbol, lib, symname::Symbol)
     libptr = dlopen(lib)
     fnptr = dlsym(libptr, string(symname,"_get_type"))
     typ = ccall(fnptr, GType, ())
-    dlclose(libptr)
+    #dlclose(libptr)
     typ
 end
 g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
@@ -118,13 +118,7 @@ function get_gtype_decl(name::Symbol, lib, symname::Symbol)
     end
 end
 
-macro Gtype(name,lib,symname)
-    gtyp = g_type(name, lib, symname)
-    @assert name === g_type_name(gtyp)
-    if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
-        error("not implemented yet")
-    end
-    iname = symbol(string(name,'I'))
+function get_type_decl(name,iname,gtyp,gtype_decl)
     quote
         if $(Meta.quot(name)) in keys(gtype_wrappers)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
@@ -137,8 +131,19 @@ macro Gtype(name,lib,symname)
             end
             gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
         end
-        $(get_gtype_decl(name, lib, symname))
+        $(gtype_decl)
     end
+end
+
+macro Gtype(name,lib,symname)
+    gtyp = g_type(name, lib, symname)
+    @assert name === g_type_name(gtyp)
+    if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
+        error("not implemented yet")
+    end
+    iname = symbol(string(name,'I'))
+    gtype_decl = get_gtype_decl(name, lib, symname)
+    get_type_decl(name,iname,gtyp,gtype_decl)
 end
 
 macro Gabstract(iname,lib,symname)
