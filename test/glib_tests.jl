@@ -12,3 +12,12 @@ wrap2 = convert(GObject, hnd)
 @assert wrap == wrap2
 
 print(wrap,'\n') #should display properties
+
+module Test
+    import Gtk
+    using Gtk.GLib
+    @Gtype GtkWidget Gtk.libgtk gtk_widget
+end
+
+@assert Test.GtkWidget == Gtk.GtkWidget
+@assert Test.GtkWidgetI == Gtk.GtkWidgetI

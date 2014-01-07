@@ -38,7 +38,7 @@ const fundamental_types = (
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for the fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),Int,(Ptr{Uint8},),name)
+g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
 # these constants are used elsewhere
 const gvoid_id = g_type_from_name(:void)
 const gboxed_id = g_type_from_name(:GBoxed)
@@ -62,6 +62,7 @@ type GObjectAny <: GObjectI
     handle::Ptr{GObject}
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
+g_type(obj::GObjectI) = g_type(typeof(obj))
 g_type(::Type{GObjectI}) = gobject_id
 g_type(::Type{GObject}) = gobject_id
 g_type(::Type{GObjectAny}) = gobject_id
@@ -77,7 +78,7 @@ function g_type(name::Symbol, lib, symname::Symbol)
         return g_type(gtype_wrappers[name])
     end
     if !isa(lib,String)
-        lib = eval(current_module(),lib)
+        lib = eval(current_module(), lib)
     end
     libptr = dlopen(lib)
     fnptr = dlsym(libptr, string(symname,"_get_type"))
@@ -85,10 +86,14 @@ function g_type(name::Symbol, lib, symname::Symbol)
     dlclose(libptr)
     typ
 end
+g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
 
 function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
-    if name in keys(gtype_ifaces)
+    if isdefined(current_module(), iname)
         return nothing
+    end
+    if name === :GObject
+        return :( const $(esc(iname)) = gtype_ifaces[:GObject] )
     end
     parent = g_type_parent(gtyp)
     @assert parent != 0
@@ -96,15 +101,20 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     piname = symbol(string(pname,'I'))
     piface_decl = get_iface_decl(pname, piname, parent)
     quote
-        $piface_decl
-        abstract $(esc(iname)) <: $(esc(piname))
-        gtype_ifaces[$(Meta.quot(name))] = $(esc(iname))
+        if $(Meta.quot(iname)) in keys(gtype_ifaces)
+            const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
+        else
+            $piface_decl
+            abstract $(esc(iname)) <: $(esc(piname))
+            gtype_ifaces[$(Meta.quot(name))] = $(esc(iname))
+        end
     end
 end
 
+get_gtype_decl(name::Symbol, lib, symname::Expr) = esc(symname)
 function get_gtype_decl(name::Symbol, lib, symname::Symbol)
     quote
-        GLib.g_type(::Type{$(esc(name))}) = ccall(($(symbol(string(symname,"_get_type"))), $(esc(lib))), GType, ())
+        GLib.g_type(::Type{$(esc(name))}) = ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ())
     end
 end
 
@@ -116,12 +126,17 @@ macro Gtype(name,lib,symname)
     end
     iname = symbol(string(name,'I'))
     quote
-        $(get_iface_decl(name, iname, gtyp))
-        type $(esc(name)) <: $(esc(iname))
-            handle::Ptr{GObjectI}
-            $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+        if $(Meta.quot(name)) in keys(gtype_wrappers)
+            const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
+            const $(esc(name)) = gtype_wrappers[$(Meta.quot(name))]
+        else
+            $(get_iface_decl(name, iname, gtyp))
+            type $(esc(name)) <: $(esc(iname))
+                handle::Ptr{GObjectI}
+                $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
+            end
+            gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
         end
-        gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
         $(get_gtype_decl(name, lib, symname))
     end
 end
@@ -143,8 +158,8 @@ macro quark_str(q)
 end
 const jlref_quark = quark"julia_ref"
 
-# All GtkWidgets are expected to have a 'handle' field
-# of type Ptr{GObjectI} corresponding to the Gtk object
+# All GObjects are expected to have a 'handle' field
+# of type Ptr{GObjectI} corresponding to the GLib object
 convert(::Type{Ptr{GObjectI}},w::GObjectI) = w.handle
 convert{T<:GObjectI}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObjectI},w))
 eltype{T<:GObjectI}(::GSList{T}) = T
@@ -237,8 +252,8 @@ end
 
 function gc_unref_weak(x::GObjectI)
     # this strongly destroys and invalidates the object
-    # it is intended to be called by Gtk, not in user code function
-    # note: this may be called multiple times by Gtk
+    # it is intended to be called by GLib, not in user code function
+    # note: this may be called multiple times by GLib
     x.handle = C_NULL
     global gc_preserve_gtk
     delete!(gc_preserve_gtk, x)
@@ -246,7 +261,7 @@ function gc_unref_weak(x::GObjectI)
 end
 function gc_unref(x::GObjectI)
     # this strongly destroys and invalidates the object
-    # it is intended to be called by Gtk, not in user code function
+    # it is intended to be called by GLib, not in user code function
     ref = ccall((:g_object_get_qdata,libgobject),Ptr{Void},(Ptr{GObjectI},Uint32),x,jlref_quark)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
