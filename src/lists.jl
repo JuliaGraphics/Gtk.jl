@@ -52,5 +52,5 @@ if gtk_version == 3
 end
 
 delete!(cb::GtkComboBoxText,i::Integer) =
-    (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GObject},Cint),cb,i); cb)
+    (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GObject},Cint),cb,i-1); cb)
 
