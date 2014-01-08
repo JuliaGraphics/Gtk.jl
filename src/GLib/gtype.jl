@@ -73,6 +73,8 @@ const gtype_wrappers = Dict{Symbol,Type}()
 gtype_ifaces[:GObject] = GObjectI
 gtype_wrappers[:GObject] = GObjectAny
 
+let libs = Dict{String,Any}()
+global g_type
 function g_type(name::Symbol, lib, symname::Symbol)
     if name in keys(gtype_wrappers)
         return g_type(gtype_wrappers[name])
@@ -80,13 +82,16 @@ function g_type(name::Symbol, lib, symname::Symbol)
     if !isa(lib,String)
         lib = eval(current_module(), lib)
     end
-    libptr = dlopen(lib)
+    libptr = get(libs, lib, C_NULL)::Ptr{Void}
+    if libptr == C_NULL
+        libs[lib] = libptr = dlopen(lib)
+    end
     fnptr = dlsym(libptr, string(symname,"_get_type"))
     typ = ccall(fnptr, GType, ())
-    #dlclose(libptr)
     typ
 end
 g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
+end
 
 function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     if isdefined(current_module(), iname)
