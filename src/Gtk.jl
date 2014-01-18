@@ -92,6 +92,7 @@ include("menus.jl")
 include("selectors.jl")
 include("misc.jl")
 include("cairo.jl")
+include("builder.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -205,6 +206,7 @@ module ShortNames
     const ScrollDirection = GdkScrollDirection
     const Justification = GtkJustification
     const NullContainer = GtkNullContainer
+    const Builder = GtkBuilder
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -214,7 +216,7 @@ module ShortNames
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key, ScrollDirection, Justification
+        NullContainer, Key, ScrollDirection, Justification, Builder
 
     # Gtk 3
     if Gtk.gtk_version >= 3
