@@ -33,7 +33,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
-    GtkFileChooserDialog, GtkNullContainer
+    GtkFileChooserDialog, GtkNullContainer, GtkBuilder
 
 # Gtk3 objects
 export GtkGrid
