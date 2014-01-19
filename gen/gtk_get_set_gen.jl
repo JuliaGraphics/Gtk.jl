@@ -44,6 +44,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkDialog" => :GtkDialogI,
     "GtkFileChooserDialog" => :GtkFileChooserDialog,
     "GtkFileChooser" => :GtkFileChooserDialog,
+    "GtkBuilder" => :GtkBuilder,
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,
