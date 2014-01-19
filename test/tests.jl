@@ -23,6 +23,15 @@ w=WeakRef(w)
 gc(); gc(); sleep(.1); gc(); gc()
 @assert w.value === nothing || w.value.handle == C_NULL
 
+win1 = Window("window 1")
+win2 = Window("window 2")
+win3 = Window("window 3")
+@assert length(Gtk.allwindows) == 3
+destroy(win2)
+@assert length(Gtk.allwindows) == 2
+destroyall()
+@assert length(Gtk.allwindows) == 0
+
 ## Frame
 w = Window(
     Frame(),

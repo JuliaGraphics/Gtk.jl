@@ -18,7 +18,7 @@ import Cairo: destroy
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    visible, destroy,
+    visible, destroy, destroyall,
     hasparent, toplevel
 
     #property, margin, padding, align
@@ -151,7 +151,7 @@ module ShortNames
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        visible, destroy,
+        visible, destroy,  destroyall,
         hasparent, toplevel
 
     # Gtk objects
