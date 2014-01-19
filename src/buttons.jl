@@ -32,7 +32,7 @@ GtkToggleButton(title::String) =
         (Ptr{Uint8},), bytestring(title)))
 
 if gtk_version >= 3
-@gtktype GtkSwitch
+    @eval @gtktype GtkSwitch
     GtkSwitch() = GtkSwitch(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
     function GtkSwitch(active::Bool)
         b = GtkSwitch()
