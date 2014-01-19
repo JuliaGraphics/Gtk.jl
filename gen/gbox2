@@ -91,6 +91,48 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gdk_set_use_xshm,Gtk.libgdk), :Void, :(Cint,), :use_xshm_))
             return use_xshm_
         end
+        function value(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_value,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function value(adjustment::Gtk.GtkAdjustment,value_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :value_))
+            return adjustment
+        end
+        function lower(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_lower,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function lower(adjustment::Gtk.GtkAdjustment,lower_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_lower,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :lower_))
+            return adjustment
+        end
+        function upper(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_upper,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function upper(adjustment::Gtk.GtkAdjustment,upper_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_upper,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :upper_))
+            return adjustment
+        end
+        function step_increment(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_step_increment,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function step_increment(adjustment::Gtk.GtkAdjustment,step_increment_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_step_increment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :step_increment_))
+            return adjustment
+        end
+        function page_increment(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_page_increment,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function page_increment(adjustment::Gtk.GtkAdjustment,page_increment_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_page_increment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :page_increment_))
+            return adjustment
+        end
+        function page_size(adjustment::Gtk.GtkAdjustment)
+            return $(Expr(:ccall, :(:gtk_adjustment_get_page_size,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
+        end
+        function page_size(adjustment::Gtk.GtkAdjustment,page_size_)
+            $(Expr(:ccall, :(:gtk_adjustment_set_page_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :adjustment, :page_size_))
+            return adjustment
+        end
         function style(widget::Gtk.GtkWidgetI)
             return $(Expr(:ccall, :(:gtk_rc_get_style,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
         end
@@ -109,7 +151,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return widget
         end
         function scroll_adjustments(widget::Gtk.GtkWidgetI,hadjustment,vadjustment)
-            $(Expr(:ccall, :(:gtk_widget_set_scroll_adjustments,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :widget, :hadjustment, :vadjustment))
+            $(Expr(:ccall, :(:gtk_widget_set_scroll_adjustments,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :widget, :hadjustment, :vadjustment))
             return widget
         end
         function can_focus(widget::Gtk.GtkWidgetI,can_focus_)
@@ -411,18 +453,18 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_container_get_focus_child,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :container)))
         end
         function focus_vadjustment(container::Gtk.GtkContainerI,adjustment)
-            $(Expr(:ccall, :(:gtk_container_set_focus_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :container, :adjustment))
+            $(Expr(:ccall, :(:gtk_container_set_focus_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :container, :adjustment))
             return container
         end
         function focus_vadjustment(container::Gtk.GtkContainerI)
-            return $(Expr(:ccall, :(:gtk_container_get_focus_vadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :container))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_container_get_focus_vadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :container)))
         end
         function focus_hadjustment(container::Gtk.GtkContainerI,adjustment)
-            $(Expr(:ccall, :(:gtk_container_set_focus_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :container, :adjustment))
+            $(Expr(:ccall, :(:gtk_container_set_focus_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :container, :adjustment))
             return container
         end
         function focus_hadjustment(container::Gtk.GtkContainerI)
-            return $(Expr(:ccall, :(:gtk_container_get_focus_hadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :container))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_container_get_focus_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :container)))
         end
         function property(container::Gtk.GtkContainerI,child,property_name,value)
             $(Expr(:ccall, :(:gtk_container_child_set_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :container, :child, :property_name, :value))
@@ -973,6 +1015,23 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_button_box_get_child_ipadding,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :widget, :ipad_x, :ipad_y))
             return (ipad_x[],ipad_y[])
         end
+        function object(builder::Gtk.GtkBuilder,name)
+            return convert(Gtk.GObject,$(Expr(:ccall, :(:gtk_builder_get_object,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Uint8}), :builder, :name)))
+        end
+        function objects(builder::Gtk.GtkBuilder)
+            return $(Expr(:ccall, :(:gtk_builder_get_objects,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :builder))
+        end
+        function translation_domain(builder::Gtk.GtkBuilder,domain)
+            $(Expr(:ccall, :(:gtk_builder_set_translation_domain,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :builder, :domain))
+            return builder
+        end
+        function translation_domain(builder::Gtk.GtkBuilder)
+            return $(Expr(:ccall, :(:gtk_builder_get_translation_domain,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :builder))
+        end
+        function type_from_name(builder::Gtk.GtkBuilder)
+            type_name = Gtk.mutable(Uint8)
+            return ($(Expr(:ccall, :(:gtk_builder_get_type_from_name,Gtk.libgtk), :Culong, :(Ptr{Gtk.GObject},Ptr{Uint8}), :builder, :type_name)),type_name[])
+        end
         function from_pixmap(image::Gtk.GtkImage,pixmap,mask)
             $(Expr(:ccall, :(:gtk_image_set_from_pixmap,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :image, :pixmap, :mask))
             return image
@@ -1295,11 +1354,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_entry_get_completion,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :entry))
         end
         function cursor_hadjustment(entry::Gtk.GtkEntry,adjustment)
-            $(Expr(:ccall, :(:gtk_entry_set_cursor_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :entry, :adjustment))
+            $(Expr(:ccall, :(:gtk_entry_set_cursor_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :entry, :adjustment))
             return entry
         end
         function cursor_hadjustment(entry::Gtk.GtkEntry)
-            return $(Expr(:ccall, :(:gtk_entry_get_cursor_hadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :entry))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_entry_get_cursor_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :entry)))
         end
         function progress_fraction(entry::Gtk.GtkEntry,fraction)
             $(Expr(:ccall, :(:gtk_entry_set_progress_fraction,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cdouble), :entry, :fraction))
@@ -1612,11 +1671,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_range_get_update_policy,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :range))
         end
         function adjustment(range::Gtk.GtkScale,adjustment_)
-            $(Expr(:ccall, :(:gtk_range_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :range, :adjustment_))
+            $(Expr(:ccall, :(:gtk_range_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :range, :adjustment_))
             return range
         end
         function adjustment(range::Gtk.GtkScale)
-            return $(Expr(:ccall, :(:gtk_range_get_adjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :range))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_range_get_adjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :range)))
         end
         function inverted(range::Gtk.GtkScale,setting)
             $(Expr(:ccall, :(:gtk_range_set_inverted,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :range, :setting))
@@ -1762,17 +1821,17 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return (width[],height[])
         end
         function hadjustment(layout::Gtk.GtkLayout)
-            return $(Expr(:ccall, :(:gtk_layout_get_hadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :layout))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_layout_get_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :layout)))
         end
         function vadjustment(layout::Gtk.GtkLayout)
-            return $(Expr(:ccall, :(:gtk_layout_get_vadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :layout))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_layout_get_vadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :layout)))
         end
         function hadjustment(layout::Gtk.GtkLayout,adjustment)
-            $(Expr(:ccall, :(:gtk_layout_set_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :layout, :adjustment))
+            $(Expr(:ccall, :(:gtk_layout_set_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :layout, :adjustment))
             return layout
         end
         function vadjustment(layout::Gtk.GtkLayout,adjustment)
-            $(Expr(:ccall, :(:gtk_layout_set_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :layout, :adjustment))
+            $(Expr(:ccall, :(:gtk_layout_set_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :layout, :adjustment))
             return layout
         end
         function uri(link_button::Gtk.GtkLinkButton)
@@ -1996,11 +2055,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return radio_button
         end
         function adjustment(spin_button::Gtk.GtkSpinButton,adjustment_)
-            $(Expr(:ccall, :(:gtk_spin_button_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :spin_button, :adjustment_))
+            $(Expr(:ccall, :(:gtk_spin_button_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :spin_button, :adjustment_))
             return spin_button
         end
         function adjustment(spin_button::Gtk.GtkSpinButton)
-            return $(Expr(:ccall, :(:gtk_spin_button_get_adjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :spin_button))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_spin_button_get_adjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :spin_button)))
         end
         function digits(spin_button::Gtk.GtkSpinButton,digits_)
             $(Expr(:ccall, :(:gtk_spin_button_set_digits,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Uint32), :spin_button, :digits_))
@@ -2377,10 +2436,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return line_top[]
         end
         function hadjustment(text_view::Gtk.GtkTextView)
-            return $(Expr(:ccall, :(:gtk_text_view_get_hadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :text_view))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_text_view_get_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :text_view)))
         end
         function vadjustment(text_view::Gtk.GtkTextView)
-            return $(Expr(:ccall, :(:gtk_text_view_get_vadjustment,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :text_view))
+            return convert(Gtk.GtkAdjustment,$(Expr(:ccall, :(:gtk_text_view_get_vadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :text_view)))
         end
         function window(text_view::Gtk.GtkTextView,win)
             return $(Expr(:ccall, :(:gtk_text_view_get_window,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Cint), :text_view, :win))

@@ -1,4 +1,5 @@
 # Gtk singly-linked list (also usable for double-linked list)
+type GSNullList end
 type GSList{T}
     data::Ptr{T}
     next::Ptr{GSList{T}}
@@ -9,7 +10,7 @@ function gslist{T}(list::Ptr{GSList{T}},own::Bool=false)
     # if own = false, then you must ensure the list is not destroyed
     # if own = true, then you must hold a reference to the returned list
     if list == C_NULL
-        return ()
+        return GSNullList()
     end
     l = unsafe_load(list)
     own ? finalizer(l, (l)->ccall((:g_list_free,libglib),Void,(Ptr{GSList{T}},),list)) : nothing
@@ -23,20 +24,23 @@ function gslist2{T}(list::Ptr{GSList{T}})
 end
 start(list::GSList) = list
 function next(list::GSList,s::GSList)
-    nx = s.next==C_NULL ? () : unsafe_load(s.next)
+    nx = s.next==C_NULL ? GSNullList() : unsafe_load(s.next)
     return (convert(eltype(s),s.data), nx)
 end
 function next(list::GSList,s::(GSList,GSList))
     s2 = s[2]
-    nx = s2.next==C_NULL ? () : unsafe_load(s2.next)
+    nx = s2.next==C_NULL ? GSNullList() : unsafe_load(s2.next)
     return (convert(eltype(s2),s2.data), (s[1],nx))
 end
 done(list::GSList,s::GSList) = false
 done(list::GSList,s) = true
 done(w::GSList,s::(GSList,GSList)) = false
-done(w::GSList,s::(Any,())) = true
+done(w::GSList,s::(GSList,GSNullList)) = true
+done(w::GSList,s::(GSNullList,GSNullList)) = true
+done(::GSNullList,any) = true
 length(list::GSList) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{typeof(list)},),&list))
+length(list::GSNullList) = 0
 getindex{T}(list::GSList{T}, i::Integer) =
     convert(eltype(list),
         ccall((:g_list_nth_data,libglib),Ptr{T},(Ptr{typeof(list)},Cuint),&list,i-1))
-done(::(),::()) = true
+getindex(list::GSNullList, i::Integer) = error("cannot access element from empty GSList")
