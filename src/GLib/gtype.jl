@@ -142,6 +142,12 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
     end
 end
 
+macro type_decl(name,gtyp,getgtype)
+    iname = symbol(string(name,'I'))
+    gtype_decl = :( g_type(::Type{$(esc(name))}) = $(esc(getgtype)) )
+    get_type_decl(name,iname,gtyp,gtype_decl)
+end
+
 macro Gtype(name,lib,symname)
     gtyp = g_type(name, lib, symname)
     @assert name === g_type_name(gtyp)
