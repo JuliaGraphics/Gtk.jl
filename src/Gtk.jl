@@ -21,7 +21,6 @@ export width, height, #minsize, maxsize
     visible, destroy,
     hasparent, toplevel, 
     stop
-    
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
