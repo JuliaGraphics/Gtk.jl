@@ -106,7 +106,7 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     piname = symbol(string(pname,'I'))
     piface_decl = get_iface_decl(pname, piname, parent)
     quote
-        if $(Meta.quot(iname)) in keys(gtype_ifaces)
+        if $(Meta.quot(name)) in keys(gtype_ifaces)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
         else
             $piface_decl
@@ -116,12 +116,14 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     end
 end
 
-get_gtype_decl(name::Symbol, lib, symname::Expr) = esc(symname)
-function get_gtype_decl(name::Symbol, lib, symname::Symbol)
+get_gtype_decl(name::Symbol, lib, symname::Expr) =
+    quote
+        GLib.g_type(::Type{$(esc(name))}) = $(esc(symname))
+    end
+get_gtype_decl(name::Symbol, lib, symname::Symbol) =
     quote
         GLib.g_type(::Type{$(esc(name))}) = ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ())
     end
-end
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
     quote
