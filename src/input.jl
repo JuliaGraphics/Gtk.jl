@@ -54,3 +54,5 @@ GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_ran
     (Cdouble,Cdouble,Cdouble),min,max,step))
 GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(scale))
 
+GtkAdjustment(spinButton::GtkSpinButton) = GtkAdjustment(ccall((:gtk_spin_button_get_adjustment,libgtk),
+    Ptr{GObject},(Ptr{GObject},), spinButton))
