@@ -317,6 +317,9 @@ pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(P
 @gtktype GtkSpinner
 GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
+start(spinner::GtkSpinner) = ccall((:gtk_spinner_start,libgtk),Void,(Ptr{GObject},),spinner)
+stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop,libgtk),Void,(Ptr{GObject},),spinner)
+
 @gtktype GtkStatusbar
 GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =

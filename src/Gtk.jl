@@ -19,7 +19,9 @@ import Cairo: destroy
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy,
-    hasparent, toplevel
+    hasparent, toplevel, 
+    stop
+    
 
     #property, margin, padding, align
     #raise, focus, destroy, enabled
@@ -152,7 +154,8 @@ module ShortNames
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
         visible, destroy,
-        hasparent, toplevel
+        hasparent, toplevel,
+        stop
 
     # Gtk objects
     const G_ = GAccessor
