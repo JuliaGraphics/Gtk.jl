@@ -143,12 +143,33 @@ isancestor(treeStore::GtkTreeStore, iter::GtkTreeIter, descendant::GtkTreeIter) 
 depth(treeStore::GtkTreeStore, iter::GtkTreeIter) =
     ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, &iter)
 
-@gtktype GtkCellRenderer
-GtkCellRenderer() = GtkCellRenderer( ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
+@gtktype GtkCellRendererAccel
+GtkCellRendererAccel() = GtkCellRendererAccel( ccall((:gtk_cell_renderer_accel_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererCombo
+GtkCellRendererCombo() = GtkCellRendererCombo( ccall((:gtk_cell_renderer_combo_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererPixbuf
+GtkCellRendererPixbuf() = GtkCellRendererPixbuf( ccall((:gtk_cell_renderer_pixbuf_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererProgress
+GtkCellRendererProgress() = GtkCellRendererProgress( ccall((:gtk_cell_renderer_progress_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererSpin
+GtkCellRendererSpin() = GtkCellRendererSpin( ccall((:gtk_cell_renderer_spin_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererText
+GtkCellRendererText() = GtkCellRendererText( ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererToggle
+GtkCellRendererToggle() = GtkCellRendererToggle( ccall((:gtk_cell_renderer_toggle_new,libgtk),Ptr{GObject},()))
+
+@gtktype GtkCellRendererSpinner
+GtkCellRendererSpinner() = GtkCellRendererSpinner( ccall((:gtk_cell_renderer_spinner_new,libgtk),Ptr{GObject},()))
 	
 @gtktype GtkTreeViewColumn
 GtkTreeViewColumn() = GtkTreeViewColumn( ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
-function GtkTreeViewColumn(renderer::GtkCellRenderer; kwargs...)
+function GtkTreeViewColumn(renderer::GtkCellRendererText; kwargs...)
     treeColumn = GtkTreeViewColumn()
 	unshift!(treeColumn,renderer)
     for (k,v) in kwargs
@@ -157,7 +178,7 @@ function GtkTreeViewColumn(renderer::GtkCellRenderer; kwargs...)
     treeColumn
 end
 
-function GtkTreeViewColumn(title::String,renderer::GtkCellRenderer; kwargs...)
+function GtkTreeViewColumn(title::String,renderer::GtkCellRendererText; kwargs...)
     treeColumn = GtkTreeViewColumn(renderer;kwargs...)
     treeColumn[:title] = title
     treeColumn
@@ -166,19 +187,19 @@ end
 empty!(treeColumn::GtkTreeViewColumn) = 
     ccall((:gtk_tree_view_column_clear,libgtk), Void, (Ptr{GObject},),treeColumn)
 
-function unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) 
+function unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererText, expand::Bool=false) 
     ccall((:gtk_tree_view_column_pack_start,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
     treeColumn
 end
 		  
-function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false)
+function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererText, expand::Bool=false)
     ccall((:gtk_tree_view_column_pack_end,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
     treeColumn
 end
 
-add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, attribute::String, column) = 
+add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererText, attribute::String, column) = 
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
           (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),int32(column))
 

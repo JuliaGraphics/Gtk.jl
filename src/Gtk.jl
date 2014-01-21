@@ -33,8 +33,11 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
     GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore, GtkTreeStore,
-    GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn, GtkCellRenderer	
-
+    GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,	
+    GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
+    GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText, 
+    GtkCellRendererToggle, GtkCellRendererSpinner
+	
 # Gtk3 objects
 export GtkGrid
 
@@ -213,8 +216,15 @@ module ShortNames
     const TreeSelection = GtkTreeSelection
     const TreeView = GtkTreeView
     const TreeViewColumn = GtkTreeViewColumn
-    const CellRenderer = GtkCellRenderer
-
+    const CellRendererAccel = GtkCellRendererAccel
+    const CellRendererCombo = GtkCellRendererCombo
+    const CellRendererPixbuf = GtkCellRendererPixbuf
+    const CellRendererProgress = GtkCellRendererProgress
+    const CellRendererSpin = GtkCellRendererSpin
+    const CellRendererText = GtkCellRendererText
+    const CellRendererToggle = GtkCellRendererToggle
+    const CellRendererSpinner = GtkCellRendererSpinner
+	
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
@@ -224,7 +234,10 @@ module ShortNames
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
         NullContainer, Key, ScrollDirection, Justification, Builder, ListStore, 
-        TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn, CellRenderer
+        TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
+        CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
+        CellRendererProgress, CellRendererSpin, CellRendererText, 
+        CellRendererToggle, CellRendererSpinner
 
     # Gtk 3
     if Gtk.gtk_version >= 3
