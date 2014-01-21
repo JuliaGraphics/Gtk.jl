@@ -42,7 +42,7 @@ Base.unsafe_store!(b::MutableA, x) = (b.x[b.i] = x)
 Base.getindex(b::MutableX) = b.x
 Base.getindex(b::MutableA) = b.x[b.i]
 
-Base.setindex!(b::MutableX, x) = (b.x = x)
-Base.setindex!(b::MutableA, x) = (b.x[b.i] = x)
+Base.setindex!{T}(b::MutableX{T}, x::T) = (b.x = x)
+Base.setindex!{T,N}(b::MutableA{T,N}, x::T) = (b.x[b.i] = x)
 
 end

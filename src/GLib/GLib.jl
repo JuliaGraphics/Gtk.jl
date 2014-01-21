@@ -2,7 +2,7 @@ module GLib
 import Base: convert, show, showall, showcompact, size, length, getindex, setindex!,
              start, next, done, eltype
 export GObject, GObjectI, GType, @Gtype, @Gabstract
-export Enum, GError, GValue, gvalue, make_gvalue
+export Enum, GError, GValue, gvalue, make_gvalue, g_type
 export GSList, gslist, gslist2, gc_ref, gc_unref, gc_ref_closure
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock

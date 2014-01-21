@@ -34,16 +34,23 @@ const fundamental_types = (
     (:GBoxed,     Ptr{Void},        None,           :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
-    #(:GType,      Int,              None,           :gtype), # this isn't a fundamental type
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
-# NOTE: in general do not cache ids, except for the fundamental values
+# NOTE: in general do not cache ids, except for these fundamental values
 g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
-# these constants are used elsewhere
-const gvoid_id = g_type_from_name(:void)
+const fundamental_ids = tuple(Int[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
+# this constant is needed elsewhere, but doesn't have a matching Julia type so it can't be used from g_type
 const gboxed_id = g_type_from_name(:GBoxed)
-const gobject_id = g_type_from_name(:GObject)
-const gstring_id = g_type_from_name(:gchararray)
+
+g_type(gtyp::GType) = gtyp
+let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
+    for (i,(name, ctype, juliatype, g_value_fn)) in enumerate(fundamental_types)
+        if juliatype !== None
+            push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
+        end
+    end
+    eval(jtypes)
+end
 
 G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType},w))
 G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
@@ -63,9 +70,6 @@ type GObjectAny <: GObjectI
     GObjectAny(handle::Ptr{GObject}) = (handle != C_NULL ? gc_ref(new(handle)) : error("Cannot construct $gname with a NULL pointer"))
 end
 g_type(obj::GObjectI) = g_type(typeof(obj))
-g_type(::Type{GObjectI}) = gobject_id
-g_type(::Type{GObject}) = gobject_id
-g_type(::Type{GObjectAny}) = gobject_id
 
 const gtype_ifaces = Dict{Symbol,Type}()
 const gtype_wrappers = Dict{Symbol,Type}()

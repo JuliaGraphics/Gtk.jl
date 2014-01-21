@@ -67,13 +67,13 @@ function GClosureMarshal(closuref, return_value, n_param_values,
             length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
             for i = 1:n_param_values
                 gv = mutable(param_values,i)
-                g_type = unsafe_load(gv).g_type
+                gtyp = unsafe_load(gv).g_type
                 # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
-                if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gobject_id))
+                if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,g_type(GObject)))
                     params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
-                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gboxed_id))
+                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,gboxed_id))
                     params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),g_type,gstring_id))
+                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,g_type(String)))
                     params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
                 else
                     params[i] = gv[]
@@ -90,8 +90,8 @@ function GClosureMarshal(closuref, return_value, n_param_values,
         end
         retval = cb(params...) # widget, args...
         if return_value != C_NULL && retval !== nothing
-            g_type = unsafe_load(return_value).g_type
-            if g_type != gvoid_id && g_type != 0
+            gtyp = unsafe_load(return_value).g_type
+            if gtyp != g_type(Void) && gtyp != 0
                 return_value[] = gvalue(retval)
             end
         end
