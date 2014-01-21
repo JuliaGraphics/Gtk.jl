@@ -63,11 +63,8 @@ type GtkTreeIter
 end
 
 @gtktype GtkListStore
-function GtkListStore{D}(types::NTuple{D,Symbol})
-    gtypes = GLib.GType[]
-    for t in types
-        push!(gtypes, GLib.g_type_from_name(t))
-    end
+function GtkListStore(types::(Type...))
+    gtypes = GLib.gvalues(types...)
     handle = ccall((:gtk_list_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
     GtkListStore(handle)
 end
@@ -83,13 +80,21 @@ GtkCellRenderer() = GtkCellRenderer( ccall((:gtk_cell_renderer_text_new,libgtk),
 @gtktype GtkTreeViewColumn
 GtkTreeViewColumn() = GtkTreeViewColumn( ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
 
-unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) = 
+
+empty!(treeColumn::GtkTreeViewColumn) = 
+    ccall((:gtk_tree_view_column_clear,libgtk), Void, (Ptr{GObject},),treeColumn)
+
+function unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) 
     ccall((:gtk_tree_view_column_pack_start,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
+    treeColumn
+end
 		  
-push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) = 
+function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false)
     ccall((:gtk_tree_view_column_pack_end,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
+    treeColumn
+end
 
 add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, attribute::String, column) = 
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
