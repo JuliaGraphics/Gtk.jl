@@ -431,3 +431,16 @@ dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
                         Stock.CANCEL, Response.CANCEL,
                         Stock.OPEN, Response.ACCEPT)
 destroy(dlg)
+
+## List box 
+ls=ListStore((Int32,String))
+it=TreeIter()
+push!(ls,it)
+tv=TreeView(ls)
+r=CellRenderer()
+c1=TreeViewColumn("A", r,text=0)
+c2=TreeViewColumn("B", r,text=1)
+push!(tv,c1)
+push!(tv,c2)
+w = Window(tv, "List View")
+destroy(w)
