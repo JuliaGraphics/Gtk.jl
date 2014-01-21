@@ -105,7 +105,7 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     pname = g_type_name(parent)
     piname = symbol(string(pname,'I'))
     piface_decl = get_iface_decl(pname, piname, parent)
-    quote
+    :(
         if $(Meta.quot(name)) in keys(gtype_ifaces)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
         else
@@ -113,20 +113,17 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
             abstract $(esc(iname)) <: $(esc(piname))
             gtype_ifaces[$(Meta.quot(name))] = $(esc(iname))
         end
-    end
+    )
 end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
-    quote
-        GLib.g_type(::Type{$(esc(name))}) = $(esc(symname))
-    end
+    :( GLib.g_type(::Type{$(esc(name))}) = $(esc(symname)) )
 get_gtype_decl(name::Symbol, lib, symname::Symbol) =
-    quote
-        GLib.g_type(::Type{$(esc(name))}) = ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ())
-    end
+    :( GLib.g_type(::Type{$(esc(name))}) =
+        ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
 
-function get_type_decl(name,iname,gtyp,gtype_decl)
-    quote
+function get_type_decl(name,iname,gtyp)
+    :(
         if $(Meta.quot(name)) in keys(gtype_wrappers)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
             const $(esc(name)) = gtype_wrappers[$(Meta.quot(name))]
@@ -138,8 +135,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
             end
             gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
         end
-        $(gtype_decl)
-    end
+    )
 end
 
 macro Gtype(name,lib,symname)
@@ -149,8 +145,9 @@ macro Gtype(name,lib,symname)
         error("not implemented yet")
     end
     iname = symbol(string(name,'I'))
-    gtype_decl = get_gtype_decl(name, lib, symname)
-    get_type_decl(name,iname,gtyp,gtype_decl)
+    Expr(:block,
+        get_type_decl(name, iname, gtyp),
+        get_gtype_decl(name, lib, symname))
 end
 
 macro Gabstract(iname,lib,symname)
@@ -158,11 +155,9 @@ macro Gabstract(iname,lib,symname)
     name = symbol(string(iname)[1:end-1])
     gtyp = g_type(name, lib, symname)
     @assert name === g_type_name(gtyp)
-    iface_decl = get_iface_decl(name, iname, gtyp)
-    quote
-        $iface_decl
-        $(get_gtype_decl(iname, lib, symname))
-    end
+    Expr(:block,
+        get_iface_decl(name, iname, gtyp),
+        get_gtype_decl(iname, lib, symname))
 end
 
 macro quark_str(q)
