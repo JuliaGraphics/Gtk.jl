@@ -46,13 +46,13 @@ GtkAdjustment(value,lower,upper,step_increment,page_increment,page_size) =
           (Float64,Float64,Float64,Float64,Float64,Float64),
           value,lower,upper,step_increment,page_increment,page_size))
 
-GtkAdjustment(scale::GtkScale) = GtkAdjustment(ccall((:gtk_range_get_adjustment,libgtk),
-                                                      Ptr{GObject},(Ptr{GObject},), scale))
+GtkAdjustment(scale::GtkScale) = convert(GtkAdjustment,
+    ccall((:gtk_range_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), scale))
 
 @gtktype GtkSpinButton
 GtkSpinButton(min,max,step) = GtkSpinButton(ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},
     (Cdouble,Cdouble,Cdouble),min,max,step))
 GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(scale))
 
-GtkAdjustment(spinButton::GtkSpinButton) = GtkAdjustment(ccall((:gtk_spin_button_get_adjustment,libgtk),
-    Ptr{GObject},(Ptr{GObject},), spinButton))
+GtkAdjustment(spinButton::GtkSpinButton) = convert(GtkAdjustment,
+    ccall((:gtk_spin_button_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), spinButton))
