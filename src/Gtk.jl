@@ -18,7 +18,7 @@ import Cairo: destroy
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    visible, destroy,
+    visible, destroy, append,
     hasparent, toplevel
 
     #property, margin, padding, align
@@ -33,7 +33,8 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
-    GtkFileChooserDialog, GtkNullContainer, GtkBuilder
+    GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore,
+    GtkTreeIter, GtkTreeView, GtkTreeViewColumn, GtkCellRenderer	
 
 # Gtk3 objects
 export GtkGrid
@@ -207,6 +208,11 @@ module ShortNames
     const Justification = GtkJustification
     const NullContainer = GtkNullContainer
     const Builder = GtkBuilder
+    const ListStore = GtkListStore 
+    const TreeIter = GtkTreeIter
+    const TreeView = GtkTreeView
+    const TreeViewColumn = GtkTreeViewColumn
+    const CellRenderer = GtkCellRenderer
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -216,7 +222,8 @@ module ShortNames
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key, ScrollDirection, Justification, Builder
+        NullContainer, Key, ScrollDirection, Justification, Builder, ListStore,
+        TreeIter, TreeView, TreeViewColumn, CellRenderer
 
     # Gtk 3
     if Gtk.gtk_version >= 3
