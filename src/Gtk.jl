@@ -11,14 +11,14 @@ import .GLib: bytestring
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
-             eltype, copy
+             eltype, copy, isvalid
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    visible, destroy, stop,
+    visible, destroy, stop, depth, isancestor,
     hasparent, toplevel
     #property, margin, padding, align
     #raise, focus, destroy, enabled
@@ -32,8 +32,8 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
-    GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore,
-    GtkTreeIter, GtkTreeView, GtkTreeViewColumn, GtkCellRenderer	
+    GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore, GtkTreeStore,
+    GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn, GtkCellRenderer	
 
 # Gtk3 objects
 export GtkGrid
@@ -151,9 +151,8 @@ module ShortNames
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        visible, destroy,
-        hasparent, toplevel,
-        stop
+        visible, destroy, stop, depth, isancestor,
+        hasparent, toplevel
 
     # Gtk objects
     const G_ = GAccessor
@@ -208,8 +207,10 @@ module ShortNames
     const Justification = GtkJustification
     const NullContainer = GtkNullContainer
     const Builder = GtkBuilder
-    const ListStore = GtkListStore 
+    const ListStore = GtkListStore
+    const TreeStore = GtkTreeStore 
     const TreeIter = GtkTreeIter
+    const TreeSelection = GtkTreeSelection
     const TreeView = GtkTreeView
     const TreeViewColumn = GtkTreeViewColumn
     const CellRenderer = GtkCellRenderer
@@ -222,8 +223,8 @@ module ShortNames
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key, ScrollDirection, Justification, Builder, ListStore,
-        TreeIter, TreeView, TreeViewColumn, CellRenderer
+        NullContainer, Key, ScrollDirection, Justification, Builder, ListStore, 
+        TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn, CellRenderer
 
     # Gtk 3
     if Gtk.gtk_version >= 3

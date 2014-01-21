@@ -47,10 +47,12 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkBuilder" => :GtkBuilderI,
     "GtkTreeModel" => :GtkTreeModelI
     "GtkListStore" => :GtkListStoreI,
+    "GtkTreeStore" => :GtkTreeStoreI,	
     "GtkCellRenderer" => :GtkCellRendererI,
     "GtkCellRendererText" => :GtkCellRendererTextI,
     "GtkTreeViewColumn" => :GtkTreeViewColumnI,
     "GtkTreeView" => :GtkTreeViewI,
+    "GtkTreeSelection" => :GtkTreeSelectionI	
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,

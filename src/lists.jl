@@ -62,6 +62,9 @@ type GtkTreeIter
   GtkTreeIter() = new(0,C_NULL,C_NULL,C_NULL)
 end
 
+# Should this be defined here (although it is only an interface)
+# @gtktype GtkTreeModel
+
 @gtktype GtkListStore
 function GtkListStore(types::(Type...))
     gtypes = GLib.gvalues(types...)
@@ -73,6 +76,72 @@ function push!(listStore::GtkListStore, iter::GtkTreeIter)
     ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
     listStore
 end
+
+function push!(listStore::GtkListStore, values::Tuple)
+    iter = GtkTreeIter()
+	push!(listStore, iter)
+	for value in values
+	    GAccessor.value(listStore, iter, value)
+	end
+    listStore
+end
+
+function unshift!(listStore::GtkListStore, iter::GtkTreeIter)
+    ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
+    listStore
+end
+
+function delete!(listStore::GtkListStore, iter::GtkTreeIter)
+    # not sure what to do with the return value here
+    deleted = ccall((:gtk_list_store_remove,libgtk),Bool,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
+    listStore
+end
+
+empty!(listStore::GtkListStore) = 
+    ccall((:gtk_list_store_clear,libgtk), Void, (Ptr{GObject},),listStore)
+
+isvalid(listStore::GtkListStore, iter::GtkTreeIter) =
+    ccall((:gtk_list_store_iter_is_valid,libgtk), Bool, (Ptr{GObject},Ptr{GtkTreeIter}),listStore, &iter)
+
+length(listStore::GtkListStore) =
+    ccall((:gtk_tree_model_iter_n_children,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),listStore, C_NULL)
+
+@gtktype GtkTreeStore
+function GtkTreeStore(types::(Type...))
+    gtypes = GLib.gvalues(types...)
+    handle = ccall((:gtk_tree_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
+    GtkTreeStore(handle)
+end
+
+function push!(treeStore::GtkTreeStore, iter::GtkTreeIter)
+    ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
+    treeStore
+end
+
+function unshift!(treeStore::GtkTreeStore, iter::GtkTreeIter)
+    ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
+    treeStore
+end
+
+function delete!(treeStore::GtkTreeStore, iter::GtkTreeIter)
+    # not sure what to do with the return value here
+    deleted = ccall((:gtk_tree_store_remove,libgtk),Bool,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
+    treeStore
+end
+
+empty!(treeStore::GtkTreeStore) = 
+    ccall((:gtk_tree_store_clear,libgtk), Void, (Ptr{GObject},),treeStore)
+
+isvalid(treeStore::GtkTreeStore, iter::GtkTreeIter) =
+    ccall((:gtk_tree_store_iter_is_valid,libgtk), Bool, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, &iter)
+
+isancestor(treeStore::GtkTreeStore, iter::GtkTreeIter, descendant::GtkTreeIter) =
+    ccall((:gtk_tree_store_is_ancestor,libgtk), Bool, 
+          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}),
+          treeStore, &iter, &descendant)
+
+depth(treeStore::GtkTreeStore, iter::GtkTreeIter) =
+    ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, &iter)
 
 @gtktype GtkCellRenderer
 GtkCellRenderer() = GtkCellRenderer( ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
@@ -113,10 +182,15 @@ add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, attribut
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
           (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),int32(column))
 
+
+@gtktype GtkTreeSelection
+
 @gtktype GtkTreeView
 GtkTreeView() = GtkTreeView(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
 GtkTreeView(listStore::GtkListStore) = GtkTreeView(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),listStore))
+GtkTreeView(treeStore::GtkTreeStore) = GtkTreeView(
+   ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
    
 function push!(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn)
   ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,treeColumn)
