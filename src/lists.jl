@@ -72,12 +72,10 @@ function GtkListStore{D}(types::NTuple{D,Symbol})
     GtkListStore(handle)
 end
 
-append(listStore::GtkListStore, iter::GtkTreeIter) = 
-  ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
-  
-set_value(listStore::GtkListStore, iter::GtkTreeIter, column, value) = 
-  ccall((:gtk_list_store_set_value,libgtk),Void,
-        (Ptr{GObject},Ptr{GtkTreeIter},Cint, Ptr{GValue}), listStore, &iter, int32(column), &(gvalue(value)[1]))
+function push!(listStore::GtkListStore, iter::GtkTreeIter)
+    ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
+    listStore
+end
 
 @gtktype GtkCellRenderer
 GtkCellRenderer() = GtkCellRenderer( ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
@@ -85,8 +83,12 @@ GtkCellRenderer() = GtkCellRenderer( ccall((:gtk_cell_renderer_text_new,libgtk),
 @gtktype GtkTreeViewColumn
 GtkTreeViewColumn() = GtkTreeViewColumn( ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
 
-pack_start(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=true) = 
+pack_start(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) = 
     ccall((:gtk_tree_view_column_pack_start,libgtk), Void,
+          (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
+		  
+pack_end(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool=false) = 
+    ccall((:gtk_tree_view_column_pack_end,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
 
 add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, attribute::String, column) = 
@@ -98,5 +100,7 @@ GtkTreeView() = GtkTreeView(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
 GtkTreeView(listStore::GtkListStore) = GtkTreeView(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),listStore))
    
-append_column(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn) =
+function push!(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn)
   ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,treeColumn)
+  treeView
+end
