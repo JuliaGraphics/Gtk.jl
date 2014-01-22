@@ -86,7 +86,7 @@ function push!(listStore::GtkListStore, values::Tuple)
 	    # This is how it is supposed to be but currently does not work
         # GAccessor.value(listStore, iter, i, value)
         ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,&iter,i,&(gvalue(value)[1]))
+              listStore,&iter,i-1,&(gvalue(value)[1]))
 	end
     listStore
 end
@@ -132,7 +132,7 @@ function push!(treeStore::GtkTreeStore, values::Tuple)
 	    # This is how it is supposed to be but currently does not work
         # GAccessor.value(treeStore, iter, i, value)
         ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,&iter,i,&(gvalue(value)[1]))
+              treeStore,&iter,i-1,&(gvalue(value)[1]))
 	end
     treeStore
 end
