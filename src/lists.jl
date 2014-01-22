@@ -65,9 +65,11 @@ end
 # Should this be defined here (although it is only an interface)
 # @gtktype GtkTreeModel
 
+### GtkListStore
+
 @gtktype GtkListStore
-function GtkListStore(types::(Type...))
-    gtypes = GLib.gvalues(types...)
+function GtkListStore(types::Type...)
+    gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_list_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
     GtkListStore(handle)
 end
@@ -80,8 +82,11 @@ end
 function push!(listStore::GtkListStore, values::Tuple)
     iter = GtkTreeIter()
 	push!(listStore, iter)
-	for value in values
-	    GAccessor.value(listStore, iter, value)
+	for (i,value) in enumerate(values)
+	    # This is how it is supposed to be but currently does not work
+        # GAccessor.value(listStore, iter, i, value)
+        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
+              listStore,&iter,i,&(gvalue(value)[1]))
 	end
     listStore
 end
@@ -106,15 +111,29 @@ isvalid(listStore::GtkListStore, iter::GtkTreeIter) =
 length(listStore::GtkListStore) =
     ccall((:gtk_tree_model_iter_n_children,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),listStore, C_NULL)
 
+### GtkTreeStore
+    
 @gtktype GtkTreeStore
-function GtkTreeStore(types::(Type...))
-    gtypes = GLib.gvalues(types...)
+function GtkTreeStore(types::Type...)
+    gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_tree_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
     GtkTreeStore(handle)
 end
 
 function push!(treeStore::GtkTreeStore, iter::GtkTreeIter)
     ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
+    treeStore
+end
+
+function push!(treeStore::GtkTreeStore, values::Tuple)
+    iter = GtkTreeIter()
+	push!(treeStore, iter)
+	for (i,value) in enumerate(values)
+	    # This is how it is supposed to be but currently does not work
+        # GAccessor.value(treeStore, iter, i, value)
+        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
+              treeStore,&iter,i,&(gvalue(value)[1]))
+	end
     treeStore
 end
 
@@ -143,6 +162,12 @@ isancestor(treeStore::GtkTreeStore, iter::GtkTreeIter, descendant::GtkTreeIter) 
 depth(treeStore::GtkTreeStore, iter::GtkTreeIter) =
     ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, &iter)
 
+### GtkTreeModelI
+    
+GtkTreeModelI = Union(GtkListStore,GtkTreeStore)
+
+### GtkCellRenderer
+    
 @gtktype GtkCellRenderer
 	
 @gtktype GtkCellRendererAccel
@@ -169,6 +194,8 @@ GtkCellRendererToggle() = GtkCellRendererToggle( ccall((:gtk_cell_renderer_toggl
 @gtktype GtkCellRendererSpinner
 GtkCellRendererSpinner() = GtkCellRendererSpinner( ccall((:gtk_cell_renderer_spinner_new,libgtk),Ptr{GObject},()))
 	
+### GtkTreeViewColumn
+    
 @gtktype GtkTreeViewColumn
 GtkTreeViewColumn() = GtkTreeViewColumn( ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
 function GtkTreeViewColumn(renderer::GtkCellRendererI; kwargs...)
@@ -205,14 +232,15 @@ add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, attribu
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
           (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),int32(column))
 
-
+### GtkTreeSelection
+          
 @gtktype GtkTreeSelection
+
+### GtkTreeView
 
 @gtktype GtkTreeView
 GtkTreeView() = GtkTreeView(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
-GtkTreeView(listStore::GtkListStore) = GtkTreeView(
-   ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),listStore))
-GtkTreeView(treeStore::GtkTreeStore) = GtkTreeView(
+GtkTreeView(treeStore::GtkTreeModelI) = GtkTreeView(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
    
 function push!(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn)

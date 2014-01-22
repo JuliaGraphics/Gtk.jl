@@ -71,6 +71,17 @@ type GObjectAny <: GObjectI
 end
 g_type(obj::GObjectI) = g_type(typeof(obj))
 
+function gtypes(types...)
+    v = gvalues(types...)
+    types = zeros(GType, length(types))
+    
+    for (i,t) in enumerate(v)
+        types[i] = t.field2
+    end
+
+    types
+end
+
 const gtype_ifaces = Dict{Symbol,Type}()
 const gtype_wrappers = Dict{Symbol,Type}()
 

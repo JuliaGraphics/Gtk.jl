@@ -433,14 +433,14 @@ dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
 destroy(dlg)
 
 ## List box 
-ls=ListStore((Int32,String))
-it=TreeIter()
-push!(ls,it)
+using Gtk.ShortNames
+ls=ListStore(Int32,Bool)
+push!(ls,(33,true))
 tv=TreeView(ls)
-r=CellRendererText()
-c1=TreeViewColumn("A", r,text=0)
-c2=TreeViewColumn("B", r,text=1)
+r1=CellRendererText()
+r2=CellRendererToggle()
+c1=TreeViewColumn("A", r1,text=0)
+c2=TreeViewColumn("B", r2,active=1)
 push!(tv,c1)
 push!(tv,c2)
-w = Window(tv, "List View")
 destroy(w)
