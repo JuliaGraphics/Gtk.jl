@@ -88,7 +88,7 @@ function push!(listStore::GtkListStore, values::Tuple)
         ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
               listStore,&iter,i-1,&(gvalue(value)[1]))
 	end
-    listStore
+    iter
 end
 
 function unshift!(listStore::GtkListStore, iter::GtkTreeIter)
@@ -120,25 +120,32 @@ function GtkTreeStore(types::Type...)
     GtkTreeStore(handle)
 end
 
-function push!(treeStore::GtkTreeStore, iter::GtkTreeIter)
-    ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
-    treeStore
+function push!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
+    if parent == nothing
+        ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
+    else
+	    ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
+    end
 end
 
-function push!(treeStore::GtkTreeStore, values::Tuple)
+function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter = GtkTreeIter()
-	push!(treeStore, iter)
+	push!(treeStore, iter, parent)
 	for (i,value) in enumerate(values)
 	    # This is how it is supposed to be but currently does not work
         # GAccessor.value(treeStore, iter, i, value)
         ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
               treeStore,&iter,i-1,&(gvalue(value)[1]))
 	end
-    treeStore
+    iter
 end
 
-function unshift!(treeStore::GtkTreeStore, iter::GtkTreeIter)
-    ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
+function unshift!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
+    if parent == nothing
+        ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
+    else
+	    ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
+    end
     treeStore
 end
 
