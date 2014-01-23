@@ -46,7 +46,12 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkFileChooser" => :GtkFileChooserDialogI,
     "GtkBuilder" => :GtkBuilderI,
     "GtkListStore" => :GtkListStoreI,
-    "GtkTreeStore" => :GtkTreeStoreI,	
+    "GtkTreeStore" => :GtkTreeStoreI,
+    "GtkTreeModelSort" => :GtkTreeModelSortI,	
+    "GtkTreeModelFilter" => :GtkTreeModelFilterI,
+    "GtkCellArea" => :GtkCellAreaI,
+    "GtkCellAreaBox" => :GtkCellAreaBoxI,	
+    "GtkCellAreaContent" => :GtkCellAreaContentI,
     "GtkCellRenderer" => :GtkCellRendererI,
     "GtkCellEditable" => :GtkCellEditableI,	
     "GtkCellRendererAccel" => :GtkCellRendererAccelI,
@@ -59,6 +64,8 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkCellRendererSpinner" => :GtkCellRendererSpinnerI,	
     "GtkTreeViewColumn" => :GtkTreeViewColumnI,
     "GtkTreeView" => :GtkTreeViewI,
+    "GtkCellView" => :GtkCellViewI,
+    "GtkIconView" => :GtkIconViewI,
     "GtkTreeSelection" => :GtkTreeSelectionI	
     ]
 cl_to_jl = [

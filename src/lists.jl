@@ -247,3 +247,15 @@ function push!(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn)
   ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,treeColumn)
   treeView
 end
+
+### To be done
+
+@gtktype GtkCellArea
+@gtktype GtkCellAreaBox
+@gtktype GtkCellAreaContent
+
+@gtktype GtkTreeModelSort
+@gtktype GtkTreeModelFilter
+
+@gtktype GtkCellView
+@gtktype GtkIconView
