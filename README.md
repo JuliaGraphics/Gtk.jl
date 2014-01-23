@@ -56,9 +56,9 @@ All objects in Gtk are intended to behave uniformly. This means that all objects
 
 On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a GtkContainerI. Of special note is the anti-object GtkNullContainer. This is not a Gtk Object. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although the standard operations like `splice!` and `delete!` also exist, and are typically preferable).
 
-### Objects have[:properties, with_types] = values
+### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
 
-The properties of any object can be accessed by treating the object as an Associative dictionary. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
+The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
 When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
 
@@ -68,9 +68,9 @@ Some Examples:
     show(STDOUT, w) # without the STDOUT parameter, show(w) would
                     # make the window visible on the screen, instead
                     # of printing the information in the REPL
-    w[:title,String]
-    w[:title] = "New title"
-    w[:urgency_hint,Bool] = true
+    getproperty(w,:title,String)
+    setproperty!(w,:title,"New title")
+    setproperty!(w,:urgency_hint,Bool,true)
 
 ### Objects can signal events
 

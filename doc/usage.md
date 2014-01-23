@@ -41,7 +41,7 @@ GtkWindow(name="", parent, width-request=-1, height-request=-1, visible=TRUE, se
 ```
 This shows you a list of properties of the object. For example, notice that the `title` property is set to `"My window"`. We can change the title in the following way:
 ```
-win[:title] = "New title"
+setproperty!(win, :title, "New title")
 ```
 and now we have:
 
@@ -49,7 +49,7 @@ and now we have:
 
 To get the property, you have to specify the return type as a second argument:
 ```
-julia> win[:title, String]
+julia> getproperty(win, :title, String)
 "New title"
 ```
 This is necessary because Gtk, a C library, maintains the state; you have to specify what type of Julia object you want to create from the pointers it passes back.
@@ -57,7 +57,7 @@ This is necessary because Gtk, a C library, maintains the state; you have to spe
 To access particular properties, you can either use symbols, like `:title`, or strings, like `"title"`. When using symbols, you'll need to convert `-` into `_`:
 
 ```
-julia> win[:double_buffered, Bool]
+julia> getproperty(win, :double_buffered, Bool)
 true
 ```
 
@@ -136,18 +136,18 @@ We can address individual "slots" in this container:
 julia> length(hbox)
 2
 
-julia> hbox[1][:label,String]
+julia> getproperty(hbox[1], :label, String)
 "Cancel"
 
-julia> hbox[2][:label,String]
+julia> getproperty(hbox[2],:label,String)
 "OK"
 ```
 
 This layout may not be exactly what you'd like. Perhaps you'd like the `ok` button to fill the available space, and to insert some blank space between them:
 
 ```
-hbox[ok,:expand] = true
-hbox[:spacing] = 10
+setproperty!(hbox,:expand,ok,true)
+setproperty!(hbox,:spacing,10)
 ```
 The first line sets the `expand` property of the `ok` button within the `hbox` container.
 
@@ -174,15 +174,15 @@ More generally, you can arrange items in a grid:
 win = Window("A new window")
 g = Grid()   # gtk3-only (use Table() for gtk2)
 a = Entry()  # a widget for entering text
-a[:text] = "This is Gtk!"
+setproperty!(a, :text, "This is Gtk!")
 b = CheckButton("Check me!")
 c = Scale(false, 0:10)     # a slider
 # Now let's place these graphical elements into the Grid:
 g[1,1] = a    # cartesian coordinates, g[x,y]
 g[2,1] = b
 g[1:2,2] = c  # spans both columns
-g[:column_homogeneous] = true  # g[:homogeoneous] for gtk2
-g[:column_spacing] = 15  # introduce a 15-pixel gap between columns
+setproperty!(g, :column_homogeneous, true) # setproperty!(g,:homogeoneous,true) for gtk2
+setproperty!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
 push!(win, g)
 showall(win)   # essential for indicating that it's time to show the layout
 ```
@@ -208,7 +208,7 @@ Calling `parent` on a top-level object yields an error, but you can check to see
 Likewise, it's possible to get the children:
 ```
 for child in hbox
-    println(child[:label,String])
+    println(setproperty!(child,:label,String))
 end
 ```
 
@@ -239,7 +239,7 @@ julia> GtkButton(action-name=NULL, action-target, related-action, use-action-app
 That's quite a lot of output; let's just print the label of the button:
 ```
 id2 = signal_connect(b, "clicked") do widget
-    println("\"", widget[:label,String], "\" was clicked!")
+    println("\"", getproperty(widget,:label,String), "\" was clicked!")
 end
 ```
 Now you get something like this:
@@ -290,8 +290,8 @@ This is because a `Scale` contains another more basic type, `Adjustment`, respon
 ```
 sc = Scale(false,0:10)   # range in integer steps, from 0 to 10
 adj = Adjustment(sc)
-adj[:upper] = 11         # now this scale goes to 11!
-adj[:value] = 7
+setproperty!(adj,:upper,11)         # now this scale goes to 11!
+setproperty!(adj,:value,7)
 win = Window(sc,"Scale")
 ```
 ![scale](figures/scale.png)

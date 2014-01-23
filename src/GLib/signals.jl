@@ -100,7 +100,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
     end
     return nothing
 end
-JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
+const JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
     (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
 
 # Signals API for the cb pointer

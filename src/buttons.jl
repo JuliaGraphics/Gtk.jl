@@ -89,7 +89,7 @@ function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton,active::Bool)
 end
 function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     if isdefined(grp,:anchor)
-        e[:group] = grp.anchor
+        setproperty!(e,:group,grp.anchor)
     else
         grp.anchor = e
     end
@@ -120,13 +120,13 @@ end
 next(w::GtkRadioButtonGroup,s) = next(s,s)
 done(w::GtkRadioButtonGroup,s) = done(s,s)
 length(w::GtkRadioButtonGroup) = length(start(w))
-getindex(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
+getproperty(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
-function getindex(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
+function getproperty(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
     k = symbol(name)
     if k == :active
         for b in grp
-            if b[:active,Bool]
+            if getproperty(b,:active,Bool)
                 return b
             end
         end
@@ -137,7 +137,7 @@ end
 
 
 function gtk_toggle_button_set_active(b::GtkWidgetI, active::Bool)
-    # Users are encouraged to use the syntax `b[:active] = true`. This is not a public function.
+    # Users are encouraged to use the syntax `setproperty!(b,:active,true)`. This is not a public function.
     ccall((:gtk_toggle_button_set_active,libgtk),Void,(Ptr{GObject},Cint),b,active)
     b
 end

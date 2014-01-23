@@ -6,6 +6,7 @@ export Enum, GError, GValue, gvalue, make_gvalue, g_type
 export GSList, gslist, gslist2, gc_ref, gc_unref, gc_ref_closure
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
+export setproperty!, getproperty
 export GConnectFlags
 include(joinpath("..","..","deps","ext_glib.jl"))
 
