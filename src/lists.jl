@@ -250,12 +250,12 @@ end
 
 ### To be done
 
-@gtktype GtkCellArea
-@gtktype GtkCellAreaBox
-@gtktype GtkCellAreaContent
+#@gtktype GtkCellArea
+#@gtktype GtkCellAreaBox
+#@gtktype GtkCellAreaContent
 
-@gtktype GtkTreeModelSort
-@gtktype GtkTreeModelFilter
+#@gtktype GtkTreeModelSort
+#@gtktype GtkTreeModelFilter
 
-@gtktype GtkCellView
-@gtktype GtkIconView
+#@gtktype GtkCellView
+#@gtktype GtkIconView
