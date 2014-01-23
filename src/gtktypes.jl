@@ -80,7 +80,7 @@ baremodule GtkJustification
     const FILL   = 3
 end
 
-function getindex{T}(w::GtkContainerI, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T})
+function getproperty{T}(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
@@ -89,12 +89,10 @@ function getindex{T}(w::GtkContainerI, child::GtkWidgetI, name::Union(String,Sym
     return val
 end
 
-#setindex!{T}(w::GtkContainerI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
-setindex!{T}(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), child, name)
-function setindex!(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol))
-    v = gvalue(value)
+#property(w::GtkContainerI, value, child::GtkWidgetI, ::Type{T}) = error("missing Gtk property-name to set")
+setproperty!{T}(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, ::Type{T}, value) = setproperty!(w, name, child, convert(T,value))
+function setproperty!(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, value)
     ccall((:gtk_container_child_set_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
+        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
     w
 end
-

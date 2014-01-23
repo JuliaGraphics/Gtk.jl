@@ -143,7 +143,7 @@ function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
 end
 #end
 
-function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
+function getproperty{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
@@ -153,11 +153,10 @@ function getindex{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
 end
 
 
-setindex!{T}(w::GObject, value, name::Union(String,Symbol), ::Type{T}) = setindex!(w, convert(T,value), name)
-function setindex!(w::GObject, value, name::Union(String,Symbol))
-    v = gvalue(value)
-    ccall((:g_object_set_property, libgobject), Void, 
-        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
+setproperty!{T}(w::GObject, name::Union(String,Symbol), ::Type{T}, value) = setproperty!(w, name, convert(T,value))
+function setproperty!(w::GObject, name::Union(String,Symbol), value)
+    ccall((:g_object_set_property, libgobject), Void,
+        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
     w
 end
 

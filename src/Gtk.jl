@@ -7,7 +7,7 @@ using .GLib
 using .GLib.MutableTypes
 using Cairo
 
-import .GLib: bytestring
+import .GLib: bytestring, setproperty!, getproperty
 import Base: convert, show, showall, run, size, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -19,7 +19,7 @@ import Cairo: destroy
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop,
-    hasparent, toplevel
+    hasparent, toplevel, setproperty!, getproperty
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -151,9 +151,9 @@ module ShortNames
     # generic interface (keep this synchronized with above)
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
-        visible, destroy,
-        hasparent, toplevel,
-        stop
+        visible, destroy, stop,
+        hasparent, toplevel, setproperty!, getproperty
+
 
     # Gtk objects
     const G_ = GAccessor

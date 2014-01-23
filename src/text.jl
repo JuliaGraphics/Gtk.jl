@@ -91,8 +91,8 @@ end
 #TODO: search
 
 convert(::Type{Ptr{Void}},iter::GtkTextIter) = iter.handle
-getindex(text::GtkTextIter, key::String, outtype::Type=Any) = getindex!(text, symbol(key), outtype)
-function getindex(text::GtkTextIter, key::Symbol, outtype::Type=Any)
+getproperty(text::GtkTextIter, key::String, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+function getproperty(text::GtkTextIter, key::Symbol, outtype::Type=Any)
     return convert(outtype,
     if     key === :offset
         ccall((:gtk_text_iter_get_offset,libgtk),Cint,(Ptr{Void},),text)
@@ -158,8 +158,8 @@ function getindex(text::GtkTextIter, key::Symbol, outtype::Type=Any)
         false
     end)::outtype
 end
-setindex!(text::GtkTextIter,value,key::String) = setindex!(text,value,symbol(key))
-function setindex!(text::GtkTextIter,value,key::Symbol)
+setproperty!(text::GtkTextIter,key::String,value) = setproperty!(text,symbol(key),value)
+function setproperty!(text::GtkTextIter,key::Symbol,value)
     if     key === :offset
         ccall((:gtk_text_iter_set_offset,libgtk),Cint,(Ptr{Void},Cint),text,value)
     elseif key === :line
@@ -261,8 +261,8 @@ last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(copy(first(r)))
 next(r::GtkTextRange,i::GtkTextIter) = next(i,i)
 done(r::GtkTextRange,i::GtkTextIter) = (i==last(r))
-getindex(text::GtkTextRange, key::String, outtype::Type=Any) = getindex!(text, symbol(key), outtype)
-function getindex(text::GtkTextRange, key::Symbol, outtype::Type=Any)
+getproperty(text::GtkTextRange, key::String, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+function getproperty(text::GtkTextRange, key::Symbol, outtype::Type=Any)
     starttext = first(text)
     endtext = last(text)
     return convert(outtype,

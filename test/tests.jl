@@ -13,12 +13,11 @@ pos = G_.position(w)
 G_.position(w, 100, 100)
 sleep(0.1)
 @assert G_.position(w) != pos
-@assert w["title",String] == "Window"
-w[:title] = "Window 2"
-@assert w[:title,String] == "Window 2"
+@assert getproperty(w,"title",String) == "Window"
+setproperty!(w,:title,"Window 2")
+@assert getproperty(w,:title,String) == "Window 2"
 destroy(w)
-@assert !w[:visible,Bool]
-# FIXME: I get a segfault now if I uncomment the next lines
+@assert !getproperty(w,:visible,Bool)
 w=WeakRef(w)
 gc(); gc(); sleep(.1); gc(); gc()
 @assert w.value === nothing || w.value.handle == C_NULL
@@ -33,8 +32,8 @@ destroy(w)
 # Labelframe
 f = Frame("Label")
 w = Window(f, "Labelframe", 400, 400)
-f[:label] = "new label"
-@assert f[:label,String] == "new label"
+setproperty!(f,:label,"new label")
+@assert getproperty(f,:label,String) == "new label"
 destroy(w)
 
 ## notebook
@@ -46,8 +45,8 @@ push!(nb, Button("th_ree"), "tab t_hree")
 push!(nb, "fo_ur", "tab _four")
 showall(w)
 @assert length(nb) == 4
-nb[:page] = 2
-@assert nb[:page,Int] == 2
+setproperty!(nb,:page,2)
+@assert getproperty(nb,:page,Int) == 2
 destroy(w)
 
 ## Panedwindow
@@ -84,15 +83,15 @@ push!(g2, b22)
 strs = ["first", "second"]
 i = 1
 for child in g1
-    @assert child[:label,String] == strs[i]
+    @assert getproperty(child,:label,String) == strs[i]
     @assert toplevel(child) == w
     i += 1
 end
+setproperty!(g1,:pack_type,b11,0) #GTK_PACK_START
+setproperty!(g1,:pack_type,b12,0) #GTK_PACK_START
+setproperty!(g1,:pack_type,b21,1) #GTK_PACK_END
+setproperty!(g1,:pack_type,b22,1) #GTK_PACK_END
 
-g1[b11,:pack_type] = 0 #GTK_PACK_START
-g1[b12,:pack_type] = 0 #GTK_PACK_START
-g2[b21,:pack_type] = 1 #GTK_PACK_END
-g2[b22,:pack_type] = 1 #GTK_PACK_END
 ## Now shrink window
 destroy(w)
 
@@ -127,10 +126,10 @@ f = BoxLayout(:v); push!(w,f)
 l = Label("label"); push!(f,l)
 b = Button("button"); push!(f,b)
 
-l[:label] = "new label"
-@assert l[:label,String] == "new label"
-b[:label] = "new label"
-@assert b[:label,String] == "new label"
+setproperty!(l,:label,"new label")
+@assert getproperty(l,:label,String) == "new label"
+setproperty!(b,:label,"new label")
+@assert getproperty(b,:label,String) == "new label"
 
 counter = 0
 id = signal_connect(b, "clicked") do widget
@@ -166,10 +165,10 @@ destroy(w)
 ## checkbox
 w = Window("Checkbutton")
 check = CheckButton("check me"); push!(w,check)
-check[:active] = true
-@assert check[:active,Bool] == true
-check[:label] = "new label"
-@assert check[:label,String] == "new label"
+setproperty!(check,:active,true)
+@assert getproperty(check,:active,String) == "TRUE"
+setproperty!(check,:label,"new label")
+@assert getproperty(check,:label,String) == "new label"
 #ctr = 0
 #tk_bind(check, "command", cb)
 #tcl(check, "invoke")
@@ -184,25 +183,25 @@ r = Array(RadioButton,3)
 r[1] = RadioButton(choices[1]); push!(f,r[1])
 r[2] = RadioButton(r[1],choices[2]); push!(f,r[2])
 r[3] = RadioButton(r[2],choices[3],true); push!(f,r[3])
-@assert [b[:active,Bool] for b in r] == [false, false, true]
-r[1][:active] = true
-@assert [b[:active,Bool] for b in r] == [true, false, false]
+@assert [getproperty(b,:active,Bool) for b in r] == [false, false, true]
+setproperty!(r[1],:active,true)
+@assert [getproperty(b,:active,Bool) for b in r] == [true, false, false]
 destroy(w)
 
 r = RadioButtonGroup(choices,2)
 @assert length(r) == 5
-@assert sum([b[:active,Bool] for b in r]) == 1
+@assert sum([getproperty(b,:active,Bool) for b in r]) == 1
 itms = Array(Any,length(r))
 for (i,e) in enumerate(r)
     itms[i] = try
-            e[:label,String]
+            getproperty(e,:label,String)
         catch
             e[1]
         end
 end
 @assert setdiff(choices, itms) == [choices[4],]
 @assert setdiff(itms, choices) == ["choice four",]
-@assert r[:active][:label,String] == choices[2]
+@assert getproperty(getproperty(r,:active),:label,String) == choices[2]
 w = Window(r,"RadioGroup")
 destroy(w)
 
@@ -210,11 +209,11 @@ destroy(w)
 tb = ToggleButton("Off")
 w = Window(tb, "ToggleButton")
 function toggled(ptr,evt,widget)
-    state = widget[:label,String]
+    state = getproperty(widget,:label,String)
     if state == "Off"
-        widget[:label] = "On"
+        setproperty!(widget,:label,"On")
     else
-        widget[:label] = "Off"
+        setproperty!(widget,:label,"Off")
     end
     int32(true)
 end
@@ -230,11 +229,11 @@ destroy(w)
 tb = ToggleButton("Off")
 w = Window(tb, "ToggleButton")
 on_signal_button_press(tb) do ptr, evt, widget
-    state = widget[:label,String]
+    state = getproperty(widget,:label,String)
     if state == "Off"
-        widget[:label] = "On"
+        setproperty!(widget,:label,"On")
     else
-        widget[:label] = "Off"
+        setproperty!(widget,:label,"Off")
     end
     true
 end
@@ -249,11 +248,11 @@ destroy(w)
 tb = ToggleButton("Off")
 w = Window(tb, "ToggleButton")
 signal_connect(tb, :button_press_event) do widget, evt
-    state = widget[:label,String]
+    state = getproperty(widget,:label,String)
     if state == "Off"
-        widget[:label] = "On"
+        setproperty!(widget,:label,"On")
     else
-        widget[:label] = "Off"
+        setproperty!(widget,:label,"Off")
     end
     true
 end
@@ -295,8 +294,8 @@ w = Window(sl, "Scale")
 G_.value(sl, 3)
 @assert G_.value(sl) == 3
 adj = Adjustment(sl)
-@assert adj[:value,Float64] == 3
-adj[:upper] = 11
+@assert getproperty(adj,:value,Float64) == 3
+setproperty!(adj,:upper,11)
 destroy(w)
 
 ## spinbutton
@@ -309,24 +308,24 @@ destroy(w)
 ## progressbar
 pb = ProgressBar()
 w = Window(pb, "Progress bar")
-pb[:fraction] = 0.7
-@assert pb[:fraction,Float64] == 0.7
+setproperty!(pb,:fraction,0.7)
+@assert getproperty(pb,:fraction,Float64) == 0.7
 destroy(w)
 
 ## spinner
 s = Spinner()
 w = Window(s, "Spinner")
-s[:active] = true
-@assert s[:active,Bool] == true
-s[:active] = false
-@assert s[:active,Bool] == false
+setproperty!(s,:active,true)
+@assert getproperty(s,:active,Bool) == true
+setproperty!(s,:active,false)
+@assert getproperty(s,:active,Bool) == false
 destroy(w)
 
 ## Entry
 e = Entry()
 w = Window(e, "Entry")
-e[:text] = "initial"
-e[:sensitive] = false
+setproperty!(e,:text,"initial")
+setproperty!(e,:sensitive,false)
 destroy(w)
 
 ## Statusbar
