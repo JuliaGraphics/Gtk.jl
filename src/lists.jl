@@ -62,9 +62,6 @@ type GtkTreeIter
   GtkTreeIter() = new(0,C_NULL,C_NULL,C_NULL)
 end
 
-# Should this be defined here (although it is only an interface)
-# @gtktype GtkTreeModel
-
 ### GtkListStore
 
 @gtktype GtkListStore
@@ -81,13 +78,11 @@ end
 
 function push!(listStore::GtkListStore, values::Tuple)
     iter = GtkTreeIter()
-	push!(listStore, iter)
-	for (i,value) in enumerate(values)
-	    # This is how it is supposed to be but currently does not work
-        # GAccessor.value(listStore, iter, i, value)
+    push!(listStore, iter)
+    for (i,value) in enumerate(values)
         ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,&iter,i-1,&(gvalue(value)[1]))
-	end
+              listStore,&iter,i-1,gvalue(value))
+    end
     iter
 end
 
@@ -124,19 +119,17 @@ function push!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
     if parent == nothing
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
     else
-	    ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
+        ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
     end
 end
 
 function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter = GtkTreeIter()
-	push!(treeStore, iter, parent)
-	for (i,value) in enumerate(values)
-	    # This is how it is supposed to be but currently does not work
-        # GAccessor.value(treeStore, iter, i, value)
+    push!(treeStore, iter, parent)
+    for (i,value) in enumerate(values)
         ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,&iter,i-1,&(gvalue(value)[1]))
-	end
+              treeStore,&iter,i-1,gvalue(value))
+    end
     iter
 end
 
@@ -144,7 +137,7 @@ function unshift!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
     if parent == nothing
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
     else
-	    ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
+        ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
     end
     treeStore
 end
@@ -176,7 +169,7 @@ GtkTreeModelI = Union(GtkListStore,GtkTreeStore)
 ### GtkCellRenderer
     
 @gtktype GtkCellRenderer
-	
+    
 @gtktype GtkCellRendererAccel
 GtkCellRendererAccel() = GtkCellRendererAccel( ccall((:gtk_cell_renderer_accel_new,libgtk),Ptr{GObject},()))
 
@@ -200,22 +193,22 @@ GtkCellRendererToggle() = GtkCellRendererToggle( ccall((:gtk_cell_renderer_toggl
 
 @gtktype GtkCellRendererSpinner
 GtkCellRendererSpinner() = GtkCellRendererSpinner( ccall((:gtk_cell_renderer_spinner_new,libgtk),Ptr{GObject},()))
-	
+    
 ### GtkTreeViewColumn
     
 @gtktype GtkTreeViewColumn
 GtkTreeViewColumn() = GtkTreeViewColumn( ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
-function GtkTreeViewColumn(renderer::GtkCellRendererI; kwargs...)
+function GtkTreeViewColumn(renderer::GtkCellRendererI, mapping::Dict)
     treeColumn = GtkTreeViewColumn()
-	unshift!(treeColumn,renderer)
-    for (k,v) in kwargs
+    unshift!(treeColumn,renderer)
+    for (k,v) in mapping
         add_attribute(treeColumn,renderer,string(k),v)
     end
     treeColumn
 end
-
-function GtkTreeViewColumn(title::String,renderer::GtkCellRendererI; kwargs...)
-    treeColumn = GtkTreeViewColumn(renderer;kwargs...)
+    
+function GtkTreeViewColumn(title::String,renderer::GtkCellRendererI, mapping::Dict)
+    treeColumn = GtkTreeViewColumn(renderer,mapping)
     treeColumn[:title] = title
     treeColumn
 end
@@ -228,7 +221,7 @@ function unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, exp
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
     treeColumn
 end
-		  
+          
 function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, expand::Bool=false)
     ccall((:gtk_tree_view_column_pack_end,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Bool),treeColumn,renderer,expand)
