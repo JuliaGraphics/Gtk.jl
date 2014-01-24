@@ -165,6 +165,7 @@ depth(treeStore::GtkTreeStore, iter::GtkTreeIter) =
 ### GtkTreeModelI
 
 GtkTreeModelI = Union(GtkListStore,GtkTreeStore)
+convert(::Type{Ptr{None}},m::GtkTreeModelI) = convert(Ptr{None},m.handle)
 
 ### GtkCellRenderer
 
