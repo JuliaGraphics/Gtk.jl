@@ -247,8 +247,12 @@ function gc_ref{T<:GObjectI}(x::T)
         ccall((:g_object_ref_sink,libgobject),Ptr{GObjectI},(Ptr{GObjectI},),x)
         finalizer(x,function(x)
                 global gc_preserve_gtk
-                gc_preserve_gtk[x] = x # convert to a strong-reference
-                ccall((:g_object_unref,libgobject),Void,(Ptr{GObjectI},),x) # may clear the strong reference
+                if x.handle != C_NULL
+                    gc_preserve_gtk[x] = x # convert to a strong-reference
+                    ccall((:g_object_unref,libgobject),Void,(Ptr{GObjectI},),x) # may clear the strong reference
+                else
+                    delete!(gc_preserve_gtk, x) # x is invalid, ensure we are dead
+                end
             end)
         gc_preserve_gtk[x] = true # record the existence of the object, but allow the finalizer
     end
