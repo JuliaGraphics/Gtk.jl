@@ -19,7 +19,8 @@ import Cairo: destroy
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop, depth, isancestor,
-    hasparent, toplevel, setproperty!, getproperty
+    hasparent, toplevel, setproperty!, getproperty,
+    selected
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -36,7 +37,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
-    GtkCellRendererToggle, GtkCellRendererSpinner
+    GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter
 
 # Gtk3 objects
 export GtkGrid
@@ -155,7 +156,8 @@ module ShortNames
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
         visible, destroy, stop, depth, isancestor,
-        hasparent, toplevel, setproperty!, getproperty
+        hasparent, toplevel, setproperty!, getproperty,
+        selected
 
     # Gtk objects
     const G_ = GAccessor
@@ -224,6 +226,7 @@ module ShortNames
     const CellRendererText = GtkCellRendererText
     const CellRendererToggle = GtkCellRendererToggle
     const CellRendererSpinner = GtkCellRendererSpinner
+    const TreeModelFilter = GtkTreeModelFilter
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -237,7 +240,7 @@ module ShortNames
         TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
-        CellRendererToggle, CellRendererSpinner
+        CellRendererToggle, CellRendererSpinner, TreeModelFilter
 
     # Gtk 3
     if Gtk.gtk_version >= 3
