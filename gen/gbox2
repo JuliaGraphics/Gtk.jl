@@ -1968,12 +1968,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_tree_view_set_tooltip_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :tree_view, :tooltip, :path, :column, :cell))
             return tree_view
         end
-        function tooltip_context(tree_view::Gtk.GtkTreeViewI,keyboard_tip,iter)
+        function tooltip_context(tree_view::Gtk.GtkTreeViewI,x,y,keyboard_tip,iter)
             path = Gtk.mutable(Ptr{Void})
             model = Gtk.mutable(Ptr{Void})
-            y = Gtk.mutable(Cint)
-            x = Gtk.mutable(Cint)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),x[],y[],model[],path[])
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),model[],path[])
         end
         function tooltip_column(tree_view::Gtk.GtkTreeViewI,column)
             $(Expr(:ccall, :(:gtk_tree_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tree_view, :column))
@@ -2494,12 +2492,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Gtk.GObject}), :icon_view, :tooltip, :path, :cell))
             return icon_view
         end
-        function tooltip_context(icon_view::Gtk.GtkIconViewI,keyboard_tip,iter)
+        function tooltip_context(icon_view::Gtk.GtkIconViewI,x,y,keyboard_tip,iter)
             path = Gtk.mutable(Ptr{Void})
             model = Gtk.mutable(Ptr{Void})
-            y = Gtk.mutable(Cint)
-            x = Gtk.mutable(Cint)
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),x[],y[],model[],path[])
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),model[],path[])
         end
         function tooltip_column(icon_view::Gtk.GtkIconViewI,column)
             $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
@@ -3018,10 +3014,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return buffer
         end
         function text(buffer::Gtk.GtkTextBufferI,start_,end_,include_hidden_chars)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Cint), :buffer, :start_, :end_, :include_hidden_chars))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint), :buffer, :start_, :end_, :include_hidden_chars))
         end
         function slice(buffer::Gtk.GtkTextBufferI,start_,end_,include_hidden_chars)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_slice,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Cint), :buffer, :start_, :end_, :include_hidden_chars))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_slice,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint), :buffer, :start_, :end_, :include_hidden_chars))
         end
         function mark(buffer::Gtk.GtkTextBufferI,name)
             return convert(Gtk.GtkTextMarkI,$(Expr(:ccall, :(:gtk_text_buffer_get_mark,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Uint8}), :buffer, :name)))
@@ -3033,31 +3029,42 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return convert(Gtk.GtkTextMarkI,$(Expr(:ccall, :(:gtk_text_buffer_get_selection_bound,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :buffer)))
         end
         function iter_at_line_offset(buffer::Gtk.GtkTextBufferI,iter,line_number,char_offset)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line_offset,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Cint), :buffer, :iter, :line_number, :char_offset))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line_offset,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint,Cint), :buffer, :iter, :line_number, :char_offset))
         end
         function iter_at_line_index(buffer::Gtk.GtkTextBufferI,iter,line_number,byte_index)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line_index,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Cint), :buffer, :iter, :line_number, :byte_index))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line_index,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint,Cint), :buffer, :iter, :line_number, :byte_index))
         end
         function iter_at_offset(buffer::Gtk.GtkTextBufferI,iter,char_offset)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_offset,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint), :buffer, :iter, :char_offset))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_offset,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint), :buffer, :iter, :char_offset))
         end
         function iter_at_line(buffer::Gtk.GtkTextBufferI,iter,line_number)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint), :buffer, :iter, :line_number))
+            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_line,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint), :buffer, :iter, :line_number))
         end
-        function start_iter(buffer::Gtk.GtkTextBufferI,iter)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_start_iter,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :buffer, :iter))
+        function start_iter(buffer::Gtk.GtkTextBufferI)
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_buffer_get_start_iter,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter}), :buffer, :iter))
+            return iter[]
         end
-        function end_iter(buffer::Gtk.GtkTextBufferI,iter)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_end_iter,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :buffer, :iter))
+        function end_iter(buffer::Gtk.GtkTextBufferI)
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_buffer_get_end_iter,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter}), :buffer, :iter))
+            return iter[]
         end
-        function bounds(buffer::Gtk.GtkTextBufferI,start_,end_)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_bounds,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :buffer, :start_, :end_))
+        function bounds(buffer::Gtk.GtkTextBufferI)
+            end_ = Gtk.mutable(Gtk.GtkTextIter)
+            start_ = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_buffer_get_bounds,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter}), :buffer, :start_, :end_))
+            return (start_[],end_[])
         end
-        function iter_at_mark(buffer::Gtk.GtkTextBufferI,iter,mark)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_mark,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GObject}), :buffer, :iter, :mark))
+        function iter_at_mark(buffer::Gtk.GtkTextBufferI,mark)
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_mark,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GObject}), :buffer, :iter, :mark))
+            return iter[]
         end
-        function iter_at_child_anchor(buffer::Gtk.GtkTextBufferI,iter,anchor)
-            return $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_child_anchor,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :buffer, :iter, :anchor))
+        function iter_at_child_anchor(buffer::Gtk.GtkTextBufferI,anchor)
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_buffer_get_iter_at_child_anchor,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Void}), :buffer, :iter, :anchor))
+            return iter[]
         end
         function modified(buffer::Gtk.GtkTextBufferI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_text_buffer_get_modified,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :buffer)))
@@ -3069,8 +3076,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function has_selection(buffer::Gtk.GtkTextBufferI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_text_buffer_get_has_selection,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :buffer)))
         end
-        function selection_bounds(buffer::Gtk.GtkTextBufferI,start_,end_)
-            return convert(Bool,$(Expr(:ccall, :(:gtk_text_buffer_get_selection_bounds,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :buffer, :start_, :end_)))
+        function selection_bounds(buffer::Gtk.GtkTextBufferI)
+            end_ = Gtk.mutable(Gtk.GtkTextIter)
+            start_ = Gtk.mutable(Gtk.GtkTextIter)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_text_buffer_get_selection_bounds,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter}), :buffer, :start_, :end_))),start_[],end_[])
         end
         function copy_target_list(buffer::Gtk.GtkTextBufferI)
             return $(Expr(:ccall, :(:gtk_text_buffer_get_copy_target_list,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :buffer))
@@ -3112,28 +3121,28 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function cursor_visible(text_view::Gtk.GtkTextViewI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_text_view_get_cursor_visible,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :text_view)))
         end
-        function iter_location(text_view::Gtk.GtkTextViewI,iter)
+        function iter_location(text_view::Gtk.GtkTextViewI)
             location = Gtk.mutable(Gtk.GdkRectangle)
-            $(Expr(:ccall, :(:gtk_text_view_get_iter_location,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GdkRectangle}), :text_view, :iter, :location))
-            return location[]
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_view_get_iter_location,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GdkRectangle}), :text_view, :iter, :location))
+            return (iter[],location[])
         end
         function iter_at_location(text_view::Gtk.GtkTextViewI,iter,x,y)
-            return $(Expr(:ccall, :(:gtk_text_view_get_iter_at_location,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Cint), :text_view, :iter, :x, :y))
+            return $(Expr(:ccall, :(:gtk_text_view_get_iter_at_location,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint,Cint), :text_view, :iter, :x, :y))
         end
-        function iter_at_position(text_view::Gtk.GtkTextViewI,iter,x,y)
-            trailing = Gtk.mutable(Cint)
-            $(Expr(:ccall, :(:gtk_text_view_get_iter_at_position,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Cint,Cint), :text_view, :iter, :trailing, :x, :y))
-            return trailing[]
+        function iter_at_position(text_view::Gtk.GtkTextViewI,iter,trailing,x,y)
+            return $(Expr(:ccall, :(:gtk_text_view_get_iter_at_position,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Cint},Cint,Cint), :text_view, :iter, :trailing, :x, :y))
         end
-        function line_yrange(text_view::Gtk.GtkTextViewI,iter)
+        function line_yrange(text_view::Gtk.GtkTextViewI)
             height = Gtk.mutable(Cint)
             y = Gtk.mutable(Cint)
-            $(Expr(:ccall, :(:gtk_text_view_get_line_yrange,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Ptr{Cint}), :text_view, :iter, :y, :height))
-            return (y[],height[])
+            iter = Gtk.mutable(Gtk.GtkTextIter)
+            $(Expr(:ccall, :(:gtk_text_view_get_line_yrange,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Cint},Ptr{Cint}), :text_view, :iter, :y, :height))
+            return (iter[],y[],height[])
         end
         function line_at_y(text_view::Gtk.GtkTextViewI,target_iter,y)
             line_top = Gtk.mutable(Cint)
-            $(Expr(:ccall, :(:gtk_text_view_get_line_at_y,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Cint}), :text_view, :target_iter, :y, :line_top))
+            $(Expr(:ccall, :(:gtk_text_view_get_line_at_y,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Cint,Ptr{Cint}), :text_view, :target_iter, :y, :line_top))
             return line_top[]
         end
         function hadjustment(text_view::Gtk.GtkTextViewI)

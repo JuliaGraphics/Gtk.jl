@@ -89,8 +89,9 @@ end
 
 #####  GtkTextIter  #####
 #TODO: search
-
 convert(::Type{Ptr{Void}},iter::GtkTextIter) = iter.handle
+convert(::Type{Ptr{GtkTextIter}},iter::GtkTextIter) = convert(Ptr{GtkTextIter},iter.handle)
+
 getproperty(text::GtkTextIter, key::String, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
 function getproperty(text::GtkTextIter, key::Symbol, outtype::Type=Any)
     return convert(outtype,

@@ -106,6 +106,7 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GdkEventKey"           => :(Gtk.GdkEventKey),
     "GdkEventMotion"        => :(Gtk.GdkEventMotion),
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
+    "GtkTextIter"           => :(Gtk.GtkTextIter),
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
@@ -254,9 +255,16 @@ function gen_get_set(body, header, args)
             fbody = Expr(:block, fbody)
             fargnames = Symbol[]
             multiret = false
+            last_inarg = 1
             for i = 2:length(argnames)
                 atype = cindex.getCursorType(fargs[i])
-                if isa(atype, cindex.Pointer) && !is_gstring(atype)
+                if !isa(atype, cindex.Pointer) || is_gstring(atype)
+                    last_inarg = i
+                end
+            end
+            for i = 2:length(argnames)
+                atype = cindex.getCursorType(fargs[i])
+                if i > last_inarg
                     atype = cindex.getPointeeType(atype)
                     T = g_type_to_jl(atype)
                     if T !== :Nothing && T !== :Void && T != :(Gtk.GObject)
