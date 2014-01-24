@@ -219,9 +219,9 @@ Note that because these are auto-generated, you will often need to do your own g
 #### New Gtk Types
 
 New Gtk types can be most easily added by using the Gtk.@GTypes macro:
-     
+
      Gtk.@GTypes GTypeName <: GParentName
-     
+
 and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
 
 #### New GValue<->Julia auto-conversions

@@ -66,7 +66,7 @@ function cairo_surface_for(widget::GtkCanvas)
     w, h = width(widget), height(widget)
     CairoSurface(
         ccall((:gdk_window_create_similar_surface,libgdk), Ptr{Void},
-        (Ptr{Void}, Enum, Int32, Int32), 
+        (Ptr{Void}, Enum, Int32, Int32),
         gdk_window(widget), Cairo.CONTENT_COLOR_ALPHA, w, h),
     w, h)
 end

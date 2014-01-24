@@ -412,7 +412,7 @@ destroy(win)
 #set_items(tr, choices[1:2])
 #destroy(w)
 
-                   
+
 ## tree grid
 #w = Window("Array")
 #pack_stop_propagate(w)
@@ -430,3 +430,28 @@ dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
                         Stock.CANCEL, Response.CANCEL,
                         Stock.OPEN, Response.ACCEPT)
 destroy(dlg)
+
+## List view
+ls=ListStore(Int32,Bool)
+push!(ls,(33,true))
+tv=TreeView(ls)
+r1=CellRendererText()
+r2=CellRendererToggle()
+c1=TreeViewColumn("A", r1,{"text" => 0})
+c2=TreeViewColumn("B", r2,{"active" => 1})
+push!(tv,c1)
+push!(tv,c2)
+w = Window(tv, "List View")
+destroy(w)
+
+## Tree view
+ts=TreeStore(String)
+iter1 = push!(ts,("one",))
+iter2 = push!(ts,("two",),iter1)
+iter3 = push!(ts,("three",),iter2)
+tv=TreeView(ts)
+r1=CellRendererText()
+c1=TreeViewColumn("A", r1, {"text" => 0})
+push!(tv,c1)
+w = Window(tv, "Tree View")
+destroy(w)

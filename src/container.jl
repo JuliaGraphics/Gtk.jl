@@ -41,7 +41,7 @@ function getindex(w::GtkBinI, i::Integer)
     c == false && error(BoundsError())
     c::GtkWidgetI
 end
- 
+
 immutable GtkNullContainer <: GtkContainerI end
 function push!(::GtkNullContainer, w::GtkWidgetI)
     p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
