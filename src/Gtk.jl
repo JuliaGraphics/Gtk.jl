@@ -18,8 +18,8 @@ import Cairo: destroy
 # generic interface:
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
-    hasparent, toplevel, setproperty!, getproperty
     visible, destroy, stop, depth, isancestor,
+    hasparent, toplevel, setproperty!, getproperty
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 

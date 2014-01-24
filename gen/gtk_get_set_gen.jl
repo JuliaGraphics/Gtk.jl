@@ -51,7 +51,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkTreeModelFilter" => :GtkTreeModelFilterI,
     "GtkCellArea" => :GtkCellAreaI,
     "GtkCellAreaBox" => :GtkCellAreaBoxI,
-    "GtkCellAreaContent" => :GtkCellAreaContentI,
+    "GtkCellAreaContext" => :GtkCellAreaContextI,
     "GtkCellRenderer" => :GtkCellRendererI,
     "GtkCellEditable" => :GtkCellEditableI,
     "GtkCellRendererAccel" => :GtkCellRendererAccelI,

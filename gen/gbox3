@@ -1196,6 +1196,73 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function state(cell::Gtk.GtkCellRendererI,widget,cell_state)
             return $(Expr(:ccall, :(:gtk_cell_renderer_get_state,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :cell, :widget, :cell_state))
         end
+        function cell_allocation(area::Gtk.GtkCellAreaI,context,widget,renderer)
+            allocation = Gtk.mutable(Gtk.GdkRectangle)
+            cell_area = Gtk.mutable(Gtk.GdkRectangle)
+            $(Expr(:ccall, :(:gtk_cell_area_get_cell_allocation,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle},Ptr{Gtk.GdkRectangle}), :area, :context, :widget, :renderer, :cell_area, :allocation))
+            return (cell_area[],allocation[])
+        end
+        function cell_at_position(area::Gtk.GtkCellAreaI,context,widget,x,y)
+            alloc_area = Gtk.mutable(Gtk.GdkRectangle)
+            cell_area = Gtk.mutable(Gtk.GdkRectangle)
+            return (convert(Gtk.GtkCellRendererI,$(Expr(:ccall, :(:gtk_cell_area_get_cell_at_position,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle},Cint,Cint,Ptr{Gtk.GdkRectangle}), :area, :context, :widget, :cell_area, :x, :y, :alloc_area))),cell_area[],alloc_area[])
+        end
+        function request_mode(area::Gtk.GtkCellAreaI)
+            return $(Expr(:ccall, :(:gtk_cell_area_get_request_mode,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :area))
+        end
+        function preferred_width(area::Gtk.GtkCellAreaI,context,widget)
+            natural_width = Gtk.mutable(Cint)
+            minimum_width = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_get_preferred_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :area, :context, :widget, :minimum_width, :natural_width))
+            return (minimum_width[],natural_width[])
+        end
+        function preferred_height_for_width(area::Gtk.GtkCellAreaI,context,widget,width)
+            natural_height = Gtk.mutable(Cint)
+            minimum_height = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_get_preferred_height_for_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint,Ptr{Cint},Ptr{Cint}), :area, :context, :widget, :width, :minimum_height, :natural_height))
+            return (minimum_height[],natural_height[])
+        end
+        function preferred_height(area::Gtk.GtkCellAreaI,context,widget)
+            natural_height = Gtk.mutable(Cint)
+            minimum_height = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_get_preferred_height,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :area, :context, :widget, :minimum_height, :natural_height))
+            return (minimum_height[],natural_height[])
+        end
+        function preferred_width_for_height(area::Gtk.GtkCellAreaI,context,widget,height)
+            natural_width = Gtk.mutable(Cint)
+            minimum_width = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_get_preferred_width_for_height,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint,Ptr{Cint},Ptr{Cint}), :area, :context, :widget, :height, :minimum_width, :natural_width))
+            return (minimum_width[],natural_width[])
+        end
+        function current_path_string(area::Gtk.GtkCellAreaI)
+            return $(Expr(:ccall, :(:gtk_cell_area_get_current_path_string,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :area))
+        end
+        function property(area::Gtk.GtkCellAreaI,renderer,property_name,value)
+            $(Expr(:ccall, :(:gtk_cell_area_cell_set_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :area, :renderer, :property_name, :value))
+            return area
+        end
+        function property(area::Gtk.GtkCellAreaI,renderer,property_name,value)
+            return $(Expr(:ccall, :(:gtk_cell_area_cell_get_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :area, :renderer, :property_name, :value))
+        end
+        function focus_cell(area::Gtk.GtkCellAreaI,renderer)
+            $(Expr(:ccall, :(:gtk_cell_area_set_focus_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :area, :renderer))
+            return area
+        end
+        function focus_cell(area::Gtk.GtkCellAreaI)
+            return convert(Gtk.GtkCellRendererI,$(Expr(:ccall, :(:gtk_cell_area_get_focus_cell,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :area)))
+        end
+        function focus_siblings(area::Gtk.GtkCellAreaI,renderer)
+            return $(Expr(:ccall, :(:gtk_cell_area_get_focus_siblings,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :area, :renderer))
+        end
+        function focus_from_sibling(area::Gtk.GtkCellAreaI,renderer)
+            return convert(Gtk.GtkCellRendererI,$(Expr(:ccall, :(:gtk_cell_area_get_focus_from_sibling,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :area, :renderer)))
+        end
+        function edited_cell(area::Gtk.GtkCellAreaI)
+            return convert(Gtk.GtkCellRendererI,$(Expr(:ccall, :(:gtk_cell_area_get_edited_cell,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :area)))
+        end
+        function edit_widget(area::Gtk.GtkCellAreaI)
+            return convert(Gtk.GtkCellEditableI,$(Expr(:ccall, :(:gtk_cell_area_get_edit_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :area)))
+        end
         function attributes(tree_column::Gtk.GtkTreeViewColumnI,cell_renderer)
             $(Expr(:ccall, :(:gtk_tree_view_column_set_attributes,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :tree_column, :cell_renderer))
             return tree_column
@@ -1408,6 +1475,21 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function valuesv(list_store::Gtk.GtkListStoreI,iter,columns,values,n_values)
             $(Expr(:ccall, :(:gtk_list_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Ptr{Void},Cint), :list_store, :iter, :columns, :values, :n_values))
             return list_store
+        end
+        function visible_func(filter::Gtk.GtkTreeModelFilterI,func,data,destroy)
+            $(Expr(:ccall, :(:gtk_tree_model_filter_set_visible_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Void}), :filter, :func, :data, :destroy))
+            return filter
+        end
+        function modify_func(filter::Gtk.GtkTreeModelFilterI,n_columns,types,func,data,destroy)
+            $(Expr(:ccall, :(:gtk_tree_model_filter_set_modify_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Culong},Ptr{Void},Ptr{Void},Ptr{Void}), :filter, :n_columns, :types, :func, :data, :destroy))
+            return filter
+        end
+        function visible_column(filter::Gtk.GtkTreeModelFilterI,column)
+            $(Expr(:ccall, :(:gtk_tree_model_filter_set_visible_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :filter, :column))
+            return filter
+        end
+        function model(filter::Gtk.GtkTreeModelFilterI)
+            return $(Expr(:ccall, :(:gtk_tree_model_filter_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :filter))
         end
         function from_file(image::Gtk.GtkImageI,filename)
             $(Expr(:ccall, :(:gtk_image_set_from_file,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :image, :filename))
@@ -1724,7 +1806,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return tree_view
         end
         function selection(tree_view::Gtk.GtkTreeViewI)
-            return $(Expr(:ccall, :(:gtk_tree_view_get_selection,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tree_view))
+            return convert(Gtk.GtkTreeSelectionI,$(Expr(:ccall, :(:gtk_tree_view_get_selection,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :tree_view)))
         end
         function hadjustment(tree_view::Gtk.GtkTreeViewI)
             return convert(Gtk.GtkAdjustmentI,$(Expr(:ccall, :(:gtk_tree_view_get_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :tree_view)))
@@ -2116,6 +2198,110 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function event_window(button::Gtk.GtkButtonI)
             return $(Expr(:ccall, :(:gtk_button_get_event_window,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :button))
         end
+        function spacing(box::Gtk.GtkCellAreaBoxI)
+            return $(Expr(:ccall, :(:gtk_cell_area_box_get_spacing,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :box))
+        end
+        function spacing(box::Gtk.GtkCellAreaBoxI,spacing_)
+            $(Expr(:ccall, :(:gtk_cell_area_box_set_spacing,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :box, :spacing_))
+            return box
+        end
+        function area(context::Gtk.GtkCellAreaContextI)
+            return convert(Gtk.GtkCellAreaI,$(Expr(:ccall, :(:gtk_cell_area_context_get_area,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :context)))
+        end
+        function preferred_width(context::Gtk.GtkCellAreaContextI)
+            natural_width = Gtk.mutable(Cint)
+            minimum_width = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_context_get_preferred_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :context, :minimum_width, :natural_width))
+            return (minimum_width[],natural_width[])
+        end
+        function preferred_height(context::Gtk.GtkCellAreaContextI)
+            natural_height = Gtk.mutable(Cint)
+            minimum_height = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_context_get_preferred_height,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :context, :minimum_height, :natural_height))
+            return (minimum_height[],natural_height[])
+        end
+        function preferred_height_for_width(context::Gtk.GtkCellAreaContextI,width)
+            natural_height = Gtk.mutable(Cint)
+            minimum_height = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_context_get_preferred_height_for_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Cint},Ptr{Cint}), :context, :width, :minimum_height, :natural_height))
+            return (minimum_height[],natural_height[])
+        end
+        function preferred_width_for_height(context::Gtk.GtkCellAreaContextI,height)
+            natural_width = Gtk.mutable(Cint)
+            minimum_width = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_context_get_preferred_width_for_height,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Cint},Ptr{Cint}), :context, :height, :minimum_width, :natural_width))
+            return (minimum_width[],natural_width[])
+        end
+        function allocation(context::Gtk.GtkCellAreaContextI)
+            height = Gtk.mutable(Cint)
+            width = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_cell_area_context_get_allocation,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :context, :width, :height))
+            return (width[],height[])
+        end
+        function fixed_height_from_font(renderer::Gtk.GtkCellRendererTextI,number_of_rows)
+            $(Expr(:ccall, :(:gtk_cell_renderer_text_set_fixed_height_from_font,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :renderer, :number_of_rows))
+            return renderer
+        end
+        function radio(toggle::Gtk.GtkCellRendererToggleI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_renderer_toggle_get_radio,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toggle)))
+        end
+        function radio(toggle::Gtk.GtkCellRendererToggleI,radio_)
+            $(Expr(:ccall, :(:gtk_cell_renderer_toggle_set_radio,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toggle, :radio_))
+            return toggle
+        end
+        function active(toggle::Gtk.GtkCellRendererToggleI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_renderer_toggle_get_active,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toggle)))
+        end
+        function active(toggle::Gtk.GtkCellRendererToggleI,setting)
+            $(Expr(:ccall, :(:gtk_cell_renderer_toggle_set_active,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toggle, :setting))
+            return toggle
+        end
+        function activatable(toggle::Gtk.GtkCellRendererToggleI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_renderer_toggle_get_activatable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toggle)))
+        end
+        function activatable(toggle::Gtk.GtkCellRendererToggleI,setting)
+            $(Expr(:ccall, :(:gtk_cell_renderer_toggle_set_activatable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toggle, :setting))
+            return toggle
+        end
+        function model(cell_view::Gtk.GtkCellViewI,model_)
+            $(Expr(:ccall, :(:gtk_cell_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :model_))
+            return cell_view
+        end
+        function model(cell_view::Gtk.GtkCellViewI)
+            return $(Expr(:ccall, :(:gtk_cell_view_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :cell_view))
+        end
+        function displayed_row(cell_view::Gtk.GtkCellViewI,path)
+            $(Expr(:ccall, :(:gtk_cell_view_set_displayed_row,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :path))
+            return cell_view
+        end
+        function displayed_row(cell_view::Gtk.GtkCellViewI)
+            return $(Expr(:ccall, :(:gtk_cell_view_get_displayed_row,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :cell_view))
+        end
+        function background_rgba(cell_view::Gtk.GtkCellViewI,rgba)
+            $(Expr(:ccall, :(:gtk_cell_view_set_background_rgba,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :rgba))
+            return cell_view
+        end
+        function draw_sensitive(cell_view::Gtk.GtkCellViewI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_view_get_draw_sensitive,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :cell_view)))
+        end
+        function draw_sensitive(cell_view::Gtk.GtkCellViewI,draw_sensitive_)
+            $(Expr(:ccall, :(:gtk_cell_view_set_draw_sensitive,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :cell_view, :draw_sensitive_))
+            return cell_view
+        end
+        function fit_model(cell_view::Gtk.GtkCellViewI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_view_get_fit_model,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :cell_view)))
+        end
+        function fit_model(cell_view::Gtk.GtkCellViewI,fit_model_)
+            $(Expr(:ccall, :(:gtk_cell_view_set_fit_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :cell_view, :fit_model_))
+            return cell_view
+        end
+        function size_of_row(cell_view::Gtk.GtkCellViewI,path,requisition)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_cell_view_get_size_of_row,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :cell_view, :path, :requisition)))
+        end
+        function background_color(cell_view::Gtk.GtkCellViewI,color)
+            $(Expr(:ccall, :(:gtk_cell_view_set_background_color,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :color))
+            return cell_view
+        end
         function mode(toggle_button::Gtk.GtkToggleButtonI,draw_indicator)
             $(Expr(:ccall, :(:gtk_toggle_button_set_mode,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toggle_button, :draw_indicator))
             return toggle_button
@@ -2339,6 +2525,183 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function filter(chooser::Gtk.GtkFileChooserDialogI)
             return $(Expr(:ccall, :(:gtk_file_chooser_get_filter,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
+        end
+        function model(icon_view::Gtk.GtkIconViewI,model_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :icon_view, :model_))
+            return icon_view
+        end
+        function model(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function text_column(icon_view::Gtk.GtkIconViewI,column)
+            $(Expr(:ccall, :(:gtk_icon_view_set_text_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
+            return icon_view
+        end
+        function text_column(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_text_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function markup_column(icon_view::Gtk.GtkIconViewI,column)
+            $(Expr(:ccall, :(:gtk_icon_view_set_markup_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
+            return icon_view
+        end
+        function markup_column(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_markup_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function pixbuf_column(icon_view::Gtk.GtkIconViewI,column)
+            $(Expr(:ccall, :(:gtk_icon_view_set_pixbuf_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
+            return icon_view
+        end
+        function pixbuf_column(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_pixbuf_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function item_orientation(icon_view::Gtk.GtkIconViewI,orientation)
+            $(Expr(:ccall, :(:gtk_icon_view_set_item_orientation,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :orientation))
+            return icon_view
+        end
+        function item_orientation(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_item_orientation,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function columns(icon_view::Gtk.GtkIconViewI,columns_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_columns,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :columns_))
+            return icon_view
+        end
+        function columns(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_columns,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function item_width(icon_view::Gtk.GtkIconViewI,item_width_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_item_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :item_width_))
+            return icon_view
+        end
+        function item_width(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_item_width,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function spacing(icon_view::Gtk.GtkIconViewI,spacing_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_spacing,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :spacing_))
+            return icon_view
+        end
+        function spacing(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_spacing,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function row_spacing(icon_view::Gtk.GtkIconViewI,row_spacing_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_row_spacing,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :row_spacing_))
+            return icon_view
+        end
+        function row_spacing(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_row_spacing,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function column_spacing(icon_view::Gtk.GtkIconViewI,column_spacing_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_column_spacing,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column_spacing_))
+            return icon_view
+        end
+        function column_spacing(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_column_spacing,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function margin(icon_view::Gtk.GtkIconViewI,margin_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_margin,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :margin_))
+            return icon_view
+        end
+        function margin(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_margin,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function item_padding(icon_view::Gtk.GtkIconViewI,item_padding_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_item_padding,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :item_padding_))
+            return icon_view
+        end
+        function item_padding(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_item_padding,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function path_at_pos(icon_view::Gtk.GtkIconViewI,x,y)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_path_at_pos,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Cint,Cint), :icon_view, :x, :y))
+        end
+        function item_at_pos(icon_view::Gtk.GtkIconViewI,x,y)
+            cell = Gtk.mutable(Ptr{Gtk.GObject})
+            path = Gtk.mutable(Ptr{Void})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_item_at_pos,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Ptr{Gtk.GObject}}), :icon_view, :x, :y, :path, :cell))),path[],convert(Gtk.GtkCellRendererI,cell[]))
+        end
+        function visible_range(icon_view::Gtk.GtkIconViewI)
+            end_path = Gtk.mutable(Ptr{Void})
+            start_path = Gtk.mutable(Ptr{Void})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_visible_range,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Ptr{Void}}), :icon_view, :start_path, :end_path))),start_path[],end_path[])
+        end
+        function activate_on_single_click(icon_view::Gtk.GtkIconViewI,single)
+            $(Expr(:ccall, :(:gtk_icon_view_set_activate_on_single_click,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :single))
+            return icon_view
+        end
+        function activate_on_single_click(icon_view::Gtk.GtkIconViewI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_activate_on_single_click,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view)))
+        end
+        function selection_mode(icon_view::Gtk.GtkIconViewI,mode)
+            $(Expr(:ccall, :(:gtk_icon_view_set_selection_mode,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :mode))
+            return icon_view
+        end
+        function selection_mode(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_selection_mode,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function item_row(icon_view::Gtk.GtkIconViewI,path)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_item_row,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void}), :icon_view, :path))
+        end
+        function item_column(icon_view::Gtk.GtkIconViewI,path)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_item_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void}), :icon_view, :path))
+        end
+        function selected_items(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_selected_items,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :icon_view))
+        end
+        function cursor(icon_view::Gtk.GtkIconViewI,path,cell,start_editing)
+            $(Expr(:ccall, :(:gtk_icon_view_set_cursor,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GObject},Cint), :icon_view, :path, :cell, :start_editing))
+            return icon_view
+        end
+        function cursor(icon_view::Gtk.GtkIconViewI)
+            cell = Gtk.mutable(Ptr{Gtk.GObject})
+            path = Gtk.mutable(Ptr{Void})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_cursor,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Ptr{Gtk.GObject}}), :icon_view, :path, :cell))),path[],convert(Gtk.GtkCellRendererI,cell[]))
+        end
+        function reorderable(icon_view::Gtk.GtkIconViewI,reorderable_)
+            $(Expr(:ccall, :(:gtk_icon_view_set_reorderable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :reorderable_))
+            return icon_view
+        end
+        function reorderable(icon_view::Gtk.GtkIconViewI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_reorderable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view)))
+        end
+        function drag_dest_item(icon_view::Gtk.GtkIconViewI,path,pos)
+            $(Expr(:ccall, :(:gtk_icon_view_set_drag_dest_item,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint), :icon_view, :path, :pos))
+            return icon_view
+        end
+        function drag_dest_item(icon_view::Gtk.GtkIconViewI)
+            pos = Gtk.mutable(Cint)
+            path = Gtk.mutable(Ptr{Void})
+            $(Expr(:ccall, :(:gtk_icon_view_get_drag_dest_item,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Cint}), :icon_view, :path, :pos))
+            return (path[],pos[])
+        end
+        function dest_item_at_pos(icon_view::Gtk.GtkIconViewI,drag_x,drag_y)
+            pos = Gtk.mutable(Cint)
+            path = Gtk.mutable(Ptr{Void})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_dest_item_at_pos,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Cint}), :icon_view, :drag_x, :drag_y, :path, :pos))),path[],pos[])
+        end
+        function cell_rect(icon_view::Gtk.GtkIconViewI,path,cell)
+            rect = Gtk.mutable(Gtk.GdkRectangle)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_cell_rect,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle}), :icon_view, :path, :cell, :rect))),rect[])
+        end
+        function tooltip_item(icon_view::Gtk.GtkIconViewI,tooltip,path)
+            $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_item,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :icon_view, :tooltip, :path))
+            return icon_view
+        end
+        function tooltip_cell(icon_view::Gtk.GtkIconViewI,tooltip,path,cell)
+            $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Gtk.GObject}), :icon_view, :tooltip, :path, :cell))
+            return icon_view
+        end
+        function tooltip_context(icon_view::Gtk.GtkIconViewI,keyboard_tip,iter)
+            path = Gtk.mutable(Ptr{Void})
+            model = Gtk.mutable(Ptr{Void})
+            y = Gtk.mutable(Cint)
+            x = Gtk.mutable(Cint)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),x[],y[],model[],path[])
+        end
+        function tooltip_column(icon_view::Gtk.GtkIconViewI,column)
+            $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
+            return icon_view
+        end
+        function tooltip_column(icon_view::Gtk.GtkIconViewI)
+            return $(Expr(:ccall, :(:gtk_icon_view_get_tooltip_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :icon_view))
         end
         function bin_window(layout::Gtk.GtkLayoutI)
             return $(Expr(:ccall, :(:gtk_layout_get_bin_window,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :layout))
@@ -3142,6 +3505,49 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function input_hints(text_view::Gtk.GtkTextViewI)
             return $(Expr(:ccall, :(:gtk_text_view_get_input_hints,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :text_view))
+        end
+        function model(tree_model::Gtk.GtkTreeModelSortI)
+            return $(Expr(:ccall, :(:gtk_tree_model_sort_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tree_model))
+        end
+        function mode(selection::Gtk.GtkTreeSelectionI,type_)
+            $(Expr(:ccall, :(:gtk_tree_selection_set_mode,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :selection, :type_))
+            return selection
+        end
+        function mode(selection::Gtk.GtkTreeSelectionI)
+            return $(Expr(:ccall, :(:gtk_tree_selection_get_mode,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :selection))
+        end
+        function select_function(selection::Gtk.GtkTreeSelectionI,func,data,destroy)
+            $(Expr(:ccall, :(:gtk_tree_selection_set_select_function,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Void}), :selection, :func, :data, :destroy))
+            return selection
+        end
+        function user_data(selection::Gtk.GtkTreeSelectionI)
+            return $(Expr(:ccall, :(:gtk_tree_selection_get_user_data,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :selection))
+        end
+        function tree_view(selection::Gtk.GtkTreeSelectionI)
+            return convert(Gtk.GtkTreeViewI,$(Expr(:ccall, :(:gtk_tree_selection_get_tree_view,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :selection)))
+        end
+        function select_function(selection::Gtk.GtkTreeSelectionI)
+            return $(Expr(:ccall, :(:gtk_tree_selection_get_select_function,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :selection))
+        end
+        function selected(selection::Gtk.GtkTreeSelectionI,iter)
+            model = Gtk.mutable(Ptr{Void})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_selection_get_selected,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Void}), :selection, :model, :iter))),model[])
+        end
+        function selected_rows(selection::Gtk.GtkTreeSelectionI)
+            model = Gtk.mutable(Ptr{Void})
+            return ($(Expr(:ccall, :(:gtk_tree_selection_get_selected_rows,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Ptr{Void}}), :selection, :model)),model[])
+        end
+        function column_types(tree_store::Gtk.GtkTreeStoreI,n_columns,types)
+            $(Expr(:ccall, :(:gtk_tree_store_set_column_types,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Culong}), :tree_store, :n_columns, :types))
+            return tree_store
+        end
+        function value(tree_store::Gtk.GtkTreeStoreI,iter,column,value_)
+            $(Expr(:ccall, :(:gtk_tree_store_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void}), :tree_store, :iter, :column, :value_))
+            return tree_store
+        end
+        function valuesv(tree_store::Gtk.GtkTreeStoreI,iter,columns,values,n_values)
+            $(Expr(:ccall, :(:gtk_tree_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Ptr{Void},Cint), :tree_store, :iter, :columns, :values, :n_values))
+            return tree_store
         end
     end)))))
 end

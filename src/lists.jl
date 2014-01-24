@@ -208,9 +208,7 @@ function GtkTreeViewColumn(renderer::GtkCellRendererI, mapping::Dict)
 end
 
 function GtkTreeViewColumn(title::String,renderer::GtkCellRendererI, mapping::Dict)
-    treeColumn = GtkTreeViewColumn(renderer,mapping)
-    treeColumn[:title] = title
-    treeColumn
+    setproperty!(GtkTreeViewColumn(renderer,mapping), :title, title)
 end
 
 empty!(treeColumn::GtkTreeViewColumn) =
@@ -250,12 +248,12 @@ end
 
 ### To be done
 
-#@gtktype GtkCellArea
-#@gtktype GtkCellAreaBox
-#@gtktype GtkCellAreaContent
+@gtktype GtkCellArea
+@gtktype GtkCellAreaBox
+@gtktype GtkCellAreaContext
 
-#@gtktype GtkTreeModelSort
-#@gtktype GtkTreeModelFilter
+@gtktype GtkTreeModelSort
+@gtktype GtkTreeModelFilter
 
-#@gtktype GtkCellView
-#@gtktype GtkIconView
+@gtktype GtkCellView
+@gtktype GtkIconView
