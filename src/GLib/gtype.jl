@@ -126,7 +126,7 @@ get_gtype_decl(name::Symbol, lib, symname::Symbol) =
     :( GLib.g_type(::Type{$(esc(name))}) =
         ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
 
-function get_type_decl(name,iname,gtyp)
+function get_type_decl(name,iname,gtyp,gtype_decl)
     :(
         if $(Meta.quot(name)) in keys(gtype_wrappers)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(name))]
@@ -138,8 +138,14 @@ function get_type_decl(name,iname,gtyp)
                 $(esc(name))(handle::Ptr{GObjectI}) = (handle != C_NULL ? gc_ref(new(handle)) : error($("Cannot construct $name with a NULL pointer")))
             end
             gtype_wrappers[$(Meta.quot(name))] = $(esc(name))
+            $(gtype_decl)
         end
     )
+end
+
+macro Gtype_decl(name,gtyp,gtype_decl)
+    iname = symbol(string(name,'I'))
+    get_type_decl(name,iname,gtyp,gtype_decl)
 end
 
 macro Gtype(name,lib,symname)
@@ -149,9 +155,8 @@ macro Gtype(name,lib,symname)
         error("not implemented yet")
     end
     iname = symbol(string(name,'I'))
-    Expr(:block,
-        get_type_decl(name, iname, gtyp),
-        get_gtype_decl(name, lib, symname))
+    gtype_decl = get_gtype_decl(name, lib, symname)
+    get_type_decl(name, iname, gtyp, gtype_decl)
 end
 
 macro Gabstract(iname,lib,symname)
