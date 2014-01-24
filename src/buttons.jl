@@ -120,7 +120,7 @@ end
 next(w::GtkRadioButtonGroup,s) = next(s,s)
 done(w::GtkRadioButtonGroup,s) = done(s,s)
 length(w::GtkRadioButtonGroup) = length(start(w))
-getproperty(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
+getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
 function getproperty(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
     k = symbol(name)
@@ -134,6 +134,7 @@ function getproperty(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
     end
     error("GtkRadioButtonGroup has no property $name")
 end
+@deprecate getindex(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString)) getproperty(grp,name)
 
 
 function gtk_toggle_button_set_active(b::GtkWidgetI, active::Bool)

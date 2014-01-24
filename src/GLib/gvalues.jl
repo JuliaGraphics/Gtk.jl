@@ -160,6 +160,11 @@ function setproperty!(w::GObject, name::Union(String,Symbol), value)
     w
 end
 
+@deprecate getindex(w::GObject, name::Union(String,Symbol), T::Type) getproperty(w,name,T)
+@deprecate setindex!(w::GObject, value, name::Union(String,Symbol), T::Type) setproperty!(w,name,T,value)
+@deprecate setindex!(w::GObject, value, name::Union(String,Symbol)) setproperty!(w,name,value)
+
+
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
     if convert(Ptr{GObjectI},w) == C_NULL

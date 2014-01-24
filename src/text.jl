@@ -373,3 +373,8 @@ visible(w::GtkTextMark) =
 visible(w::GtkTextMark, state::Bool) =
     ccall((:gtk_text_mark_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
 show(w::GtkTextMark) = visible(w,true)
+
+@deprecate getindex(text::GtkTextIter, key::String, outtype::Type=Any) getproperty(text, key, outtype)
+@deprecate getindex(text::GtkTextIter, key::Symbol, outtype::Type=Any) getproperty(text, key, outtype)
+@deprecate setindex!(text::GtkTextIter, value, key::Union(Symbol,String)) setproperty!(text, key, value)
+@deprecate getindex(text::GtkTextRange, key::Union(Symbol,String), outtype::Type=Any) getproperty(text, key, outtype)

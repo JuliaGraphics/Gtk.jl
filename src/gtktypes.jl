@@ -96,3 +96,7 @@ function setproperty!(w::GtkContainerI, name::Union(String,Symbol), child::GtkWi
         (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
     w
 end
+
+@deprecate getindex(w::GtkContainerI, child::GtkWidgetI, name::Union(String,Symbol), T::Type) getproperty(w,name,child,T)
+@deprecate setindex!(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol), T::Type) setproperty!(w,name,child,T,value)
+@deprecate setindex!(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol)) setproperty!(w,name,child,value)
