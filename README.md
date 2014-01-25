@@ -21,7 +21,7 @@ You may need to repeat steps 3 and 4 every time you restart julia, or put these 
 
 I use MacPorts:
 
-1. `port install gtk2 +quartz -x11 gtk3 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything to minimize conflicts)
+1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything to minimize conflicts)
 2. push!(DL_LOAD_PATH,"/opt/local/lib")
 You will need to repeat step 2 every time you restart julia, or put this line in your ~/.juliarc.jl file.
 
