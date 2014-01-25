@@ -188,7 +188,6 @@ end
 ### GtkTreeModelI
 
 GtkTreeModelI = Union(GtkListStore,GtkTreeStore,GtkTreeModelFilter)
-convert(::Type{Ptr{None}},m::GtkTreeModelI) = convert(Ptr{None},m.handle)
 
 function getindex(treeModel::GtkTreeModelI, iter::GtkTreeIter, column::Integer)
     arr = [GValue()]
@@ -214,6 +213,15 @@ end
 
 ncolumns(treeModel::GtkTreeModelI) =
     ccall((:gtk_tree_model_get_n_columns,libgtk), Cint, (Ptr{GObject},),treeModel)
+
+### GtkTreeSortableI
+
+baremodule GtkSortType
+    const GTK_SORT_ASCENDING = 0
+    const GTK_SORT_DESCENDING = 1
+end
+
+GtkTreeSortableI  = Union(GtkListStore,GtkTreeStore)
 
 ### GtkCellRenderer
 
@@ -302,8 +310,10 @@ GtkTreeView() = GtkTreeView(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
 GtkTreeView(treeStore::GtkTreeModelI) = GtkTreeView(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
 
-function push!(treeView::GtkTreeView,treeColumn::GtkTreeViewColumn)
-  ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,treeColumn)
+function push!(treeView::GtkTreeView,treeColumns::GtkTreeViewColumn...)
+  for col in treeColumns
+    ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,col)
+  end
   treeView
 end
 

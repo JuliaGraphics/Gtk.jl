@@ -66,7 +66,10 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkTreeView" => :GtkTreeViewI,
     "GtkCellView" => :GtkCellViewI,
     "GtkIconView" => :GtkIconViewI,
-    "GtkTreeSelection" => :GtkTreeSelectionI
+    "GtkTreeSelection" => :GtkTreeSelectionI,
+    "GtkTreeSortable" => :GtkTreeSortableI,
+    "GtkTreeModel" => :GtkTreeModelI,
+    "GtkTreeModelFilter" => :GtkTreeModelFilterI 
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,

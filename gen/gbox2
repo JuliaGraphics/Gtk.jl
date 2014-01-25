@@ -1235,6 +1235,50 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function sensitive(cell::Gtk.GtkCellRendererI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_cell_renderer_get_sensitive,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :cell)))
         end
+        function flags(tree_model::Gtk.GtkTreeModelI)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_flags,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tree_model))
+        end
+        function n_columns(tree_model::Gtk.GtkTreeModelI)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_n_columns,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tree_model))
+        end
+        function column_type(tree_model::Gtk.GtkTreeModelI,index_)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_column_type,Gtk.libgtk), :Culong, :(Ptr{Gtk.GObject},Cint), :tree_model, :index_))
+        end
+        function iter(tree_model::Gtk.GtkTreeModelI,iter_,path)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :tree_model, :iter_, :path)))
+        end
+        function iter_from_string(tree_model::Gtk.GtkTreeModelI,iter,path_string)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_from_string,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Uint8}), :tree_model, :iter, :path_string)))
+        end
+        function string_from_iter(tree_model::Gtk.GtkTreeModelI,iter)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_string_from_iter,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter))
+        end
+        function iter_first(tree_model::Gtk.GtkTreeModelI,iter)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_first,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter)))
+        end
+        function path(tree_model::Gtk.GtkTreeModelI,iter)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_path,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter))
+        end
+        function value(tree_model::Gtk.GtkTreeModelI,iter,column,value_)
+            return $(Expr(:ccall, :(:gtk_tree_model_get_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void}), :tree_model, :iter, :column, :value_))
+        end
+        function sort_column_id(sortable::Gtk.GtkTreeSortableI)
+            order = Gtk.mutable(Cint)
+            sort_column_id_ = Gtk.mutable(Cint)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_sortable_get_sort_column_id,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :sortable, :sort_column_id_, :order))),sort_column_id_[],order[])
+        end
+        function sort_column_id(sortable::Gtk.GtkTreeSortableI,sort_column_id_,order)
+            $(Expr(:ccall, :(:gtk_tree_sortable_set_sort_column_id,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :sortable, :sort_column_id_, :order))
+            return sortable
+        end
+        function sort_func(sortable::Gtk.GtkTreeSortableI,sort_column_id,sort_func_,user_data,destroy)
+            $(Expr(:ccall, :(:gtk_tree_sortable_set_sort_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void},Ptr{Void},Ptr{Void}), :sortable, :sort_column_id, :sort_func_, :user_data, :destroy))
+            return sortable
+        end
+        function default_sort_func(sortable::Gtk.GtkTreeSortableI,sort_func,user_data,destroy)
+            $(Expr(:ccall, :(:gtk_tree_sortable_set_default_sort_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Void}), :sortable, :sort_func, :user_data, :destroy))
+            return sortable
+        end
         function cell_renderers(tree_column::Gtk.GtkTreeViewColumnI)
             return $(Expr(:ccall, :(:gtk_tree_view_column_get_cell_renderers,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tree_column))
         end
@@ -1362,7 +1406,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_tree_view_column_get_sort_order,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tree_column))
         end
         function cell_data(tree_column::Gtk.GtkTreeViewColumnI,tree_model,iter,is_expander,is_expanded)
-            $(Expr(:ccall, :(:gtk_tree_view_column_cell_set_cell_data,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Cint,Cint), :tree_column, :tree_model, :iter, :is_expander, :is_expanded))
+            $(Expr(:ccall, :(:gtk_tree_view_column_cell_set_cell_data,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Void},Cint,Cint), :tree_column, :tree_model, :iter, :is_expander, :is_expanded))
             return tree_column
         end
         function size(tree_column::Gtk.GtkTreeViewColumnI)
@@ -1408,11 +1452,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return toggle
         end
         function model(cell_view::Gtk.GtkCellViewI,model_)
-            $(Expr(:ccall, :(:gtk_cell_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :model_))
+            $(Expr(:ccall, :(:gtk_cell_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :cell_view, :model_))
             return cell_view
         end
         function model(cell_view::Gtk.GtkCellViewI)
-            return $(Expr(:ccall, :(:gtk_cell_view_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :cell_view))
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_cell_view_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :cell_view)))
         end
         function displayed_row(cell_view::Gtk.GtkCellViewI,path)
             $(Expr(:ccall, :(:gtk_cell_view_set_displayed_row,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :cell_view, :path))
@@ -1528,7 +1572,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return filter
         end
         function model(filter::Gtk.GtkTreeModelFilterI)
-            return $(Expr(:ccall, :(:gtk_tree_model_filter_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :filter))
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_tree_model_filter_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :filter)))
         end
         function buffer(entry::Gtk.GtkEntryI)
             return $(Expr(:ccall, :(:gtk_entry_get_buffer,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :entry))
@@ -1731,10 +1775,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return entry
         end
         function model(tree_view::Gtk.GtkTreeViewI)
-            return $(Expr(:ccall, :(:gtk_tree_view_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tree_view))
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_tree_view_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :tree_view)))
         end
         function model(tree_view::Gtk.GtkTreeViewI,model_)
-            $(Expr(:ccall, :(:gtk_tree_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :tree_view, :model_))
+            $(Expr(:ccall, :(:gtk_tree_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :tree_view, :model_))
             return tree_view
         end
         function selection(tree_view::Gtk.GtkTreeViewI)
@@ -1970,8 +2014,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function tooltip_context(tree_view::Gtk.GtkTreeViewI,x,y,keyboard_tip,iter)
             path = Gtk.mutable(Ptr{Void})
-            model = Gtk.mutable(Ptr{Void})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),model[],path[])
+            model = Gtk.mutable(Ptr{Gtk.GObject})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Void}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[])
         end
         function tooltip_column(tree_view::Gtk.GtkTreeViewI,column)
             $(Expr(:ccall, :(:gtk_tree_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tree_view, :column))
@@ -2334,11 +2378,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return pixbuf
         end
         function model(icon_view::Gtk.GtkIconViewI,model_)
-            $(Expr(:ccall, :(:gtk_icon_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :icon_view, :model_))
+            $(Expr(:ccall, :(:gtk_icon_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :icon_view, :model_))
             return icon_view
         end
         function model(icon_view::Gtk.GtkIconViewI)
-            return $(Expr(:ccall, :(:gtk_icon_view_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :icon_view))
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_icon_view_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :icon_view)))
         end
         function text_column(icon_view::Gtk.GtkIconViewI,column)
             $(Expr(:ccall, :(:gtk_icon_view_set_text_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
@@ -2494,8 +2538,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function tooltip_context(icon_view::Gtk.GtkIconViewI,x,y,keyboard_tip,iter)
             path = Gtk.mutable(Ptr{Void})
-            model = Gtk.mutable(Ptr{Void})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),model[],path[])
+            model = Gtk.mutable(Ptr{Gtk.GObject})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[])
         end
         function tooltip_column(icon_view::Gtk.GtkIconViewI,column)
             $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
@@ -3252,7 +3296,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_text_view_get_default_attributes,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :text_view))
         end
         function model(tree_model::Gtk.GtkTreeModelSortI)
-            return $(Expr(:ccall, :(:gtk_tree_model_sort_get_model,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tree_model))
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_tree_model_sort_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :tree_model)))
         end
         function mode(selection::Gtk.GtkTreeSelectionI,type_)
             $(Expr(:ccall, :(:gtk_tree_selection_set_mode,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :selection, :type_))
@@ -3275,12 +3319,12 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_tree_selection_get_select_function,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :selection))
         end
         function selected(selection::Gtk.GtkTreeSelectionI,iter)
-            model = Gtk.mutable(Ptr{Void})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_selection_get_selected,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Void}), :selection, :model, :iter))),model[])
+            model = Gtk.mutable(Ptr{Gtk.GObject})
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_selection_get_selected,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Gtk.GObject}},Ptr{Void}), :selection, :model, :iter))),convert(Gtk.GtkTreeModelI,model[]))
         end
         function selected_rows(selection::Gtk.GtkTreeSelectionI)
-            model = Gtk.mutable(Ptr{Void})
-            return ($(Expr(:ccall, :(:gtk_tree_selection_get_selected_rows,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Ptr{Void}}), :selection, :model)),model[])
+            model = Gtk.mutable(Ptr{Gtk.GObject})
+            return ($(Expr(:ccall, :(:gtk_tree_selection_get_selected_rows,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Ptr{Gtk.GObject}}), :selection, :model)),convert(Gtk.GtkTreeModelI,model[]))
         end
         function column_types(tree_store::Gtk.GtkTreeStoreI,n_columns,types)
             $(Expr(:ccall, :(:gtk_tree_store_set_column_types,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Culong}), :tree_store, :n_columns, :types))
