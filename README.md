@@ -58,6 +58,8 @@ On the flip side, you can assign child widgets to indices, or `push!` them onto 
 
 ### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
 
+warning: this API uses 0-based indexing
+
 The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
 When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
@@ -126,6 +128,8 @@ Note: the return type and argument types do not need to match the spec. However,
 ### Objects have get and set accessor methods
 
 warning: this API has not been completely finalized
+warning: this API uses 0-based indexing
+note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
 
 ``Gtk._`` (not exported), ``Gtk.G_`` (exported by ShortNames), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the GtkObjects. The difference between a get and set method is based upon the number of arguments.
 
@@ -220,9 +224,24 @@ Note that because these are auto-generated, you will often need to do your own g
 
 New Gtk types can be most easily added by using the Gtk.@GTypes macro:
 
-     Gtk.@GTypes GTypeName <: GParentName
+     Gtk.@GTypes GTypeName library_variable sym_name
+     Gtk.@GTypes GTypeName library_variable gtyp_getter_expr
 
-and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: for example, the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+
+You can subclass a type in Julia using the following code pattern:
+
+    type MyWidget <: Gtk.GtkButtonI
+        handle::Ptr{Gtk.GObjectI}
+        other_fields
+        function MyWidget(label)
+            btn = GtkButton(label)
+            Gtk.gc_move_ref(new(btn), btn)
+        end
+    end
+
+This creates a MyWidget which inherits its behavior from GtkButton. The `gc_move_ref` call transfers ownership of the GtkObject handle from GtkButton to MyWidget in a gc safe manner. Afterwards, the btn object is invalid and converting from a `Ptr{GtkObjectI}` to a `GtkObjectI` will return the MyWidget object.
+
 
 #### New GValue<->Julia auto-conversions
 
