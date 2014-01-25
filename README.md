@@ -58,7 +58,7 @@ On the flip side, you can assign child widgets to indices, or `push!` them onto 
 
 ### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
 
-warning: this API uses 0-based indexing
+     > warning: this API uses 0-based indexing
 
 The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
@@ -127,9 +127,9 @@ Note: the return type and argument types do not need to match the spec. However,
 
 ### Objects have get and set accessor methods
 
-warning: this API has not been completely finalized
-warning: this API uses 0-based indexing
-note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
+    > warning: this API has not been completely finalized
+    > warning: this API uses 0-based indexing
+    > note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
 
 ``Gtk._`` (not exported), ``Gtk.G_`` (exported by ShortNames), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the GtkObjects. The difference between a get and set method is based upon the number of arguments.
 
