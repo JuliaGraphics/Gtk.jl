@@ -8,7 +8,7 @@ using .GLib.MutableTypes
 using Cairo
 
 import .GLib: bytestring, setproperty!, getproperty
-import Base: convert, show, showall, run, size, length, getindex, setindex!,
+import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid
