@@ -279,6 +279,19 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
+## Usage without the REPL
+
+To write applications that you run as Julia scripts, e.g., from the command line as `julia myapplication.jl`, insert
+
+```
+if !isinteractive()
+    wait(Condition())
+end
+```
+
+at the end of your script. That will prevent `julia` from exiting before the user even sees the window(s).
+
+
 ## Specific graphical elements
 
 ### Scales
