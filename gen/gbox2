@@ -2795,6 +2795,50 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_radio_button_set_group,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :radio_button, :group_))
             return radio_button
         end
+        function hadjustment(scrolled_window::Gtk.GtkScrolledWindowI,hadjustment_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :scrolled_window, :hadjustment_))
+            return scrolled_window
+        end
+        function vadjustment(scrolled_window::Gtk.GtkScrolledWindowI,vadjustment_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :scrolled_window, :vadjustment_))
+            return scrolled_window
+        end
+        function hadjustment(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkAdjustmentI,$(Expr(:ccall, :(:gtk_scrolled_window_get_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function vadjustment(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkAdjustmentI,$(Expr(:ccall, :(:gtk_scrolled_window_get_vadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function hscrollbar(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_scrolled_window_get_hscrollbar,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function vscrollbar(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_scrolled_window_get_vscrollbar,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function policy(scrolled_window::Gtk.GtkScrolledWindowI,hscrollbar_policy,vscrollbar_policy)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_policy,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :scrolled_window, :hscrollbar_policy, :vscrollbar_policy))
+            return scrolled_window
+        end
+        function policy(scrolled_window::Gtk.GtkScrolledWindowI)
+            vscrollbar_policy = Gtk.mutable(Cint)
+            hscrollbar_policy = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_scrolled_window_get_policy,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :scrolled_window, :hscrollbar_policy, :vscrollbar_policy))
+            return (hscrollbar_policy[],vscrollbar_policy[])
+        end
+        function placement(scrolled_window::Gtk.GtkScrolledWindowI,window_placement)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_placement,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :window_placement))
+            return scrolled_window
+        end
+        function placement(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_placement,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function shadow_type(scrolled_window::Gtk.GtkScrolledWindowI,type_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_shadow_type,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :type_))
+            return scrolled_window
+        end
+        function shadow_type(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_shadow_type,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
         function adjustment(spin_button::Gtk.GtkSpinButtonI,adjustment_)
             $(Expr(:ccall, :(:gtk_spin_button_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :spin_button, :adjustment_))
             return spin_button

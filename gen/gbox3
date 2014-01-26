@@ -3097,6 +3097,78 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_scale_get_layout_offsets,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :scale, :x, :y))
             return (x[],y[])
         end
+        function hadjustment(scrolled_window::Gtk.GtkScrolledWindowI,hadjustment_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :scrolled_window, :hadjustment_))
+            return scrolled_window
+        end
+        function vadjustment(scrolled_window::Gtk.GtkScrolledWindowI,vadjustment_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_vadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :scrolled_window, :vadjustment_))
+            return scrolled_window
+        end
+        function hadjustment(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkAdjustmentI,$(Expr(:ccall, :(:gtk_scrolled_window_get_hadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function vadjustment(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkAdjustmentI,$(Expr(:ccall, :(:gtk_scrolled_window_get_vadjustment,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function hscrollbar(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_scrolled_window_get_hscrollbar,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function vscrollbar(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_scrolled_window_get_vscrollbar,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function policy(scrolled_window::Gtk.GtkScrolledWindowI,hscrollbar_policy,vscrollbar_policy)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_policy,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Cint), :scrolled_window, :hscrollbar_policy, :vscrollbar_policy))
+            return scrolled_window
+        end
+        function policy(scrolled_window::Gtk.GtkScrolledWindowI)
+            vscrollbar_policy = Gtk.mutable(Cint)
+            hscrollbar_policy = Gtk.mutable(Cint)
+            $(Expr(:ccall, :(:gtk_scrolled_window_get_policy,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :scrolled_window, :hscrollbar_policy, :vscrollbar_policy))
+            return (hscrollbar_policy[],vscrollbar_policy[])
+        end
+        function placement(scrolled_window::Gtk.GtkScrolledWindowI,window_placement)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_placement,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :window_placement))
+            return scrolled_window
+        end
+        function placement(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_placement,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function shadow_type(scrolled_window::Gtk.GtkScrolledWindowI,type_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_shadow_type,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :type_))
+            return scrolled_window
+        end
+        function shadow_type(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_shadow_type,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function min_content_width(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_min_content_width,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function min_content_width(scrolled_window::Gtk.GtkScrolledWindowI,width)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_min_content_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :width))
+            return scrolled_window
+        end
+        function min_content_height(scrolled_window::Gtk.GtkScrolledWindowI)
+            return $(Expr(:ccall, :(:gtk_scrolled_window_get_min_content_height,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function min_content_height(scrolled_window::Gtk.GtkScrolledWindowI,height)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_min_content_height,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :height))
+            return scrolled_window
+        end
+        function kinetic_scrolling(scrolled_window::Gtk.GtkScrolledWindowI,kinetic_scrolling_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_kinetic_scrolling,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :kinetic_scrolling_))
+            return scrolled_window
+        end
+        function kinetic_scrolling(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_scrolled_window_get_kinetic_scrolling,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
+        function capture_button_press(scrolled_window::Gtk.GtkScrolledWindowI,capture_button_press_)
+            $(Expr(:ccall, :(:gtk_scrolled_window_set_capture_button_press,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :scrolled_window, :capture_button_press_))
+            return scrolled_window
+        end
+        function capture_button_press(scrolled_window::Gtk.GtkScrolledWindowI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_scrolled_window_get_capture_button_press,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window)))
+        end
         function adjustment(spin_button::Gtk.GtkSpinButtonI,adjustment_)
             $(Expr(:ccall, :(:gtk_spin_button_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :spin_button, :adjustment_))
             return spin_button

@@ -37,7 +37,8 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
-    GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter
+    GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
+    GtkScrolledWindow
 
 # Gtk3 objects
 export GtkGrid
@@ -227,6 +228,7 @@ module ShortNames
     const CellRendererToggle = GtkCellRendererToggle
     const CellRendererSpinner = GtkCellRendererSpinner
     const TreeModelFilter = GtkTreeModelFilter
+    const ScrolledWindow = GtkScrolledWindow
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -240,7 +242,8 @@ module ShortNames
         TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
-        CellRendererToggle, CellRendererSpinner, TreeModelFilter
+        CellRendererToggle, CellRendererSpinner, TreeModelFilter,
+        ScrolledWindow
 
     # Gtk 3
     if Gtk.gtk_version >= 3

@@ -16,5 +16,11 @@ function GtkWindow(title=nothing, w=-1, h=-1, resizable=true, toplevel=true)
     widget
 end
 
-#GtkScrolledWindow
+@gtktype GtkScrolledWindow
+function GtkScrolledWindow()
+    hnd = ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
+                C_NULL,C_NULL)
+    GtkScrolledWindow(hnd)
+end
+
 #GtkSeparator — A separator widget
