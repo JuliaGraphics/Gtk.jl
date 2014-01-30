@@ -1,10 +1,11 @@
-Julia interface to Gtk+-2 and Gtk+-3 GUI library (http://www.gtk.org/)
+##Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
+http://www.gtk.org/
 
 Disclaimer: some part of this API may not be finalized
 
 ## Installation
 
-Prior to using this library, you must install a version of libgtk on your computer. While this interface currently defaults to using Gtk+-2, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable.
+Prior to using this library, you must install a semi-recent version of `libgtk` on your computer. While this interface currently defaults to using `Gtk+-3`, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable to `2`.
 
 ### Windows
 
