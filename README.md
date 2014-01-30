@@ -10,22 +10,22 @@ Prior to using this library, you must install a version of libgtk on your comput
 
 The easiest method of installation is to use `WinRPM.jl`:
 
-1. Pkg.add("WinRPM")
-2. WinRPM.install("gtk2")
-3. RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
-4. ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
+     Pkg.add("WinRPM")
+     using WinRPM
+     WinRPM.install(["gtk2","gtk3"])
+     RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
+     ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
 
-You may need to repeat steps 3 and 4 every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
+You may need to repeat the last two steps every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
 
 ### OS X
 
 I use MacPorts:
 
-1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything to minimize conflicts)
-2. push!(DL_LOAD_PATH,"/opt/local/lib")
-You will need to repeat step 2 every time you restart julia, or put this line in your ~/.juliarc.jl file.
+1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything, to minimize conflicts and maximize Quartz)
+2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
-If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz back-end). See https://github.com/JuliaLang/Homebrew.jl/issues/27 for possible eventual workarounds.
+If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See https://github.com/JuliaLang/Homebrew.jl/issues/27 for possible eventual workarounds.
 
 ### Linux
 
