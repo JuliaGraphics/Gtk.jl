@@ -39,7 +39,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
-    GtkToggleToolButton
+    GtkToggleToolButton, GtkMenuToolButton
     
 # Gtk enums
 export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle
@@ -240,6 +240,7 @@ module ShortNames
     const ToolButton = GtkToolButton
     const SeparatorToolItem = GtkSeparatorToolItem
     const ToggleToolButton = GtkToggleToolButton
+    const MenuToolButton = GtkMenuToolButton
     
     # Gtk enums
     const ToolbarStyle = GtkToolbarStyle
@@ -261,7 +262,7 @@ module ShortNames
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
-        ToggleToolButton
+        ToggleToolButton, MenuToolButton
 
     export ToolbarStyle, SortType, IconSize, ReliefStyle
 

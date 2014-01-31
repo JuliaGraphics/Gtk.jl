@@ -2909,6 +2909,21 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function label_widget(button::Gtk.GtkToolButtonI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_tool_button_get_label_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :button)))
         end
+        function menu(button::Gtk.GtkMenuToolButtonI,menu_)
+            $(Expr(:ccall, :(:gtk_menu_tool_button_set_menu,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :button, :menu_))
+            return button
+        end
+        function menu(button::Gtk.GtkMenuToolButtonI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_menu_tool_button_get_menu,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :button)))
+        end
+        function arrow_tooltip_text(button::Gtk.GtkMenuToolButtonI,text)
+            $(Expr(:ccall, :(:gtk_menu_tool_button_set_arrow_tooltip_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :text))
+            return button
+        end
+        function arrow_tooltip_markup(button::Gtk.GtkMenuToolButtonI,markup)
+            $(Expr(:ccall, :(:gtk_menu_tool_button_set_arrow_tooltip_markup,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :markup))
+            return button
+        end
         function group_name(notebook::Gtk.GtkNotebookI,group_name_)
             $(Expr(:ccall, :(:gtk_notebook_set_group_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :notebook, :group_name_))
             return notebook

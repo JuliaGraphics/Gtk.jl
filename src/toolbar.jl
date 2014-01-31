@@ -55,6 +55,10 @@ GtkToggleToolButton() = GtkToggleToolButton(
 
 #TODO GtkRadioToolButton (needs GSList as argument)
 
+@gtktype GtkMenuToolButton
+GtkMenuToolButton(stock_id::String) = GtkMenuToolButton(
+    ccall((:gtk_menu_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
+    
 ### GtkSeparatorToolItem
 @gtktype GtkSeparatorToolItem
 GtkSeparatorToolItem() = GtkSeparatorToolItem(
