@@ -7,10 +7,10 @@ GtkToolItem() = GtkToolItem(
 ### GtkToolbar
 
 baremodule GtkToolbarStyle
-    const GTK_TOOLBAR_ICONS = 0
-    const GTK_TOOLBAR_TEXT = 1
-    const GTK_TOOLBAR_BOTH = 2
-    const GTK_TOOLBAR_BOTH_HORIZ = 3
+    const ICONS=0
+    const TEXT=1
+    const BOTH=2
+    const BOTH_HORIZ=3
 end
 
 @gtktype GtkToolbar
