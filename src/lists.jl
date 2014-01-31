@@ -221,7 +221,7 @@ baremodule GtkSortType
     const GTK_SORT_DESCENDING = 1
 end
 
-GtkTreeSortableI  = Union(GtkListStore,GtkTreeStore)
+typealias GtkTreeSortableI Union(GtkListStore,GtkTreeStore)
 
 ### GtkCellRenderer
 
