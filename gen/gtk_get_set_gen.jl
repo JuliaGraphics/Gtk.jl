@@ -73,7 +73,10 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkScrolledWindow" => :GtkScrolledWindowI,
     "GtkToolbar" => :GtkToolbarI,
     "GtkToolItem" => :GtkToolItemI,
-    "GtkToolButton" => :GtkToolButtonI
+    "GtkToolButton" => :GtkToolButtonI,
+    "GtkToggleToolButton" => :GtkToggleToolButtonI,
+    "GtkSeparatorToolItem" => :GtkSeparatorToolItemI
+    
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,

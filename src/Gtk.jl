@@ -38,10 +38,11 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
-    GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton
+    GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
+    GtkToggleToolButton
     
 # Gtk enums
-export GtkToolbarStyle, GtkSortType, GtkIconSize
+export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle
 
 # Gtk3 objects
 export GtkGrid
@@ -237,11 +238,14 @@ module ShortNames
     const Toolbar = GtkToolbar
     const ToolItem = GtkToolItem
     const ToolButton = GtkToolButton
+    const SeparatorToolItem = GtkSeparatorToolItem
+    const ToggleToolButton = GtkToggleToolButton
     
     # Gtk enums
     const ToolbarStyle = GtkToolbarStyle
     const SortType = GtkSortType
     const IconSize = GtkIconSize
+    const ReliefStyle = GtkReliefStyle
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -256,9 +260,10 @@ module ShortNames
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
-        ScrolledWindow, Toolbar, ToolItem, ToolButton
+        ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
+        ToggleToolButton
 
-    export ToolbarStyle, SortType, IconSize
+    export ToolbarStyle, SortType, IconSize, ReliefStyle
 
     # Gtk 3
     if Gtk.gtk_version >= 3

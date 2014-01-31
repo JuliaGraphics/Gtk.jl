@@ -2922,6 +2922,13 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_radio_button_set_group,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :radio_button, :group_))
             return radio_button
         end
+        function active(button::Gtk.GtkToggleToolButtonI,is_active)
+            $(Expr(:ccall, :(:gtk_toggle_tool_button_set_active,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :button, :is_active))
+            return button
+        end
+        function active(button::Gtk.GtkToggleToolButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_toggle_tool_button_get_active,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :button)))
+        end
         function hadjustment(scrolled_window::Gtk.GtkScrolledWindowI,hadjustment_)
             $(Expr(:ccall, :(:gtk_scrolled_window_set_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :scrolled_window, :hadjustment_))
             return scrolled_window
@@ -2965,6 +2972,13 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function shadow_type(scrolled_window::Gtk.GtkScrolledWindowI)
             return $(Expr(:ccall, :(:gtk_scrolled_window_get_shadow_type,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :scrolled_window))
+        end
+        function draw(item::Gtk.GtkSeparatorToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_separator_tool_item_get_draw,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :item)))
+        end
+        function draw(item::Gtk.GtkSeparatorToolItemI,draw_)
+            $(Expr(:ccall, :(:gtk_separator_tool_item_set_draw,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :item, :draw_))
+            return item
         end
         function adjustment(spin_button::Gtk.GtkSpinButtonI,adjustment_)
             $(Expr(:ccall, :(:gtk_spin_button_set_adjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :spin_button, :adjustment_))

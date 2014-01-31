@@ -46,3 +46,18 @@ length(toolbar::GtkToolbar) =
 @gtktype GtkToolButton
 GtkToolButton(stock_id::String) = GtkToolButton(
     ccall((:gtk_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
+
+@gtktype GtkToggleToolButton
+GtkToggleToolButton(stock_id::String) = GtkToggleToolButton(
+    ccall((:gtk_toggle_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
+GtkToggleToolButton() = GtkToggleToolButton(
+    ccall((:gtk_toggle_tool_button_new,libgtk),Ptr{GObject},()))
+
+#TODO GtkRadioToolButton (needs GSList as argument)
+
+### GtkSeparatorToolItem
+@gtktype GtkSeparatorToolItem
+GtkSeparatorToolItem() = GtkSeparatorToolItem(
+    ccall((:gtk_separator_tool_item_new,libgtk),Ptr{GObject},()))
+    
+
