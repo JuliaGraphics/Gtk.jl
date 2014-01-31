@@ -1,31 +1,32 @@
-Julia interface to Gtk+-2 and Gtk+-3 GUI library (http://www.gtk.org/)
+##Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
+http://www.gtk.org/
 
 Disclaimer: some part of this API may not be finalized
 
 ## Installation
 
-Prior to using this library, you must install a version of libgtk on your computer. While this interface currently defaults to using Gtk+-2, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable.
+Prior to using this library, you must install a semi-recent version of `libgtk` on your computer. While this interface currently defaults to using `Gtk+-3`, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable to `2`.
 
 ### Windows
 
 The easiest method of installation is to use `WinRPM.jl`:
 
-1. Pkg.add("WinRPM")
-2. WinRPM.install("gtk2")
-3. RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
-4. ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
+     Pkg.add("WinRPM")
+     using WinRPM
+     WinRPM.install(["gtk2","gtk3"])
+     RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
+     ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
 
-You may need to repeat steps 3 and 4 every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
+You may need to repeat the last two steps every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
 
 ### OS X
 
 I use MacPorts:
 
-1. `port install gtk2 +quartz -x11 gtk3 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything to minimize conflicts)
-2. push!(DL_LOAD_PATH,"/opt/local/lib")
-You will need to repeat step 2 every time you restart julia, or put this line in your ~/.juliarc.jl file.
+1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything, to minimize conflicts and maximize Quartz)
+2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
-If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz back-end). See https://github.com/JuliaLang/Homebrew.jl/issues/27 for possible eventual workarounds.
+If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See https://github.com/JuliaLang/Homebrew.jl/issues/27 for possible eventual workarounds.
 
 ### Linux
 
@@ -57,6 +58,8 @@ All objects in Gtk are intended to behave uniformly. This means that all objects
 On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a GtkContainerI. Of special note is the anti-object GtkNullContainer. This is not a Gtk Object. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although the standard operations like `splice!` and `delete!` also exist, and are typically preferable).
 
 ### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
+
+     > warning: this API uses 0-based indexing
 
 The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
@@ -125,7 +128,9 @@ Note: the return type and argument types do not need to match the spec. However,
 
 ### Objects have get and set accessor methods
 
-warning: this API has not been completely finalized
+    > warning: this API has not been completely finalized
+    > warning: this API uses 0-based indexing
+    > note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
 
 ``Gtk._`` (not exported), ``Gtk.G_`` (exported by ShortNames), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the GtkObjects. The difference between a get and set method is based upon the number of arguments.
 
@@ -220,9 +225,24 @@ Note that because these are auto-generated, you will often need to do your own g
 
 New Gtk types can be most easily added by using the Gtk.@GTypes macro:
 
-     Gtk.@GTypes GTypeName <: GParentName
+     Gtk.@GTypes GTypeName library_variable sym_name
+     Gtk.@GTypes GTypeName library_variable gtyp_getter_expr
 
-and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: for example, the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+
+You can subclass a type in Julia using the following code pattern:
+
+    type MyWidget <: Gtk.GtkButtonI
+        handle::Ptr{Gtk.GObjectI}
+        other_fields
+        function MyWidget(label)
+            btn = GtkButton(label)
+            Gtk.gc_move_ref(new(btn), btn)
+        end
+    end
+
+This creates a MyWidget which inherits its behavior from GtkButton. The `gc_move_ref` call transfers ownership of the GtkObject handle from GtkButton to MyWidget in a gc safe manner. Afterwards, the btn object is invalid and converting from a `Ptr{GtkObjectI}` to a `GtkObjectI` will return the MyWidget object.
+
 
 #### New GValue<->Julia auto-conversions
 

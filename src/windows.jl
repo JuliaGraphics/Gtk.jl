@@ -16,6 +16,8 @@ function GtkWindow(title=nothing, w=-1, h=-1, resizable=true, toplevel=true)
     widget
 end
 
+resize!(win::GtkWindow, w::Integer, h::Integer) = ccall((:gtk_window_resize,libgtk),Void,(Ptr{GObject},Int32,Int32),win,w,h)
+
 @gtktype GtkScrolledWindow
 function GtkScrolledWindow()
     hnd = ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),

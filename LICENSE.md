@@ -24,7 +24,7 @@ The Julia-Gtk bindings are licensed under the MIT License:
 > WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ------
-The Gtk project is licensed under the GNU General Public License Version 2:
+The Gtk project is licensed under the GNU Lesser General Public License, version 2.1:
 
 >                   GNU LIBRARY GENERAL PUBLIC LICENSE
 >                        Version 2, June 1991
