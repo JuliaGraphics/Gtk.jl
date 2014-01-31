@@ -38,7 +38,10 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
-    GtkScrolledWindow
+    GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton
+    
+# Gtk enums
+export GtkToolbarStyle, GtkSortType, GtkIconSize
 
 # Gtk3 objects
 export GtkGrid
@@ -98,6 +101,8 @@ include("selectors.jl")
 include("misc.jl")
 include("cairo.jl")
 include("builder.jl")
+include("toolbar.jl")
+include("icon.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -229,6 +234,14 @@ module ShortNames
     const CellRendererSpinner = GtkCellRendererSpinner
     const TreeModelFilter = GtkTreeModelFilter
     const ScrolledWindow = GtkScrolledWindow
+    const Toolbar = GtkToolbar
+    const ToolItem = GtkToolItem
+    const ToolButton = GtkToolButton
+    
+    # Gtk enums
+    const ToolbarStyle = GtkToolbarStyle
+    const SortType = GtkSortType
+    const IconSize = GtkIconSize
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -243,7 +256,9 @@ module ShortNames
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
-        ScrolledWindow
+        ScrolledWindow, Toolbar, ToolItem, ToolButton
+
+    export ToolbarStyle, SortType, IconSize
 
     # Gtk 3
     if Gtk.gtk_version >= 3

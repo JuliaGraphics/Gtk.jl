@@ -2597,6 +2597,133 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             tooltips = Gtk.mutable(Ptr{Void})
             return (convert(Bool,$(Expr(:ccall, :(:gtk_tooltips_get_info_from_tip_window,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Ptr{Gtk.GObject}}), :tip_window, :tooltips, :current_widget))),tooltips[],convert(Gtk.GtkWidgetI,current_widget[]))
         end
+        function homogeneous(tool_item::Gtk.GtkToolItemI,homogeneous_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_homogeneous,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :homogeneous_))
+            return tool_item
+        end
+        function homogeneous(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_homogeneous,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function expand(tool_item::Gtk.GtkToolItemI,expand_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_expand,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :expand_))
+            return tool_item
+        end
+        function expand(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_expand,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function tooltip(tool_item::Gtk.GtkToolItemI,tooltips,tip_text,tip_private)
+            $(Expr(:ccall, :(:gtk_tool_item_set_tooltip,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Uint8},Ptr{Uint8}), :tool_item, :tooltips, :tip_text, :tip_private))
+            return tool_item
+        end
+        function tooltip_text(tool_item::Gtk.GtkToolItemI,text)
+            $(Expr(:ccall, :(:gtk_tool_item_set_tooltip_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :tool_item, :text))
+            return tool_item
+        end
+        function tooltip_markup(tool_item::Gtk.GtkToolItemI,markup)
+            $(Expr(:ccall, :(:gtk_tool_item_set_tooltip_markup,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :tool_item, :markup))
+            return tool_item
+        end
+        function use_drag_window(tool_item::Gtk.GtkToolItemI,use_drag_window_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_use_drag_window,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :use_drag_window_))
+            return tool_item
+        end
+        function use_drag_window(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_use_drag_window,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function visible_horizontal(tool_item::Gtk.GtkToolItemI,visible_horizontal_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_visible_horizontal,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :visible_horizontal_))
+            return tool_item
+        end
+        function visible_horizontal(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_visible_horizontal,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function visible_vertical(tool_item::Gtk.GtkToolItemI,visible_vertical_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_visible_vertical,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :visible_vertical_))
+            return tool_item
+        end
+        function visible_vertical(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_visible_vertical,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function is_important(tool_item::Gtk.GtkToolItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_item_get_is_important,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item)))
+        end
+        function is_important(tool_item::Gtk.GtkToolItemI,is_important_)
+            $(Expr(:ccall, :(:gtk_tool_item_set_is_important,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tool_item, :is_important_))
+            return tool_item
+        end
+        function ellipsize_mode(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_ellipsize_mode,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function icon_size(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_icon_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function orientation(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_orientation,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function toolbar_style(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_toolbar_style,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function relief_style(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_relief_style,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function text_alignment(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_text_alignment,Gtk.libgtk), :Cfloat, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function text_orientation(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_text_orientation,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function text_size_group(tool_item::Gtk.GtkToolItemI)
+            return $(Expr(:ccall, :(:gtk_tool_item_get_text_size_group,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :tool_item))
+        end
+        function proxy_menu_item(tool_item::Gtk.GtkToolItemI,menu_item_id)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_tool_item_get_proxy_menu_item,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Ptr{Uint8}), :tool_item, :menu_item_id)))
+        end
+        function proxy_menu_item(tool_item::Gtk.GtkToolItemI,menu_item_id,menu_item)
+            $(Expr(:ccall, :(:gtk_tool_item_set_proxy_menu_item,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Gtk.GObject}), :tool_item, :menu_item_id, :menu_item))
+            return tool_item
+        end
+        function label(button::Gtk.GtkToolButtonI,label_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :label_))
+            return button
+        end
+        function label(button::Gtk.GtkToolButtonI)
+            return $(Expr(:ccall, :(:gtk_tool_button_get_label,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :button))
+        end
+        function use_underline(button::Gtk.GtkToolButtonI,use_underline_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_use_underline,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :button, :use_underline_))
+            return button
+        end
+        function use_underline(button::Gtk.GtkToolButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tool_button_get_use_underline,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :button)))
+        end
+        function stock_id(button::Gtk.GtkToolButtonI,stock_id_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_stock_id,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :stock_id_))
+            return button
+        end
+        function stock_id(button::Gtk.GtkToolButtonI)
+            return $(Expr(:ccall, :(:gtk_tool_button_get_stock_id,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :button))
+        end
+        function icon_name(button::Gtk.GtkToolButtonI,icon_name_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_icon_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :icon_name_))
+            return button
+        end
+        function icon_name(button::Gtk.GtkToolButtonI)
+            return $(Expr(:ccall, :(:gtk_tool_button_get_icon_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :button))
+        end
+        function icon_widget(button::Gtk.GtkToolButtonI,icon_widget_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_icon_widget,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :button, :icon_widget_))
+            return button
+        end
+        function icon_widget(button::Gtk.GtkToolButtonI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_tool_button_get_icon_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :button)))
+        end
+        function label_widget(button::Gtk.GtkToolButtonI,label_widget_)
+            $(Expr(:ccall, :(:gtk_tool_button_set_label_widget,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :button, :label_widget_))
+            return button
+        end
+        function label_widget(button::Gtk.GtkToolButtonI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_tool_button_get_label_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :button)))
+        end
         function group_id(notebook::Gtk.GtkNotebookI,group_id_)
             $(Expr(:ccall, :(:gtk_notebook_set_group_id,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :notebook, :group_id_))
             return notebook
@@ -3338,6 +3465,60 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function default_attributes(text_view::Gtk.GtkTextViewI)
             return $(Expr(:ccall, :(:gtk_text_view_get_default_attributes,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :text_view))
+        end
+        function item_index(toolbar::Gtk.GtkToolbarI,item)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_item_index,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :toolbar, :item))
+        end
+        function n_items(toolbar::Gtk.GtkToolbarI)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_n_items,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar))
+        end
+        function nth_item(toolbar::Gtk.GtkToolbarI,n)
+            return convert(Gtk.GtkToolItemI,$(Expr(:ccall, :(:gtk_toolbar_get_nth_item,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},Cint), :toolbar, :n)))
+        end
+        function show_arrow(toolbar::Gtk.GtkToolbarI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_toolbar_get_show_arrow,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar)))
+        end
+        function show_arrow(toolbar::Gtk.GtkToolbarI,show_arrow_)
+            $(Expr(:ccall, :(:gtk_toolbar_set_show_arrow,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toolbar, :show_arrow_))
+            return toolbar
+        end
+        function style(toolbar::Gtk.GtkToolbarI)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_style,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar))
+        end
+        function style(toolbar::Gtk.GtkToolbarI,style_)
+            $(Expr(:ccall, :(:gtk_toolbar_set_style,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toolbar, :style_))
+            return toolbar
+        end
+        function icon_size(toolbar::Gtk.GtkToolbarI)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_icon_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar))
+        end
+        function icon_size(toolbar::Gtk.GtkToolbarI,icon_size_)
+            $(Expr(:ccall, :(:gtk_toolbar_set_icon_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toolbar, :icon_size_))
+            return toolbar
+        end
+        function relief_style(toolbar::Gtk.GtkToolbarI)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_relief_style,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar))
+        end
+        function drop_index(toolbar::Gtk.GtkToolbarI,x,y)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_drop_index,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Cint,Cint), :toolbar, :x, :y))
+        end
+        function drop_highlight_item(toolbar::Gtk.GtkToolbarI,tool_item,index_)
+            $(Expr(:ccall, :(:gtk_toolbar_set_drop_highlight_item,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint), :toolbar, :tool_item, :index_))
+            return toolbar
+        end
+        function orientation(toolbar::Gtk.GtkToolbarI)
+            return $(Expr(:ccall, :(:gtk_toolbar_get_orientation,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar))
+        end
+        function orientation(toolbar::Gtk.GtkToolbarI,orientation_)
+            $(Expr(:ccall, :(:gtk_toolbar_set_orientation,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toolbar, :orientation_))
+            return toolbar
+        end
+        function tooltips(toolbar::Gtk.GtkToolbarI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_toolbar_get_tooltips,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toolbar)))
+        end
+        function tooltips(toolbar::Gtk.GtkToolbarI,enable)
+            $(Expr(:ccall, :(:gtk_toolbar_set_tooltips,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :toolbar, :enable))
+            return toolbar
         end
         function model(tree_model::Gtk.GtkTreeModelSortI)
             return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_tree_model_sort_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :tree_model)))
