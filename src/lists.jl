@@ -217,8 +217,8 @@ ncolumns(treeModel::GtkTreeModelI) =
 ### GtkTreeSortableI
 
 baremodule GtkSortType
-    const GTK_SORT_ASCENDING = 0
-    const GTK_SORT_DESCENDING = 1
+    const ASCENDING = 0
+    const DESCENDING = 1
 end
 
 typealias GtkTreeSortableI Union(GtkListStore,GtkTreeStore)
