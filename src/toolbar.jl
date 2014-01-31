@@ -25,13 +25,17 @@ getindex(toolbar::GtkToolbar, pos::Integer) =
     ccall((:gtk_toolbar_get_nth_item,libgtk),Ptr{GObject},(Ptr{GObject},Cint),
            toolbar,int32(pos))
 
-function push!(toolbar::GtkToolbar, item::GtkToolItemI) 
-    toolbar[-1] = item
+function push!(toolbar::GtkToolbar, items::GtkToolItemI...)
+    for item in items
+        toolbar[-1] = item
+    end
     toolbar
 end
 
-function unshift!(toolbar::GtkToolbar, item::GtkToolItemI) 
-    toolbar[0] = item
+function unshift!(toolbar::GtkToolbar, items::GtkToolItemI...) 
+    for item in reverse(items)
+        toolbar[0] = item
+    end
     toolbar
 end
 

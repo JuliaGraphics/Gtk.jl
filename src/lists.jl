@@ -311,10 +311,10 @@ GtkTreeView(treeStore::GtkTreeModelI) = GtkTreeView(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
 
 function push!(treeView::GtkTreeView,treeColumns::GtkTreeViewColumn...)
-  for col in treeColumns
-    ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,col)
-  end
-  treeView
+    for col in treeColumns
+        ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,col)
+    end
+    treeView
 end
 
 ### To be done
