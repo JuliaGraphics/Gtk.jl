@@ -76,7 +76,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,g_type(String)))
                     params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
                 else
-                    params[i] = gv[]
+                    params[i] = gv[Any]
                 end
                 if i > 1
                     params[i] = convert(param_types[i-1], params[i])
@@ -85,7 +85,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
             push!(params, closure)
         else
             for i = 1:n_param_values
-                params[i] = mutable(param_values,i)[]
+                params[i] = mutable(param_values,i)[Any]
             end
         end
         retval = cb(params...) # widget, args...

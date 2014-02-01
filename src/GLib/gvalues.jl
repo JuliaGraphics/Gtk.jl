@@ -14,8 +14,9 @@ function gvalue{T}(::Type{T})
     v
 end
 function gvalue(x)
-    v = gvalue(typeof(x))
-    v[] = x
+    T = typeof(x)
+    v = gvalue(T)
+    v[T] = x
     v
 end
 function gvalues(xs...)
@@ -112,7 +113,7 @@ const fundamental_fns = tuple(Function[make_gvalue(juliatype, ctype, g_value_fn,
 make_gvalue(Symbol, Ptr{Uint8}, :static_string, :(g_type(String)), false)
 make_gvalue(Type, GType, :gtype, (:g_gtype,:libgobject))
 
-function getindex(gv::Union(Mutable{GValue}, Ptr{GValue}))
+function getindex(gv::GV, ::Type{Any})
     gtyp = unsafe_load(gv).g_type
     if gtyp == 0
         error("Invalid GValue type")
