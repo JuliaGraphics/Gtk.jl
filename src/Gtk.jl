@@ -20,7 +20,7 @@ export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
-    selected
+    selected, hasselection, unselect!, selectall!, unselectall!
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -42,7 +42,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkToggleToolButton, GtkMenuToolButton
     
 # Gtk enums
-export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle
+export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode
 
 # Gtk3 objects
 export GtkGrid
@@ -164,7 +164,7 @@ module ShortNames
         reveal, configure, draw, cairo_context,
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
-        selected
+        selected, hasselection, unselect!, selectall!, unselectall!
 
     # Gtk objects
     const G_ = GAccessor
@@ -247,6 +247,7 @@ module ShortNames
     const SortType = GtkSortType
     const IconSize = GtkIconSize
     const ReliefStyle = GtkReliefStyle
+    const SelectionMode = GtkSelectionMode
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -264,7 +265,7 @@ module ShortNames
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
         ToggleToolButton, MenuToolButton
 
-    export ToolbarStyle, SortType, IconSize, ReliefStyle
+    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode
 
     # Gtk 3
     if Gtk.gtk_version >= 3

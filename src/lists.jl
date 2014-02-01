@@ -296,15 +296,44 @@ add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI,
 
 ### GtkTreeSelection
 
+baremodule GtkSelectionMode
+    const NONE=0
+    const SINGLE=1
+    const BROWSE=2
+    const MULTIPLE=3
+end
+
 @gtktype GtkTreeSelection
 
 function selected(selection::GtkTreeSelection)
     model = mutable(Ptr{GtkTreeModelI})
     iter = GtkTreeIter()
-    ret = ccall((:gtk_tree_selection_get_selected,libgtk),Cint,
-          (Ptr{GObject},Ptr{Ptr{GtkTreeModelI}},Ptr{GtkTreeIter}),selection,model,&iter)
-    convert(GtkTreeModelI, model[]), iter, bool(ret)
+    ret = bool(ccall((:gtk_tree_selection_get_selected,libgtk),Cint,
+          (Ptr{GObject},Ptr{Ptr{GtkTreeModelI}},Ptr{GtkTreeIter}),selection,model,&iter))
+    if !ret
+        error("No selection of GtkTreeSelection")
+    end
+    convert(GtkTreeModelI, model[]), iter
 end
+
+length(selection::GtkTreeSelection) =
+    ccall((:gtk_tree_selection_count_selected_rows,libgtk), Cint, (Ptr{GObject},),selection)
+
+hasselection(selection::GtkTreeSelection) = length(selection) > 0
+
+select!(selection::GtkTreeSelection, iter::GtkTreeIter) =
+    ccall((:gtk_tree_selection_select_iter,libgtk), Void, 
+          (Ptr{GObject},Ptr{GtkTreeIter}),selection, &iter)
+          
+unselect!(selection::GtkTreeSelection, iter::GtkTreeIter) =
+    ccall((:gtk_tree_selection_unselect_iter,libgtk), Void, 
+          (Ptr{GObject},Ptr{GtkTreeIter}),selection, &iter)
+    
+selectall!(selection::GtkTreeSelection) =
+    ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
+
+unselectall!(selection::GtkTreeSelection) =
+    ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
 
 ### GtkTreeView
 
