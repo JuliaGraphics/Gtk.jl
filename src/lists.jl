@@ -173,16 +173,20 @@ function GtkTreeModelFilter(child_model::GObjectI)
     GtkTreeModelFilter(handle)
 end
 
-function convert_iter_to_child_iter(model::GtkTreeModelFilter, child_iter::GtkTreeIter, filter_iter::GtkTreeIter)
+function convert_iter_to_child_iter(model::GtkTreeModelFilter, filter_iter::GtkTreeIter)
+    child_iter = GtkTreeIter()
     ccall((:gtk_tree_model_filter_convert_iter_to_child_iter,libgtk),Void,
           (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), 
           model, &child_iter, &filter_iter)
+    child_iter
 end
 
-function convert_child_iter_to_iter(model::GtkTreeModelFilter, filter_iter::GtkTreeIter, child_iter::GtkTreeIter)
+function convert_child_iter_to_iter(model::GtkTreeModelFilter, child_iter::GtkTreeIter)
+    filter_iter = GtkTreeIter()
     ccall((:gtk_tree_model_filter_convert_child_iter_to_iter,libgtk),Void,
           (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), 
           model,  &filter_iter, &child_iter)
+    filter_iter
 end
 
 ### GtkTreeModelI
@@ -285,22 +289,21 @@ function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, expand
     treeColumn
 end
 
-add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, attribute::String, column) =
+add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI, 
+              attribute::String, column::Integer) =
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
-          (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),int32(column))
+          (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),column)
 
 ### GtkTreeSelection
 
 @gtktype GtkTreeSelection
 
 function selected(selection::GtkTreeSelection)
+    model = mutable(Ptr{GtkTreeModelI})
     iter = GtkTreeIter()
-    # can I convert this to its actual type???
-    model = convert(Ptr{Gtk.GObject},G_.model(G_.tree_view(selection)))
-    # TODO return value? -> Look at Python implementation
     ret = ccall((:gtk_tree_selection_get_selected,libgtk),Cint,
-          (Ptr{GObject},Ptr{Ptr{GObject}},Ptr{GtkTreeIter}),selection,&model,&iter)
-    model, iter, bool(ret)
+          (Ptr{GObject},Ptr{Ptr{GtkTreeModelI}},Ptr{GtkTreeIter}),selection,model,&iter)
+    convert(GtkTreeModelI, model[]), iter, bool(ret)
 end
 
 ### GtkTreeView

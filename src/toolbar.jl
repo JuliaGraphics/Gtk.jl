@@ -17,24 +17,23 @@ end
 GtkToolbar() = GtkToolbar(
     ccall((:gtk_toolbar_new,libgtk),Ptr{GObject},()))
     
-setindex!(toolbar::GtkToolbar, item::GtkToolItemI, pos::Integer) =
+insert!(toolbar::GtkToolbar, pos::Integer, item::GtkToolItemI) =
     ccall((:gtk_toolbar_insert,libgtk),Void,(Ptr{GObject},Ptr{GObject},Cint),
-           toolbar,item,int32(pos))
+           toolbar,item,pos)
 
-getindex(toolbar::GtkToolbar, pos::Integer) =
-    ccall((:gtk_toolbar_get_nth_item,libgtk),Ptr{GObject},(Ptr{GObject},Cint),
-           toolbar,int32(pos))
+getindex(toolbar::GtkToolbar, pos::Integer) = convert(GObject,
+    ccall((:gtk_toolbar_get_nth_item,libgtk),Ptr{GObject},(Ptr{GObject},Cint), toolbar,pos))
 
 function push!(toolbar::GtkToolbar, items::GtkToolItemI...)
     for item in items
-        toolbar[-1] = item
+        insert!(toolbar, -1, item)
     end
     toolbar
 end
 
 function unshift!(toolbar::GtkToolbar, items::GtkToolItemI...) 
     for item in reverse(items)
-        toolbar[0] = item
+        insert!(toolbar, 0, item)
     end
     toolbar
 end
