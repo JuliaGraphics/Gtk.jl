@@ -71,14 +71,9 @@ function GtkListStore(types::Type...)
     GtkListStore(handle)
 end
 
-function push!(listStore::GtkListStore, iter::GtkTreeIter)
-    ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
-    iter
-end
-
 function push!(listStore::GtkListStore, values::Tuple)
     iter = GtkTreeIter()
-    push!(listStore, iter)
+    ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
     for (i,value) in enumerate(values)
         ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
               listStore,&iter,i-1,gvalue(value))
@@ -86,15 +81,20 @@ function push!(listStore::GtkListStore, values::Tuple)
     iter
 end
 
-function unshift!(listStore::GtkListStore, iter::GtkTreeIter)
+function unshift!(listStore::GtkListStore, values::Tuple)
+    iter = GtkTreeIter()
     ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
+    for (i,value) in enumerate(values)
+        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
+              listStore,&iter,i-1,gvalue(value))
+    end
     iter
 end
 
 function delete!(listStore::GtkListStore, iter::GtkTreeIter)
     # not sure what to do with the return value here
     deleted = ccall((:gtk_list_store_remove,libgtk),Cint,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
-    iter
+    listStore
 end
 
 empty!(listStore::GtkListStore) =
@@ -116,18 +116,13 @@ function GtkTreeStore(types::Type...)
     GtkTreeStore(handle)
 end
 
-function push!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
+function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
+    iter = GtkTreeIter()
     if parent == nothing
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
     else
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
-    end
-    iter
-end
-
-function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
-    iter = GtkTreeIter()
-    push!(treeStore, iter, parent)
+    end    
     for (i,value) in enumerate(values)
         ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
               treeStore,&iter,i-1,gvalue(value))
@@ -135,11 +130,16 @@ function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter
 end
 
-function unshift!(treeStore::GtkTreeStore, iter::GtkTreeIter, parent=nothing)
+function unshift!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
+    iter = GtkTreeIter()
     if parent == nothing
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, &iter, C_NULL)
     else
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, &iter, &parent)
+    end    
+    for (i,value) in enumerate(values)
+        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
+              treeStore,&iter,i-1,gvalue(value))
     end
     iter
 end
@@ -147,7 +147,7 @@ end
 function delete!(treeStore::GtkTreeStore, iter::GtkTreeIter)
     # not sure what to do with the return value here
     deleted = ccall((:gtk_tree_store_remove,libgtk),Cint,(Ptr{GObject},Ptr{GtkTreeIter}), treeStore, &iter)
-    iter
+    treeStore
 end
 
 empty!(treeStore::GtkTreeStore) =
