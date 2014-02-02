@@ -197,7 +197,6 @@ function getindex(treeModel::GtkTreeModelI, iter::GtkTreeIter, column::Integer)
     val = mutable(GValue())
     ccall((:gtk_tree_model_get_value,libgtk), Void, (Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
            treeModel, &iter, column-1, val)
-    println(val[Any])
     val[Any]
 end
 
