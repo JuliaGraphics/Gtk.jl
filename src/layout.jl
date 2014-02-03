@@ -230,6 +230,8 @@ function splice!(w::GtkNotebook, i::Integer)
     w
 end
 
+pagenumber(w::GtkNotebook, child::GtkWidgetI) =
+    ccall((:gtk_notebook_page_num,libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
 
 ### GtkOverlay
 if gtk_version == 3

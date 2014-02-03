@@ -20,7 +20,8 @@ export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
-    selected, hasselection, unselect!, selectall!, unselectall!
+    selected, hasselection, unselect!, selectall!, unselectall!,
+    pagenumber
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -164,7 +165,8 @@ module ShortNames
         reveal, configure, draw, cairo_context,
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
-        selected, hasselection, unselect!, selectall!, unselectall!
+        selected, hasselection, unselect!, selectall!, unselectall!,
+        pagenumber
 
     # Gtk objects
     const G_ = GAccessor

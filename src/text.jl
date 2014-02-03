@@ -38,7 +38,7 @@ GtkTextTag(name::String) = GtkTextTag(
 type GtkTextIter
     handle::Ptr{Void}
     reverse::Bool
-    function _GtkTextIter(text::GtkTextBuffer,reverse::Bool)
+    function _GtkTextIter(text::GtkTextBufferI,reverse::Bool)
         iter = new(ccall((:gtk_text_iter_copy,libgtk),Ptr{Void},
             (Ptr{GObject},),text),reverse)
         finalizer(iter, (x::GtkTextIter)->ccall((:gtk_text_iter_free,libgtk),Void,
@@ -51,25 +51,25 @@ type GtkTextIter
             (Ptr{Void},),x.handle))
         iter
     end
-    function GtkTextIter(text::GtkTextBuffer,char_offset::Integer,reverse::Bool=false)
+    function GtkTextIter(text::GtkTextBufferI,char_offset::Integer,reverse::Bool=false)
         iter = _GtkTextIter(text,reverse)
         ccall((:gtk_text_buffer_get_iter_at_offset,libgtk),Void,
             (Ptr{GObject},Ptr{Void},Cint),text,iter.handle,char_offset-1)
         iter
     end
-    function GtkTextIter(text::GtkTextBuffer,line::Integer,char_offset::Integer,reverse::Bool=false)
+    function GtkTextIter(text::GtkTextBufferI,line::Integer,char_offset::Integer,reverse::Bool=false)
         iter = _GtkTextIter(text,reverse)
         ccall((:gtk_text_buffer_get_iter_at_line_offset,libgtk),Void,
             (Ptr{GObject},Ptr{Void},Cint,Cint),text,iter.handle,line-1,char_offset-1)
         iter
     end
-    function GtkTextIter(text::GtkTextBuffer,reverse::Bool=false)
+    function GtkTextIter(text::GtkTextBufferI,reverse::Bool=false)
         iter = _GtkTextIter(text,reverse)
         ccall((:gtk_text_buffer_get_start_iter,libgtk),Void,
             (Ptr{GObject},Ptr{Void}),text,iter.handle)
         iter
     end
-    function GtkTextIter(text::GtkTextBuffer,mark::GtkTextMark,reverse::Bool=false)
+    function GtkTextIter(text::GtkTextBufferI,mark::GtkTextMark,reverse::Bool=false)
         iter = _GtkTextIter(text,reverse)
         ccall((:gtk_text_buffer_get_iter_at_mark,libgtk),Void,
             (Ptr{GObject},Ptr{Void},Ptr{GObject}),text,iter.handle,mark)
