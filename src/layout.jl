@@ -158,7 +158,7 @@ function getindex(pane::GtkPaned, i::Integer)
     return convert(GtkWidgetI, x)
 end
 
-function setindex!(grid::GtkPaned, child, i::Integer)
+function setindex!(pane::GtkPaned, child, i::Integer)
     if i == 1
         ccall((:gtk_paned_add1, libgtk), Void, (Ptr{GObject},Ptr{GObject}), pane, child)
     elseif i == 2
@@ -168,7 +168,7 @@ function setindex!(grid::GtkPaned, child, i::Integer)
     end
 end
 
-function setindex!(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
+function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
     if i == 1
         ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GObject},Ptr{GObject},Cint,Cint), pane, child, resize, shrink)
     elseif i == 2

@@ -21,7 +21,7 @@ export width, height, #minsize, maxsize
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
-    pagenumber
+    pagenumber, present
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -166,7 +166,7 @@ module ShortNames
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
         selected, hasselection, unselect!, selectall!, unselectall!,
-        pagenumber
+        pagenumber, present
 
     # Gtk objects
     const G_ = GAccessor
