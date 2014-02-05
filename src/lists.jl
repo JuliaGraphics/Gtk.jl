@@ -55,12 +55,47 @@ delete!(cb::GtkComboBoxText,i::Integer) =
     (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GObject},Cint),cb,i-1); cb)
 
 type GtkTreeIter
-  stamp::Cint
-  user_data::Ptr{Void}
-  user_data2::Ptr{Void}
-  user_data3::Ptr{Void}
-  GtkTreeIter() = new(0,C_NULL,C_NULL,C_NULL)
+    stamp::Cint
+    user_data::Ptr{Void}
+    user_data2::Ptr{Void}
+    user_data3::Ptr{Void}
+    GtkTreeIter() = new(0,C_NULL,C_NULL,C_NULL)
 end
+
+### GtkTreePath
+
+# for debugging purpose
+type _GtkTreePath
+    depth::Cint
+    alloc::Cint
+    indices::Ptr{Cint}
+end
+
+type GtkTreePath
+    handle::Ptr{Void}
+    
+    function GtkTreePath()
+        path = new(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
+        finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
+            (Ptr{Void},),x.handle))
+        path
+    end
+    
+    function GtkTreePath(pathIn::Ptr{GtkTreePath})
+      path = new(convert(Ptr{Void},pathIn))
+    end
+    
+    function Base.copy(path::GtkTreePath)
+        path = new(ccall((:gtk_tree_path_copy,libgtk),Ptr{Void},(Ptr{Void},),path.handle))
+        finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
+            (Ptr{Void},),x.handle))
+        path
+    end    
+end
+
+convert(::Type{Ptr{Void}},path::GtkTreePath) = path.handle
+convert(::Type{Ptr{GtkTreePath}},path::GtkTreePath) = convert(Ptr{GtkTreePath},path.handle)
+convert(::Type{GtkTreePath},path::Ptr{GtkTreePath}) = GtkTreePath(path)
 
 ### GtkListStore
 
@@ -217,6 +252,13 @@ end
 ncolumns(treeModel::GtkTreeModelI) =
     ccall((:gtk_tree_model_get_n_columns,libgtk), Cint, (Ptr{GObject},),treeModel)
 
+#TODO: Replace by accessor
+function iter(treeModel::GtkTreeModelI, path::GtkTreePath)
+  it = GtkTreeIter()
+  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{Void},Ptr{Void}),treeModel,&it,path))
+  ret, it
+end
+
 ### GtkTreeSortableI
 
 baremodule GtkSortType
@@ -346,6 +388,20 @@ function push!(treeView::GtkTreeView,treeColumns::GtkTreeViewColumn...)
         ccall((:gtk_tree_view_append_column,libgtk),Void,(Ptr{GObject},Ptr{GObject}),treeView,col)
     end
     treeView
+end
+
+# TODO Use internal accessor with default values?
+function path_at_pos(treeView::GtkTreeView, x::Int, y::Int)
+    pathPtr = mutable(Ptr{GtkTreePath})
+    path = GtkTreePath() 
+    
+    ret = bool( ccall((:gtk_tree_view_get_path_at_pos,libgtk),Cint,
+                      (Ptr{GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
+                       treeView,x,y,pathPtr,C_NULL,C_NULL,C_NULL) )
+    if ret
+      path = convert(GtkTreePath, pathPtr[])   
+    end
+    ret, path
 end
 
 ### To be done
