@@ -206,19 +206,19 @@ GtkExpander(title) =
 ### GtkNotebook
 @gtktype GtkNotebook
 GtkNotebook() = GtkNotebook(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
-function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::String)
+function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
         w, x, label, position-1)+1
     w
 end
-function unshift!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::String)
+function unshift!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_prepend_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
     w
 end
-function push!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::String)
+function push!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_append_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1

@@ -391,7 +391,7 @@ function push!(treeView::GtkTreeView,treeColumns::GtkTreeViewColumn...)
 end
 
 # TODO Use internal accessor with default values?
-function path_at_pos(treeView::GtkTreeView, x::Int, y::Int)
+function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     pathPtr = mutable(Ptr{GtkTreePath})
     path = GtkTreePath() 
     
