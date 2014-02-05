@@ -191,7 +191,7 @@ end
 
 ### GtkTreeModelI
 
-GtkTreeModelI = Union(GtkListStore,GtkTreeStore,GtkTreeModelFilter)
+typealias GtkTreeModelI Union(GtkListStore,GtkTreeStore,GtkTreeModelFilter)
 
 function getindex(treeModel::GtkTreeModelI, iter::GtkTreeIter, column::Integer)
     val = mutable(GValue())

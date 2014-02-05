@@ -62,3 +62,5 @@ GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(
 
 GtkAdjustment(spinButton::GtkSpinButton) = convert(GtkAdjustment,
     ccall((:gtk_spin_button_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), spinButton))
+    
+typealias GtkEditableI Union(GtkEntry)

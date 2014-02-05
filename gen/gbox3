@@ -1507,6 +1507,28 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_drag_source_set_icon_gicon,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :widget, :icon))
             return widget
         end
+        function selection_bounds(editable::Gtk.GtkEditableI)
+            end_pos = Gtk.mutable(Cint)
+            start_pos = Gtk.mutable(Cint)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_editable_get_selection_bounds,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}), :editable, :start_pos, :end_pos))),start_pos[],end_pos[])
+        end
+        function chars(editable::Gtk.GtkEditableI,start_pos,end_pos)
+            return $(Expr(:ccall, :(:gtk_editable_get_chars,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Cint,Cint), :editable, :start_pos, :end_pos))
+        end
+        function position(editable::Gtk.GtkEditableI,position_)
+            $(Expr(:ccall, :(:gtk_editable_set_position,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :editable, :position_))
+            return editable
+        end
+        function position(editable::Gtk.GtkEditableI)
+            return $(Expr(:ccall, :(:gtk_editable_get_position,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :editable))
+        end
+        function editable(editable_::Gtk.GtkEditableI,is_editable)
+            $(Expr(:ccall, :(:gtk_editable_set_editable,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :editable_, :is_editable))
+            return editable_
+        end
+        function editable(editable_::Gtk.GtkEditableI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_editable_get_editable,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :editable_)))
+        end
         function column_types(list_store::Gtk.GtkListStoreI,n_columns,types)
             $(Expr(:ccall, :(:gtk_list_store_set_column_types,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Culong}), :list_store, :n_columns, :types))
             return list_store
