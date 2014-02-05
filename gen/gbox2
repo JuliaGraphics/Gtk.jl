@@ -1574,6 +1574,73 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function model(filter::Gtk.GtkTreeModelFilterI)
             return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_tree_model_filter_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :filter)))
         end
+        function entry(completion::Gtk.GtkEntryCompletionI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_entry_completion_get_entry,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function model(completion::Gtk.GtkEntryCompletionI,model_)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :completion, :model_))
+            return completion
+        end
+        function model(completion::Gtk.GtkEntryCompletionI)
+            return convert(Gtk.GtkTreeModelI,$(Expr(:ccall, :(:gtk_entry_completion_get_model,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function match_func(completion::Gtk.GtkEntryCompletionI,func,func_data,func_notify)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_match_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Void}), :completion, :func, :func_data, :func_notify))
+            return completion
+        end
+        function minimum_key_length(completion::Gtk.GtkEntryCompletionI,length)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_minimum_key_length,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :length))
+            return completion
+        end
+        function minimum_key_length(completion::Gtk.GtkEntryCompletionI)
+            return $(Expr(:ccall, :(:gtk_entry_completion_get_minimum_key_length,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion))
+        end
+        function inline_completion(completion::Gtk.GtkEntryCompletionI,inline_completion_)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_inline_completion,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :inline_completion_))
+            return completion
+        end
+        function inline_completion(completion::Gtk.GtkEntryCompletionI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_entry_completion_get_inline_completion,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function inline_selection(completion::Gtk.GtkEntryCompletionI,inline_selection_)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_inline_selection,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :inline_selection_))
+            return completion
+        end
+        function inline_selection(completion::Gtk.GtkEntryCompletionI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_entry_completion_get_inline_selection,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function popup_completion(completion::Gtk.GtkEntryCompletionI,popup_completion_)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_popup_completion,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :popup_completion_))
+            return completion
+        end
+        function popup_completion(completion::Gtk.GtkEntryCompletionI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_entry_completion_get_popup_completion,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function width(completion::Gtk.GtkEntryCompletionI,popup_set_width)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_popup_set_width,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :popup_set_width))
+            return completion
+        end
+        function width(completion::Gtk.GtkEntryCompletionI)
+            $(Expr(:ccall, :(:gtk_entry_completion_get_popup_set_width,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion))
+            return completion
+        end
+        function popup_single_match(completion::Gtk.GtkEntryCompletionI,popup_single_match_)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_popup_single_match,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :popup_single_match_))
+            return completion
+        end
+        function popup_single_match(completion::Gtk.GtkEntryCompletionI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_entry_completion_get_popup_single_match,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion)))
+        end
+        function completion_prefix(completion::Gtk.GtkEntryCompletionI)
+            return $(Expr(:ccall, :(:gtk_entry_completion_get_completion_prefix,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :completion))
+        end
+        function text_column(completion::Gtk.GtkEntryCompletionI,column)
+            $(Expr(:ccall, :(:gtk_entry_completion_set_text_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :completion, :column))
+            return completion
+        end
+        function text_column(completion::Gtk.GtkEntryCompletionI)
+            return $(Expr(:ccall, :(:gtk_entry_completion_get_text_column,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :completion))
+        end
         function buffer(entry::Gtk.GtkEntryI)
             return $(Expr(:ccall, :(:gtk_entry_get_buffer,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :entry))
         end
@@ -1667,11 +1734,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_entry_get_alignment,Gtk.libgtk), :Cfloat, :(Ptr{Gtk.GObject},), :entry))
         end
         function completion(entry::Gtk.GtkEntryI,completion_)
-            $(Expr(:ccall, :(:gtk_entry_set_completion,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :entry, :completion_))
+            $(Expr(:ccall, :(:gtk_entry_set_completion,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :entry, :completion_))
             return entry
         end
         function completion(entry::Gtk.GtkEntryI)
-            return $(Expr(:ccall, :(:gtk_entry_get_completion,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :entry))
+            return convert(Gtk.GtkEntryCompletionI,$(Expr(:ccall, :(:gtk_entry_get_completion,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :entry)))
         end
         function cursor_hadjustment(entry::Gtk.GtkEntryI,adjustment)
             $(Expr(:ccall, :(:gtk_entry_set_cursor_hadjustment,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :entry, :adjustment))

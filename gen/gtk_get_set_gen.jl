@@ -15,6 +15,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkCanvas" => :GtkCanvasI,
     "GtkComboBoxText" => :GtkComboBoxTextI,
     "GtkEntry" => :GtkEntryI,
+    "GtkEntryCompletion" => :GtkEntryCompletionI,
     "GtkImage" => :GtkImageI,
     "GtkLabel" => :GtkLabelI,
     "GtkProgressBar" => :GtkProgressBarI,

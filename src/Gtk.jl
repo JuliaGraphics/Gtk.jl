@@ -21,7 +21,7 @@ export width, height, #minsize, maxsize
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
-    pagenumber, present
+    pagenumber, present, complete
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -29,7 +29,7 @@ export width, height, #minsize, maxsize
 export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
-    GtkToggleButton, GtkLinkButton, GtkVolumeButton,
+    GtkToggleButton, GtkLinkButton, GtkVolumeButton, GtkEntryCompletion,
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
@@ -166,7 +166,7 @@ module ShortNames
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
         selected, hasselection, unselect!, selectall!, unselectall!,
-        pagenumber, present
+        pagenumber, present, complete
 
     # Gtk objects
     const G_ = GAccessor
@@ -190,6 +190,7 @@ module ShortNames
     const LinkButton = GtkLinkButton
     const VolumeButton = GtkVolumeButton
     const Entry = GtkEntry
+    const EntryCompletion = GtkEntryCompletion
     const Scale = GtkScale
     const Adjustment = GtkAdjustment
     const SpinButton = GtkSpinButton
@@ -254,7 +255,7 @@ module ShortNames
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
-        ToggleButton, LinkButton, VolumeButton,
+        ToggleButton, LinkButton, VolumeButton, EntryCompletion,
         Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
