@@ -152,7 +152,9 @@ function _.position(w::GtkWindow,x::Integer,y::Integer)
     w
 end
 
-
+import .Const: GdkScrollDirection, GdkEventType
+import .Const: GtkWindowType, GtkJustification, GtkFileChooserAction, GtkResponseType
+const GtkResponse = GtkResponseType
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames

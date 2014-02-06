@@ -95,57 +95,6 @@ baremodule GdkModifierType
     const MODIFIER = 0x5c001fff
 end
 
-baremodule GdkEventType
-  const NOTHING           = -1
-  const DELETE            = 0
-  const DESTROY           = 1
-  const EXPOSE            = 2
-  const MOTION_NOTIFY     = 3
-  const BUTTON_PRESS      = 4
-  const DOUBLE_BUTTON_PRESS = 5
-  const TRIPLE_BUTTON_PRESS = 6
-  const BUTTON_RELEASE    = 7
-  const KEY_PRESS         = 8
-  const KEY_RELEASE       = 9
-  const ENTER_NOTIFY      = 10
-  const LEAVE_NOTIFY      = 11
-  const FOCUS_CHANGE      = 12
-  const CONFIGURE         = 13
-  const MAP               = 14
-  const UNMAP             = 15
-  const PROPERTY_NOTIFY   = 16
-  const SELECTION_CLEAR   = 17
-  const SELECTION_REQUEST = 18
-  const SELECTION_NOTIFY  = 19
-  const PROXIMITY_IN      = 20
-  const PROXIMITY_OUT     = 21
-  const DRAG_ENTER        = 22
-  const DRAG_LEAVE        = 23
-  const DRAG_MOTION       = 24
-  const DRAG_STATUS       = 25
-  const DROP_START        = 26
-  const DROP_FINISHED     = 27
-  const CLIENT_EVENT      = 28
-  const VISIBILITY_NOTIFY = 29
-  const SCROLL            = 31
-  const WINDOW_STATE      = 32
-  const SETTING           = 33
-  const OWNER_CHANGE      = 34
-  const GRAB_BROKEN       = 35
-  const DAMAGE            = 36
-  const TOUCH_BEGIN       = 37
-  const TOUCH_UPDATE      = 38
-  const TOUCH_END         = 39
-  const TOUCH_CANCEL      = 40
-end
-
-baremodule GdkScrollDirection
-  const UP    = 0
-  const DOWN  = 1
-  const LEFT  = 2
-  const RIGHT = 3
-end
-
 baremodule GdkKeySyms
   const VoidSymbol = 0xffffff
   const BackSpace = 0xff08

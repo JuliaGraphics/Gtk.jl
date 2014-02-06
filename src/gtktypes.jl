@@ -49,11 +49,6 @@ visible(w::GtkWidgetI, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Voi
 show(w::GtkWidgetI) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObjectI},),w)
 showall(w::GtkWidgetI) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObjectI},),w)
 
-baremodule GtkWindowType
-    const TOPLEVEL = 0
-    const POPUP = 1
-end
-
 baremodule GtkPositionType
     const LEFT = 0
     const RIGHT = 1
@@ -71,13 +66,6 @@ baremodule GtkPositionType
         else
             Main.Base.error(Main.Base.string("invalid GtkPositionType ",s))
         end
-end
-
-baremodule GtkJustification
-    const LEFT   = 0
-    const RIGHT  = 1
-    const CENTER = 2
-    const FILL   = 3
 end
 
 function getproperty{T}(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, ::Type{T})
