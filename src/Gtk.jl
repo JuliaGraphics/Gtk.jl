@@ -130,21 +130,29 @@ for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes
 end
 
 export GAccessor
-let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen", "gbox$(gtk_version)")
-    fastcachedir = "$(cachedir)_julia$(VERSION.major)_$(VERSION.minor)"
-    if isfile(fastcachedir) && true
-        open(fastcachedir) do cache
+let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
+    gboxcache = joinpath(cachedir,"gbox$(gtk_version)")
+    fastgboxcache = "$(gboxcache)_julia$(VERSION.major)_$(VERSION.minor)"
+    if isfile(fastgboxcache) && true
+        open(fastgboxcache) do cache
             eval(deserialize(cache))
         end
     else
-        map(eval, include(cachedir).args)
+        map(eval, include(gboxcache).args)
     end
+    constcache = joinpath(cachedir,"consts")
+    eval(Expr(:toplevel, :($(Expr(:module, true, :Const,  
+        include(constcache)
+    )))))
+    #or just map(eval,include(constcache).args)
 end
 const _ = GAccessor
 function _.position(w::GtkWindow,x::Integer,y::Integer)
     ccall((:gtk_window_move,libgtk),Void,(Ptr{GObject},Cint,Cint),w,x,y)
     w
 end
+
+
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
