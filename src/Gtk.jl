@@ -40,7 +40,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
-    GtkToggleToolButton, GtkMenuToolButton
+    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext
     
 # Gtk enums
 export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode
@@ -105,6 +105,7 @@ include("misc.jl")
 include("cairo.jl")
 include("builder.jl")
 include("toolbar.jl")
+include("theme.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -244,6 +245,8 @@ module ShortNames
     const SeparatorToolItem = GtkSeparatorToolItem
     const ToggleToolButton = GtkToggleToolButton
     const MenuToolButton = GtkMenuToolButton
+    const CssProvider = GtkCssProvider
+    const StyleContext = GtkStyleContext
     
     # Gtk enums
     const ToolbarStyle = GtkToolbarStyle
@@ -266,7 +269,7 @@ module ShortNames
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
-        ToggleToolButton, MenuToolButton
+        ToggleToolButton, MenuToolButton, CssProvider, StyleContext
 
     export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode
 

@@ -263,10 +263,10 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
 GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
-function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size::Symbol=:invalid)
-    source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing)
+function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:invalid)
+    source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing) + (stock_id!==nothing)
     @assert(source_count <= 1,
-        "GdkPixbuf must have at most one resource_path, filename, or icon_name argument")
+        "GdkPixbuf must have at most one resource_path, filename, stock_id, or icon_name argument")
     local img::GtkImage
     if resource_path !== nothing
         img = GtkImage(ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path)))
@@ -274,6 +274,8 @@ function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size
         img = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
     elseif icon_name !== nothing
         img = GtkImage(ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.get(size)))
+    elseif stock_id !== nothing
+        img = GtkImage(ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(stock_id),GtkIconSize.get(size)))
     else
         img = GtkImage(ccall((:gtk_image_new,libgtk),Ptr{GObject},()))
     end
