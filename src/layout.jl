@@ -51,7 +51,7 @@ if gtk_version == 3
     end
 
     function insert!(grid::GtkGrid, sibling, side::Symbol)
-        ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.get(side))
+        ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, get_enum(GtkPositionType,side))
     end
 else
     GtkGrid(x...) = error("GtkGrid is not available until Gtk3.0")

@@ -49,25 +49,6 @@ visible(w::GtkWidgetI, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Voi
 show(w::GtkWidgetI) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObjectI},),w)
 showall(w::GtkWidgetI) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObjectI},),w)
 
-baremodule GtkPositionType
-    const LEFT = 0
-    const RIGHT = 1
-    const TOP = 2
-    const BOTTOM = 3
-    get(s::Symbol) =
-        if s === :left
-            LEFT
-        elseif s === :right
-            RIGHT
-        elseif s === :top
-            TOP
-        elseif s === :bottom
-            BOTTOM
-        else
-            Main.Base.error(Main.Base.string("invalid GtkPositionType ",s))
-        end
-end
-
 function getproperty{T}(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,

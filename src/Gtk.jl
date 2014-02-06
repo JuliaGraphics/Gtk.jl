@@ -154,7 +154,17 @@ end
 
 import .Const: GdkScrollDirection, GdkEventType
 import .Const: GtkWindowType, GtkJustification, GtkFileChooserAction, GtkResponseType
+import .Const: GtkPositionType, GtkIconSize
 const GtkResponse = GtkResponseType
+function get_enum(enum,symb) 
+    symb = symbol(uppercase(string(symb)))
+    if isdefined(enum,symb)
+        getfield(enum,symb)
+    else
+        error(string("invalid ", enum))
+    end
+end
+
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
