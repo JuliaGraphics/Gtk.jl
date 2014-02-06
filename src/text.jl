@@ -302,7 +302,7 @@ function getproperty(text::GtkTextRange, key::Symbol, outtype::Type=Any)
             (Ptr{GtkTextIter},Ptr{GtkTextIter}),starttext,endtext),true)
     end)::outtype
 end
-function splice!(text::GtkTextBuffer,index::GtkTextRange)
+function splice!(text::GtkTextBufferI,index::GtkTextRange)
     ccall((:gtk_text_buffer_delete,libgtk),Void,
         (Ptr{GObject},Ptr{GtkTextIter},Ptr{GtkTextIter}),text,first(index),last(index))
     text
@@ -315,33 +315,38 @@ in(x::TI, r::GtkTextRange) = bool(ccall((:gtk_text_iter_in_range,libgtk),Cint,
 #TODO: tags, marks
 #TODO: clipboard, selection/cursor, user_action_groups
 
-start(text::GtkTextBuffer) = start(GtkTextIter(text))
-next(text::GtkTextBuffer, iter) = next(iter,iter)
-done(text::GtkTextBuffer, iter) = done(iter,iter)
-length(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_char_count,libgtk),Cint,
+start(text::GtkTextBufferI) = start(GtkTextIter(text))
+next(text::GtkTextBufferI, iter) = next(iter,iter)
+done(text::GtkTextBufferI, iter) = done(iter,iter)
+length(text::GtkTextBufferI) = ccall((:gtk_text_buffer_get_char_count,libgtk),Cint,
     (Ptr{GObject},),text)
-#get_line_count(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_line_count,libgtk),Cint,(Ptr{GObject},),text)
-function insert!(text::GtkTextBuffer,index::TI,str::String)
+#get_line_count(text::GtkTextBufferI) = ccall((:gtk_text_buffer_get_line_count,libgtk),Cint,(Ptr{GObject},),text)
+function insert!(text::GtkTextBufferI,index::TI,str::String)
     ccall((:gtk_text_buffer_insert,libgtk),Void,
         (Ptr{GObject},Ptr{GtkTextIter},Ptr{Uint8},Cint),text,mutable(index),bytestring(str),sizeof(str))
     text
 end
-function insert!(text::GtkTextBuffer,str::String)
+function insert!(text::GtkTextBufferI,str::String)
     ccall((:gtk_text_buffer_insert_at_cursor,libgtk),Void,
         (Ptr{GObject},Ptr{Uint8},Cint),text,bytestring(str),sizeof(str))
     text
 end
-function splice!(text::GtkTextBuffer,index::GtkTextIter)
+function splice!(text::GtkTextBufferI,index::GtkTextIter)
     ccall((:gtk_text_buffer_backspace,libgtk),Void,
         (Ptr{GObject},Ptr{GtkTextIter},Cint,Cint),text,mutable(index),false,true)
     text
 end
-function splice!(text::GtkTextBuffer)
+function splice!(text::GtkTextBufferI)
     ccall((:gtk_text_buffer_delete_selection,libgtk),Cint,
         (Ptr{GObject},Cint,Cint),text,false,true)
     text
 end
 
+begin_user_action(buffer::GtkTextBufferI) = 
+  ccall((:gtk_text_buffer_begin_user_action,libgtk),Void,(Ptr{GObject},),buffer)
+  
+end_user_action(buffer::GtkTextBufferI) = 
+  ccall((:gtk_text_buffer_end_user_action,libgtk),Void,(Ptr{GObject},),buffer)
 
 #####  GtkTextView  #####
 #TODO: scrolling/views, child overlays
