@@ -65,11 +65,11 @@ end
 ### GtkTreePath
 
 # for debugging purpose
-type _GtkTreePath
-    depth::Cint
-    alloc::Cint
-    indices::Ptr{Cint}
-end
+# type _GtkTreePath
+#    depth::Cint
+#    alloc::Cint
+#    indices::Ptr{Cint}
+# end
 
 type GtkTreePath
     handle::Ptr{Void}
@@ -82,7 +82,10 @@ type GtkTreePath
     end
     
     function GtkTreePath(pathIn::Ptr{GtkTreePath})
-      path = new(convert(Ptr{Void},pathIn))
+        path = new(convert(Ptr{Void},pathIn))
+        finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
+            (Ptr{Void},),x.handle))
+        path        
     end
     
     function Base.copy(path::GtkTreePath)
