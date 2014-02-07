@@ -479,7 +479,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return convert(Bool,$(Expr(:ccall, :(:gtk_widget_get_has_tooltip,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :widget)))
         end
         function style_context(widget::Gtk.GtkWidgetI)
-            return $(Expr(:ccall, :(:gtk_widget_get_style_context,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
+            return convert(Gtk.GtkStyleContextI,$(Expr(:ccall, :(:gtk_widget_get_style_context,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :widget)))
         end
         function path(widget::Gtk.GtkWidgetI)
             return $(Expr(:ccall, :(:gtk_widget_get_path,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
@@ -1113,23 +1113,27 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function column_type(tree_model::Gtk.GtkTreeModelI,index_)
             return $(Expr(:ccall, :(:gtk_tree_model_get_column_type,Gtk.libgtk), :Culong, :(Ptr{Gtk.GObject},Cint), :tree_model, :index_))
         end
-        function iter(tree_model::Gtk.GtkTreeModelI,iter_,path)
-            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}), :tree_model, :iter_, :path)))
+        function iter(tree_model::Gtk.GtkTreeModelI,path)
+            iter_ = Gtk.mutable(Gtk.GtkTreeIter)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Void}), :tree_model, :iter_, :path))),iter_[])
         end
         function iter_from_string(tree_model::Gtk.GtkTreeModelI,iter,path_string)
-            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_from_string,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Uint8}), :tree_model, :iter, :path_string)))
+            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_from_string,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Uint8}), :tree_model, :iter, :path_string)))
         end
-        function string_from_iter(tree_model::Gtk.GtkTreeModelI,iter)
-            return $(Expr(:ccall, :(:gtk_tree_model_get_string_from_iter,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter))
+        function string_from_iter(tree_model::Gtk.GtkTreeModelI)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
+            return ($(Expr(:ccall, :(:gtk_tree_model_get_string_from_iter,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter}), :tree_model, :iter)),iter[])
         end
-        function iter_first(tree_model::Gtk.GtkTreeModelI,iter)
-            return convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_first,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter)))
+        function iter_first(tree_model::Gtk.GtkTreeModelI)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_model_get_iter_first,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter}), :tree_model, :iter))),iter[])
         end
-        function path(tree_model::Gtk.GtkTreeModelI,iter)
-            return $(Expr(:ccall, :(:gtk_tree_model_get_path,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Void}), :tree_model, :iter))
+        function path(tree_model::Gtk.GtkTreeModelI)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
+            return ($(Expr(:ccall, :(:gtk_tree_model_get_path,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter}), :tree_model, :iter)),iter[])
         end
         function value(tree_model::Gtk.GtkTreeModelI,iter,column,value_)
-            return $(Expr(:ccall, :(:gtk_tree_model_get_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void}), :tree_model, :iter, :column, :value_))
+            return $(Expr(:ccall, :(:gtk_tree_model_get_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Cint,Ptr{Void}), :tree_model, :iter, :column, :value_))
         end
         function request_mode(cell::Gtk.GtkCellRendererI)
             return $(Expr(:ccall, :(:gtk_cell_renderer_get_request_mode,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :cell))
@@ -1433,7 +1437,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_tree_view_column_get_sort_order,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tree_column))
         end
         function cell_data(tree_column::Gtk.GtkTreeViewColumnI,tree_model,iter,is_expander,is_expanded)
-            $(Expr(:ccall, :(:gtk_tree_view_column_cell_set_cell_data,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Void},Cint,Cint), :tree_column, :tree_model, :iter, :is_expander, :is_expanded))
+            $(Expr(:ccall, :(:gtk_tree_view_column_cell_set_cell_data,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Cint,Cint), :tree_column, :tree_model, :iter, :is_expander, :is_expanded))
             return tree_column
         end
         function size(tree_column::Gtk.GtkTreeViewColumnI)
@@ -1534,11 +1538,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return list_store
         end
         function value(list_store::Gtk.GtkListStoreI,iter,column,value_)
-            $(Expr(:ccall, :(:gtk_list_store_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void}), :list_store, :iter, :column, :value_))
+            $(Expr(:ccall, :(:gtk_list_store_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Cint,Ptr{Void}), :list_store, :iter, :column, :value_))
             return list_store
         end
         function valuesv(list_store::Gtk.GtkListStoreI,iter,columns,values,n_values)
-            $(Expr(:ccall, :(:gtk_list_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Ptr{Void},Cint), :list_store, :iter, :columns, :values, :n_values))
+            $(Expr(:ccall, :(:gtk_list_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Cint},Ptr{Void},Cint), :list_store, :iter, :columns, :values, :n_values))
             return list_store
         end
         function visible_func(filter::Gtk.GtkTreeModelFilterI,func,data,destroy)
@@ -2178,10 +2182,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_tree_view_set_tooltip_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :tree_view, :tooltip, :path, :column, :cell))
             return tree_view
         end
-        function tooltip_context(tree_view::Gtk.GtkTreeViewI,x,y,keyboard_tip,iter)
+        function tooltip_context(tree_view::Gtk.GtkTreeViewI,x,y,keyboard_tip)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
             path = Gtk.mutable(Ptr{Void})
             model = Gtk.mutable(Ptr{Gtk.GObject})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Void}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[])
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Gtk.GtkTreeIter}), :tree_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[],iter[])
         end
         function tooltip_column(tree_view::Gtk.GtkTreeViewI,column)
             $(Expr(:ccall, :(:gtk_tree_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :tree_view, :column))
@@ -2656,6 +2661,191 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function filter(chooser::Gtk.GtkFileChooserDialogI)
             return $(Expr(:ccall, :(:gtk_file_chooser_get_filter,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :chooser))
         end
+        function title(font_button::Gtk.GtkFontButtonI)
+            return $(Expr(:ccall, :(:gtk_font_button_get_title,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :font_button))
+        end
+        function title(font_button::Gtk.GtkFontButtonI,title_)
+            $(Expr(:ccall, :(:gtk_font_button_set_title,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :font_button, :title_))
+            return font_button
+        end
+        function use_font(font_button::Gtk.GtkFontButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_font_button_get_use_font,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :font_button)))
+        end
+        function use_font(font_button::Gtk.GtkFontButtonI,use_font_)
+            $(Expr(:ccall, :(:gtk_font_button_set_use_font,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :font_button, :use_font_))
+            return font_button
+        end
+        function use_size(font_button::Gtk.GtkFontButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_font_button_get_use_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :font_button)))
+        end
+        function use_size(font_button::Gtk.GtkFontButtonI,use_size_)
+            $(Expr(:ccall, :(:gtk_font_button_set_use_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :font_button, :use_size_))
+            return font_button
+        end
+        function font_name(font_button::Gtk.GtkFontButtonI)
+            return $(Expr(:ccall, :(:gtk_font_button_get_font_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :font_button))
+        end
+        function font_name(font_button::Gtk.GtkFontButtonI,fontname)
+            $(Expr(:ccall, :(:gtk_font_button_set_font_name,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Uint8}), :font_button, :fontname))
+            return font_button
+        end
+        function show_style(font_button::Gtk.GtkFontButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_font_button_get_show_style,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :font_button)))
+        end
+        function show_style(font_button::Gtk.GtkFontButtonI,show_style_)
+            $(Expr(:ccall, :(:gtk_font_button_set_show_style,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :font_button, :show_style_))
+            return font_button
+        end
+        function show_size(font_button::Gtk.GtkFontButtonI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_font_button_get_show_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :font_button)))
+        end
+        function show_size(font_button::Gtk.GtkFontButtonI,show_size_)
+            $(Expr(:ccall, :(:gtk_font_button_set_show_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :font_button, :show_size_))
+            return font_button
+        end
+        function font_family(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_font_family,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function font_face(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_font_face,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function font_size(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_font_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function font_desc(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_font_desc,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function font_desc(fontchooser::Gtk.GtkFontChooserI,font_desc_)
+            $(Expr(:ccall, :(:gtk_font_chooser_set_font_desc,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :fontchooser, :font_desc_))
+            return fontchooser
+        end
+        function font(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_font,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function font(fontchooser::Gtk.GtkFontChooserI,fontname)
+            $(Expr(:ccall, :(:gtk_font_chooser_set_font,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :fontchooser, :fontname))
+            return fontchooser
+        end
+        function preview_text(fontchooser::Gtk.GtkFontChooserI)
+            return $(Expr(:ccall, :(:gtk_font_chooser_get_preview_text,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :fontchooser))
+        end
+        function preview_text(fontchooser::Gtk.GtkFontChooserI,text)
+            $(Expr(:ccall, :(:gtk_font_chooser_set_preview_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :fontchooser, :text))
+            return fontchooser
+        end
+        function show_preview_entry(fontchooser::Gtk.GtkFontChooserI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_font_chooser_get_show_preview_entry,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :fontchooser)))
+        end
+        function show_preview_entry(fontchooser::Gtk.GtkFontChooserI,show_preview_entry_)
+            $(Expr(:ccall, :(:gtk_font_chooser_set_show_preview_entry,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :fontchooser, :show_preview_entry_))
+            return fontchooser
+        end
+        function filter_func(fontchooser::Gtk.GtkFontChooserI,filter,user_data,destroy)
+            $(Expr(:ccall, :(:gtk_font_chooser_set_filter_func,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Void}), :fontchooser, :filter, :user_data, :destroy))
+            return fontchooser
+        end
+        function style(provider::Gtk.GtkStyleProviderI,path)
+            return $(Expr(:ccall, :(:gtk_style_provider_get_style,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Void}), :provider, :path))
+        end
+        function style_property(provider::Gtk.GtkStyleProviderI,path,state,pspec,value)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_style_provider_get_style_property,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void},Ptr{Void}), :provider, :path, :state, :pspec, :value)))
+        end
+        function icon_factory(provider::Gtk.GtkStyleProviderI,path)
+            return $(Expr(:ccall, :(:gtk_style_provider_get_icon_factory,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Void}), :provider, :path))
+        end
+        function section(context::Gtk.GtkStyleContextI,property)
+            return $(Expr(:ccall, :(:gtk_style_context_get_section,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Ptr{Uint8}), :context, :property))
+        end
+        function property(context::Gtk.GtkStyleContextI,property_,state,value)
+            return $(Expr(:ccall, :(:gtk_style_context_get_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Cint,Ptr{Void}), :context, :property_, :state, :value))
+        end
+        function state(context::Gtk.GtkStyleContextI,flags)
+            $(Expr(:ccall, :(:gtk_style_context_set_state,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :context, :flags))
+            return context
+        end
+        function state(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_state,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :context))
+        end
+        function scale(context::Gtk.GtkStyleContextI,scale_)
+            $(Expr(:ccall, :(:gtk_style_context_set_scale,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :context, :scale_))
+            return context
+        end
+        function scale(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_scale,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :context))
+        end
+        function path(context::Gtk.GtkStyleContextI,path_)
+            $(Expr(:ccall, :(:gtk_style_context_set_path,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :context, :path_))
+            return context
+        end
+        function path(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_path,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :context))
+        end
+        function parent(context::Gtk.GtkStyleContextI,parent_)
+            $(Expr(:ccall, :(:gtk_style_context_set_parent,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :context, :parent_))
+            return context
+        end
+        function parent(context::Gtk.GtkStyleContextI)
+            return convert(Gtk.GtkStyleContextI,$(Expr(:ccall, :(:gtk_style_context_get_parent,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :context)))
+        end
+        function style_property(context::Gtk.GtkStyleContextI,property_name,value)
+            return $(Expr(:ccall, :(:gtk_style_context_get_style_property,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :context, :property_name, :value))
+        end
+        function style(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_style,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},), :context))
+        end
+        function screen(context::Gtk.GtkStyleContextI,screen_)
+            $(Expr(:ccall, :(:gtk_style_context_set_screen,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :context, :screen_))
+            return context
+        end
+        function screen(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_screen,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :context))
+        end
+        function frame_clock(context::Gtk.GtkStyleContextI,frame_clock_)
+            $(Expr(:ccall, :(:gtk_style_context_set_frame_clock,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :context, :frame_clock_))
+            return context
+        end
+        function frame_clock(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_frame_clock,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :context))
+        end
+        function direction(context::Gtk.GtkStyleContextI,direction_)
+            $(Expr(:ccall, :(:gtk_style_context_set_direction,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :context, :direction_))
+            return context
+        end
+        function direction(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_direction,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :context))
+        end
+        function junction_sides(context::Gtk.GtkStyleContextI,sides)
+            $(Expr(:ccall, :(:gtk_style_context_set_junction_sides,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :context, :sides))
+            return context
+        end
+        function junction_sides(context::Gtk.GtkStyleContextI)
+            return $(Expr(:ccall, :(:gtk_style_context_get_junction_sides,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :context))
+        end
+        function color(context::Gtk.GtkStyleContextI,state,color_)
+            return $(Expr(:ccall, :(:gtk_style_context_get_color,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :color_))
+        end
+        function background_color(context::Gtk.GtkStyleContextI,state,color)
+            return $(Expr(:ccall, :(:gtk_style_context_get_background_color,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :color))
+        end
+        function border_color(context::Gtk.GtkStyleContextI,state,color)
+            return $(Expr(:ccall, :(:gtk_style_context_get_border_color,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :color))
+        end
+        function font(context::Gtk.GtkStyleContextI,state)
+            return $(Expr(:ccall, :(:gtk_style_context_get_font,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},Cint), :context, :state))
+        end
+        function border(context::Gtk.GtkStyleContextI,state,border_)
+            return $(Expr(:ccall, :(:gtk_style_context_get_border,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :border_))
+        end
+        function padding(context::Gtk.GtkStyleContextI,state,padding_)
+            return $(Expr(:ccall, :(:gtk_style_context_get_padding,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :padding_))
+        end
+        function margin(context::Gtk.GtkStyleContextI,state,margin_)
+            return $(Expr(:ccall, :(:gtk_style_context_get_margin,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint,Ptr{Void}), :context, :state, :margin_))
+        end
+        function background(context::Gtk.GtkStyleContextI,window)
+            $(Expr(:ccall, :(:gtk_style_context_set_background,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :context, :window))
+            return context
+        end
         function model(icon_view::Gtk.GtkIconViewI,model_)
             $(Expr(:ccall, :(:gtk_icon_view_set_model,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :icon_view, :model_))
             return icon_view
@@ -2819,10 +3009,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_cell,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Ptr{Gtk.GObject}), :icon_view, :tooltip, :path, :cell))
             return icon_view
         end
-        function tooltip_context(icon_view::Gtk.GtkIconViewI,x,y,keyboard_tip,iter)
+        function tooltip_context(icon_view::Gtk.GtkIconViewI,x,y,keyboard_tip)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
             path = Gtk.mutable(Ptr{Void})
             model = Gtk.mutable(Ptr{Gtk.GObject})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Void}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[])
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_icon_view_get_tooltip_context,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint},Cint,Ptr{Ptr{Gtk.GObject}},Ptr{Ptr{Void}},Ptr{Gtk.GtkTreeIter}), :icon_view, :x, :y, :keyboard_tip, :model, :path, :iter))),convert(Gtk.GtkTreeModelI,model[]),path[],iter[])
         end
         function tooltip_column(icon_view::Gtk.GtkIconViewI,column)
             $(Expr(:ccall, :(:gtk_icon_view_set_tooltip_column,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :icon_view, :column))
@@ -3935,9 +4126,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function select_function(selection::Gtk.GtkTreeSelectionI)
             return $(Expr(:ccall, :(:gtk_tree_selection_get_select_function,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :selection))
         end
-        function selected(selection::Gtk.GtkTreeSelectionI,iter)
+        function selected(selection::Gtk.GtkTreeSelectionI)
+            iter = Gtk.mutable(Gtk.GtkTreeIter)
             model = Gtk.mutable(Ptr{Gtk.GObject})
-            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_selection_get_selected,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Gtk.GObject}},Ptr{Void}), :selection, :model, :iter))),convert(Gtk.GtkTreeModelI,model[]))
+            return (convert(Bool,$(Expr(:ccall, :(:gtk_tree_selection_get_selected,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},Ptr{Ptr{Gtk.GObject}},Ptr{Gtk.GtkTreeIter}), :selection, :model, :iter))),convert(Gtk.GtkTreeModelI,model[]),iter[])
         end
         function selected_rows(selection::Gtk.GtkTreeSelectionI)
             model = Gtk.mutable(Ptr{Gtk.GObject})
@@ -3948,11 +4140,11 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return tree_store
         end
         function value(tree_store::Gtk.GtkTreeStoreI,iter,column,value_)
-            $(Expr(:ccall, :(:gtk_tree_store_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Cint,Ptr{Void}), :tree_store, :iter, :column, :value_))
+            $(Expr(:ccall, :(:gtk_tree_store_set_value,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Cint,Ptr{Void}), :tree_store, :iter, :column, :value_))
             return tree_store
         end
         function valuesv(tree_store::Gtk.GtkTreeStoreI,iter,columns,values,n_values)
-            $(Expr(:ccall, :(:gtk_tree_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void},Ptr{Cint},Ptr{Void},Cint), :tree_store, :iter, :columns, :values, :n_values))
+            $(Expr(:ccall, :(:gtk_tree_store_set_valuesv,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Cint},Ptr{Void},Cint), :tree_store, :iter, :columns, :values, :n_values))
             return tree_store
         end
     end)))))

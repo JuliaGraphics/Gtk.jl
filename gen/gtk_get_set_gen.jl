@@ -42,6 +42,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkRadioButton" => :GtkRadioButtonI,
     "GtkToggleButton" => :GtkToggleButtonI,
     "GtkVolumeButton" => :GtkVolumeButtonI,
+    "GtkFontButton" => :GtkFontButtonI,
     "GtkWindow" => :GtkWindowI,
     "GtkDialog" => :GtkDialogI,
     "GtkFileChooserDialog" => :GtkFileChooserDialogI,
@@ -81,7 +82,8 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkMenuToolButton" => :GtkMenuToolButtonI,
     "GtkCssProvider" => :GtkCssProviderI,
     "GtkStyleProvider" => :GtkStyleProviderI,  
-    "GtkStyleContext" => : GtkStyleContextI
+    "GtkStyleContext" => :GtkStyleContextI,
+    "GtkFontChooser" => :GtkFontChooserI,
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,

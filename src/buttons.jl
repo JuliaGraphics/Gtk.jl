@@ -191,3 +191,8 @@ baremodule GtkReliefStyle
     const HALF=1
     const NONE=2
 end
+
+@gtktype GtkFontButton
+GtkFontButton() = GtkFontButton(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
+
+typealias GtkFontChooserI Union(GtkFontButton)

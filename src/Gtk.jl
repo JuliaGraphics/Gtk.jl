@@ -29,7 +29,7 @@ export width, height, #minsize, maxsize
 export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
-    GtkToggleButton, GtkLinkButton, GtkVolumeButton, GtkEntryCompletion,
+    GtkToggleButton, GtkLinkButton, GtkVolumeButton, GtkFontButton, GtkEntryCompletion,
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
@@ -190,6 +190,7 @@ module ShortNames
     const ToggleButton = GtkToggleButton
     const LinkButton = GtkLinkButton
     const VolumeButton = GtkVolumeButton
+    const FontButton = GtkFontButton
     const Entry = GtkEntry
     const EntryCompletion = GtkEntryCompletion
     const Scale = GtkScale
@@ -258,7 +259,7 @@ module ShortNames
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
-        ToggleButton, LinkButton, VolumeButton, EntryCompletion,
+        ToggleButton, LinkButton, VolumeButton, FontButton, EntryCompletion,
         Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,

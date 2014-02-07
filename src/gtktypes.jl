@@ -49,6 +49,10 @@ visible(w::GtkWidgetI, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Voi
 show(w::GtkWidgetI) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObjectI},),w)
 showall(w::GtkWidgetI) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObjectI},),w)
 
+# TODO Use Pango type PangoFontDescription once it is wrapped
+modifyfont(w::GtkWidgetI, font_desc::Ptr{Void}) = 
+   ccall((:gtk_widget_modify_font,libgtk),Void,(Ptr{GObjectI},Ptr{Void}),w,font_desc)
+
 baremodule GtkWindowType
     const TOPLEVEL = 0
     const POPUP = 1
