@@ -1,4 +1,4 @@
-
+if gtk_version == 3
 @gtktype GtkCssProvider
 GtkCssProvider() = GtkCssProvider(ccall((:gtk_css_provider_get_default,libgtk),Ptr{GObject},()))
 
@@ -31,3 +31,7 @@ GtkStyleContext() = GtkStyleContext(ccall((:gtk_style_context_new,libgtk),Ptr{GO
 push!(context::GtkStyleContext, provider::GtkStyleProviderI, priority::Integer) =
   ccall((:gtk_style_context_add_provider,libgtk),Void,(Ptr{GObject},Ptr{GObject},Cuint), 
          context,provider,priority)
+else
+    GtkCssProvider(x...) = error("GtkStyleContext is not available until Gtk3.0")
+    GtkStyleContext(x...) = error("GtkStyleContext is not available until Gtk3.0")
+end

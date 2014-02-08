@@ -92,9 +92,12 @@ function g_type(name::Symbol, lib, symname::Symbol)
     if libptr == C_NULL
         libs[lib] = libptr = dlopen(lib)
     end
-    fnptr = dlsym(libptr, string(symname,"_get_type"))
-    typ = ccall(fnptr, GType, ())
-    typ
+    fnptr = dlsym_e(libptr, string(symname,"_get_type"))
+    if fnptr != C_NULL
+        ccall(fnptr, GType, ())
+    else
+        convert(GType, 0)
+    end
 end
 g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
 end
@@ -152,6 +155,9 @@ end
 
 macro Gtype(name,lib,symname)
     gtyp = g_type(name, lib, symname)
+    if gtyp == 0
+        return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
+    end
     @assert name === g_type_name(gtyp)
     if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
         error("not implemented yet")
@@ -165,6 +171,9 @@ macro Gabstract(iname,lib,symname)
     @assert endswith(string(iname),"I")
     name = symbol(string(iname)[1:end-1])
     gtyp = g_type(name, lib, symname)
+    if gtyp == 0
+        return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
+    end
     @assert name === g_type_name(gtyp)
     Expr(:block,
         get_iface_decl(name, iname, gtyp),

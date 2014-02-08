@@ -21,7 +21,7 @@
 
 if gtk_version == 3
     ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-    @eval @gtktype GtkGrid
+    @gtktype GtkGrid
     GtkGrid() = GtkGrid(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
     function getindex(grid::GtkGrid, i::Integer, j::Integer)
@@ -235,7 +235,7 @@ pagenumber(w::GtkNotebook, child::GtkWidgetI) =
 
 ### GtkOverlay
 if gtk_version == 3
-    @eval @gtktype GtkOverlay # this is a GtkBin, except it behaves more like a container
+    @gtktype GtkOverlay # this is a GtkBin, except it behaves more like a container
     GtkOverlay() = GtkOverlay(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
     GtkOverlay(w::GtkWidgetI) = invoke(push!, (GtkContainer,), GtkOverlay(), w)
