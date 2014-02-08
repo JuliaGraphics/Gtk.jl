@@ -1236,6 +1236,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
                 const MODIFIER_RESERVED_29 = 536870912
                 const RELEASE = 1073741824
                 const MODIFIER = 1543512063
+                const BUTTONS = 7936
             end)))))
         $(Expr(:toplevel, :($(Expr(:module, false, :GdkNotifyType, quote 
                 const ANCESTOR = 0

@@ -16,7 +16,7 @@ end
 
 function strip_mask(vals)
     if all( [endswith(string(name),"_mask") for (name,val) in vals] )
-        [ (string(name)[1:end-5],val) for (name,val) in vals]
+        [ (symbol(string(name)[1:end-5]),val) for (name,val) in vals]
     else
         vals
     end
@@ -49,6 +49,9 @@ function write_gtk_consts(fn)
     for (name,vals,isflags) in GI.get_enums(gdk)
         if isflags 
             vals = strip_mask(vals)
+        end
+        if name == :ModifierType
+            push!(vals, (:buttons, 256+512+1024+2048+4096))
         end
         name = symbol("Gdk$name")
         push!(exprs, enum_decl(name,vals))
