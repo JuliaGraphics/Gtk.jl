@@ -141,20 +141,15 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
         map(eval, include(gboxcache).args)
     end
     constcache = joinpath(cachedir,"consts")
-    eval(Expr(:toplevel, :($(Expr(:module, true, :Const,  
-        include(constcache)
-    )))))
-    #or just map(eval,include(constcache).args)
+    map(eval,include(constcache).args)
 end
 const _ = GAccessor
+using .GConstants
 function _.position(w::GtkWindow,x::Integer,y::Integer)
     ccall((:gtk_window_move,libgtk),Void,(Ptr{GObject},Cint,Cint),w,x,y)
     w
 end
 
-import .Const: GdkScrollDirection, GdkEventType
-import .Const: GtkWindowType, GtkJustification, GtkFileChooserAction, GtkResponseType
-import .Const: GtkPositionType, GtkIconSize
 const GtkResponse = GtkResponseType
 function get_enum(enum,symb) 
     symb = symbol(uppercase(string(symb)))
