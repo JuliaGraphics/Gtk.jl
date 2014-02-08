@@ -11,6 +11,12 @@
 @gtktype GtkEntry
 GtkEntry() = GtkEntry(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
 
+@gtktype GtkEntryCompletion 
+GtkEntryCompletion() = GtkEntryCompletion(ccall((:gtk_entry_completion_new,libgtk),Ptr{GObject},()))
+
+complete(completion::GtkEntryCompletion) = 
+    ccall((:gtk_entry_completion_complete,libgtk),Void,(Ptr{GObject},),completion)
+
 @gtktype GtkScale
 if gtk_version == 3
     GtkScale(vertical::Bool,min,max,step) = GtkScale(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
@@ -56,3 +62,5 @@ GtkSpinButton(scale::Ranges) = GtkSpinButton(minimum(scale),maximum(scale),step(
 
 GtkAdjustment(spinButton::GtkSpinButton) = convert(GtkAdjustment,
     ccall((:gtk_spin_button_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), spinButton))
+    
+typealias GtkEditableI Union(GtkEntry)

@@ -158,7 +158,7 @@ function getindex(pane::GtkPaned, i::Integer)
     return convert(GtkWidgetI, x)
 end
 
-function setindex!(grid::GtkPaned, child, i::Integer)
+function setindex!(pane::GtkPaned, child, i::Integer)
     if i == 1
         ccall((:gtk_paned_add1, libgtk), Void, (Ptr{GObject},Ptr{GObject}), pane, child)
     elseif i == 2
@@ -168,7 +168,7 @@ function setindex!(grid::GtkPaned, child, i::Integer)
     end
 end
 
-function setindex!(grid::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
+function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
     if i == 1
         ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GObject},Ptr{GObject},Cint,Cint), pane, child, resize, shrink)
     elseif i == 2
@@ -206,19 +206,19 @@ GtkExpander(title) =
 ### GtkNotebook
 @gtktype GtkNotebook
 GtkNotebook() = GtkNotebook(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
-function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::String)
+function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
         w, x, label, position-1)+1
     w
 end
-function unshift!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::String)
+function unshift!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_prepend_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
     w
 end
-function push!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::String)
+function push!(w::GtkNotebook, x::Union(GtkWidgetI,String), label::Union(GtkWidgetI,String))
     ccall((:gtk_notebook_append_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
@@ -230,6 +230,8 @@ function splice!(w::GtkNotebook, i::Integer)
     w
 end
 
+pagenumber(w::GtkNotebook, child::GtkWidgetI) =
+    ccall((:gtk_notebook_page_num,libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
 
 ### GtkOverlay
 if gtk_version == 3

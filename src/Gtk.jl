@@ -19,7 +19,9 @@ import Cairo: destroy
 export width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop, depth, isancestor,
-    hasparent, toplevel, setproperty!, getproperty
+    hasparent, toplevel, setproperty!, getproperty,
+    selected, hasselection, unselect!, selectall!, unselectall!,
+    pagenumber, present, complete, begin_user_action, end_user_action
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -27,7 +29,7 @@ export width, height, #minsize, maxsize
 export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNotebook,
     GtkExpander, GtkOverlay, GtkFrame, GtkAspectFrame,
     GtkLabel, GtkButton, GtkCheckButton, GtkRadioButton, GtkRadioButtonGroup,
-    GtkToggleButton, GtkLinkButton, GtkVolumeButton,
+    GtkToggleButton, GtkLinkButton, GtkVolumeButton, GtkFontButton, GtkEntryCompletion,
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
@@ -36,7 +38,12 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
-    GtkCellRendererToggle, GtkCellRendererSpinner
+    GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
+    GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
+    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext
+    
+# Gtk enums
+export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode
 
 # Gtk3 objects
 export GtkGrid
@@ -86,6 +93,7 @@ include("events.jl")
 include("container.jl")
 include("windows.jl")
 include("layout.jl")
+include("icon.jl")
 include("displays.jl")
 include("lists.jl")
 include("buttons.jl")
@@ -96,6 +104,8 @@ include("selectors.jl")
 include("misc.jl")
 include("cairo.jl")
 include("builder.jl")
+include("toolbar.jl")
+include("theme.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -155,7 +165,9 @@ module ShortNames
     export width, height, #minsize, maxsize
         reveal, configure, draw, cairo_context,
         visible, destroy, stop, depth, isancestor,
-        hasparent, toplevel, setproperty!, getproperty
+        hasparent, toplevel, setproperty!, getproperty,
+        selected, hasselection, unselect!, selectall!, unselectall!,
+        pagenumber, present, complete, begin_user_action, end_user_action
 
     # Gtk objects
     const G_ = GAccessor
@@ -178,7 +190,9 @@ module ShortNames
     const ToggleButton = GtkToggleButton
     const LinkButton = GtkLinkButton
     const VolumeButton = GtkVolumeButton
+    const FontButton = GtkFontButton
     const Entry = GtkEntry
+    const EntryCompletion = GtkEntryCompletion
     const Scale = GtkScale
     const Adjustment = GtkAdjustment
     const SpinButton = GtkSpinButton
@@ -224,11 +238,28 @@ module ShortNames
     const CellRendererText = GtkCellRendererText
     const CellRendererToggle = GtkCellRendererToggle
     const CellRendererSpinner = GtkCellRendererSpinner
+    const TreeModelFilter = GtkTreeModelFilter
+    const ScrolledWindow = GtkScrolledWindow
+    const Toolbar = GtkToolbar
+    const ToolItem = GtkToolItem
+    const ToolButton = GtkToolButton
+    const SeparatorToolItem = GtkSeparatorToolItem
+    const ToggleToolButton = GtkToggleToolButton
+    const MenuToolButton = GtkMenuToolButton
+    const CssProvider = GtkCssProvider
+    const StyleContext = GtkStyleContext
+    
+    # Gtk enums
+    const ToolbarStyle = GtkToolbarStyle
+    const SortType = GtkSortType
+    const IconSize = GtkIconSize
+    const ReliefStyle = GtkReliefStyle
+    const SelectionMode = GtkSelectionMode
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
         Label, Button, CheckButton, RadioButton, RadioButtonGroup,
-        ToggleButton, LinkButton, VolumeButton,
+        ToggleButton, LinkButton, VolumeButton, FontButton, EntryCompletion,
         Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
@@ -237,7 +268,11 @@ module ShortNames
         TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
-        CellRendererToggle, CellRendererSpinner
+        CellRendererToggle, CellRendererSpinner, TreeModelFilter,
+        ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
+        ToggleToolButton, MenuToolButton, CssProvider, StyleContext
+
+    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode
 
     # Gtk 3
     if Gtk.gtk_version >= 3

@@ -259,42 +259,14 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 
 #TODO: image transformations, rotations, compositing
 
-baremodule GtkIconSize
-    const INVALID=0
-    const MENU=1
-    const SMALL_TOOLBAR=2
-    const LARGE_TOOLBAR=3
-    const BUTTON=4
-    const DND=5
-    const DIALOG=6
-    get(s::Symbol) =
-        if     s === :invalid
-            INVALID
-        elseif s === :menu
-            MENU
-        elseif s === :small_toolbar
-            SMALL_TOOLBAR
-        elseif s === :large_toolbar
-            LARGE_TOOLBAR
-        elseif s === :button
-            BUTTON
-        elseif s === :dnd
-            DND
-        elseif s === :dialog
-            DIALOG
-        else
-            Main.Base.error(Main.Base.string("invalid GtkIconSize ",s))
-        end
-end
-
 @gtktype GtkImage
 GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
 GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
-function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size::Symbol=:invalid)
-    source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing)
+function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:invalid)
+    source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing) + (stock_id!==nothing)
     @assert(source_count <= 1,
-        "GdkPixbuf must have at most one resource_path, filename, or icon_name argument")
+        "GdkPixbuf must have at most one resource_path, filename, stock_id, or icon_name argument")
     local img::GtkImage
     if resource_path !== nothing
         img = GtkImage(ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path)))
@@ -302,6 +274,8 @@ function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,size
         img = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
     elseif icon_name !== nothing
         img = GtkImage(ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.get(size)))
+    elseif stock_id !== nothing
+        img = GtkImage(ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(stock_id),GtkIconSize.get(size)))
     else
         img = GtkImage(ccall((:gtk_image_new,libgtk),Ptr{GObject},()))
     end

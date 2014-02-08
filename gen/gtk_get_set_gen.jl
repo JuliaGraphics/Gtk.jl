@@ -14,7 +14,9 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkTextTag" => :GtkTextTagI,
     "GtkCanvas" => :GtkCanvasI,
     "GtkComboBoxText" => :GtkComboBoxTextI,
+    "GtkEditable" => :GtkEditableI,
     "GtkEntry" => :GtkEntryI,
+    "GtkEntryCompletion" => :GtkEntryCompletionI,
     "GtkImage" => :GtkImageI,
     "GtkLabel" => :GtkLabelI,
     "GtkProgressBar" => :GtkProgressBarI,
@@ -40,6 +42,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkRadioButton" => :GtkRadioButtonI,
     "GtkToggleButton" => :GtkToggleButtonI,
     "GtkVolumeButton" => :GtkVolumeButtonI,
+    "GtkFontButton" => :GtkFontButtonI,
     "GtkWindow" => :GtkWindowI,
     "GtkDialog" => :GtkDialogI,
     "GtkFileChooserDialog" => :GtkFileChooserDialogI,
@@ -66,7 +69,21 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkTreeView" => :GtkTreeViewI,
     "GtkCellView" => :GtkCellViewI,
     "GtkIconView" => :GtkIconViewI,
-    "GtkTreeSelection" => :GtkTreeSelectionI
+    "GtkTreeSelection" => :GtkTreeSelectionI,
+    "GtkTreeSortable" => :GtkTreeSortableI,
+    "GtkTreeModel" => :GtkTreeModelI,
+    "GtkTreeModelFilter" => :GtkTreeModelFilterI,
+    "GtkScrolledWindow" => :GtkScrolledWindowI,
+    "GtkToolbar" => :GtkToolbarI,
+    "GtkToolItem" => :GtkToolItemI,
+    "GtkToolButton" => :GtkToolButtonI,
+    "GtkToggleToolButton" => :GtkToggleToolButtonI,
+    "GtkSeparatorToolItem" => :GtkSeparatorToolItemI,
+    "GtkMenuToolButton" => :GtkMenuToolButtonI,
+    "GtkCssProvider" => :GtkCssProviderI,
+    "GtkStyleProvider" => :GtkStyleProviderI,  
+    "GtkStyleContext" => :GtkStyleContextI,
+    "GtkFontChooser" => :GtkFontChooserI,
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,
@@ -107,6 +124,8 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GdkEventMotion"        => :(Gtk.GdkEventMotion),
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
+    "GtkTreeIter"           => :(Gtk.GtkTreeIter),
+    "GtkTreePath"           => :(Gtk.GtkTreePath),    
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
