@@ -125,6 +125,7 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
+    "GtkTreePath"           => :(Gtk.GtkTreePath),    
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
