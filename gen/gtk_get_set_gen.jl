@@ -47,6 +47,7 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkDialog" => :GtkDialogI,
     "GtkFileChooserDialog" => :GtkFileChooserDialogI,
     "GtkFileChooser" => :GtkFileChooserDialogI,
+    "GtkAboutDialog" => :GtkAboutDialogI,
     "GtkBuilder" => :GtkBuilderI,
     "GtkListStore" => :GtkListStoreI,
     "GtkTreeStore" => :GtkTreeStoreI,

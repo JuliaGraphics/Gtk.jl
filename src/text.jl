@@ -331,7 +331,7 @@ function insert!(text::GtkTextBufferI,str::String)
         (Ptr{GObject},Ptr{Uint8},Cint),text,bytestring(str),sizeof(str))
     text
 end
-function splice!(text::GtkTextBufferI,index::GtkTextIter)
+function splice!(text::GtkTextBufferI,index::TI)
     ccall((:gtk_text_buffer_backspace,libgtk),Void,
         (Ptr{GObject},Ptr{GtkTextIter},Cint,Cint),text,mutable(index),false,true)
     text

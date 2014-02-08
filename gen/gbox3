@@ -864,6 +864,111 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         function content_area(dialog::Gtk.GtkDialogI)
             return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_dialog_get_content_area,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :dialog)))
         end
+        function program_name(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_program_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function program_name(about::Gtk.GtkAboutDialogI,name)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_program_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :name))
+            return about
+        end
+        function version(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_version,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function version(about::Gtk.GtkAboutDialogI,version_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_version,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :version_))
+            return about
+        end
+        function copyright(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_copyright,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function copyright(about::Gtk.GtkAboutDialogI,copyright_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_copyright,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :copyright_))
+            return about
+        end
+        function comments(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_comments,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function comments(about::Gtk.GtkAboutDialogI,comments_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_comments,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :comments_))
+            return about
+        end
+        function license(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_license,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function license(about::Gtk.GtkAboutDialogI,license_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_license,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :license_))
+            return about
+        end
+        function license_type(about::Gtk.GtkAboutDialogI,license_type_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_license_type,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :about, :license_type_))
+            return about
+        end
+        function license_type(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_license_type,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :about))
+        end
+        function wrap_license(about::Gtk.GtkAboutDialogI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_about_dialog_get_wrap_license,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :about)))
+        end
+        function wrap_license(about::Gtk.GtkAboutDialogI,wrap_license_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_wrap_license,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :about, :wrap_license_))
+            return about
+        end
+        function website(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_website,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function website(about::Gtk.GtkAboutDialogI,website_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_website,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :website_))
+            return about
+        end
+        function website_label(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_website_label,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function website_label(about::Gtk.GtkAboutDialogI,website_label_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_website_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :website_label_))
+            return about
+        end
+        function authors(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_authors,Gtk.libgtk), :(Ptr{Ptr{Uint8}}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function authors(about::Gtk.GtkAboutDialogI,authors_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_authors,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}), :about, :authors_))
+            return about
+        end
+        function documenters(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_documenters,Gtk.libgtk), :(Ptr{Ptr{Uint8}}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function documenters(about::Gtk.GtkAboutDialogI,documenters_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_documenters,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}), :about, :documenters_))
+            return about
+        end
+        function artists(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_artists,Gtk.libgtk), :(Ptr{Ptr{Uint8}}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function artists(about::Gtk.GtkAboutDialogI,artists_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_artists,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}), :about, :artists_))
+            return about
+        end
+        function translator_credits(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_translator_credits,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function translator_credits(about::Gtk.GtkAboutDialogI,translator_credits_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_translator_credits,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :translator_credits_))
+            return about
+        end
+        function logo(about::Gtk.GtkAboutDialogI)
+            return convert(Gtk.GdkPixbufI,$(Expr(:ccall, :(:gtk_about_dialog_get_logo,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :about)))
+        end
+        function logo(about::Gtk.GtkAboutDialogI,logo_)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_logo,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :about, :logo_))
+            return about
+        end
+        function logo_icon_name(about::Gtk.GtkAboutDialogI)
+            return $(Expr(:ccall, :(:gtk_about_dialog_get_logo_icon_name,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :about))
+        end
+        function logo_icon_name(about::Gtk.GtkAboutDialogI,icon_name)
+            $(Expr(:ccall, :(:gtk_about_dialog_set_logo_icon_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :icon_name))
+            return about
+        end
         function for_attach_widget(widget::Gtk.GtkWidgetI)
             return $(Expr(:ccall, :(:gtk_menu_get_for_attach_widget,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
         end

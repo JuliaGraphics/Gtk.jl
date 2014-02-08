@@ -33,7 +33,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
-    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
+    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar, GtkAboutDialog,
     GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore, GtkTreeStore,
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
@@ -212,6 +212,7 @@ module ShortNames
     const SeparatorMenuItem = GtkSeparatorMenuItem
     const Menu = GtkMenu
     const MenuBar = GtkMenuBar
+    const AboutDialog = GtkAboutDialog
     const FileChooserDialog = GtkFileChooserDialog
     const FileChooserAction = GtkFileChooserAction
     const Key = GdkKeySyms
@@ -288,7 +289,7 @@ module ShortNames
     end
 
     # Selectors
-    export FileChooserDialog, FileChooserAction, Stock, Response
+    export AboutDialog, FileChooserDialog, FileChooserAction, Stock, Response
 
     # Events
     export gtk_doevent, EventMask, ModifierType, EventType,

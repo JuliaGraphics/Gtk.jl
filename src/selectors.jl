@@ -63,3 +63,7 @@ baremodule GtkResponse
     const APPLY        = -10
     const HELP         = -11
 end
+
+@gtktype GtkAboutDialog
+GtkAboutDialog() = GtkAboutDialog(
+    ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
