@@ -415,9 +415,11 @@ end
 
 ### To be done
 
-@gtktype GtkCellArea
-@gtktype GtkCellAreaBox
-@gtktype GtkCellAreaContext
+if gtk_version == 3
+    @gtktype GtkCellArea
+    @gtktype GtkCellAreaBox
+    @gtktype GtkCellAreaContext
+end
 
 @gtktype GtkTreeModelSort
 
