@@ -348,6 +348,13 @@ begin_user_action(buffer::GtkTextBufferI) =
 end_user_action(buffer::GtkTextBufferI) = 
   ccall((:gtk_text_buffer_end_user_action,libgtk),Void,(Ptr{GObject},),buffer)
 
+function user_action(f::Function, buffer::GtkTextBufferI)
+  begin_user_action(buffer)
+  f(buffer)
+  end_user_action(buffer)
+end
+
+
 #####  GtkTextView  #####
 #TODO: scrolling/views, child overlays
 

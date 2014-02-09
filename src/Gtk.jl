@@ -21,7 +21,8 @@ export width, height, #minsize, maxsize
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
-    pagenumber, present, complete, begin_user_action, end_user_action
+    pagenumber, present, complete, user_action,
+    keyval
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -40,10 +41,12 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
-    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext
+    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext,
+    GtkAccelGroup
     
 # Gtk enums
-export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode, GtkDialogFlags
+export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode, 
+    GtkDialogFlags, GtkAccelFlags
 
 # Gtk3 objects
 export GtkGrid
@@ -167,7 +170,8 @@ module ShortNames
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
         selected, hasselection, unselect!, selectall!, unselectall!,
-        pagenumber, present, complete, begin_user_action, end_user_action
+        pagenumber, present, complete, user_action,
+        keyval
 
     # Gtk objects
     const G_ = GAccessor
@@ -250,6 +254,7 @@ module ShortNames
     const MenuToolButton = GtkMenuToolButton
     const CssProvider = GtkCssProvider
     const StyleContext = GtkStyleContext
+    const AccelGroup = GtkAccelGroup
     
     # Gtk enums
     const ToolbarStyle = GtkToolbarStyle
@@ -258,6 +263,7 @@ module ShortNames
     const ReliefStyle = GtkReliefStyle
     const SelectionMode = GtkSelectionMode
     const DialogFlags = GtkDialogFlags
+    const AccelFlags = GtkAccelFlags
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -273,9 +279,11 @@ module ShortNames
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
-        ToggleToolButton, MenuToolButton, CssProvider, StyleContext
+        ToggleToolButton, MenuToolButton, CssProvider, StyleContext,
+        AccelGroup
 
-    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode, DialogFlags
+    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode, DialogFlags,
+        AccelFlags
 
     # Gtk 3
     if Gtk.gtk_version >= 3

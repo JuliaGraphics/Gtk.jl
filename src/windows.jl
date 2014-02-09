@@ -20,6 +20,16 @@ resize!(win::GtkWindowI, w::Integer, h::Integer) = ccall((:gtk_window_resize,lib
 
 present(win::GtkWindowI) = ccall((:gtk_window_present,libgtk),Void,(Ptr{GObject},),win)
 
+function push!(win::GtkWindowI, accel_group::GtkAccelGroup)
+  ccall((:gtk_window_add_accel_group,libgtk),Void,(Ptr{GObject},Ptr{GObject}),win,accel_group)
+  win
+end
+  
+function delete!(win::GtkWindowI, accel_group::GtkAccelGroup)
+  ccall((:gtk_window_remove_accel_group,libgtk),Void,(Ptr{GObject},Ptr{GObject}),win,accel_group)
+  win
+end
+
 @gtktype GtkScrolledWindow
 function GtkScrolledWindow()
     hnd = ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),

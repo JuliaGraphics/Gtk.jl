@@ -91,6 +91,12 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gdk_set_use_xshm,Gtk.libgdk), :Void, :(Cint,), :use_xshm_))
             return use_xshm_
         end
+        function is_locked(accel_group::Gtk.GtkAccelGroupI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_accel_group_get_is_locked,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :accel_group)))
+        end
+        function modifier_mask(accel_group::Gtk.GtkAccelGroupI)
+            return $(Expr(:ccall, :(:gtk_accel_group_get_modifier_mask,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :accel_group))
+        end
         function value(adjustment::Gtk.GtkAdjustmentI)
             return $(Expr(:ccall, :(:gtk_adjustment_get_value,Gtk.libgtk), :Cdouble, :(Ptr{Gtk.GObject},), :adjustment))
         end
@@ -147,7 +153,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             return $(Expr(:ccall, :(:gtk_widget_get_child_requisition,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :widget, :requisition))
         end
         function accel_path(widget::Gtk.GtkWidgetI,accel_path_,accel_group)
-            $(Expr(:ccall, :(:gtk_widget_set_accel_path,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}), :widget, :accel_path_, :accel_group))
+            $(Expr(:ccall, :(:gtk_widget_set_accel_path,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Gtk.GObject}), :widget, :accel_path_, :accel_group))
             return widget
         end
         function scroll_adjustments(widget::Gtk.GtkWidgetI,hadjustment,vadjustment)
@@ -871,8 +877,64 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_about_dialog_set_logo_icon_name,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :about, :icon_name))
             return about
         end
+        function active(menu::Gtk.GtkMenuI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_menu_get_active,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :menu)))
+        end
+        function active(menu::Gtk.GtkMenuI,index_)
+            $(Expr(:ccall, :(:gtk_menu_set_active,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Uint32), :menu, :index_))
+            return menu
+        end
+        function accel_group(menu::Gtk.GtkMenuI,accel_group_)
+            $(Expr(:ccall, :(:gtk_menu_set_accel_group,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :menu, :accel_group_))
+            return menu
+        end
+        function accel_group(menu::Gtk.GtkMenuI)
+            return convert(Gtk.GtkAccelGroupI,$(Expr(:ccall, :(:gtk_menu_get_accel_group,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :menu)))
+        end
+        function accel_path(menu::Gtk.GtkMenuI,accel_path_)
+            $(Expr(:ccall, :(:gtk_menu_set_accel_path,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :menu, :accel_path_))
+            return menu
+        end
+        function accel_path(menu::Gtk.GtkMenuI)
+            return $(Expr(:ccall, :(:gtk_menu_get_accel_path,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :menu))
+        end
+        function attach_widget(menu::Gtk.GtkMenuI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_menu_get_attach_widget,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :menu)))
+        end
+        function tearoff_state(menu::Gtk.GtkMenuI,torn_off)
+            $(Expr(:ccall, :(:gtk_menu_set_tearoff_state,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :menu, :torn_off))
+            return menu
+        end
+        function tearoff_state(menu::Gtk.GtkMenuI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_menu_get_tearoff_state,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :menu)))
+        end
+        function title(menu::Gtk.GtkMenuI,title_)
+            $(Expr(:ccall, :(:gtk_menu_set_title,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :menu, :title_))
+            return menu
+        end
+        function title(menu::Gtk.GtkMenuI)
+            return $(Expr(:ccall, :(:gtk_menu_get_title,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :menu))
+        end
+        function screen(menu::Gtk.GtkMenuI,screen_)
+            $(Expr(:ccall, :(:gtk_menu_set_screen,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Void}), :menu, :screen_))
+            return menu
+        end
+        function monitor(menu::Gtk.GtkMenuI,monitor_num)
+            $(Expr(:ccall, :(:gtk_menu_set_monitor,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :menu, :monitor_num))
+            return menu
+        end
+        function monitor(menu::Gtk.GtkMenuI)
+            return $(Expr(:ccall, :(:gtk_menu_get_monitor,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :menu))
+        end
         function for_attach_widget(widget::Gtk.GtkWidgetI)
             return $(Expr(:ccall, :(:gtk_menu_get_for_attach_widget,Gtk.libgtk), :(Ptr{Void}), :(Ptr{Gtk.GObject},), :widget))
+        end
+        function reserve_toggle_size(menu::Gtk.GtkMenuI,reserve_toggle_size_)
+            $(Expr(:ccall, :(:gtk_menu_set_reserve_toggle_size,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :menu, :reserve_toggle_size_))
+            return menu
+        end
+        function reserve_toggle_size(menu::Gtk.GtkMenuI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_menu_get_reserve_toggle_size,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :menu)))
         end
         function text(label::Gtk.GtkLabelI,str)
             $(Expr(:ccall, :(:gtk_label_set_text,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :label, :str))
@@ -1606,6 +1668,41 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         end
         function inconsistent(toggle_button::Gtk.GtkToggleButtonI)
             return convert(Bool,$(Expr(:ccall, :(:gtk_toggle_button_get_inconsistent,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :toggle_button)))
+        end
+        function submenu(menu_item::Gtk.GtkMenuItemI,submenu_)
+            $(Expr(:ccall, :(:gtk_menu_item_set_submenu,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :menu_item, :submenu_))
+            return menu_item
+        end
+        function submenu(menu_item::Gtk.GtkMenuItemI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_menu_item_get_submenu,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :menu_item)))
+        end
+        function right_justified(menu_item::Gtk.GtkMenuItemI,right_justified_)
+            $(Expr(:ccall, :(:gtk_menu_item_set_right_justified,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :menu_item, :right_justified_))
+            return menu_item
+        end
+        function right_justified(menu_item::Gtk.GtkMenuItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_menu_item_get_right_justified,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :menu_item)))
+        end
+        function accel_path(menu_item::Gtk.GtkMenuItemI,accel_path_)
+            $(Expr(:ccall, :(:gtk_menu_item_set_accel_path,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :menu_item, :accel_path_))
+            return menu_item
+        end
+        function accel_path(menu_item::Gtk.GtkMenuItemI)
+            return $(Expr(:ccall, :(:gtk_menu_item_get_accel_path,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :menu_item))
+        end
+        function label(menu_item::Gtk.GtkMenuItemI,label_)
+            $(Expr(:ccall, :(:gtk_menu_item_set_label,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :menu_item, :label_))
+            return menu_item
+        end
+        function label(menu_item::Gtk.GtkMenuItemI)
+            return $(Expr(:ccall, :(:gtk_menu_item_get_label,Gtk.libgtk), :(Ptr{Uint8}), :(Ptr{Gtk.GObject},), :menu_item))
+        end
+        function use_underline(menu_item::Gtk.GtkMenuItemI,setting)
+            $(Expr(:ccall, :(:gtk_menu_item_set_use_underline,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :menu_item, :setting))
+            return menu_item
+        end
+        function use_underline(menu_item::Gtk.GtkMenuItemI)
+            return convert(Bool,$(Expr(:ccall, :(:gtk_menu_item_get_use_underline,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :menu_item)))
         end
         function priority(tag::Gtk.GtkTextTagI)
             return $(Expr(:ccall, :(:gtk_text_tag_get_priority,Gtk.libgtk), :Cint, :(Ptr{Gtk.GObject},), :tag))

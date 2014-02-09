@@ -304,3 +304,7 @@ immutable GdkEventCrossing <: GdkEventI
   focus::Cint
   state::Uint32
 end
+
+keyval(name::String) =
+  ccall((:gdk_keyval_from_name,libgtk),Cuint,(Ptr{Uint8},),bytestring(name))
+

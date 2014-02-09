@@ -85,6 +85,9 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkStyleProvider" => :GtkStyleProviderI,  
     "GtkStyleContext" => :GtkStyleContextI,
     "GtkFontChooser" => :GtkFontChooserI,
+    "GtkAccelGroup" => :GtkAccelGroupI,
+    "GtkMenu" => :GtkMenuI,
+    "GtkMenuItem" => :GtkMenuItemI,
     ]
 cl_to_jl = [
     cindex.VoidType         => :Void,
