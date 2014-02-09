@@ -27,4 +27,25 @@ function GtkScrolledWindow()
     GtkScrolledWindow(hnd)
 end
 
+baremodule  GtkDialogFlags
+    import Base.<<
+    const MODAL = 1 << 0
+    const DESTROY_WITH_PARENT = 1 << 1
+end
+
+function GtkDialog(title::String, parent::GtkContainerI, flags::Integer, button_text_response...)
+    n = length(button_text_response)
+    if !iseven(n)
+        error("button_text_response must consist of text/response pairs")
+    end
+    w = GtkDialog(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
+                (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
+                title, parent, flags, C_NULL))
+    for i = 1:2:n
+        push!(w, button_text_response[i], button_text_response[i+1])
+    end
+    show(w)
+    w
+end
+
 #GtkSeparator — A separator widget

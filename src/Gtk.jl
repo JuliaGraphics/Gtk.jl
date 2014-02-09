@@ -33,7 +33,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
-    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar, GtkAboutDialog,
+    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar, GtkAboutDialog, GtkDialog,
     GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore, GtkTreeStore,
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
@@ -43,7 +43,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext
     
 # Gtk enums
-export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode
+export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode, GtkDialogFlags
 
 # Gtk3 objects
 export GtkGrid
@@ -212,6 +212,7 @@ module ShortNames
     const SeparatorMenuItem = GtkSeparatorMenuItem
     const Menu = GtkMenu
     const MenuBar = GtkMenuBar
+    const Dialog = GtkDialog    
     const AboutDialog = GtkAboutDialog
     const FileChooserDialog = GtkFileChooserDialog
     const FileChooserAction = GtkFileChooserAction
@@ -256,6 +257,7 @@ module ShortNames
     const IconSize = GtkIconSize
     const ReliefStyle = GtkReliefStyle
     const SelectionMode = GtkSelectionMode
+    const DialogFlags = GtkDialogFlags
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -273,7 +275,7 @@ module ShortNames
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
         ToggleToolButton, MenuToolButton, CssProvider, StyleContext
 
-    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode
+    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode, DialogFlags
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -289,7 +291,7 @@ module ShortNames
     end
 
     # Selectors
-    export AboutDialog, FileChooserDialog, FileChooserAction, Stock, Response
+    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, Stock, Response
 
     # Events
     export gtk_doevent, EventMask, ModifierType, EventType,
