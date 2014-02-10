@@ -44,7 +44,7 @@ baremodule GdkEventMask
 end
 
 baremodule GdkModifierType
-    import Base: <<, |
+    import Base: <<, |, @osx
     const SHIFT    = 1 << 0
     const LOCK     = 1 << 1
     const CONTROL  = 1 << 2
@@ -89,6 +89,8 @@ baremodule GdkModifierType
     const MODIFIER_RESERVED_29  = 1 << 29
 
     const RELEASE  = 1 << 30
+    
+    const COMMAND = @osx?  1 << 28 :  1 << 2
 
     # Combination of SHIFT..BUTTON5 + SUPER
     # + HYPER + META + RELEASE */
@@ -306,5 +308,5 @@ immutable GdkEventCrossing <: GdkEventI
 end
 
 keyval(name::String) =
-  ccall((:gdk_keyval_from_name,libgtk),Cuint,(Ptr{Uint8},),bytestring(name))
+  ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{Uint8},),bytestring(name))
 

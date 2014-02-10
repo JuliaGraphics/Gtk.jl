@@ -42,11 +42,14 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
     GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext,
-    GtkAccelGroup
+    GtkAccelGroup, GtkApplication
     
 # Gtk enums
 export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode, 
     GtkDialogFlags, GtkAccelFlags
+    
+# GIO enums
+export GApplicationFlags
 
 # Gtk3 objects
 export GtkGrid
@@ -109,6 +112,8 @@ include("cairo.jl")
 include("builder.jl")
 include("toolbar.jl")
 include("theme.jl")
+include("gio.jl")
+include("application.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -255,6 +260,7 @@ module ShortNames
     const CssProvider = GtkCssProvider
     const StyleContext = GtkStyleContext
     const AccelGroup = GtkAccelGroup
+    const Application = GtkApplication
     
     # Gtk enums
     const ToolbarStyle = GtkToolbarStyle
@@ -280,10 +286,14 @@ module ShortNames
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
         ToggleToolButton, MenuToolButton, CssProvider, StyleContext,
-        AccelGroup
+        AccelGroup, Application
 
+    # Gtk enums
     export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode, DialogFlags,
         AccelFlags
+        
+    # GIO enums
+    export GApplicationFlags     
 
     # Gtk 3
     if Gtk.gtk_version >= 3

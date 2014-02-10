@@ -10,13 +10,13 @@ function GtkCssProvider(;data=nothing,filename=nothing)
     if data !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_data,libgtk), Bool,
-            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{GError}),
+            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{Ptr{GError}}),
             provider, bytestring(data), -1, error_check)
         end
     elseif filename !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_path,libgtk), Bool,
-            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{GError}),
+            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{Ptr{GError}}),
             provider, bytestring(filename), error_check)
         end
     end
