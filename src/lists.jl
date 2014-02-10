@@ -263,9 +263,10 @@ ncolumns(treeModel::GtkTreeModelI) =
 
 #TODO: Replace by accessor
 function iter(treeModel::GtkTreeModelI, path::GtkTreePath)
-  it = GtkTreeIter()
-  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{Void},Ptr{Void}),treeModel,&it,path))
-  ret, it
+  it = mutable(GtkTreeIter)
+  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreePath}),
+                    treeModel,it,&path))
+  ret, it[]
 end
 
 ### GtkTreeSortableI
