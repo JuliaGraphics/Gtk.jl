@@ -52,7 +52,7 @@ GtkToggleToolButton(stock_id::String) = GtkToggleToolButton(
 GtkToggleToolButton() = GtkToggleToolButton(
     ccall((:gtk_toggle_tool_button_new,libgtk),Ptr{GObject},()))
 
-#TODO GtkRadioToolButton (needs GSList as argument)
+#TODO GtkRadioToolButton (needs _GSList as argument)
 
 @gtktype GtkMenuToolButton
 GtkMenuToolButton(stock_id::String) = GtkMenuToolButton(

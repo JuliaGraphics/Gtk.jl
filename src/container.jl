@@ -17,11 +17,11 @@ function empty!(w::GtkContainerI)
     w
 end
 
-start(w::GtkContainerI) = gslist2(ccall((:gtk_container_get_children,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), w))
+start(w::GtkContainerI) = glist_iter(ccall((:gtk_container_get_children,libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), w))
 next(w::GtkContainerI, list) = next(list[1],list)
 done(w::GtkContainerI, list) = done(list[1],list)
 length(w::GtkContainerI) = length(start(w)[1])
-getindex(w::GtkContainerI, i::Integer) = convert(GtkWidgetI,start(w)[2][i])::GtkWidgetI
+getindex(w::GtkContainerI, i::Integer) = convert(GtkWidgetI,start(w)[1][i])::GtkWidgetI
 
 function start(w::GtkBinI)
     child = ccall((:gtk_bin_get_child,libgtk), Ptr{GObject}, (Ptr{GObject},), w)

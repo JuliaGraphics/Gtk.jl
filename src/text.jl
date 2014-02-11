@@ -112,11 +112,11 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
     elseif key === :visible_line_offset
         ccall((:gtk_text_iter_get_visible_line_offset,libgtk),Cint,(Ptr{GtkTextIter},),text)
     elseif key === :marks
-        gslist(ccall((:gtk_text_iter_get_marks,libgtk),Ptr{GSList{GtkTextMark}},(Ptr{GtkTextIter},),text),false) # GtkTextMark iter
+        ccall((:gtk_text_iter_get_marks,libgtk),Ptr{_GSList{GtkTextMark}},(Ptr{GtkTextIter},),text) # GtkTextMark iter
     elseif key === :toggled_on_tags
-        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList{GtkTextTag}},(Ptr{GtkTextIter},Cint),text,true),false) # GtkTextTag iter
+        ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{_GSList{GtkTextTag}},(Ptr{GtkTextIter},Cint),text,true) # GtkTextTag iter
     elseif key === :toggled_off_tags
-        gslist(ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{GSList{GtkTextTag}},(Ptr{GtkTextIter},Cint),text,false),false) # GtkTextTag iter
+        ccall((:gtk_text_iter_get_toggled_tags,libgtk),Ptr{_GSList{GtkTextTag}},(Ptr{GtkTextIter},Cint),text,false) # GtkTextTag iter
 #    elseif key === :child_anchor
 #        convert(GtkTextChildAnchor,ccall((:gtk_text_iter_get_child_anchor,libgtk),Ptr{GtkTextChildAnchor},(Ptr{GtkTextIter},Cint),text,false))
     elseif key === :can_insert
