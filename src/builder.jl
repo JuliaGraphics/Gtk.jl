@@ -10,8 +10,8 @@ function GtkBuilder(filename::String)
 	GtkBuilder(handle)
 end
 
-start(builder::GtkBuilder) = gslist2(ccall((:gtk_builder_get_objects,libgtk), Ptr{GSList{GObject}}, (Ptr{GObject},), builder))
-next(builder::GtkBuilder, list) = next(list[1],list)
-done(builder::GtkBuilder, list) = done(list[1],list)
+start(builder::GtkBuilder) = glist_iter(ccall((:gtk_builder_get_objects,libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), builder))
+next(w::GtkBuilder, list) = next(list[1],list)
+done(w::GtkBuilder, list) = done(list[1],list)
 length(builder::GtkBuilder) = length(start(builder)[1])
-getindex(builder::GtkBuilder, i::Integer) = convert(GtkWidgetI,start(builder)[2][i])::GtkWidgetI
+getindex(builder::GtkBuilder, i::Integer) = convert(GtkWidgetI,start(builder)[1][i])::GtkWidgetI

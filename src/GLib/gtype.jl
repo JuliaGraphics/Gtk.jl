@@ -189,7 +189,7 @@ const jlref_quark = quark"julia_ref"
 # of type Ptr{GObjectI} corresponding to the GLib object
 convert(::Type{Ptr{GObjectI}},w::GObjectI) = w.handle
 convert{T<:GObjectI}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObjectI},w))
-eltype{T<:GObjectI}(::GSList{T}) = T
+eltype{T<:GObjectI}(::_LList{T}) = T
 
 # this could be used for gtk methods returing widgets of unknown type
 # and/or might have been wrapped by julia before
