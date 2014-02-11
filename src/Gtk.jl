@@ -140,7 +140,7 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     else
         map(eval, include(gboxcache).args)
     end
-    constcache = joinpath(cachedir,"consts")
+    constcache = joinpath(cachedir,"consts$(gtk_version)")
     map(eval,include(constcache).args)
 end
 const _ = GAccessor

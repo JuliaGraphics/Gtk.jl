@@ -1,5 +1,9 @@
 using GI;
 
+#to regenerate, execute
+#julia gen_consts.jl 2
+#julia gen_consts.jl 3
+
 const_expr(name,val) =  :(const $(symbol(name)) = $(val))
         
 function enum_decl(enumname,vals)
@@ -22,11 +26,13 @@ function strip_mask(vals)
     end
 end
 
-function write_gtk_consts(fn)
+nam(t) = t[1]
+
+function write_gtk_consts(fn,gtk_version=3)
     body = Expr(:block)
     toplevel = Expr(:toplevel,Expr(:module, true, :GConstants, body))
     exprs = body.args
-    gtk = GINamespace(:Gtk)
+    gtk = GINamespace(:Gtk,"$version.0")
     exports = Expr(:export)
     for (name,val) in GI.get_consts(gtk)
         if !beginswith(string(name),"STOCK_") 
@@ -66,4 +72,6 @@ function write_gtk_consts(fn)
     end
 end
 
-write_gtk_consts("consts")
+version = (length(ARGS) > 0) ? int(ARGS[1]) : 3
+
+write_gtk_consts("consts$version", version)
