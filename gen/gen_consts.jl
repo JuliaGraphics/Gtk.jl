@@ -34,8 +34,9 @@ function write_gtk_consts(fn,gtk_version=3)
     exprs = body.args
     gtk = GINamespace(:Gtk,"$version.0")
     exports = Expr(:export)
+    gtk_exclude = ["STOCK_", "STYLE_", "PRINT_SETTINGS_"]
     for (name,val) in GI.get_consts(gtk)
-        if !beginswith(string(name),"STOCK_") 
+        if !any([beginswith(string(name),prefix) for prefix in gtk_exclude])
             push!(exprs, const_expr("GTK_$name",val))
         end
     end
