@@ -11,7 +11,7 @@ import .GLib: bytestring, setproperty!, getproperty
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
-             eltype, copy, isvalid
+             eltype, copy, isvalid, string
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
@@ -22,7 +22,7 @@ export width, height, #minsize, maxsize
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
     pagenumber, present, complete, user_action,
-    keyval
+    keyval, prev, up, down
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -176,7 +176,7 @@ module ShortNames
         hasparent, toplevel, setproperty!, getproperty,
         selected, hasselection, unselect!, selectall!, unselectall!,
         pagenumber, present, complete, user_action,
-        keyval
+        keyval, prev, up, down
 
     # Gtk objects
     const G_ = GAccessor
