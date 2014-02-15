@@ -1,6 +1,3 @@
-import Clang.cindex
-gtk_libdir = "/opt/local/lib"
-
 const GtkTypeMap = (ASCIIString=>Symbol)[
     "GObject" => :GObjectI,
     "GtkWidget" => :GtkWidgetI,
@@ -223,11 +220,7 @@ function is_gbool(ctype)
     true
 end
 
-function gen_get_set(body, header, args)
-    local gtk_h
-    cd(JULIA_HOME) do
-        gtk_h = cindex.parse_header(header, diagnostics=true, args=args)
-    end
+function gen_get_set(body, gtk_h)
     fdecls = cindex.search(gtk_h, cindex.FunctionDecl)
     count = 0
     for fdecl in fdecls
@@ -324,28 +317,3 @@ function gen_get_set(body, header, args)
     end
     count
 end
-
-toplevels = {}
-cppargs = []
-for gtk_version = (2, 3)
-    body = Expr(:block,
-        Expr(:import, :., :., :Gtk),
-        Expr(:import, :., :., :Gtk, :GObject),
-    )
-    toplevel = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
-    args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
-    count = gen_get_set(body, joinpath(gtk_libdir,"..","include","gtk-$gtk_version.0","gtk","gtk.h"), args)
-    cachepath = "gbox$(gtk_version)"
-    println("Generated $cachepath with $count function definitions")
-    open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia$(VERSION.major)_$(VERSION.minor)"), "w") do cache
-        serialize(cache, toplevel)
-    end
-    open(joinpath(splitdir(@__FILE__)[1], cachepath), "w") do cache
-        Base.println(cache,"quote")
-        Base.show_unquoted(cache, toplevel)
-        println(cache)
-        Base.println(cache,"end")
-    end
-    push!(toplevels,toplevel)
-end
-toplevels

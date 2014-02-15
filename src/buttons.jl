@@ -186,12 +186,6 @@ function GtkVolumeButton(value::Real) # 0<=value<=1
     b
 end
 
-baremodule GtkReliefStyle
-    const NORMAL=0
-    const HALF=1
-    const NONE=2
-end
-
 @gtktype GtkFontButton
 GtkFontButton() = GtkFontButton(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
 
