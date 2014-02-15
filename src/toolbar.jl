@@ -6,13 +6,6 @@ GtkToolItem() = GtkToolItem(
 
 ### GtkToolbar
 
-baremodule GtkToolbarStyle
-    const ICONS=0
-    const TEXT=1
-    const BOTH=2
-    const BOTH_HORIZ=3
-end
-
 @gtktype GtkToolbar
 GtkToolbar() = GtkToolbar(
     ccall((:gtk_toolbar_new,libgtk),Ptr{GObject},()))

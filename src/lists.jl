@@ -270,11 +270,6 @@ end
 
 ### GtkTreeSortableI
 
-baremodule GtkSortType
-    const ASCENDING = 0
-    const DESCENDING = 1
-end
-
 typealias GtkTreeSortableI Union(GtkListStore,GtkTreeStore)
 
 ### GtkCellRenderer
@@ -345,13 +340,6 @@ add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRendererI,
           (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),column)
 
 ### GtkTreeSelection
-
-baremodule GtkSelectionMode
-    const NONE=0
-    const SINGLE=1
-    const BROWSE=2
-    const MULTIPLE=3
-end
 
 @gtktype GtkTreeSelection
 
