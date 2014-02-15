@@ -1,8 +1,8 @@
 using GI
 
 #to regenerate, execute
-#julia gen_consts.jl 2
-#julia gen_consts.jl 3
+#julia gi_gen_consts.jl 2
+#julia gi_gen_consts.jl 3
 
 const_expr(name,val) =  :(const $(symbol(name)) = $(val))
 
@@ -32,8 +32,19 @@ function write_gtk_consts(fn,gtk_version=3)
     body = Expr(:block)
     toplevel = Expr(:toplevel,Expr(:module, true, :GConstants, body))
     exprs = body.args
-    gtk = GINamespace(:Gtk,"$version.0")
     exports = Expr(:export)
+
+    glib = GINamespace(:GLib,"2.0")
+    for (name,val) in GI.get_consts(glib)
+            push!(exprs, const_expr("G_$name",val))
+    end
+    for (name,vals,isflags) in GI.get_enums(glib)
+        name = symbol("G$name")
+        push!(exprs, enum_decl(name,vals))
+        push!(exports.args, name)
+    end
+
+    gtk = GINamespace(:Gtk,"$version.0")
     gtk_exclude = ["STOCK_", "STYLE_", "PRINT_SETTINGS_"]
     for (name,val) in GI.get_consts(gtk)
         if !any([beginswith(string(name),prefix) for prefix in gtk_exclude])
@@ -75,4 +86,4 @@ end
 
 version = (length(ARGS) > 0) ? int(ARGS[1]) : 3
 
-write_gtk_consts("consts$version", version)
+write_gtk_consts("gconsts$version", version)
