@@ -62,5 +62,19 @@ function gen_consts(body, gtk_h)
             count += 1
         end
     end
+    mdecls = cindex.search(gtk_h, cindex.MacroDefinition)
+    for mdecl in mdecls
+        name = cindex.spelling(mdecl)
+        if ismatch(r"^G\w*[A-Za-z]$", name)
+            tokens = cindex.tokenize(mdecl)
+            if length(tokens) == 2 && isa(tokens[2], cindex.Literal)
+                tok2 = Clang.wrap_c.lex_exprn(tokens, 2)[1]
+                tok2 = replace(tok2, "\$", "\\\$")
+                push!(body.args, Expr(:const, Expr(:(=), symbol(name), parse(tok2))))
+            else
+                println("Skipping: ", name, " = ", [tokens...])
+            end
+        end
+    end
     count
 end
