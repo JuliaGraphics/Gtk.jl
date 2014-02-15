@@ -35,13 +35,13 @@ GtkScale(vertical::Bool,scale::Ranges) = GtkScale(vertical,minimum(scale),maximu
 function push!(scale::GtkScale, value, position::Symbol, markup::String)
     ccall((:gtk_scale_add_mark,libgtk),Void,
         (Ptr{GObject},Cdouble,Enum,Ptr{Uint8}),
-        scale,value,GtkPositionType.get(position),bytestring(markup))
+        scale,value,GtkPositionType.(position),bytestring(markup))
     scale
 end
 function push!(scale::GtkScale, value, position::Symbol)
     ccall((:gtk_scale_add_mark,libgtk),Void,
         (Ptr{GObject},Cdouble,Enum,Ptr{Uint8}),
-        scale,value,GtkPositionType.get(position),C_NULL)
+        scale,value,GtkPositionType.(position),C_NULL)
     scale
 end
 empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObject},),scale)
