@@ -53,37 +53,6 @@ showall(w::GtkWidgetI) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObjectI}
 modifyfont(w::GtkWidgetI, font_desc::Ptr{Void}) = 
    ccall((:gtk_widget_modify_font,libgtk),Void,(Ptr{GObjectI},Ptr{Void}),w,font_desc)
 
-baremodule GtkWindowType
-    const TOPLEVEL = 0
-    const POPUP = 1
-end
-
-baremodule GtkPositionType
-    const LEFT = 0
-    const RIGHT = 1
-    const TOP = 2
-    const BOTTOM = 3
-    get(s::Symbol) =
-        if s === :left
-            LEFT
-        elseif s === :right
-            RIGHT
-        elseif s === :top
-            TOP
-        elseif s === :bottom
-            BOTTOM
-        else
-            Main.Base.error(Main.Base.string("invalid GtkPositionType ",s))
-        end
-end
-
-baremodule GtkJustification
-    const LEFT   = 0
-    const RIGHT  = 1
-    const CENTER = 2
-    const FILL   = 3
-end
-
 function getproperty{T}(w::GtkContainerI, name::Union(String,Symbol), child::GtkWidgetI, ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
