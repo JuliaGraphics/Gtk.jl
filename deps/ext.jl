@@ -24,6 +24,8 @@ else
 end
 if OS_NAME == :Windows
     const libgdk_pixbuf = "libgdk_pixbuf-2.0-0"
+    const libgio = "libgio-2.0-0"
 else
     const libgdk_pixbuf = "libgdk_pixbuf-2.0"
+    const libgio = "libgio-2.0"    
 end

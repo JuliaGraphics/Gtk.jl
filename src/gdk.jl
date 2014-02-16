@@ -17,7 +17,6 @@ end
 
 gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
-
 baremodule GdkKeySyms
   const VoidSymbol = 0xffffff
   const BackSpace = 0xff08
@@ -176,3 +175,7 @@ immutable GdkEventCrossing <: GdkEventI
   focus::Cint
   state::Uint32
 end
+
+keyval(name::String) =
+  ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{Uint8},),bytestring(name))
+

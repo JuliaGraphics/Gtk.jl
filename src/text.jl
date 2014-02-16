@@ -140,9 +140,9 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
     elseif key === :is_cursor_position
         bool(ccall((:gtk_text_iter_is_cursor_position,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :chars_in_line
-        ccall((:gtk_text_iter_chars_in_line,libgtk),Cint,(Ptr{GtkTextIter},),text)
+        ccall((:gtk_text_iter_get_chars_in_line,libgtk),Cint,(Ptr{GtkTextIter},),text)
     elseif key === :bytes_in_line
-        ccall((:gtk_text_iter_bytes_in_line,libgtk),Cint,(Ptr{GtkTextIter},),text)
+        ccall((:gtk_text_iter_get_bytes_in_line,libgtk),Cint,(Ptr{GtkTextIter},),text)
 #    elseif key === :attributes
 #        view = getproperty(text,:view)::GtkTextView
 #        attrs = getproperty(view,:default_attributes)::GtkTextAttributes
@@ -331,7 +331,7 @@ function insert!(text::GtkTextBufferI,str::String)
         (Ptr{GObject},Ptr{Uint8},Cint),text,bytestring(str),sizeof(str))
     text
 end
-function splice!(text::GtkTextBufferI,index::GtkTextIter)
+function splice!(text::GtkTextBufferI,index::TI)
     ccall((:gtk_text_buffer_backspace,libgtk),Void,
         (Ptr{GObject},Ptr{GtkTextIter},Cint,Cint),text,mutable(index),false,true)
     text
@@ -347,6 +347,43 @@ begin_user_action(buffer::GtkTextBufferI) =
   
 end_user_action(buffer::GtkTextBufferI) = 
   ccall((:gtk_text_buffer_end_user_action,libgtk),Void,(Ptr{GObject},),buffer)
+
+function user_action(f::Function, buffer::GtkTextBufferI)
+    begin_user_action(buffer)
+    try
+      f(buffer)
+    finally
+      end_user_action(buffer)
+    end
+end
+
+function create_tag(buffer::GtkTextBufferI, tag_name::String; properties...)
+    tag = GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
+                (Ptr{GObject},Ptr{Uint8},Ptr{Void}),
+                buffer, bytestring(tag_name), C_NULL))
+    for (k,v) in properties
+        setproperty!(tag, k, v)
+    end
+    tag
+end
+
+function apply_tag(buffer::GtkTextBufferI, name::String, itstart::TI, itend::TI)
+    ccall((:gtk_text_buffer_apply_tag_by_name,libgtk), Void,
+         (Ptr{GObject}, Ptr{Uint8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+         buffer, bytestring(name), mutable(itstart), mutable(itend))
+end
+
+function remove_tag(buffer::GtkTextBufferI, name::String, itstart::TI, itend::TI)
+    ccall((:gtk_text_buffer_remove_tag_by_name,libgtk), Void,
+         (Ptr{GObject}, Ptr{Uint8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+         buffer, bytestring(name), mutable(itstart), mutable(itend))
+end
+
+function remove_all_tags(buffer::GtkTextBufferI, itstart::TI, itend::TI)
+    ccall((:gtk_text_buffer_remove_all_tags,libgtk), Void,
+         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+         buffer, mutable(itstart), mutable(itend))
+end
 
 #####  GtkTextView  #####
 #TODO: scrolling/views, child overlays

@@ -44,6 +44,8 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkDialog" => :GtkDialogI,
     "GtkFileChooserDialog" => :GtkFileChooserDialogI,
     "GtkFileChooser" => :GtkFileChooserDialogI,
+    "GtkAboutDialog" => :GtkAboutDialogI,
+    "GtkMessageDialog" => :GtkMessageDialogI,
     "GtkBuilder" => :GtkBuilderI,
     "GtkListStore" => :GtkListStoreI,
     "GtkTreeStore" => :GtkTreeStoreI,
@@ -81,6 +83,9 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkStyleProvider" => :GtkStyleProviderI,  
     "GtkStyleContext" => :GtkStyleContextI,
     "GtkFontChooser" => :GtkFontChooserI,
+    "GtkAccelGroup" => :GtkAccelGroupI,
+    "GtkMenu" => :GtkMenuI,
+    "GtkMenuItem" => :GtkMenuItemI,
     ]
 const GtkBoxedMap = (ASCIIString=>Symbol)[
     "GtkTreePath" => :GtkTreePath,
