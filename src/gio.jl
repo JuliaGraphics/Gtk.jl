@@ -14,10 +14,3 @@ end
 
 activate(app::GApplicationI) = 
     ccall((:g_application_activate,libgio),Void, (Ptr{GObject},), app)
-
-#void                g_application_open                  (GApplication *application,
-#                                                         GFile **files,
-#                                                         gint n_files,
-#                                                         const gchar *hint);
-
-#g_application_register() then g_application_activate() or g_application_open(), then exit if g_application_is_remote()

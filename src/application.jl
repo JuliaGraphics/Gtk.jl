@@ -19,11 +19,3 @@ app_menu(app::GtkApplication, app_menu::GObject) =
 GtkApplicationWindow(app::GtkApplication) = GtkApplicationWindow(
     ccall((:gtk_application_window_new, libgtk), Ptr{GObject}, (Ptr{GObject},), app) )
     
-    
-
-#void                gtk_application_window_set_show_menubar
-#                                                        (GtkApplicationWindow *window,
-#                                                         gboolean show_menubar);
-#gboolean            gtk_application_window_get_show_menubar
-#                                                        (GtkApplicationWindow *window);
-#guint               gtk_application_window_get_id       (GtkApplicationWindow *window);
