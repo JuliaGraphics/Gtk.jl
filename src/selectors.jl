@@ -38,11 +38,9 @@ run(widget::GtkDialogI) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},),
 
 baremodule GtkStock
     const CANCEL = "gtk-cancel"
+    const NO = "gtk-no"
+    const YES = "gtk-yes"
     const OPEN = "gtk-open"
     const SAVE = "gtk-save"
     const SAVE_AS = "gtk-save-as"
 end
-
-@gtktype GtkAboutDialog
-GtkAboutDialog() = GtkAboutDialog(
-    ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))

@@ -3088,6 +3088,20 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             $(Expr(:ccall, :(:gtk_menu_tool_button_set_arrow_tooltip_markup,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :button, :markup))
             return button
         end
+        function image(dialog::Gtk.GtkMessageDialogI,image_)
+            $(Expr(:ccall, :(:gtk_message_dialog_set_image,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Gtk.GObject}), :dialog, :image_))
+            return dialog
+        end
+        function image(dialog::Gtk.GtkMessageDialogI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_message_dialog_get_image,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :dialog)))
+        end
+        function markup(message_dialog::Gtk.GtkMessageDialogI,str)
+            $(Expr(:ccall, :(:gtk_message_dialog_set_markup,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Ptr{Uint8}), :message_dialog, :str))
+            return message_dialog
+        end
+        function message_area(message_dialog::Gtk.GtkMessageDialogI)
+            return convert(Gtk.GtkWidgetI,$(Expr(:ccall, :(:gtk_message_dialog_get_message_area,Gtk.libgtk), :(Ptr{Gtk.GObject}), :(Ptr{Gtk.GObject},), :message_dialog)))
+        end
         function group_id(notebook::Gtk.GtkNotebookI,group_id_)
             $(Expr(:ccall, :(:gtk_notebook_set_group_id,Gtk.libgtk), :Void, :(Ptr{Gtk.GObject},Cint), :notebook, :group_id_))
             return notebook

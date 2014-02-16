@@ -48,7 +48,26 @@ function GtkDialog(title::String, parent::GtkContainerI, flags::Integer, button_
     for i = 1:2:n
         push!(w, button_text_response[i], button_text_response[i+1])
     end
-    show(w)
+    w
+end
+
+@gtktype GtkAboutDialog
+GtkAboutDialog() = GtkAboutDialog(
+    ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
+    
+@gtktype GtkMessageDialog
+function GtkMessageDialog(parent::GtkContainerI, flags::Integer, typ::Integer, 
+                          message::String, button_text_response...)
+    n = length(button_text_response)
+    if !iseven(n)
+        error("button_text_response must consist of text/response pairs")
+    end
+    w = GtkMessageDialog(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
+                (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
+                parent, flags, typ, 0, bytestring(message) ))
+    for i = 1:2:n
+        push!(w, button_text_response[i], button_text_response[i+1])
+    end
     w
 end
 
