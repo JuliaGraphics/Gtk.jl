@@ -349,22 +349,20 @@ end_user_action(buffer::GtkTextBufferI) =
   ccall((:gtk_text_buffer_end_user_action,libgtk),Void,(Ptr{GObject},),buffer)
 
 function user_action(f::Function, buffer::GtkTextBufferI)
-  begin_user_action(buffer)
-  f(buffer)
-  end_user_action(buffer)
+    begin_user_action(buffer)
+    try
+      f(buffer)
+    finally
+      end_user_action(buffer)
+    end
 end
 
-
-function create_tag(buffer::GtkTextBufferI, tag_name::String, properties...)
-    n = length(properties)
-    if !iseven(n)
-        error("properties must consist of property/value pairs")
-    end
+function create_tag(buffer::GtkTextBufferI, tag_name::String; properties...)
     tag = GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
                 (Ptr{GObject},Ptr{Uint8},Ptr{Void}),
                 buffer, bytestring(tag_name), C_NULL))
-    for i = 1:2:n
-        setproperty!(tag, properties[i], properties[i+1])
+    for (k,v) in properties
+        setproperty!(tag, k, v)
     end
     tag
 end
