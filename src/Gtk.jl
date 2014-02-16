@@ -60,7 +60,7 @@ export gtk_doevent, popup,
     on_signal_button_release, on_signal_motion
 
 # Selectors
-export GtkFileChooserAction, GtkStock
+export GtkFileChooserAction
 
 # Constants
 export GdkKeySyms
@@ -225,7 +225,6 @@ module ShortNames
     const FileChooserAction = GtkFileChooserAction
     const MessageDialog = GtkMessageDialog
     const Key = GdkKeySyms
-    const Stock = GtkStock
     const NullContainer = GtkNullContainer
     const Builder = GtkBuilder
     const ListStore = GtkListStore
@@ -286,7 +285,7 @@ module ShortNames
     end
 
     # Selectors
-    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, MessageDialog, Stock
+    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, MessageDialog
 
     # Events
     export gtk_doevent, popup,

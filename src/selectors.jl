@@ -30,17 +30,7 @@ function GtkFileChooserDialog(title::String, parent::GtkContainerI, action::Inte
     for i = 1:2:n
         push!(w, button_text_response[i], button_text_response[i+1])
     end
-    show(w)
     w
 end
 
 run(widget::GtkDialogI) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
-
-baremodule GtkStock
-    const CANCEL = "gtk-cancel"
-    const NO = "gtk-no"
-    const YES = "gtk-yes"
-    const OPEN = "gtk-open"
-    const SAVE = "gtk-save"
-    const SAVE_AS = "gtk-save-as"
-end
