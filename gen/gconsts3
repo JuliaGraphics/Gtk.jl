@@ -2729,7 +2729,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
         const GDK_PARENT_RELATIVE = 1
         const GDK_MAX_TIMECOORD_AXES = 128
         const GDK_PIXBUF_FEATURES_H = 1
-        const GDK_PIXBUF_VERSION = "2.30.4"
+        const GDK_PIXBUF_VERSION = "2.30.3"
         const GDK_KEY_VoidSymbol = 0x00ffffff
         const GDK_KEY_BackSpace = 0xff08
         const GDK_KEY_Tab = 0xff09

@@ -5,19 +5,19 @@ GtkCssProvider() = GtkCssProvider(ccall((:gtk_css_provider_get_default,libgtk),P
 function GtkCssProvider(;data=nothing,filename=nothing)
     source_count = (data!==nothing) + (filename!==nothing)
     @assert(source_count <= 1,
-        "GtkCssProvider must have at most one data, filename, or path argument")
+        "GtkCssProvider must have at most one data or filename argument")
     provider = GtkCssProvider(ccall((:gtk_css_provider_get_default,libgtk),Ptr{GObject},()))
     if data !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_data,libgtk), Bool,
-            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{GError}),
-            provider, data, -1, error_check)
+            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{Ptr{GError}}),
+            provider, bytestring(data), -1, error_check)
         end
     elseif filename !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_path,libgtk), Bool,
-            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{GError}),
-            provider, filename, error_check)
+            (Ptr{GObject}, Ptr{Uint8}, Clong, Ptr{Ptr{GError}}),
+            provider, bytestring(filename), error_check)
         end
     end
     return provider

@@ -78,7 +78,7 @@ show(io::IO, iter::GtkTreeIter) = print("GtkTreeIter(...)")
 # end
 
 type GtkTreePath
-    handle::Ptr{Void}
+    handle::Ptr{Void} 
     
     function GtkTreePath()
         path = new(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
@@ -105,6 +105,13 @@ end
 convert(::Type{Ptr{Void}},path::GtkTreePath) = path.handle
 convert(::Type{Ptr{GtkTreePath}},path::GtkTreePath) = convert(Ptr{GtkTreePath},path.handle)
 convert(::Type{GtkTreePath},path::Ptr{GtkTreePath}) = GtkTreePath(path)
+
+next(path::GtkTreePath) = ccall((:gtk_tree_path_next,libgtk), Void, (Ptr{GtkTreePath},),path)
+prev(path::GtkTreePath) = bool( ccall((:gtk_tree_path_prev,libgtk),Cint, (Ptr{GtkTreePath},),path))
+up(path::GtkTreePath) = bool( ccall((:gtk_tree_path_up,libgtk),Cint, (Ptr{GtkTreePath},),path))
+down(path::GtkTreePath) = ccall((:gtk_tree_path_down,libgtk), Void, (Ptr{GtkTreePath},),path)
+string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8}, 
+                                            (Ptr{GtkTreePath},),path))
 
 ### GtkListStore
 
@@ -263,11 +270,22 @@ ncolumns(treeModel::GtkTreeModelI) =
 
 #TODO: Replace by accessor
 function iter(treeModel::GtkTreeModelI, path::GtkTreePath)
-  it = GtkTreeIter()
-  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{Void},Ptr{Void}),treeModel,&it,path))
-  ret, it
+  it = mutable(GtkTreeIter)
+  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreePath}),
+                    treeModel,it,path))
+  ret, it[]
 end
 
+#TODO: Replace by accessor (accessor is wrong)
+function path(treeModel::GtkTreeModelI, iter::TRI)
+  GtkTreePath( ccall((:gtk_tree_model_get_path,libgtk), Ptr{GtkTreePath}, 
+                            (Ptr{GObject},Ptr{GtkTreeIter}),
+                            treeModel,mutable(iter)))
+end
+
+depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth,libgtk), Cint, 
+    (Ptr{GtkTreePath},),path)
+    
 ### GtkTreeSortableI
 
 typealias GtkTreeSortableI Union(GtkListStore,GtkTreeStore)

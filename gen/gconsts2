@@ -2779,7 +2779,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
         const GDK_PARENT_RELATIVE = 1
         const GDK_MAX_TIMECOORD_AXES = 128
         const GDK_PIXBUF_FEATURES_H = 1
-        const GDK_PIXBUF_VERSION = "2.30.4"
+        const GDK_PIXBUF_VERSION = "2.30.3"
         const GTK_PATH_PRIO_MASK = 0x0f
         const GTK_MAX_COMPOSE_LEN = 7
         const GTK_PAPER_NAME_LETTER = "na_letter"

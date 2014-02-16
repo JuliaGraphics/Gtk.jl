@@ -73,3 +73,16 @@ end
 @deprecate getindex(w::GtkContainerI, child::GtkWidgetI, name::Union(String,Symbol), T::Type) getproperty(w,name,child,T)
 @deprecate setindex!(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol), T::Type) setproperty!(w,name,child,T,value)
 @deprecate setindex!(w::GtkContainerI, value, child::GtkWidgetI, name::Union(String,Symbol)) setproperty!(w,name,child,value)
+
+@gtktype GtkAccelGroup
+GtkAccelGroup() = GtkAccelGroup(
+    ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
+
+function push!(w::GtkWidgetI, accel_signal::String, accel_group::GtkAccelGroup,
+               accel_key::Integer, accel_mods::Integer, accel_flags::Integer)
+    ccall((:gtk_widget_add_accelerator,libgtk), Void,
+         (Ptr{GObject}, Ptr{Uint8}, Ptr{GObject}, Cuint, Cint, Cint), 
+          w, bytestring(accel_signal),accel_group, accel_key, accel_mods, accel_flags)
+    w
+end  
+      

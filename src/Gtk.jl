@@ -11,7 +11,7 @@ import .GLib: bytestring, setproperty!, getproperty
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
-             eltype, copy, isvalid
+             eltype, copy, isvalid, string
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
 
@@ -21,7 +21,8 @@ export width, height, #minsize, maxsize
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
-    pagenumber, present, complete, begin_user_action, end_user_action
+    pagenumber, present, complete, user_action,
+    keyval, prev, up, down
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
@@ -33,14 +34,16 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkEntry, GtkScale, GtkAdjustment, GtkSpinButton, GtkComboBoxText, GdkPixbuf,
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
-    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar,
-    GtkFileChooserDialog, GtkNullContainer, GtkBuilder, GtkListStore, GtkTreeStore,
+    GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar, GtkAboutDialog, GtkDialog,
+    GtkFileChooserDialog, GtkMessageDialog, GtkNullContainer, 
+    GtkBuilder, GtkListStore, GtkTreeStore,
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
     GtkCellRendererProgress, GtkCellRendererSpin, GtkCellRendererText,
     GtkCellRendererToggle, GtkCellRendererSpinner, GtkTreeModelFilter,
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
-    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext
+    GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext,
+    GtkAccelGroup, GtkApplication
 
 # Gtk3 objects
 export GtkGrid
@@ -57,7 +60,7 @@ export gtk_doevent, popup,
     on_signal_button_release, on_signal_motion
 
 # Selectors
-export GtkFileChooserAction, GtkStock
+export GtkFileChooserAction
 
 # Constants
 export GdkKeySyms
@@ -101,6 +104,8 @@ include("cairo.jl")
 include("builder.jl")
 include("toolbar.jl")
 include("theme.jl")
+include("gio.jl")
+include("application.jl")
 
 function Base.subtypes(T::DataType, b::Bool)
     if b == false
@@ -168,7 +173,8 @@ module ShortNames
         visible, destroy, stop, depth, isancestor,
         hasparent, toplevel, setproperty!, getproperty,
         selected, hasselection, unselect!, selectall!, unselectall!,
-        pagenumber, present, complete, begin_user_action, end_user_action
+        pagenumber, present, complete, user_action,
+        keyval, prev, up, down
 
     # Gtk objects
     const G_ = GAccessor
@@ -213,10 +219,12 @@ module ShortNames
     const SeparatorMenuItem = GtkSeparatorMenuItem
     const Menu = GtkMenu
     const MenuBar = GtkMenuBar
+    const Dialog = GtkDialog    
+    const AboutDialog = GtkAboutDialog
     const FileChooserDialog = GtkFileChooserDialog
     const FileChooserAction = GtkFileChooserAction
+    const MessageDialog = GtkMessageDialog
     const Key = GdkKeySyms
-    const Stock = GtkStock
     const NullContainer = GtkNullContainer
     const Builder = GtkBuilder
     const ListStore = GtkListStore
@@ -243,6 +251,8 @@ module ShortNames
     const MenuToolButton = GtkMenuToolButton
     const CssProvider = GtkCssProvider
     const StyleContext = GtkStyleContext
+    const AccelGroup = GtkAccelGroup
+    const Application = GtkApplication
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -258,7 +268,8 @@ module ShortNames
         CellRendererProgress, CellRendererSpin, CellRendererText,
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
-        ToggleToolButton, MenuToolButton, CssProvider, StyleContext
+        ToggleToolButton, MenuToolButton, CssProvider, StyleContext,
+        AccelGroup, Application    
 
     # Gtk 3
     if Gtk.gtk_version >= 3
@@ -274,7 +285,7 @@ module ShortNames
     end
 
     # Selectors
-    export FileChooserDialog, FileChooserAction, Stock
+    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, MessageDialog
 
     # Events
     export gtk_doevent, popup,
