@@ -44,10 +44,6 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext,
     GtkAccelGroup, GtkApplication
     
-# Gtk enums
-export GtkToolbarStyle, GtkSortType, GtkIconSize, GtkReliefStyle, GtkSelectionMode, 
-    GtkDialogFlags, GtkAccelFlags
-    
 # GIO enums
 export GApplicationFlags
 
@@ -58,19 +54,18 @@ export GtkGrid
 export GtkTable, GtkAlignment
 
 # Gtk-specific event handling
-export gtk_doevent, GdkEventMask, GdkModifierType, GdkEventType,
+export gtk_doevent, popup,
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     add_events, signal_emit,
     on_signal_destroy, on_signal_button_press,
-    on_signal_button_release, on_signal_motion,
-    popup
+    on_signal_button_release, on_signal_motion
 
 # Selectors
-export GtkFileChooserAction, GtkStock, GtkResponse
+export GtkFileChooserAction, GtkStock
 
 # Constants
-export GdkKeySyms, GdkScrollDirection, GtkJustification
+export GdkKeySyms
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow
@@ -99,7 +94,6 @@ include("events.jl")
 include("container.jl")
 include("windows.jl")
 include("layout.jl")
-include("icon.jl")
 include("displays.jl")
 include("lists.jl")
 include("buttons.jl")
@@ -148,17 +142,23 @@ for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes
 end
 
 export GAccessor
-let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen", "gbox$(gtk_version)")
-    fastcachedir = "$(cachedir)_julia$(VERSION.major)_$(VERSION.minor)"
-    if isfile(fastcachedir) && true
-        open(fastcachedir) do cache
-            eval(deserialize(cache))
+let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
+    fastgtkcache = "gtk$(gtk_version)_julia$(VERSION.major)_$(VERSION.minor)"
+    if isfile(fastgtkcache) && true
+        open(fastgtkcache) do cache
+            while !eof(cache)
+                eval(deserialize(cache))
+            end
         end
     else
-        map(eval, include(cachedir).args)
+        gboxcache = joinpath(cachedir,"gbox$(gtk_version)")
+        map(eval, include(gboxcache).args)
+        constcache = joinpath(cachedir,"gconsts$(gtk_version)")
+        map(eval,include(constcache).args)
     end
 end
 const _ = GAccessor
+using .GConstants
 function _.position(w::GtkWindow,x::Integer,y::Integer)
     ccall((:gtk_window_move,libgtk),Void,(Ptr{GObject},Cint,Cint),w,x,y)
     w
@@ -227,12 +227,6 @@ module ShortNames
     const FileChooserAction = GtkFileChooserAction
     const Key = GdkKeySyms
     const Stock = GtkStock
-    const Response = GtkResponse
-    const EventMask = GdkEventMask
-    const ModifierType = GdkModifierType
-    const EventType = GdkEventType
-    const ScrollDirection = GdkScrollDirection
-    const Justification = GtkJustification
     const NullContainer = GtkNullContainer
     const Builder = GtkBuilder
     const ListStore = GtkListStore
@@ -261,15 +255,6 @@ module ShortNames
     const StyleContext = GtkStyleContext
     const AccelGroup = GtkAccelGroup
     const Application = GtkApplication
-    
-    # Gtk enums
-    const ToolbarStyle = GtkToolbarStyle
-    const SortType = GtkSortType
-    const IconSize = GtkIconSize
-    const ReliefStyle = GtkReliefStyle
-    const SelectionMode = GtkSelectionMode
-    const DialogFlags = GtkDialogFlags
-    const AccelFlags = GtkAccelFlags
 
     export G_, Window, Canvas, BoxLayout, ButtonBox, Paned, Layout, Notebook,
         Expander, Overlay, Frame, AspectFrame,
@@ -279,7 +264,7 @@ module ShortNames
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
         MenuItem, SeparatorMenuItem, Menu, MenuBar,
-        NullContainer, Key, ScrollDirection, Justification, Builder, ListStore,
+        NullContainer, Key, Builder, ListStore,
         TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,
         CellRendererProgress, CellRendererSpin, CellRendererText,
@@ -287,10 +272,6 @@ module ShortNames
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
         ToggleToolButton, MenuToolButton, CssProvider, StyleContext,
         AccelGroup, Application
-
-    # Gtk enums
-    export ToolbarStyle, SortType, IconSize, ReliefStyle, SelectionMode, DialogFlags,
-        AccelFlags
         
     # GIO enums
     export GApplicationFlags     
@@ -309,16 +290,15 @@ module ShortNames
     end
 
     # Selectors
-    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, Stock, Response
+    export Dialog, AboutDialog, FileChooserDialog, FileChooserAction, Stock
 
     # Events
-    export gtk_doevent, EventMask, ModifierType, EventType,
+    export gtk_doevent, popup,
         signal_connect, signal_handler_disconnect,
         signal_handler_block, signal_handler_unblock,
         add_events, signal_emit,
         on_signal_destroy, on_signal_button_press,
-        on_signal_button_release, on_signal_motion,
-        popup
+        on_signal_button_release, on_signal_motion
 end
 using .ShortNames
 export Canvas, Window

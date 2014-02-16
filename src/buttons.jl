@@ -110,10 +110,10 @@ function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothin
 end
 function start(grp::GtkRadioButtonGroup)
     if isempty(grp)
-        list = ()
+        list = convert(Ptr{_GList{GtkRadioButton}},C_NULL)
     else
-        list = gslist(ccall((:gtk_radio_button_get_group,libgtk), Ptr{GSList{GtkRadioButton}},
-            (Ptr{GObject},), grp.anchor), false)
+        list = ccall((:gtk_radio_button_get_group,libgtk), Ptr{_GList{GtkRadioButton}},
+            (Ptr{GObject},), grp.anchor)
     end
     list
 end
@@ -184,12 +184,6 @@ function GtkVolumeButton(value::Real) # 0<=value<=1
     b = GtkVolumeButton()
     ccall((:gtk_scale_button_set_value,libgtk),Void,(Ptr{GObject},Cdouble),b,value)
     b
-end
-
-baremodule GtkReliefStyle
-    const NORMAL=0
-    const HALF=1
-    const NONE=2
 end
 
 @gtktype GtkFontButton

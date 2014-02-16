@@ -36,32 +36,11 @@ end
 
 run(widget::GtkDialogI) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
 
-baremodule GtkFileChooserAction
-    const OPEN = 0
-    const SAVE = 1
-    const SELECT_FOLDER = 2
-    const CREATE_FOLDER = 3
-end
-
 baremodule GtkStock
     const CANCEL = "gtk-cancel"
     const OPEN = "gtk-open"
     const SAVE = "gtk-save"
     const SAVE_AS = "gtk-save-as"
-end
-
-baremodule GtkResponse
-    const NONE         = -1
-    const REJECT       = -2
-    const ACCEPT       = -3
-    const DELETE_EVENT = -4
-    const OK           = -5
-    const CANCEL       = -6
-    const CLOSE        = -7
-    const YES          = -8
-    const NO           = -9
-    const APPLY        = -10
-    const HELP         = -11
 end
 
 @gtktype GtkAboutDialog

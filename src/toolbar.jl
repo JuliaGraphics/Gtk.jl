@@ -6,13 +6,6 @@ GtkToolItem() = GtkToolItem(
 
 ### GtkToolbar
 
-baremodule GtkToolbarStyle
-    const ICONS=0
-    const TEXT=1
-    const BOTH=2
-    const BOTH_HORIZ=3
-end
-
 @gtktype GtkToolbar
 GtkToolbar() = GtkToolbar(
     ccall((:gtk_toolbar_new,libgtk),Ptr{GObject},()))
@@ -52,7 +45,7 @@ GtkToggleToolButton(stock_id::String) = GtkToggleToolButton(
 GtkToggleToolButton() = GtkToggleToolButton(
     ccall((:gtk_toggle_tool_button_new,libgtk),Ptr{GObject},()))
 
-#TODO GtkRadioToolButton (needs GSList as argument)
+#TODO GtkRadioToolButton (needs _GSList as argument)
 
 @gtktype GtkMenuToolButton
 GtkMenuToolButton(stock_id::String) = GtkMenuToolButton(

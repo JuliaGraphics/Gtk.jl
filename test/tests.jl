@@ -1,5 +1,5 @@
 ## Tests
-using Gtk.ShortNames, Base.Graphics
+using Gtk.ShortNames, Gtk.GConstants, Base.Graphics
 
 ## Window
 w = Window("Window", 400, 300)
@@ -427,8 +427,8 @@ destroy(win)
 
 ## Selectors
 dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
-                        Stock.CANCEL, Response.CANCEL,
-                        Stock.OPEN, Response.ACCEPT)
+                        Stock.CANCEL, GtkResponseType.CANCEL,
+                        Stock.OPEN, GtkResponseType.ACCEPT)
 destroy(dlg)
 
 ## List view
@@ -465,7 +465,7 @@ push!(toolbar,tb1)
 unshift!(toolbar,tb2)
 push!(toolbar,tb3)
 push!(toolbar,SeparatorToolItem(), ToggleToolButton("gtk-open"), MenuToolButton("gtk-new"))
-G_.style(toolbar,ToolbarStyle.BOTH)
+G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = Window(toolbar, "Toolbar")
 showall(w)
 destroy(w)
