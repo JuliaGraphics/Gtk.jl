@@ -2530,7 +2530,7 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
         const G_GNUC_FUNCTION = ""
         const G_GNUC_PRETTY_FUNCTION = ""
         const G_ANALYZER_ANALYZING = 1
-        const GID_MAX = *(2147483647,U)
+        const GID_MAX = 2147483647
         const G_GINT16_MODIFIER = "h"
         const G_GINT16_FORMAT = "hi"
         const G_GUINT16_FORMAT = "hu"
@@ -2573,9 +2573,9 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
         const G_BIG_ENDIAN = 4321
         const G_PDP_ENDIAN = 3412
         const G_DATALIST_FLAGS_MASK = 0x03
-        const G_DATE_BAD_JULIAN = *(0,U)
-        const G_DATE_BAD_DAY = *(0,U)
-        const G_DATE_BAD_YEAR = *(0,U)
+        const G_DATE_BAD_JULIAN = 0
+        const G_DATE_BAD_DAY = 0
+        const G_DATE_BAD_YEAR = 0
         const G_DIR_SEPARATOR = '/'
         const G_DIR_SEPARATOR_S = "/"
         const G_SEARCHPATH_SEPARATOR = ':'
@@ -2725,8 +2725,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GConstants, quote
         const G_MENU_ATTRIBUTE_ICON = "icon"
         const G_MENU_LINK_SUBMENU = "submenu"
         const G_MENU_LINK_SECTION = "section"
-        const GDK_CURRENT_TIME = *(0,L)
-        const GDK_PARENT_RELATIVE = *(1,L)
+        const GDK_CURRENT_TIME = 0
+        const GDK_PARENT_RELATIVE = 1
         const GDK_MAX_TIMECOORD_AXES = 128
         const GDK_PIXBUF_FEATURES_H = 1
         const GDK_PIXBUF_VERSION = "2.30.3"
