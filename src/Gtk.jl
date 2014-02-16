@@ -43,9 +43,6 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkScrolledWindow, GtkToolbar, GtkToolItem, GtkToolButton, GtkSeparatorToolItem,
     GtkToggleToolButton, GtkMenuToolButton, GtkCssProvider, GtkStyleContext,
     GtkAccelGroup, GtkApplication
-    
-# GIO enums
-export GApplicationFlags
 
 # Gtk3 objects
 export GtkGrid
@@ -271,10 +268,7 @@ module ShortNames
         CellRendererToggle, CellRendererSpinner, TreeModelFilter,
         ScrolledWindow, Toolbar, ToolItem, ToolButton, SeparatorToolItem,
         ToggleToolButton, MenuToolButton, CssProvider, StyleContext,
-        AccelGroup, Application
-        
-    # GIO enums
-    export GApplicationFlags     
+        AccelGroup, Application    
 
     # Gtk 3
     if Gtk.gtk_version >= 3

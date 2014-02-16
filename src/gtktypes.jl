@@ -77,13 +77,6 @@ end
 @gtktype GtkAccelGroup
 GtkAccelGroup() = GtkAccelGroup(
     ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
-    
-baremodule GtkAccelFlags
-  import Base.<<
-  const VISIBLE        = 1 << 0 # display in GtkAccelLabel?
-  const LOCKED         = 1 << 1 # is it removable?
-  const MASK           = 0x07
-end
 
 function push!(w::GtkWidgetI, accel_signal::String, accel_group::GtkAccelGroup,
                accel_key::Integer, accel_mods::Integer, accel_flags::Integer)

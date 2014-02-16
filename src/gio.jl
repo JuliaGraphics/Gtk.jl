@@ -1,15 +1,4 @@
 
-baremodule GApplicationFlags
-    import Base.<<
-    const NONE = 0
-    const IS_SERVICE  = 1 << 0
-    const IS_LAUNCHER = 1 << 1
-    const HANDLES_OPEN = 1 << 2
-    const HANDLES_COMMAND_LINE = 1 << 3
-    const SEND_ENVIRONMENT = 1 << 4
-    const NON_UNIQUE = 1 << 5
-end
-
 @Gtype GApplication libgio g_application
 
 run(app::GApplicationI) = 

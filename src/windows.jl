@@ -25,9 +25,9 @@ function push!(win::GtkWindowI, accel_group::GtkAccelGroup)
   win
 end
   
-function delete!(win::GtkWindowI, accel_group::GtkAccelGroup)
+function splice!(win::GtkWindowI, accel_group::GtkAccelGroup)
   ccall((:gtk_window_remove_accel_group,libgtk),Void,(Ptr{GObject},Ptr{GObject}),win,accel_group)
-  win
+  accel_group
 end
 
 @gtktype GtkScrolledWindow
@@ -35,12 +35,6 @@ function GtkScrolledWindow()
     hnd = ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
                 C_NULL,C_NULL)
     GtkScrolledWindow(hnd)
-end
-
-baremodule  GtkDialogFlags
-    import Base.<<
-    const MODAL = 1 << 0
-    const DESTROY_WITH_PARENT = 1 << 1
 end
 
 function GtkDialog(title::String, parent::GtkContainerI, flags::Integer, button_text_response...)
