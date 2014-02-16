@@ -82,6 +82,9 @@ const GtkTypeMap = (ASCIIString=>Symbol)[
     "GtkStyleContext" => :GtkStyleContextI,
     "GtkFontChooser" => :GtkFontChooserI,
     ]
+const GtkBoxedMap = (ASCIIString=>Symbol)[
+    "GtkTreePath" => :GtkTreePath,
+    ]
 cl_to_jl = [
     cindex.VoidType         => :Void,
     cindex.BoolType         => :Bool,
@@ -122,10 +125,15 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
-    "GtkTreePath"           => :(Gtk.GtkTreePath),    
+    "GList"                 => :(Gtk._GList),
+    "GSList"                => :(Gtk._GSList),
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
+end
+for (gtktype,v) in GtkBoxedMap
+    GtkTypeMap[gtktype] = v
+    c_typdef_to_jl[gtktype] = Expr(:., :Gtk, Meta.quot(v))
 end
 const reserved_names = Set{Symbol}([symbol(x) for x in split("
     Base Main Core Array Expr Ptr
@@ -315,5 +323,19 @@ function gen_get_set(body, gtk_h)
         end
         count += 1
     end
+    push!(body.args, quote
+        function default_icon_list()
+            ccall((:gtk_window_get_default_icon_list,Gtk.libgtk), Ptr{Gtk._GList{Gtk.GdkPixbuf}}, ())
+            return list
+        end
+        function default_icon_list(list::Gtk.GList)
+            ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Void, (Ptr{Gtk._GList},), list)
+            return list
+        end
+        function position(w::Gtk.GtkWindowI,x::Integer,y::Integer)
+            ccall((:gtk_window_move,Gtk.libgtk),Void,(Ptr{Gtk.GObjectI},Cint,Cint),w,x,y)
+            w
+        end
+    end)
     count
 end

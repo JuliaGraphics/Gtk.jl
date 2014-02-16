@@ -72,7 +72,7 @@ function gen_consts(body, gtk_h)
                 tok2 = replace(tok2, "\$", "\\\$")
                 push!(body.args, Expr(:const, Expr(:(=), symbol(name), parse(tok2))))
             else
-                println("Skipping: ", name, " = ", [tokens...])
+                #println("Skipping: ", name, " = ", [tokens...])
             end
         end
     end

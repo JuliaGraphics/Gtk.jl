@@ -78,32 +78,18 @@ show(io::IO, iter::GtkTreeIter) = print("GtkTreeIter(...)")
 # end
 
 type GtkTreePath
-    handle::Ptr{Void}
-    
-    function GtkTreePath()
-        path = new(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
-        finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
-            (Ptr{Void},),x.handle))
-        path
-    end
-    
+    handle::Ptr{GtkTreePath}
     function GtkTreePath(pathIn::Ptr{GtkTreePath})
-        path = new(convert(Ptr{Void},pathIn))
+        path = new(pathIn)
         finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
             (Ptr{Void},),x.handle))
         path        
     end
-    
-    function Base.copy(path::GtkTreePath)
-        path = new(ccall((:gtk_tree_path_copy,libgtk),Ptr{Void},(Ptr{Void},),path.handle))
-        finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
-            (Ptr{Void},),x.handle))
-        path
-    end    
 end
+GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
+copy(path::GtkTreePath) = GtkTreePath(ccall((:gtk_tree_path_copy,libgtk),Ptr{Void},(Ptr{GtkTreePath},),path))
 
-convert(::Type{Ptr{Void}},path::GtkTreePath) = path.handle
-convert(::Type{Ptr{GtkTreePath}},path::GtkTreePath) = convert(Ptr{GtkTreePath},path.handle)
+convert(::Type{Ptr{GtkTreePath}},path::GtkTreePath) = path.handle
 convert(::Type{GtkTreePath},path::Ptr{GtkTreePath}) = GtkTreePath(path)
 
 ### GtkListStore
@@ -264,7 +250,7 @@ ncolumns(treeModel::GtkTreeModelI) =
 #TODO: Replace by accessor
 function iter(treeModel::GtkTreeModelI, path::GtkTreePath)
   it = GtkTreeIter()
-  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{Void},Ptr{Void}),treeModel,&it,path))
+  ret = bool( ccall((:gtk_tree_model_get_iter,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}),treeModel,&it,path))
   ret, it
 end
 

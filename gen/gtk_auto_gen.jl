@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 
-import Clang.cindex
+import Clang, Clang.cindex
 include("gtk_get_set_gen.jl")
 include("gtk_consts_gen.jl")
 
