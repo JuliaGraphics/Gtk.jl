@@ -1,7 +1,14 @@
 ##Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
+
 http://www.gtk.org/
 
-Disclaimer: some part of this API may not be finalized
+https://developer.gnome.org/gtk/stable
+
+---
+
+####Disclaimer: major API surgery is planned for the next release version. See https://github.com/JuliaLang/Gtk.jl/issues/72 for more information.
+
+---
 
 ## Installation
 
