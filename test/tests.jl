@@ -426,10 +426,12 @@ destroy(win)
 #destroy(w)
 
 ## Selectors
-dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
-                        Stock.CANCEL, GtkResponseType.CANCEL,
-                        Stock.OPEN, GtkResponseType.ACCEPT)
-destroy(dlg)
+if Gtk.gtk_version == 2
+    dlg = FileChooserDialog("Select file", NullContainer(), FileChooserAction.OPEN,
+                            Stock.CANCEL, GtkResponseType.CANCEL,
+                            Stock.OPEN, GtkResponseType.ACCEPT)
+    destroy(dlg)
+end
 
 ## List view
 ls=ListStore(Int32,Bool)
