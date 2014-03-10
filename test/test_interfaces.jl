@@ -2,11 +2,11 @@ include("../src/Interfaces.jl")
 using .Interfaces
 using Base.Test
 
-@interface IFACE1
-@interface IFACE2
-@interface IFACE3
+abstract IFACE1 <: Interface
 @implements Int <: IFACE1
+abstract IFACE2 <: Interface
 @implements Real <: IFACE2
+abstract IFACE3 <: Interface
 @implements Int <: IFACE3
 
 @multi testfn(x::IFACE1) = "hello"

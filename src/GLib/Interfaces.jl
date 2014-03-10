@@ -59,11 +59,11 @@ end
 
 abstract Interface
 InterfacesMap = ObjectIdDict()
-macro interface(name)
-    quote
-        abstract $(esc(name)) <: Interface
-    end
-end
+#macro interface(name)
+#    quote
+#        abstract $(esc(name)) <: Interface
+#    end
+#end
 macro implements(expr)
     (expr.head === :comparison && length(expr.args) == 3 && expr.args[2] === :(<:)) || error("Invalid syntax for @implements A <: B")
     obj = expr.args[1]

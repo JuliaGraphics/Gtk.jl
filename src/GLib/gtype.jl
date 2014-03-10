@@ -109,6 +109,13 @@ function get_iface_decl(name::Symbol, iname::Symbol, gtyp::GType)
     if name === :GObject
         return :( const $(esc(iname)) = gtype_ifaces[:GObject] )
     end
+    ntypes = mutable(Cuint)
+    interfaces = ccall((:g_type_interfaces,libgobject),Ptr{GType},(GType,Ptr{Cuint}),gtyp,ntypes)
+    println(g_type_name(gtyp), " implements ->")
+    for i = 1:ntypes[]
+        interface = unsafe_load(interfaces,i)
+        println("  ",g_type_name(interface))
+    end
     parent = g_type_parent(gtyp)
     @assert parent != 0
     pname = g_type_name(parent)

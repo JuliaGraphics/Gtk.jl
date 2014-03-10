@@ -18,6 +18,8 @@ bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:s
 ccall((:g_type_init,libgobject),Void,())
 include("MutableTypes.jl")
 using .MutableTypes
+include("Interfaces.jl")
+using .Interfaces
 include("glist.jl")
 include("gtype.jl")
 include("gvalues.jl")
