@@ -35,7 +35,7 @@ export GtkWindow, GtkCanvas, GtkBox, GtkButtonBox, GtkPaned, GtkLayout, GtkNoteb
     GtkImage, GtkProgressBar, GtkSpinner, GtkStatusbar, GtkStatusIcon,
     GtkTextBuffer, GtkTextView, GtkTextMark, GtkTextTag,
     GtkMenuItem, GtkSeparatorMenuItem, GtkMenu, GtkMenuBar, GtkAboutDialog, GtkDialog,
-    GtkFileChooserDialog, GtkMessageDialog, GtkNullContainer, 
+    GtkFileChooserDialog, GtkMessageDialog, GtkSeparator, GtkNullContainer, 
     GtkBuilder, GtkListStore, GtkTreeStore,
     GtkTreeIter, GtkTreeSelection, GtkTreeView, GtkTreeViewColumn,
     GtkCellRendererAccel, GtkCellRendererCombo, GtkCellRendererPixbuf,
@@ -132,7 +132,7 @@ end
 for container in subtypes(GtkContainerI,true)
     @eval $(symbol(string(container)))(child::GtkWidgetI,vargs...) = push!($container(vargs...),child)
 end
-for orientable in tuple(:GtkPaned, :GtkScale, [sym.name.name for sym in subtypes(GtkBoxI,true)]...)
+for orientable in tuple(:GtkPaned, :GtkScale, :GtkSeparator, [sym.name.name for sym in subtypes(GtkBoxI,true)]...)
     @eval $orientable(orientation::Symbol,vargs...) = $orientable(
             (orientation==:v ? true :
             (orientation==:h ? false :
@@ -203,6 +203,7 @@ module ShortNames
     const Pixbuf = GdkPixbuf
     const Image = GtkImage
     const ProgressBar = GtkProgressBar
+    const Separator = GtkSeparator
     const Spinner = GtkSpinner
     const Statusbar = GtkStatusbar
     const StatusIcon = GtkStatusIcon
@@ -257,7 +258,7 @@ module ShortNames
         Entry, Scale, Adjustment, SpinButton, ComboBoxText,
         Pixbuf, Image, ProgressBar, Spinner, Statusbar,
         StatusIcon, TextBuffer, TextView, TextMark, TextTag,
-        MenuItem, SeparatorMenuItem, Menu, MenuBar,
+        MenuItem, Separator, SeparatorMenuItem, Menu, MenuBar,
         NullContainer, Key, Builder, ListStore,
         TreeStore, TreeIter, TreeSelection, TreeView, TreeViewColumn,
         CellRendererAccel, CellRendererCombo, CellRendererPixbuf,

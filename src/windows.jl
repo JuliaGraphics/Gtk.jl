@@ -71,4 +71,12 @@ function GtkMessageDialog(parent::GtkContainerI, flags::Integer, typ::Integer,
     w
 end
 
-#GtkSeparator — A separator widget
+@gtktype GtkSeparator
+GtkSeparator(vertical::Bool) =
+    GtkSeparator(
+        if vertical
+            ccall((:gtk_vseparator_new,libgtk),Ptr{GObject},())
+        else
+            ccall((:gtk_hseparator_new,libgtk),Ptr{GObject},())
+        end
+        )
