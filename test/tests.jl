@@ -66,8 +66,10 @@ f = BoxLayout(:v)
 w = Window(f, "Last in, first covered", 400, 400)
 
 g1 = BoxLayout(:h)
+hsep = Separator(:h)
 g2 = BoxLayout(:h)
 push!(f,g1)
+push!(f,hsep)
 push!(f,g2)
 
 b11 = Button("first")
