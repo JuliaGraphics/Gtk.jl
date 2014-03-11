@@ -12,7 +12,7 @@ function gen_consts(body, gtk_h)
             if m === nothing
                 continue
             end
-            name = symbol(m.captures[1])
+            name = symbol(name)
             push!(exports.args, name)
             consts = Expr(:block)
             push!(body.args, Expr(:toplevel, Expr(:module, false, name, consts)))

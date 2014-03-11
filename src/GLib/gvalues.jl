@@ -144,7 +144,7 @@ function getindex(gv::GV, ::Type{Any})
 end
 #end
 
-function getproperty{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
+function getproperty{T}(w::GObject, name::StringLike, ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
@@ -154,21 +154,21 @@ function getproperty{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
 end
 
 
-setproperty!{T}(w::GObject, name::Union(String,Symbol), ::Type{T}, value) = setproperty!(w, name, convert(T,value))
-function setproperty!(w::GObject, name::Union(String,Symbol), value)
+setproperty!{T}(w::GObject, name::StringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
+function setproperty!(w::GObject, name::StringLike, value)
     ccall((:g_object_set_property, libgobject), Void,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
     w
 end
 
-@deprecate getindex(w::GObject, name::Union(String,Symbol), T::Type) getproperty(w,name,T)
-@deprecate setindex!(w::GObject, value, name::Union(String,Symbol), T::Type) setproperty!(w,name,T,value)
-@deprecate setindex!(w::GObject, value, name::Union(String,Symbol)) setproperty!(w,name,value)
+@deprecate getindex(w::GObject, name::StringLike, T::Type) getproperty(w,name,T)
+@deprecate setindex!(w::GObject, value, name::StringLike, T::Type) setproperty!(w,name,T,value)
+@deprecate setindex!(w::GObject, value, name::StringLike) setproperty!(w,name,value)
 
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
-    if convert(Ptr{GObjectI},w) == C_NULL
+    if convert(Ptr{GObject},w) == C_NULL
         print(io,"<NULL>)")
         return
     end

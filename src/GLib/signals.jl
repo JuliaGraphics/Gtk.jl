@@ -1,5 +1,6 @@
 sizeof_gclosure = 0
-function init()
+function __init__()
+    ccall((:g_type_init,libgobject),Void,())
     global sizeof_gclosure = WORD_SIZE
     closure = C_NULL
     while closure == C_NULL
@@ -12,7 +13,7 @@ end
 # id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),
+function signal_connect(cb::Function,w::GObject,sig::StringLike,
         RT::Type,param_types::Tuple,after::Bool=false,closure=w) #TODO: assert that length(param_types) is correct
     if isgeneric(cb)
         callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,typeof(closure)))
@@ -32,10 +33,11 @@ end
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),after::Bool=false)
+function signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool=false)
     _signal_connect(cb, w, sig, after, false,nothing,nothing)
 end
-function _signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),after::Bool,gtk_call_conv::Bool,param_types,closure)
+function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk_call_conv::Bool,param_types,closure)
+    @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object,libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+WORD_SIZE*2, w)
     closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
     unsafe_store!(closure_env, cb, 1)
@@ -56,6 +58,7 @@ function _signal_connect(cb::Function,w::GObject,sig::Union(String,Symbol),after
 end
 function GClosureMarshal(closuref, return_value, n_param_values,
                          param_values, invocation_hint, marshal_data)
+    @assert sizeof_gclosure > 0
     try
         closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
         cb = unsafe_load(closure_env, 1)
@@ -120,7 +123,7 @@ signal_handler_block(w::GObject, handler_id::Culong) =
 signal_handler_unblock(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_unblock,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
-function signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
+function signal_emit(w::GObject, sig::StringLike, RT::Type, args...)
     i = isa(sig, String) ? search(sig, "::") : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i)+1:end]

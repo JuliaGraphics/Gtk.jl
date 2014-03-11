@@ -153,7 +153,7 @@ bstride(a,i) = stride(a,i)*sizeof(eltype(a))
 #GdkPixbuf(xpm_data=[...])
 #GdkPixbuf(data=[...],has_alpha=true)
 #GdkPixbuf(width=1,height=1,has_alpha=true)
-function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_data=nothing,inline_data=nothing,data=nothing,
+function new(::Type{GdkPixbuf};stream=nothing,resource_path=nothing,filename=nothing,xpm_data=nothing,inline_data=nothing,data=nothing,
         width=-1,height=-1,preserve_aspect_ratio=true,has_alpha=nothing)
     source_count = (stream!==nothing) + (resource_path!==nothing) + (filename!==nothing) +
         (xpm_data!==nothing) + (inline_data!==nothing) + (data!==nothing)
@@ -187,13 +187,13 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
     elseif xpm_data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from xpm_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data,libgdk_pixbuf),Ptr{GObject},(Ptr{Ptr{Uint8}},),xpm_data)
+            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data,libgdk_pixbuf),Ptr{GObject},(Ptr{Ptr{Void}},),xpm_data)
             return pixbuf !== C_NULL
         end
     elseif inline_data !== nothing
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from inline_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_inline,libgdk_pixbuf),Ptr{GObject},(Cint,Ptr{Uint8},Cint,Ptr{Ptr{GError}}),sizeof(inline_data),inline_data,true,error_check)
+            pixbuf = ccall((:gdk_pixbuf_new_from_inline,libgdk_pixbuf),Ptr{GObject},(Cint,Ptr{Void},Cint,Ptr{Ptr{GError}}),sizeof(inline_data),inline_data,true,error_check)
             return pixbuf !== C_NULL
         end
     elseif data !== nothing # RGB or RGBA array, packed however you wish
@@ -202,7 +202,7 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
         width = size(data,1)*bstride(data,1)/(3+int(alpha))
         height = size(data,2)
         pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk_pixbuf),Ptr{GObject},
-            (Ptr{Uint8},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Any),
+            (Ptr{Void},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Any),
             data,0,alpha,8,width,height,bstride(data,2),
             gc_ref_closure(data),data)
     else
@@ -211,13 +211,13 @@ function GdkPixbuf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_da
         pixbuf = ccall((:gdk_pixbuf_new,libgdk_pixbuf),Ptr{GObject},
             (Cint,Cint,Cint,Cint,Cint),0,alpha,8,width,height)
     end
-    return GdkPixbuf(pixbuf)
+    return new(GdkPixbuf,pixbuf)
 end
 #GdkPixbufLoader for new with type/mimetype
 #GdkPixbuf(callback, stream, width=-1, height=-1, preserve_aspect_ratio=true)
 
-copy(img::GdkPixbuf) = GdkPixbuf(ccall((:gdk_pixbuf_copy,libgdk_pixbuf),Ptr{GObject},(Ptr{GObject},),img))
-slice(img::GdkPixbuf,x,y) = GdkPixbuf(ccall((:gdk_pixbuf_new_subpixbuf,libgdk_pixbuf),Ptr{GObject},
+copy(img::GdkPixbuf) = new(GdkPixbuf,ccall((:gdk_pixbuf_copy,libgdk_pixbuf),Ptr{GObject},(Ptr{GObject},),img))
+slice(img::GdkPixbuf,x,y) = new(GdkPixbuf,ccall((:gdk_pixbuf_new_subpixbuf,libgdk_pixbuf),Ptr{GObject},
     (Ptr{GObject},Cint,Cint,Cint,Cint),img,first(x)-1,first(y)-1,length(x),length(y)))
 width(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_width,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
 height(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_height,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
@@ -260,42 +260,42 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 #TODO: image transformations, rotations, compositing
 
 @gtktype GtkImage
-GtkImage(pixbuf::GdkPixbuf) = GtkImage(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
-GtkImage(filename::String) = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
+new(::Type{GtkImage}, pixbuf::GdkPixbuf) = new(GtkImage,ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
+new(::Type{GtkImage}, filename::String) = new(GtkImage,ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
-function GtkImage(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:INVALID)
+function new(::Type{GtkImage};resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:INVALID)
     source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing) + (stock_id!==nothing)
     @assert(source_count <= 1,
         "GdkPixbuf must have at most one resource_path, filename, stock_id, or icon_name argument")
-    local img::GtkImage
+    local img::Ptr{GObject}
     if resource_path !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path)))
+        img = ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path))
     elseif filename !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
+        img = ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename))
     elseif icon_name !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.(size)))
+        img = ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.(size))
     elseif stock_id !== nothing
-        img = GtkImage(ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(stock_id),GtkIconSize.(size)))
+        img = ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(stock_id),GtkIconSize.(size))
     else
-        img = GtkImage(ccall((:gtk_image_new,libgtk),Ptr{GObject},()))
+        img = ccall((:gtk_image_new,libgtk),Ptr{GObject},())
     end
-    return img
+    return new(GtkImage,img)
 end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
-GdkPixbuf(img::GtkImage) = GdkPixbuf(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
+new(::Type{GdkPixbuf}, img::GtkImage) = new(GdkPixbuf,ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
 
 @gtktype GtkProgressBar
-GtkProgressBar() = GtkProgressBar(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkProgressBar}) = new(GtkProgressBar,ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
 pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
 @gtktype GtkSpinner
-GtkSpinner() = GtkSpinner(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkSpinner}) = new(GtkSpinner,ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
 start(spinner::GtkSpinner) = ccall((:gtk_spinner_start,libgtk),Void,(Ptr{GObject},),spinner)
 stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop,libgtk),Void,(Ptr{GObject},),spinner)
 
 @gtktype GtkStatusbar
-GtkStatusbar() = GtkStatusbar(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkStatusbar}) = new(GtkStatusbar,ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
     ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
         status,bytestring(source))
@@ -314,8 +314,8 @@ empty!(status::GtkStatusbar,context) =
         status,context_id(status,context),context_id(context))
 
 #@gtktype GtkInfoBar
-#GtkInfoBar() = GtkInfoBar(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
+#new(::Type{GtkInfoBar}) = new(GtkInfoBar,ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
 @gtktype GtkStatusIcon
-GtkStatusIcon() = GtkStatusIcon(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkStatusIcon}) = new(GtkStatusIcon,ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
 

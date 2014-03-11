@@ -20,20 +20,20 @@
 #GtkRadioToolButton — A toolbar item that contains a radio button
 
 @gtktype GtkMenuItem
-GtkMenuItem() = GtkMenuItem(ccall((:gtk_menu_item_new,libgtk),Ptr{GObject},()))
-GtkMenuItem(label::String) =
-    GtkMenuItem(ccall((:gtk_menu_item_new_with_mnemonic,libgtk),Ptr{GObject},
+new(::Type{GtkMenuItem}) = new(GtkMenuItem,ccall((:gtk_menu_item_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkMenuItem}, label::String) =
+    new(GtkMenuItem,ccall((:gtk_menu_item_new_with_mnemonic,libgtk),Ptr{GObject},
                 (Ptr{Uint8},), bytestring(label)))
 
 
 @gtktype GtkSeparatorMenuItem
-GtkSeparatorMenuItem() = GtkSeparatorMenuItem(ccall((:gtk_separator_menu_item_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkSeparatorMenuItem}) = new(GtkSeparatorMenuItem,ccall((:gtk_separator_menu_item_new,libgtk),Ptr{GObject},()))
 
 
 @gtktype GtkMenu
-GtkMenu() = GtkMenu(ccall((:gtk_menu_new,libgtk),Ptr{GObject},()))
-function GtkMenu(item::GtkMenuItem)
-    menu = GtkMenu()
+new(::Type{GtkMenu}) = new(GtkMenu,ccall((:gtk_menu_new,libgtk),Ptr{GObject},()))
+function new(::Type{GtkMenu}, item::GtkMenuItem)
+    menu = new(GtkMenu)
 #     GAccessor.submenu(item, menu)
     ccall((:gtk_menu_item_set_submenu,libgtk),Void,(Ptr{GObject},Ptr{GObject}),
           item, menu)
@@ -42,10 +42,10 @@ end
 
 
 @gtktype GtkMenuBar
-GtkMenuBar() = GtkMenuBar(ccall((:gtk_menu_bar_new,libgtk),Ptr{GObject},()))
+new(::Type{GtkMenuBar}) = new(GtkMenuBar,ccall((:gtk_menu_bar_new,libgtk),Ptr{GObject},()))
 
 
-popup(menu::GtkMenuShellI, event::GdkEventButton) =
+popup(menu::GtkMenuShell, event::GdkEventButton) =
     ccall((:gtk_menu_popup,libgtk), Void,
           (Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{Void},Cuint,Uint32),
           menu, GtkNullContainer(), GtkNullContainer(), GtkNullContainer(), C_NULL, event.button, event.time)

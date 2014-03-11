@@ -1,91 +1,91 @@
 const GtkTypeMap = (ASCIIString=>Symbol)[
-    "GObject" => :GObjectI,
-    "GtkWidget" => :GtkWidgetI,
-    "GtkContainer" => :GtkContainerI,
-    "GtkBin" => :GtkBinI,
-    "GtkBox" => :GtkBoxI,
-    "GdkPixbuf" => :GdkPixbufI,
-    "GtkStatusIcon" => :GtkStatusIconI,
-    "GtkTextBuffer" => :GtkTextBufferI,
-    "GtkTextMark" => :GtkTextMarkI,
-    "GtkTextTag" => :GtkTextTagI,
-    "GtkCanvas" => :GtkCanvasI,
-    "GtkComboBoxText" => :GtkComboBoxTextI,
-    "GtkEditable" => :GtkEditableI,
-    "GtkEntry" => :GtkEntryI,
-    "GtkEntryCompletion" => :GtkEntryCompletionI,
-    "GtkImage" => :GtkImageI,
-    "GtkLabel" => :GtkLabelI,
-    "GtkProgressBar" => :GtkProgressBarI,
-    "GtkScale" => :GtkScaleI,
-    "GtkRange" => :GtkScaleI, #GtkRangeI,
-    "GtkAdjustment" => :GtkAdjustmentI,
-    "GtkSpinButton" => :GtkSpinButtonI,
-    "GtkSpinner" => :GtkSpinnerI,
-    "GtkTextView" => :GtkTextViewI,
-    "GtkLayout" => :GtkLayoutI,
-    "GtkNotebook" => :GtkNotebookI,
-    "GtkPaned" => :GtkPanedI,
-    "GtkTable" => :GtkTableI,
-    "GtkButtonBox" => :GtkButtonBoxI,
-    "GtkStatusbar" => :GtkStatusbarI,
-    "GtkAlignment" => :GtkAlignmentI,
-    "GtkAspectFrame" => :GtkAspectFrameI,
-    "GtkButton" => :GtkButtonI,
-    "GtkCheckButton" => :GtkCheckButtonI,
-    "GtkExpander" => :GtkExpanderI,
-    "GtkFrame" => :GtkFrameI,
-    "GtkLinkButton" => :GtkLinkButtonI,
-    "GtkRadioButton" => :GtkRadioButtonI,
-    "GtkToggleButton" => :GtkToggleButtonI,
-    "GtkVolumeButton" => :GtkVolumeButtonI,
-    "GtkFontButton" => :GtkFontButtonI,
-    "GtkWindow" => :GtkWindowI,
-    "GtkDialog" => :GtkDialogI,
-    "GtkFileChooserDialog" => :GtkFileChooserDialogI,
-    "GtkFileChooser" => :GtkFileChooserDialogI,
-    "GtkAboutDialog" => :GtkAboutDialogI,
-    "GtkMessageDialog" => :GtkMessageDialogI,
-    "GtkBuilder" => :GtkBuilderI,
-    "GtkListStore" => :GtkListStoreI,
-    "GtkTreeStore" => :GtkTreeStoreI,
-    "GtkTreeModelSort" => :GtkTreeModelSortI,
-    "GtkTreeModelFilter" => :GtkTreeModelFilterI,
-    "GtkCellArea" => :GtkCellAreaI,
-    "GtkCellAreaBox" => :GtkCellAreaBoxI,
-    "GtkCellAreaContext" => :GtkCellAreaContextI,
-    "GtkCellRenderer" => :GtkCellRendererI,
-    "GtkCellEditable" => :GtkCellEditableI,
-    "GtkCellRendererAccel" => :GtkCellRendererAccelI,
-    "GtkCellRendererCombo" => :GtkCellRendererComboI,
-    "GtkCellRendererPixbuf" => :GtkCellRendererPixbufI,
-    "GtkCellRendererProgress" => :GtkCellRendererProgressI,
-    "GtkCellRendererSpin" => :GtkCellRendererSpinI,
-    "GtkCellRendererText" => :GtkCellRendererTextI,
-    "GtkCellRendererToggle" => :GtkCellRendererToggleI,
-    "GtkCellRendererSpinner" => :GtkCellRendererSpinnerI,
-    "GtkTreeViewColumn" => :GtkTreeViewColumnI,
-    "GtkTreeView" => :GtkTreeViewI,
-    "GtkCellView" => :GtkCellViewI,
-    "GtkIconView" => :GtkIconViewI,
-    "GtkTreeSelection" => :GtkTreeSelectionI,
-    "GtkTreeSortable" => :GtkTreeSortableI,
-    "GtkTreeModel" => :GtkTreeModelI,
-    "GtkTreeModelFilter" => :GtkTreeModelFilterI,
-    "GtkScrolledWindow" => :GtkScrolledWindowI,
-    "GtkToolbar" => :GtkToolbarI,
-    "GtkToolItem" => :GtkToolItemI,
-    "GtkToolButton" => :GtkToolButtonI,
-    "GtkToggleToolButton" => :GtkToggleToolButtonI,
-    "GtkSeparatorToolItem" => :GtkSeparatorToolItemI,
-    "GtkMenuToolButton" => :GtkMenuToolButtonI,
-    "GtkCssProvider" => :GtkCssProviderI,
-    "GtkStyleProvider" => :GtkStyleProviderI,  
-    "GtkStyleContext" => :GtkStyleContextI,
-    "GtkFontChooser" => :GtkFontChooserI,
-    "GtkAccelGroup" => :GtkAccelGroupI,
-    "GtkMenu" => :GtkMenuI,
-    "GtkMenuItem" => :GtkMenuItemI,
+    "GObject" => :GObject,
+    "GtkWidget" => :GtkWidget,
+    "GtkContainer" => :GtkContainer,
+    "GtkBin" => :GtkBin,
+    "GtkBox" => :GtkBox,
+    "GdkPixbuf" => :GdkPixbuf,
+    "GtkStatusIcon" => :GtkStatusIcon,
+    "GtkTextBuffer" => :GtkTextBuffer,
+    "GtkTextMark" => :GtkTextMark,
+    "GtkTextTag" => :GtkTextTag,
+    "GtkCanvas" => :GtkCanvas,
+    "GtkComboBoxText" => :GtkComboBoxText,
+    "GtkEditable" => :GtkEditable,
+    "GtkEntry" => :GtkEntry,
+    "GtkEntryCompletion" => :GtkEntryCompletion,
+    "GtkImage" => :GtkImage,
+    "GtkLabel" => :GtkLabel,
+    "GtkProgressBar" => :GtkProgressBar,
+    "GtkScale" => :GtkScale,
+    "GtkRange" => :GtkScale, #GtkRange,
+    "GtkAdjustment" => :GtkAdjustment,
+    "GtkSpinButton" => :GtkSpinButton,
+    "GtkSpinner" => :GtkSpinner,
+    "GtkTextView" => :GtkTextView,
+    "GtkLayout" => :GtkLayout,
+    "GtkNotebook" => :GtkNotebook,
+    "GtkPaned" => :GtkPaned,
+    "GtkTable" => :GtkTable,
+    "GtkButtonBox" => :GtkButtonBox,
+    "GtkStatusbar" => :GtkStatusbar,
+    "GtkAlignment" => :GtkAlignment,
+    "GtkAspectFrame" => :GtkAspectFrame,
+    "GtkButton" => :GtkButton,
+    "GtkCheckButton" => :GtkCheckButton,
+    "GtkExpander" => :GtkExpander,
+    "GtkFrame" => :GtkFrame,
+    "GtkLinkButton" => :GtkLinkButton,
+    "GtkRadioButton" => :GtkRadioButton,
+    "GtkToggleButton" => :GtkToggleButton,
+    "GtkVolumeButton" => :GtkVolumeButton,
+    "GtkFontButton" => :GtkFontButton,
+    "GtkWindow" => :GtkWindow,
+    "GtkDialog" => :GtkDialog,
+    "GtkFileChooserDialog" => :GtkFileChooserDialog,
+    "GtkFileChooser" => :GtkFileChooserDialog,
+    "GtkAboutDialog" => :GtkAboutDialog,
+    "GtkMessageDialog" => :GtkMessageDialog,
+    "GtkBuilder" => :GtkBuilder,
+    "GtkListStore" => :GtkListStore,
+    "GtkTreeStore" => :GtkTreeStore,
+    "GtkTreeModelSort" => :GtkTreeModelSort,
+    "GtkTreeModelFilter" => :GtkTreeModelFilter,
+    "GtkCellArea" => :GtkCellArea,
+    "GtkCellAreaBox" => :GtkCellAreaBox,
+    "GtkCellAreaContext" => :GtkCellAreaContext,
+    "GtkCellRenderer" => :GtkCellRenderer,
+    "GtkCellEditable" => :GtkCellEditable,
+    "GtkCellRendererAccel" => :GtkCellRendererAccel,
+    "GtkCellRendererCombo" => :GtkCellRendererCombo,
+    "GtkCellRendererPixbuf" => :GtkCellRendererPixbuf,
+    "GtkCellRendererProgress" => :GtkCellRendererProgress,
+    "GtkCellRendererSpin" => :GtkCellRendererSpin,
+    "GtkCellRendererText" => :GtkCellRendererText,
+    "GtkCellRendererToggle" => :GtkCellRendererToggle,
+    "GtkCellRendererSpinner" => :GtkCellRendererSpinner,
+    "GtkTreeViewColumn" => :GtkTreeViewColumn,
+    "GtkTreeView" => :GtkTreeView,
+    "GtkCellView" => :GtkCellView,
+    "GtkIconView" => :GtkIconView,
+    "GtkTreeSelection" => :GtkTreeSelection,
+    "GtkTreeSortable" => :GtkTreeSortable,
+    "GtkTreeModel" => :GtkTreeModel,
+    "GtkTreeModelFilter" => :GtkTreeModelFilter,
+    "GtkScrolledWindow" => :GtkScrolledWindow,
+    "GtkToolbar" => :GtkToolbar,
+    "GtkToolItem" => :GtkToolItem,
+    "GtkToolButton" => :GtkToolButton,
+    "GtkToggleToolButton" => :GtkToggleToolButton,
+    "GtkSeparatorToolItem" => :GtkSeparatorToolItem,
+    "GtkMenuToolButton" => :GtkMenuToolButton,
+    "GtkCssProvider" => :GtkCssProvider,
+    "GtkStyleProvider" => :GtkStyleProvider,  
+    "GtkStyleContext" => :GtkStyleContext,
+    "GtkFontChooser" => :GtkFontChooser,
+    "GtkAccelGroup" => :GtkAccelGroup,
+    "GtkMenu" => :GtkMenu,
+    "GtkMenuItem" => :GtkMenuItem,
     ]
 const GtkBoxedMap = (ASCIIString=>Symbol)[
     "GtkTreePath" => :GtkTreePath,
@@ -138,7 +138,7 @@ for gtktype in keys(GtkTypeMap)
 end
 for (gtktype,v) in GtkBoxedMap
     GtkTypeMap[gtktype] = v
-    c_typdef_to_jl[gtktype] = Expr(:., :Gtk, Meta.quot(v))
+    c_typdef_to_jl[gtktype] = Expr(:., :Gtk, QuoteNode(v))
 end
 const reserved_names = Set{Symbol}([symbol(x) for x in split("
     Base Main Core Array Expr Ptr
@@ -146,7 +146,7 @@ const reserved_names = Set{Symbol}([symbol(x) for x in split("
     while do for if ifelse nothing quote
     start next end done top tuple convert
     Gtk GAccessor GValue
-    ")]...)
+    ")])
 for typsym in values(cl_to_jl)
     push!(reserved_names, typsym)
 end
@@ -156,11 +156,11 @@ for typsym in values(c_typdef_to_jl)
     end
 end
 const gtklibname = (ASCIIString=>Any)[
-    "gtk" => Expr(:., :Gtk, Expr(:quote, :libgtk)),
-    "gdk" => Expr(:., :Gtk, Expr(:quote, :libgdk)),
-    "gobject" => Expr(:., :Gtk, Expr(:quote, :libgobject)),
-    "glib" => Expr(:., :Gtk, Expr(:quote, :libglib)),
-    "gdk-pixbuf" => Expr(:., :Gtk, Expr(:quote, :libgdk_pixbuf)),
+    "gtk" => Expr(:., :Gtk, QuoteNode(:libgtk)),
+    "gdk" => Expr(:., :Gtk, QuoteNode(:libgdk)),
+    "gobject" => Expr(:., :Gtk, QuoteNode(:libgobject)),
+    "glib" => Expr(:., :Gtk, QuoteNode(:libglib)),
+    "gdk-pixbuf" => Expr(:., :Gtk, QuoteNode(:libgdk_pixbuf)),
     "deprecated" => nothing,
     ]
 
@@ -207,7 +207,7 @@ function g_get_gtype(ctype)
     if arg1ty === :Void
         return :Nothing
     end
-    return Expr(:., :Gtk, Expr(:quote,arg1ty))
+    return Expr(:., :Gtk, QuoteNode(arg1ty))
 end
 
 function is_gstring(ctype)
@@ -272,7 +272,7 @@ function gen_get_set(body, gtk_h)
             continue
         end
         if m.captures[1] == "get"
-            fbody = :( ccall(($(Meta.quot(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) )
+            fbody = :( ccall(($(QuoteNode(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) )
             gtype = g_get_gtype(cindex.return_type(fdecl))
             if gtype != :Nothing
                 fbody = :( convert($gtype, $fbody) )
@@ -319,7 +319,7 @@ function gen_get_set(body, gtk_h)
             push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), fargnames...), fbody))
         elseif m.captures[1] == "set"
             fbody = Expr(:block,
-                :( ccall(($(Meta.quot(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) ),
+                :( ccall(($(QuoteNode(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) ),
                 Expr(:return, argnames[1])
             )
             push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), argnames[2:end]...), fbody))
@@ -337,8 +337,8 @@ function gen_get_set(body, gtk_h)
             ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Void, (Ptr{Gtk._GList},), list)
             return list
         end
-        function position(w::Gtk.GtkWindowI,x::Integer,y::Integer)
-            ccall((:gtk_window_move,Gtk.libgtk),Void,(Ptr{Gtk.GObjectI},Cint,Cint),w,x,y)
+        function position(w::Gtk.GtkWindow,x::Integer,y::Integer)
+            ccall((:gtk_window_move,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Cint),w,x,y)
             w
         end
     end)
