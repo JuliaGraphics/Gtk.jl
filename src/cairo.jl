@@ -9,7 +9,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     back::CairoSurface   # backing store
     backcc::CairoContext
 
-    function Gtk.new(::Type{GtkCanvas}, w, h)
+    function GtkCanvas(w=-1, h=-1)
         da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GObject},())
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32), da, w, h)
         widget = new(da, false, MouseHandler(), nothing, nothing)
@@ -26,7 +26,6 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         gc_ref(widget)
     end
 end
-new(::Type{GtkCanvas}) = new(GtkCanvas, -1,-1)
 
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     widget.has_allocation = true

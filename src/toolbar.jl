@@ -1,13 +1,13 @@
 ### GtkToolItem
 
 @gtktype GtkToolItem
-new(::Type{GtkToolItem}) = new(GtkToolItem,
+GtkToolItemLeaf() = GtkToolItemLeaf(
     ccall((:gtk_tool_item_new,libgtk),Ptr{GObject},()))
 
 ### GtkToolbar
 
 @gtktype GtkToolbar
-new(::Type{GtkToolbar}) = new(GtkToolbar,
+GtkToolbarLeaf() = GtkToolbarLeaf(
     ccall((:gtk_toolbar_new,libgtk),Ptr{GObject},()))
     
 insert!(toolbar::GtkToolbar, pos::Integer, item::GtkToolItem) =
@@ -36,24 +36,24 @@ length(toolbar::GtkToolbar) =
   
 ### GtkToolButton
 @gtktype GtkToolButton
-new(::Type{GtkToolButton}, stock_id::String) = new(GtkToolButton,
+GtkToolButtonLeaf(stock_id::String) = GtkToolButtonLeaf(
     ccall((:gtk_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
 
 @gtktype GtkToggleToolButton
-new(::Type{GtkToggleToolButton}, stock_id::String) = new(GtkToggleToolButton,
+GtkToggleToolButtonLeaf(stock_id::String) = GtkToggleToolButtonLeaf(
     ccall((:gtk_toggle_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
-new(::Type{GtkToggleToolButton}) = new(GtkToggleToolButton,
+GtkToggleToolButtonLeaf() = GtkToggleToolButtonLeaf(
     ccall((:gtk_toggle_tool_button_new,libgtk),Ptr{GObject},()))
 
 #TODO GtkRadioToolButton (needs _GSList as argument)
 
 @gtktype GtkMenuToolButton
-new(::Type{GtkMenuToolButton}, stock_id::String) = new(GtkMenuToolButton,
+GtkMenuToolButtonLeaf(stock_id::String) = GtkMenuToolButtonLeaf(
     ccall((:gtk_menu_tool_button_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(stock_id)))
     
 ### GtkSeparatorToolItem
 @gtktype GtkSeparatorToolItem
-new(::Type{GtkSeparatorToolItem}) = new(GtkSeparatorToolItem,
+GtkSeparatorToolItemLeaf() = GtkSeparatorToolItemLeaf(
     ccall((:gtk_separator_tool_item_new,libgtk),Ptr{GObject},()))
     
 

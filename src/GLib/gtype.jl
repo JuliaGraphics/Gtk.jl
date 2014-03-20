@@ -67,15 +67,14 @@ const G_TYPE_FLAG_DEEP_DERIVABLE    = 1 << 3
 type GObjectLeaf <: GObject
     handle::Ptr{GObject}
     function GObjectLeaf(handle::Ptr{GObject})
-        if handle != C_NULL
-            gc_ref(new(handle))
-        else
+        if handle == C_NULL
             error("Cannot construct $gname with a NULL pointer")
         end
+        gc_ref(new(handle))
     end
 end
 g_type(obj::GObject) = g_type(typeof(obj))
-new{T<:GObject}(::Type{T}, handle::Ptr{GObject}) = T(handle)
+new{T}(::Type{T}, args...) = T(args...)
 
 gtypes(types...) = GType[g_type(t) for t in types]
 
@@ -133,10 +132,12 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
     :(
         if $(Meta.quot(iname)) in keys(gtype_ifaces)
             const $(esc(iname)) = gtype_ifaces[$(Meta.quot(iname))]
+            nothing
         else
             $piface_decl
             abstract $(esc(iname)) <: $(esc(piname))
             gtype_ifaces[$(Meta.quot(iname))] = $(esc(iname))
+            nothing
         end
     )
 end
@@ -148,31 +149,40 @@ get_gtype_decl(name::Symbol, lib, symname::Symbol) =
         ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
-    :(
+    ename = esc(name)
+    einame = esc(iname)
+    cm = current_module()
+    :(begin
         if $(Meta.quot(iname)) in keys(gtype_wrappers)
-            const $(esc(iname)) = gtype_ifaces[$(Meta.quot(iname))]
-            const $(esc(name)) = gtype_wrappers[$(Meta.quot(iname))]
+            const $einame = gtype_ifaces[$(QuoteNode(iname))]
         else
             $(get_itype_decl(iname, gtyp))
-            type $(esc(name)) <: $(esc(iname))
-                handle::Ptr{GObject}
-                function $(esc(name))(handle::Ptr{GObject})
-                    if handle != C_NULL
-                        gc_ref(new(handle))
-                    else
-                        error($("Cannot construct $name with a NULL pointer"))
-                    end
-                end
-            end
-            GLib.new(::Type{$(esc(iname))}, handle::Ptr{GObject}) = new($(esc(name)), handle)
-            gtype_wrappers[$(Meta.quot(iname))] = $(esc(name))
-            $(gtype_decl)
         end
-    )
+        type $ename <: $einame
+            handle::Ptr{GObject}
+            function $ename(handle::Ptr{GObject})
+                if handle == C_NULL
+                    error($("Cannot construct $name with a NULL pointer"))
+                end
+                gc_ref(new(handle))
+            end
+        end
+        function $ename(args...; kwargs...)
+            w = $ename(args...)
+            for (kw,val) in kwargs
+                $cm._.(kw)(w, val)
+            end
+            w
+        end
+        GLib.new(::Type{$einame}, args...) = $ename(args...)
+        gtype_wrappers[$(QuoteNode(iname))] = $ename
+        $(gtype_decl)
+        nothing
+    end)
 end
 
 macro Gtype_decl(name,gtyp,gtype_decl)
-    get_type_decl(name,symbol(string(name,"Leaf")),gtyp,gtype_decl)
+    get_type_decl(name,symbol(string(name,current_module().suffix)),gtyp,gtype_decl)
 end
 
 macro Gtype(iname,lib,symname)
@@ -185,7 +195,7 @@ macro Gtype(iname,lib,symname)
     if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
         error("not implemented yet")
     end
-    name = symbol(string(iname,"Leaf"))
+    name = symbol(string(iname,current_module().suffix))
     gtype_decl = get_gtype_decl(name, lib, symname)
     get_type_decl(name, iname, gtyp, gtype_decl)
 end

@@ -5,7 +5,7 @@ const AccelGroup = GtkAccelGroup
 const Adjustment = GtkAdjustment
 const Application = GtkApplication
 const AspectFrame = GtkAspectFrame
-const BoxLayout = GtkBox
+const Box = GtkBox
 const Builder = GtkBuilder
 const Button = GtkButton
 const ButtonBox = GtkButtonBox
@@ -39,13 +39,11 @@ const MenuItem = GtkMenuItem
 const MenuToolButton = GtkMenuToolButton
 const MessageDialog = GtkMessageDialog
 const Notebook = GtkNotebook
-const NullContainer = GtkNullContainer
 const Overlay = GtkOverlay
 const Paned = GtkPaned
 const Pixbuf = GdkPixbuf
 const ProgressBar = GtkProgressBar
 const RadioButton = GtkRadioButton
-const RadioButtonGroup = GtkRadioButtonGroup
 const Scale = GtkScale
 const ScrolledWindow = GtkScrolledWindow
 const SeparatorMenuItem = GtkSeparatorMenuItem
@@ -80,7 +78,7 @@ export G_,
     Adjustment,
     Application,
     AspectFrame,
-    BoxLayout,
+    Box,
     Builder,
     Button,
     ButtonBox,
@@ -114,13 +112,11 @@ export G_,
     MenuToolButton,
     MessageDialog,
     Notebook,
-    NullContainer,
     Overlay,
     Paned,
     Pixbuf,
     ProgressBar,
     RadioButton,
-    RadioButtonGroup,
     Scale,
     ScrolledWindow,
     SeparatorMenuItem,

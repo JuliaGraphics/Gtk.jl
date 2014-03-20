@@ -9,7 +9,7 @@ end
 @gtktype GtkDialog
 @gtktype GtkMenuShell
 
-convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},new(GtkLabel,w))
+convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},GtkLabelLeaf(w))
 
 destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
@@ -70,7 +70,7 @@ end
 @deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike) setproperty!(w,name,child,value)
 
 @gtktype GtkAccelGroup
-new(::Type{GtkAccelGroup}) = new(GtkAccelGroup,
+GtkAccelGroupLeaf() = GtkAccelGroupLeaf(
     ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
 
 function push!(w::GtkWidget, accel_signal::StringLike, accel_group::GtkAccelGroup,

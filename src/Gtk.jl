@@ -2,12 +2,13 @@
 
 module Gtk
 
+const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
 using Cairo
 
-import .GLib: new, setproperty!, getproperty, StringLike, bytestring
+import .GLib: setproperty!, getproperty, StringLike, bytestring
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -19,6 +20,7 @@ typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
 include("basic_exports.jl")
 include("long_exports.jl")
+include("long_leaf_exports.jl")
 include(joinpath("..","deps","ext.jl"))
 
 include("gtktypes.jl")
@@ -42,11 +44,17 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-new{T<:Union(GtkBox,GtkPaned,GtkScale)}(::Type{T}, orientation::Symbol, args...) = new(T,
-        (orientation==:v ? true :
-        (orientation==:h ? false :
-        error("invalid $T orientation $orientation"))),
-    args...)
+for container in GLib.concrete_subtypes(GtkContainer)
+    container = container.name.name
+    @eval $container(child::GtkWidget,vargs...) = push!($container(vargs...),child)
+end
+for orientable in GLib.concrete_subtypes(GtkPaned, GtkScale, GtkBox)
+    orientable = orientable.name.name
+    @eval $orientable(orientation::Symbol,vargs...) = $orientable(
+            (orientation==:v ? true :
+            (orientation==:h ? false :
+            error("invalid $($orientable) orientation $orientation"))),vargs...)
+end
 
 export GAccessor
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
@@ -73,6 +81,7 @@ module ShortNames
     export Gtk
     include("basic_exports.jl")
     include("short_exports.jl")
+    include("short_leaf_exports.jl")
 end
 using .ShortNames
 

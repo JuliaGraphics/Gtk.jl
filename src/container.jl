@@ -1,5 +1,3 @@
-new{T<:GtkContainer}(::Type{T}, child::GtkWidget, args...) = push!(new(T,args...),child)
-
 function push!(w::GtkContainer, child)
     ccall((:gtk_container_add,libgtk), Void, (Ptr{GObject},Ptr{GObject},), w, child)
     w
@@ -40,12 +38,12 @@ function getindex(w::GtkBin, i::Integer)
     c::GtkWidget
 end
 
-immutable GtkNullContainer <: GtkContainer end
-function push!(::GtkNullContainer, w::GtkWidget)
+immutable GtkNullContainerLeaf <: GtkContainer end
+function push!(::GtkNullContainerLeaf, w::GtkWidget)
     p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
     if p != C_NULL
         p = ccall((:gtk_container_remove,libgtk), Ptr{GObject}, (Ptr{GObject},Ptr{GObject},), p, w)
     end
     w
 end
-convert(::Type{Ptr{GObject}},::GtkNullContainer) = convert(Ptr{GObject},C_NULL)
+convert(::Type{Ptr{GObject}},::GtkNullContainerLeaf) = convert(Ptr{GObject},C_NULL)

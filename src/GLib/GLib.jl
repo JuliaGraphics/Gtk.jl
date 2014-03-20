@@ -4,7 +4,7 @@ import Base: convert, show, showall, showcompact, size, length, getindex, setind
              start, next, done, eltype
 
 export GObject, GType, @Gtype, @Gabstract
-export Enum, GError, GValue, gvalue, make_gvalue, g_type, new
+export Enum, GError, GValue, gvalue, make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gc_ref, gc_unref, gc_move_ref, gc_ref_closure
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
@@ -19,6 +19,24 @@ bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own))
 
+function concrete_subtypes(T::DataType...)
+    queue = [T...]
+    subt = Set{DataType}()
+    while !isempty(queue)
+        x = pop!(queue)
+        if isa(x,DataType)
+            if x.abstract
+                for s in Base.subtypes(x)
+                    push!(queue, s)
+                end
+            else
+                push!(subt, x)
+            end
+        end
+    end
+    return subt
+end
+
 ccall((:g_type_init,libgobject),Void,())
 
 include("MutableTypes.jl")
@@ -32,4 +50,3 @@ include("gerror.jl")
 include("signals.jl")
 
 end
-
