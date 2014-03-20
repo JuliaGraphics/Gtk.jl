@@ -1,7 +1,5 @@
 ##Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
-http://www.gtk.org/
-
-Disclaimer: some part of this API may not be finalized
+Using the Gtk library from [http://www.gtk.org/](http://www.gtk.org/)
 
 ## Installation
 
@@ -26,15 +24,16 @@ I use MacPorts:
 1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything, to minimize conflicts and maximize Quartz)
 2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
-If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See https://github.com/JuliaLang/Homebrew.jl/issues/27 for possible eventual workarounds.
+If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
 
 ### Linux
 
-Try any of the following until something is successful:
+Try any of the following lines until something is successful:
 
      aptitude install libgtk2.0-0 libgtk-3-0
      apt-get install libgtk2.0-0 libgtk-3-0
      yum install gtk2 gtk3
+     pkg install gtk2 gtk3
 
 On some distributions you can also install a `devhelp` package to have a local copy of the Gtk documentation.
 
@@ -46,28 +45,47 @@ There is also a more [detailed description](doc/usage.md) in tutorial style, as 
 
 ### Referring to Gtk.Objects
 
-Gtk object can be referenced by their Gtk names (which almost always have a name like GtkWindow), their interfaces (which will have an ``I`` prefixed to their name, such as GtkContainerI), or their "short name" (which is generally just the Gtk name without the "Gtk", for example, Window). You can call `using Gtk` to import the regular names, or `using Gtk.ShortNames` to import the shorter names. You can also call `import Gtk`, and then access either the regular or short names (e.g. `Gtk.Window` or `Gtk.GtkWindow`).
+Gtk object can be referenced by their Gtk names (which almost always have a name like `GtkWindow`), or their "short name" (which is generally just the Gtk name without the "Gtk", for example, `Window`). You can call `using Gtk` to import the regular names, or `using Gtk.ShortNames` to import the shorter names. You can also call `import Gtk`, and then access either the regular or short names (e.g. `Gtk.Window` or `Gtk.GtkWindow`).
+
+### Constructing a Gtk.ObjectLeaf
+
+Gtk object constructors (by convention), are the name of the Gtk object (interface) name, with a suffix of `Leaf` appended. For example, to construct a new Window, the user would invoke `Gtk.WindowLeaf()`.
+
+All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding `setproperty!` method (see below).
+
+    w = GtkWindow(title="Hello World")
 
 ### Objects are containers for their [child_elements...]
 
-All objects in Gtk are intended to behave uniformly. This means that all objects will try to act as container objects. Indexing into an object (by number), or iterating the object will return a list of its contents or child objects. This also means that constructors are called with information on the elements that they contain. For example, when you create a button, you can specify either the embedded text or another widget!
+All objects in Gtk are intended to behave uniformly. This means that all objects will try to act as container objects for whatever they 'contain'. Indexing into an object (by number), or iterating the object will return a list of its contents or child objects. This also means that constructors are called with information on the elements that they contain. For example, when you create a button, you can specify either the embedded text or another widget!
 
-    Gtk.Button("This is a button")
-    Gtk.Button(Gtk.Label("Click me"))
+    Gtk.ButtonLeaf("This is a button")
+    Gtk.ButtonLeaf(Gtk.LabelLeaf("Click me"))
 
-On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a GtkContainerI. Of special note is the anti-object GtkNullContainer. This is not a Gtk Object. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although the standard operations like `splice!` and `delete!` also exist, and are typically preferable).
+On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a `GtkContainer`. Of special note is the anti-object `GtkNullContainerLeaf` or simply `NullLeaf`. This is not actually a `GObject`. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although standard operations like `splice!` and `delete!` also exist, and are typically preferable for readability).
+
+The optimal pattern for creating objects generally depends upon the usage. However, you may find the following pattern useful for creating layout hierarchies:
+
+    w=Gtk.WindowLeaf() |>
+        (f=Gtk.BoxLeaf(:h) |>
+            (b=Gtk.ButtonLeaf("1")) |>
+            (c=Gtk.ButtonLeaf("2")) |>
+            (f2=Gtk.BoxLeaf(:v) |>
+                Gtk.LabelLeaf("3") |>
+                Gtk.LabelLeaf("4"))) |>
+        showall
 
 ### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
 
      > warning: this API uses 0-based indexing
 
-The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a GtkObjectI at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
+The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a `GtkObject` at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
 When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
 
 Some Examples:
 
-    w = GtkWindow("Title")
+    w = GtkWindowLeaf("Title")
     show(STDOUT, w) # without the STDOUT parameter, show(w) would
                     # make the window visible on the screen, instead
                     # of printing the information in the REPL
@@ -96,11 +114,11 @@ See section on [Extending Gtk's Functionality with new GValue<->Julia auto-conve
 
 If you want pre-optimized event handlers, you will need to specify the interface types when creating the signal handlers. (There are a few `on_signal_` convenience functions which do this, often in conjunction with setting other flags needed for the signal handler to function). You will often find it necessary to refer to the Gtk documentation for the signals API for Gtk callbacks:
 
-- Gtk+-2
-  -  https://developer.gnome.org/gtk2/stable/GObject.html#GObject-destroy
-  -  https://developer.gnome.org/gtk2/stable/GtkWidget.html#GtkWidget-accel-closures-changed
-- Gtk+-3
-  -  https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed
+- Gtk+ 2
+  -  [Gtk2 Object Closures](https://developer.gnome.org/gtk2/stable/GObject.html#GObject-destroy)
+  -  [Gtk2 Widget Closures](https://developer.gnome.org/gtk2/stable/GtkWidget.html#GtkWidget-accel-closures-changed)
+- Gtk+ 3
+  -  [Gtk3 Widget Closures](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed)
 
 Note that the ArgType argument only specifies the type for the middle arguments. The type of the first and last arguments are determined automatically.
 
@@ -132,13 +150,13 @@ Note: the return type and argument types do not need to match the spec. However,
     > warning: this API uses 0-based indexing
     > note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
 
-``Gtk._`` (not exported), ``Gtk.G_`` (exported by ShortNames), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the GtkObjects. The difference between a get and set method is based upon the number of arguments.
+``Gtk._`` (not exported), ``Gtk.G_`` (exported by `Gtk.ShortNames`), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the `GObject`'s. The difference between a get and set method is based upon the number of arguments.
 
 Example usage:
 
-    bytestring(Gtk._.title(Window("my title")))
-    G_.title(Window("my title"), "my new title")
-    GAccessor.size(Window("what size?"))
+    bytestring(Gtk._.title(WindowLeaf("my title")))
+    G_.title(WindowLeaf("my title"), "my new title")
+    GAccessor.size(WindowLeaf("what size?"))
 
 Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.
 
@@ -151,20 +169,18 @@ Note that because these are auto-generated, you will often need to do your own g
     .  .  +- Ranges = Ranges{T}
     .  .  .  +- GtkTextRange
     .  +- GError
-    .  +- GObject = GObjectI
-    .  +- GObjectI
-    .  .  +- GObjectAny = GObjectAny{Name}
+    .  +- GObject
+    .  .  +- GObjectLeaf{Name}
     .  .  +- GdkPixbuf
     .  .  +- GtkStatusIcon
     .  .  +- GtkTextBuffer
     .  .  +- GtkTextMark
     .  .  +- GtkTextTag
-    .  .  +- GtkWidgetI
-    .  .  .  +- Canvas = GtkCanvas
+    .  .  +- GtkWidget
     .  .  .  +- GtkCanvas
     .  .  .  +- GtkComboBoxText
-    .  .  .  +- GtkContainerI
-    .  .  .  .  +- GtkBinI
+    .  .  .  +- GtkContainer
+    .  .  .  .  +- GtkBin
     .  .  .  .  .  +- GtkAlignment
     .  .  .  .  .  +- GtkAspectFrame
     .  .  .  .  .  +- GtkButton
@@ -175,13 +191,10 @@ Note that because these are auto-generated, you will often need to do your own g
     .  .  .  .  .  +- GtkRadioButton
     .  .  .  .  .  +- GtkToggleButton
     .  .  .  .  .  +- GtkVolumeButton
-    .  .  .  .  .  +- GtkWindowI
-    .  .  .  .  .  .  +- GtkDialogI
+    .  .  .  .  .  +- GtkWindow
+    .  .  .  .  .  .  +- GtkDialog
     .  .  .  .  .  .  .  +- GtkFileChooserDialog
-    .  .  .  .  .  .  +- GtkWindow
-    .  .  .  .  .  .  +- Window = GtkWindow
-    .  .  .  .  +- GtkBoxI
-    .  .  .  .  .  +- GtkBox
+    .  .  .  .  +- GtkBox
     .  .  .  .  .  +- GtkButtonBox
     .  .  .  .  .  +- GtkStatusbar
     .  .  .  .  +- GtkGrid
@@ -202,9 +215,9 @@ Note that because these are auto-generated, you will often need to do your own g
     .  .  .  +- GtkSwitch
     .  .  .  +- GtkTextView
     .  +- GParamSpec
-    .  +- GSList = GSList{T}
+    .  +- GSList{T}
     .  +- GValue
-    .  +- GdkEventI
+    .  +- GdkEvent
     .  .  +- GdkEventAny
     .  .  +- GdkEventButton
     .  .  +- GdkEventCrossing
@@ -223,26 +236,27 @@ Note that because these are auto-generated, you will often need to do your own g
 
 #### New Gtk Types
 
-New Gtk types can be most easily added by using the Gtk.@GTypes macro:
+You can subclass an existing Gtk type in Julia using the following code pattern:
 
-     Gtk.@GTypes GTypeName library_variable sym_name
-     Gtk.@GTypes GTypeName library_variable gtyp_getter_expr
-
-and then defining the appropriate outer constructors. Pay attention to existing constructors that already exist, though, to avoid confusion: for example, the first argument to a GtkContainer may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
-
-You can subclass a type in Julia using the following code pattern:
-
-    type MyWidget <: Gtk.GtkButtonI
-        handle::Ptr{Gtk.GObjectI}
+    type MyWidget <: Gtk.GtkButton
+        handle::Ptr{Gtk.GObject}
         other_fields
         function MyWidget(label)
-            btn = GtkButton(label)
+            btn = GtkButtonLeaf(label)
             Gtk.gc_move_ref(new(btn), btn)
         end
     end
 
-This creates a MyWidget which inherits its behavior from GtkButton. The `gc_move_ref` call transfers ownership of the GtkObject handle from GtkButton to MyWidget in a gc safe manner. Afterwards, the btn object is invalid and converting from a `Ptr{GtkObjectI}` to a `GtkObjectI` will return the MyWidget object.
+This creates a `MyWidget` type which inherits its behavior from `GtkButton`. The `gc_move_ref` call transfers ownership of the `GObject` handle from `GtkButton` to `MyWidget` in a gc-safe manner. Afterwards, the `btn` object is invalid and converting from the `Ptr{GtkObject}` to `GtkObject` will return the `MyWidget` object.
 
+New native Gtk types can be most easily added by invoking the `Gtk.@GTypes` macro:
+
+     Gtk.@GTypes GTypeName library_variable sym_name
+     Gtk.@GTypes GTypeName library_variable gtyp_getter_expr
+
+and then defining the appropriate outer constructors. Note that the `@GTypes` macro expects a variable `suffix` to be defined in the current module, which will be appended to the name of the type to create a unique type instance.
+
+Please pay attention to existing constructors that already exist to avoid user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
 
 #### New GValue<->Julia auto-conversions
 

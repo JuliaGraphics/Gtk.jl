@@ -12,6 +12,13 @@ function empty!(w::GtkContainer)
     end
     w
 end
+function append!(w::GtkContainer, children)
+    for child in children
+        push!(w, child)
+    end
+    w
+end
+Base.|>(parent::GtkContainer, child::Union(GObject,String)) = push!(parent, child)
 
 start(w::GtkContainer) = glist_iter(ccall((:gtk_container_get_children,libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), w))
 next(w::GtkContainer, list) = next(list[1],list)

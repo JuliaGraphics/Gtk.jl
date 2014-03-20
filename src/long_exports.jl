@@ -1,5 +1,5 @@
 # Gtk objects
-export 
+export GObject,
     GdkPixbuf,
     GtkAboutDialog,
     GtkAccelGroup,

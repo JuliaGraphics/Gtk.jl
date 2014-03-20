@@ -151,7 +151,6 @@ get_gtype_decl(name::Symbol, lib, symname::Symbol) =
 function get_type_decl(name,iname,gtyp,gtype_decl)
     ename = esc(name)
     einame = esc(iname)
-    cm = current_module()
     :(begin
         if $(Meta.quot(iname)) in keys(gtype_wrappers)
             const $einame = gtype_ifaces[$(QuoteNode(iname))]
@@ -170,7 +169,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
         function $ename(args...; kwargs...)
             w = $ename(args...)
             for (kw,val) in kwargs
-                $cm._.(kw)(w, val)
+                setproperty!(w, kw, val)
             end
             w
         end
@@ -347,4 +346,3 @@ function gc_move_ref(new::GObject, old::GObject)
     gc_force_floating(new)
     gc_ref(new)
 end
-

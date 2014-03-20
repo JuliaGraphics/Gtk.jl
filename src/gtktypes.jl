@@ -41,8 +41,8 @@ end
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
 visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
-show(w::GtkWidget) = ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w)
-showall(w::GtkWidget) = ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w)
+show(w::GtkWidget) = (ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
+showall(w::GtkWidget) = (ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)
 
 # TODO Use Pango type PangoFontDescription once it is wrapped
 modifyfont(w::GtkWidget, font_desc::Ptr{Void}) = 

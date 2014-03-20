@@ -122,7 +122,7 @@ done(w::GtkRadioButtonGroupLeaf,s) = done(s,s)
 length(w::GtkRadioButtonGroupLeaf) = length(start(w))
 getindex!(w::GtkRadioButtonGroupLeaf, i::Integer) = convert(GtkRadioButton,start(w)[i])
 isempty(grp::GtkRadioButtonGroupLeaf) = !isdefined(grp,:anchor)
-function getproperty(grp::GtkRadioButtonGroupLeaf,name::Union(Symbol,ByteString))
+function getproperty(grp::GtkRadioButtonGroupLeaf,name::StringLike)
     k = symbol(name)
     if k == :active
         for b in grp

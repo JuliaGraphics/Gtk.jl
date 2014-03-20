@@ -72,7 +72,7 @@ const TreeViewColumn = GtkTreeViewColumn
 const VolumeButton = GtkVolumeButton
 const Window = GtkWindow
 
-export G_,
+export G_, GObject,
     AboutDialog,
     AccelGroup,
     Adjustment,

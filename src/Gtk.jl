@@ -10,7 +10,7 @@ using Cairo
 
 import .GLib: setproperty!, getproperty, StringLike, bytestring
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
-             insert!, push!, unshift!, shift!, pop!, splice!, delete!,
+             insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string
 import Base.Graphics: width, height, getgc
