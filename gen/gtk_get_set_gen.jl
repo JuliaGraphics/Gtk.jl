@@ -235,6 +235,9 @@ end
 
 function gen_get_set(body, gtk_h)
     fdecls = cindex.search(gtk_h, cindex.FunctionDecl)
+    exports = Set{Symbol}([:default_icon_list, :position])
+    export_stmt = Expr(:export)
+    push!(body.args,export_stmt)
     count = 0
     for fdecl in fdecls
         fargs = cindex.search(fdecl, cindex.ParmDecl)
@@ -326,6 +329,7 @@ function gen_get_set(body, gtk_h)
         else
             @assert false
         end
+        push!(exports, method_name)
         count += 1
     end
     push!(body.args, quote
@@ -342,5 +346,8 @@ function gen_get_set(body, gtk_h)
             w
         end
     end)
+    for x in exports
+        push!(export_stmt.args, x)
+    end
     count
 end
