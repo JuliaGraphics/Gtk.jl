@@ -14,28 +14,28 @@
 #GtkLockButton — A widget to unlock or lock privileged operations
 
 @gtktype GtkButton
-GtkButton() = GtkButton(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
-GtkButton(title::String) =
-    GtkButton(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
+GtkButtonLeaf() = GtkButtonLeaf(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
+GtkButtonLeaf(title::String) =
+    GtkButtonLeaf(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 @gtktype GtkCheckButton
-GtkCheckButton() = GtkCheckButton(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))
-GtkCheckButton(title::String) =
-    GtkCheckButton(ccall((:gtk_check_button_new_with_mnemonic,libgtk),Ptr{GObject},
+GtkCheckButtonLeaf() = GtkCheckButtonLeaf(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))
+GtkCheckButtonLeaf(title::String) =
+    GtkCheckButtonLeaf(ccall((:gtk_check_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 @gtktype GtkToggleButton
-GtkToggleButton() = GtkToggleButton(ccall((:gtk_toggle_button_new,libgtk),Ptr{GObject},()))
-GtkToggleButton(title::String) =
-    GtkToggleButton(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
+GtkToggleButtonLeaf() = GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new,libgtk),Ptr{GObject},()))
+GtkToggleButtonLeaf(title::String) =
+    GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 if gtk_version >= 3
     @gtktype GtkSwitch
-    GtkSwitch() = GtkSwitch(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
-    function GtkSwitch(active::Bool)
-        b = GtkSwitch()
+    GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
+    function GtkSwitchLeaf(active::Bool)
+        b = GtkSwitchLeaf()
         ccall((:gtk_switch_set_active,libgtk),Void,(Ptr{GObject},Cint),b,active)
         b
     end
@@ -44,50 +44,50 @@ else
 end
 
 @gtktype GtkRadioButton
-GtkRadioButton(group::Ptr{Void}=C_NULL) =
-    GtkRadioButton(ccall((:gtk_radio_button_new,libgtk),Ptr{GObject},
+GtkRadioButtonLeaf(group::Ptr{Void}=C_NULL) =
+    GtkRadioButtonLeaf(ccall((:gtk_radio_button_new,libgtk),Ptr{GObject},
         (Ptr{Void},),group))
-GtkRadioButton(group::Ptr{Void},label::String) =
-    GtkRadioButton(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
+GtkRadioButtonLeaf(group::Ptr{Void},label::String) =
+    GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Void},Ptr{Uint8}),group,bytestring(label)))
-GtkRadioButton(label::String) =
-    GtkRadioButton(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
+GtkRadioButtonLeaf(label::String) =
+    GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Void},Ptr{Uint8}),C_NULL,bytestring(label)))
-GtkRadioButton(group::GtkRadioButton) =
-    GtkRadioButton(ccall((:gtk_radio_button_new_from_widget,libgtk),Ptr{GObject},
+GtkRadioButtonLeaf(group::GtkRadioButton) =
+    GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_from_widget,libgtk),Ptr{GObject},
         (Ptr{GObject},),group))
-GtkRadioButton(group::GtkRadioButton,label::String) =
-    GtkRadioButton(ccall((:gtk_radio_button_new_with_mnemonic_from_widget,libgtk),Ptr{GObject},
+GtkRadioButtonLeaf(group::GtkRadioButton,label::String) =
+    GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic_from_widget,libgtk),Ptr{GObject},
         (Ptr{GObject},Ptr{Uint8}),group,bytestring(label)))
-GtkRadioButton(group::GtkRadioButton,child::GtkWidgetI,vargs...) =
-    push!(GtkRadioButton(group,vargs...), child)
+GtkRadioButtonLeaf(group::GtkRadioButton,child::GtkWidget,vargs...) =
+    push!(GtkRadioButtonLeaf(group,vargs...), child)
 
-type GtkRadioButtonGroup <: GtkContainerI # NOT an @GType
+type GtkRadioButtonGroupLeaf <: GtkContainer # NOT a native @gtktype
     # when iterating/indexing elements will be in reverse / *random* order
 
     # the behavior is specified as undefined if the first
     # element is moved to a new group
     # do not rely on the current behavior, since it may change
-    handle::GtkContainerI
+    handle::GtkContainer
     anchor::GtkRadioButton
-    GtkRadioButtonGroup(layout::GtkContainerI) = new(layout)
+    GtkRadioButtonGroupLeaf(layout::GtkContainer) = new(layout)
 end
-GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBox(true))
-function GtkRadioButtonGroup(elem::Vector, active::Int=1)
-    grp = GtkRadioButtonGroup()
+GtkRadioButtonGroupLeaf() = GtkRadioButtonGroupLeaf(GtkBoxLeaf(true))
+function GtkRadioButtonGroupLeaf(elem::Vector, active::Int=1)
+    grp = GtkRadioButtonGroupLeaf()
     for (i,e) in enumerate(elem)
         push!(grp, e, i==active)
     end
     grp
 end
-convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroup) = convert(Ptr{GObject},grp.handle)
-show(io::IO,::GtkRadioButtonGroup) = print(io,"GtkRadioButtonGroup()")
-function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton,active::Bool)
+convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroupLeaf) = convert(Ptr{GObject},grp.handle)
+show(io::IO,::GtkRadioButtonGroupLeaf) = print(io,"GtkRadioButtonGroupLeaf()")
+function push!(grp::GtkRadioButtonGroupLeaf,e::GtkRadioButton,active::Bool)
     push!(grp, e)
     gtk_toggle_button_set_active(e, active)
     grp
 end
-function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
+function push!(grp::GtkRadioButtonGroupLeaf,e::GtkRadioButton)
     if isdefined(grp,:anchor)
         setproperty!(e,:group,grp.anchor)
     else
@@ -96,11 +96,11 @@ function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothing)
+function push!(grp::GtkRadioButtonGroupLeaf,label,active::Union(Bool,Nothing)=nothing)
     if isdefined(grp,:anchor)
-        e = GtkRadioButton(grp.anchor, label)
+        e = GtkRadioButtonLeaf(grp.anchor, label)
     else
-        grp.anchor = e = GtkRadioButton(label)
+        grp.anchor = e = GtkRadioButtonLeaf(label)
     end
     if isa(active,Bool)
         gtk_toggle_button_set_active(e,active::Bool)
@@ -108,7 +108,7 @@ function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothin
     push!(grp.handle, e)
     grp
 end
-function start(grp::GtkRadioButtonGroup)
+function start(grp::GtkRadioButtonGroupLeaf)
     if isempty(grp)
         list = convert(Ptr{_GList{GtkRadioButton}},C_NULL)
     else
@@ -117,12 +117,12 @@ function start(grp::GtkRadioButtonGroup)
     end
     list
 end
-next(w::GtkRadioButtonGroup,s) = next(s,s)
-done(w::GtkRadioButtonGroup,s) = done(s,s)
-length(w::GtkRadioButtonGroup) = length(start(w))
-getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
-isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
-function getproperty(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
+next(w::GtkRadioButtonGroupLeaf,s) = next(s,s)
+done(w::GtkRadioButtonGroupLeaf,s) = done(s,s)
+length(w::GtkRadioButtonGroupLeaf) = length(start(w))
+getindex!(w::GtkRadioButtonGroupLeaf, i::Integer) = convert(GtkRadioButton,start(w)[i])
+isempty(grp::GtkRadioButtonGroupLeaf) = !isdefined(grp,:anchor)
+function getproperty(grp::GtkRadioButtonGroupLeaf,name::Union(Symbol,ByteString))
     k = symbol(name)
     if k == :active
         for b in grp
@@ -132,46 +132,29 @@ function getproperty(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString))
         end
         error("no active elements in GtkRadioGroup")
     end
-    error("GtkRadioButtonGroup has no property $name")
+    error("GtkRadioButtonGroupLeaf has no property $name")
 end
-@deprecate getindex(grp::GtkRadioButtonGroup,name::Union(Symbol,ByteString)) getproperty(grp,name)
 
-
-function gtk_toggle_button_set_active(b::GtkWidgetI, active::Bool)
+function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
     # Users are encouraged to use the syntax `setproperty!(b,:active,true)`. This is not a public function.
     ccall((:gtk_toggle_button_set_active,libgtk),Void,(Ptr{GObject},Cint),b,active)
     b
 end
-# Append a named argument, active::Bool, to the various constructors
-# but first, resolve some conflicts
-GtkRadioButton(a::GtkRadioButton,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a),active)
-GtkRadioButton(a::GtkRadioButton,b::GtkWidgetI,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
-GtkRadioButton(a::GtkRadioButton,b,active::Bool) = gtk_toggle_button_set_active(GtkRadioButton(a,b),active)
-for btn in (:GtkCheckButton, :GtkToggleButton, :GtkRadioButton)
-    @eval begin
-        $btn(active::Bool) = gtk_toggle_button_set_active($btn(),active)
-        $btn(a,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
-        $btn(a::GtkWidgetI,active::Bool) = gtk_toggle_button_set_active($btn(a),active)
-        $btn(a,b,active::Bool) = gtk_toggle_button_set_active($btn(a,b),active)
-        $btn(a,b,c,active::Bool) = gtk_toggle_button_set_active($btn(a,b,c),active)
-    end
-end
-
 
 @gtktype GtkLinkButton
-GtkLinkButton(uri::String) =
-    GtkLinkButton(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
+GtkLinkButtonLeaf(uri::String) =
+    GtkLinkButtonLeaf(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
         (Ptr{Uint8},),bytestring(uri)))
-GtkLinkButton(uri::String,label::String) =
-    GtkLinkButton(ccall((:gtk_link_button_new_with_label,libgtk),Ptr{GObject},
+GtkLinkButtonLeaf(uri::String,label::String) =
+    GtkLinkButtonLeaf(ccall((:gtk_link_button_new_with_label,libgtk),Ptr{GObject},
         (Ptr{Uint8},Ptr{Uint8}),bytestring(uri),bytestring(label)))
-function GtkLinkButton(uri::String,label::String,visited::Bool)
-    b = GtkLinkButton(uri,label)
+function GtkLinkButtonLeaf(uri::String,label::String,visited::Bool)
+    b = GtkLinkButtonLeaf(uri,label)
     ccall((:gtk_link_button_set_visited,libgtk),Void,(Ptr{GObject},Cint),b,visited)
     b
 end
-function GtkLinkButton(uri::String,visited::Bool)
-    b = GtkLinkButton(uri)
+function GtkLinkButtonLeaf(uri::String,visited::Bool)
+    b = GtkLinkButtonLeaf(uri)
     ccall((:gtk_link_button_set_visited,libgtk),Void,(Ptr{GObject},Cint),b,visited)
     b
 end
@@ -179,14 +162,14 @@ end
 #TODO: @gtktype GtkScaleButton
 
 @gtktype GtkVolumeButton
-GtkVolumeButton() = GtkVolumeButton(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
-function GtkVolumeButton(value::Real) # 0<=value<=1
-    b = GtkVolumeButton()
+GtkVolumeButtonLeaf() = GtkVolumeButtonLeaf(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
+function GtkVolumeButtonLeaf(value::Real) # 0<=value<=1
+    b = GtkVolumeButtonLeaf()
     ccall((:gtk_scale_button_set_value,libgtk),Void,(Ptr{GObject},Cdouble),b,value)
     b
 end
 
 @gtktype GtkFontButton
-GtkFontButton() = GtkFontButton(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
+GtkFontButtonLeaf() = GtkFontButtonLeaf(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
 
-typealias GtkFontChooserI Union(GtkFontButton)
+typealias GtkFontChooser Union(GtkFontButton)
