@@ -1,7 +1,10 @@
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = symbol(join([lowercase(s) for s in groups],"_"))
-    :( @Gtype $(esc(name)) libgtk $(esc(symname)))
+    quote
+        @Gtype $(esc(name)) libgtk $(esc(symname))
+        const $(esc(symbol(string(name,:_new)))) = $(esc(symbol(string(name,current_module().suffix))))
+    end
 end
 @gtktype GtkWidget
 @gtktype GtkContainer
@@ -9,7 +12,7 @@ end
 @gtktype GtkDialog
 @gtktype GtkMenuShell
 
-convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},GtkLabelLeaf(w))
+convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},GtkLabel_new(w))
 
 destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
@@ -70,7 +73,7 @@ end
 @deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike) setproperty!(w,name,child,value)
 
 @gtktype GtkAccelGroup
-GtkAccelGroupLeaf() = GtkAccelGroupLeaf(
+GtkAccelGroup_new() = GtkAccelGroup_new(
     ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
 
 function push!(w::GtkWidget, accel_signal::StringLike, accel_group::GtkAccelGroup,

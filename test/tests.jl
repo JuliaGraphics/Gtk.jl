@@ -2,7 +2,7 @@
 using Gtk.ShortNames, Gtk.GConstants, Base.Graphics
 
 ## Window
-w = WindowLeaf("Window", 400, 300)
+w = Window_new("Window", 400, 300)
 @assert width(w) == 400
 @assert height(w) == 300
 @assert size(w) == (400, 300)
@@ -23,25 +23,25 @@ gc(); gc(); sleep(.1); gc(); gc()
 @assert w.value === nothing || w.value.handle == C_NULL
 
 ## Frame
-w = WindowLeaf(
-    FrameLeaf(),
+w = Window_new(
+    Frame_new(),
     "Frame", 400, 400)
 @assert size(w) == (400, 400)
 destroy(w)
 
 # Labelframe
-f = FrameLeaf("Label")
-w = WindowLeaf(f, "Labelframe", 400, 400)
+f = Frame_new("Label")
+w = Window_new(f, "Labelframe", 400, 400)
 setproperty!(f,:label,"new label")
 @assert getproperty(f,:label,String) == "new label"
 destroy(w)
 
 ## notebook
-nb = NotebookLeaf()
-w = push!(WindowLeaf("Notebook"),nb)
-push!(nb, ButtonLeaf("o_ne"), "tab _one")
-push!(nb, ButtonLeaf("t_wo"), "tab _two")
-push!(nb, ButtonLeaf("th_ree"), "tab t_hree")
+nb = Notebook_new()
+w = push!(Window_new("Notebook"),nb)
+push!(nb, Button_new("o_ne"), "tab _one")
+push!(nb, Button_new("t_wo"), "tab _two")
+push!(nb, Button_new("th_ree"), "tab t_hree")
 push!(nb, "fo_ur", "tab _four")
 showall(w)
 @assert length(nb) == 4
@@ -50,33 +50,33 @@ setproperty!(nb,:page,2)
 destroy(w)
 
 ## Panedwindow
-w = WindowLeaf("Panedwindow", 400, 400)
-pw = PanedLeaf(:h)
-pw2 = PanedLeaf(:v)
+w = Window_new("Panedwindow", 400, 400)
+pw = Paned_new(:h)
+pw2 = Paned_new(:v)
 push!(w, pw)
-push!(pw, ButtonLeaf("one"))
+push!(pw, Button_new("one"))
 push!(pw, pw2)
-push!(pw2,ButtonLeaf("two"))
-push!(pw2,ButtonLeaf("three"))
+push!(pw2,Button_new("two"))
+push!(pw2,Button_new("three"))
 destroy(w)
 
 ## example of last in first covered
 ## Create this GUI, then shrink window with the mouse
-f = BoxLeaf(:v)
-w = WindowLeaf(f, "Last in, first covered", 400, 400)
+f = Box_new(:v)
+w = Window_new(f, "Last in, first covered", 400, 400)
 
-g1 = BoxLeaf(:h)
-g2 = BoxLeaf(:h)
+g1 = Box_new(:h)
+g2 = Box_new(:h)
 push!(f,g1)
 push!(f,g2)
 
-b11 = ButtonLeaf("first")
+b11 = Button_new("first")
 push!(g1, b11)
-b12 = ButtonLeaf("second")
+b12 = Button_new("second")
 push!(g1, b12)
-b21 = ButtonLeaf("first")
+b21 = Button_new("first")
 push!(g2, b21)
-b22 = ButtonLeaf("second")
+b22 = Button_new("second")
 push!(g2, b22)
 
 ## Iteration and toplevel
@@ -96,24 +96,24 @@ setproperty!(g1,:pack_type,b22,1) #GTK_PACK_END
 destroy(w)
 
 ## ButtonBox
-bb = ButtonBoxLeaf(:h)
-w = WindowLeaf(bb, "ButtonBox")
-cancel = ButtonLeaf("Cancel")
-ok = ButtonLeaf("OK")
+bb = ButtonBox_new(:h)
+w = Window_new(bb, "ButtonBox")
+cancel = Button_new("Cancel")
+ok = Button_new("OK")
 push!(bb, cancel)
 push!(bb, ok)
 
 # Expander
 delete!(w, bb)
-ex = ExpanderLeaf(bb, "Some buttons")
+ex = Expander_new(bb, "Some buttons")
 push!(w, ex)
 destroy(w)
 
 ## Grid
-grid = TableLeaf(3,3)
-w = WindowLeaf(grid, "Grid", 400, 400)
-grid[2,2] = ButtonLeaf("2,2")
-grid[2,3] = ButtonLeaf("2,3")
+grid = Table_new(3,3)
+w = Window_new(grid, "Grid", 400, 400)
+grid[2,2] = Button_new("2,2")
+grid[2,3] = Button_new("2,3")
 grid[1,1] = "grid"
 destroy(w)
 
@@ -121,10 +121,10 @@ destroy(w)
 ## Widgets
 
 ## button, label
-w = WindowLeaf("Widgets")
-f = BoxLeaf(:v); push!(w,f)
-l = LabelLeaf("label"); push!(f,l)
-b = ButtonLeaf("button"); push!(f,b)
+w = Window_new("Widgets")
+f = Box_new(:v); push!(w,f)
+l = Label_new("label"); push!(f,l)
+b = Button_new("button"); push!(f,b)
 
 setproperty!(l,:label,"new label")
 @assert getproperty(l,:label,String) == "new label"
@@ -158,13 +158,13 @@ destroy(w)
 icon = Array(Gtk.RGB, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
-b = ButtonLeaf(ImageLeaf(PixbufLeaf(data=icon, has_alpha=false)))
-w = WindowLeaf(b, "Icon button", 60, 40)
+b = Button_new(Image_new(Pixbuf_new(data=icon, has_alpha=false)))
+w = Window_new(b, "Icon button", 60, 40)
 destroy(w)
 
 ## checkbox
-w = WindowLeaf("Checkbutton")
-check = CheckButtonLeaf("check me"); push!(w,check)
+w = Window_new("Checkbutton")
+check = CheckButton_new("check me"); push!(w,check)
 setproperty!(check,:active,true)
 @assert getproperty(check,:active,String) == "TRUE"
 setproperty!(check,:label,"new label")
@@ -176,19 +176,19 @@ setproperty!(check,:label,"new label")
 destroy(w)
 
 ## radio
-choices = ["choice one", "choice two", "choice three", RadioButtonLeaf("choice four"), LabelLeaf("choice five")]
-w = WindowLeaf("Radio")
-f = BoxLeaf(:v); push!(w,f)
+choices = ["choice one", "choice two", "choice three", RadioButton_new("choice four"), Label_new("choice five")]
+w = Window_new("Radio")
+f = Box_new(:v); push!(w,f)
 r = Array(RadioButton,3)
-r[1] = RadioButtonLeaf(choices[1]); push!(f,r[1])
-r[2] = RadioButtonLeaf(r[1],choices[2]); push!(f,r[2])
-r[3] = RadioButtonLeaf(r[2],choices[3],active=true); push!(f,r[3])
+r[1] = RadioButton_new(choices[1]); push!(f,r[1])
+r[2] = RadioButton_new(r[1],choices[2]); push!(f,r[2])
+r[3] = RadioButton_new(r[2],choices[3],active=true); push!(f,r[3])
 @assert [getproperty(b,:active,Bool) for b in r] == [false, false, true]
 setproperty!(r[1],:active,true)
 @assert [getproperty(b,:active,Bool) for b in r] == [true, false, false]
 destroy(w)
 
-r = RadioButtonGroupLeaf(choices,2)
+r = RadioButtonGroup_new(choices,2)
 @assert length(r) == 5
 @assert sum([getproperty(b,:active,Bool) for b in r]) == 1
 itms = Array(Any,length(r))
@@ -202,12 +202,12 @@ end
 @assert setdiff(choices, itms) == [choices[4],]
 @assert setdiff(itms, choices) == ["choice four",]
 @assert getproperty(getproperty(r,:active),:label,String) == choices[2]
-w = WindowLeaf(r,"RadioGroup")
+w = Window_new(r,"RadioGroup")
 destroy(w)
 
 ## ToggleButton
-tb = ToggleButtonLeaf("Off")
-w = WindowLeaf(tb, "ToggleButton")
+tb = ToggleButton_new("Off")
+w = Window_new(tb, "ToggleButton")
 function toggled(ptr,evt,widget)
     state = getproperty(widget,:label,String)
     if state == "Off"
@@ -226,8 +226,8 @@ signal_emit(tb, "button-release-event", Bool, release)
 destroy(w)
 
 ## ToggleButton repeat 1
-tb = ToggleButtonLeaf("Off")
-w = WindowLeaf(tb, "ToggleButton")
+tb = ToggleButton_new("Off")
+w = Window_new(tb, "ToggleButton")
 on_signal_button_press(tb) do ptr, evt, widget
     state = getproperty(widget,:label,String)
     if state == "Off"
@@ -245,8 +245,8 @@ signal_emit(tb, "button-release-event", Bool, release)
 destroy(w)
 
 ## ToggleButton repeat 2
-tb = ToggleButtonLeaf("Off")
-w = WindowLeaf(tb, "ToggleButton")
+tb = ToggleButton_new("Off")
+w = Window_new(tb, "ToggleButton")
 signal_connect(tb, :button_press_event) do widget, evt
     state = getproperty(widget,:label,String)
     if state == "Off"
@@ -264,57 +264,57 @@ signal_emit(tb, "button-release-event", Bool, release)
 destroy(w)
 
 ## LinkButton
-b = LinkButtonLeaf("https://github.com/JuliaLang/Gtk.jl", "Gtk.jl")
-w = WindowLeaf(b, "LinkButton")
+b = LinkButton_new("https://github.com/JuliaLang/Gtk.jl", "Gtk.jl")
+w = Window_new(b, "LinkButton")
 destroy(w)
 
 ## VolumeButton
-b = VolumeButtonLeaf(0.3)
-w = WindowLeaf(b, "VolumeButton", 50, 50)
+b = VolumeButton_new(0.3)
+w = Window_new(b, "VolumeButton", 50, 50)
 destroy(w)
 
 ## combobox
-combo = ComboBoxTextLeaf()
+combo = ComboBoxText_new()
 choices = ["Strawberry", "Vanilla", "Chocolate"]
 for c in choices
     push!(combo, c)
 end
-w = WindowLeaf(combo, "ComboBoxText")
+w = Window_new(combo, "ComboBoxText")
 destroy(w)
-combo = ComboBoxTextLeaf(true)
+combo = ComboBoxText_new(true)
 for c in choices
     push!(combo, c)
 end
-w = WindowLeaf(combo, "ComboBoxText with entry")
+w = Window_new(combo, "ComboBoxText with entry")
 destroy(w)
 
 ## slider/scale
-sl = ScaleLeaf(true, 1:10)
-w = WindowLeaf(sl, "Scale")
+sl = Scale_new(true, 1:10)
+w = Window_new(sl, "Scale")
 G_.value(sl, 3)
 @assert G_.value(sl) == 3
-adj = AdjustmentLeaf(sl)
+adj = Adjustment_new(sl)
 @assert getproperty(adj,:value,Float64) == 3
 setproperty!(adj,:upper,11)
 destroy(w)
 
 ## spinbutton
-sp = SpinButtonLeaf(1:10)
-w = WindowLeaf(sp, "SpinButton")
+sp = SpinButton_new(1:10)
+w = Window_new(sp, "SpinButton")
 G_.value(sp, 3)
 @assert G_.value(sp) == 3
 destroy(w)
 
 ## progressbar
-pb = ProgressBarLeaf()
-w = WindowLeaf(pb, "Progress bar")
+pb = ProgressBar_new()
+w = Window_new(pb, "Progress bar")
 setproperty!(pb,:fraction,0.7)
 @assert getproperty(pb,:fraction,Float64) == 0.7
 destroy(w)
 
 ## spinner
-s = SpinnerLeaf()
-w = WindowLeaf(s, "Spinner")
+s = Spinner_new()
+w = Window_new(s, "Spinner")
 setproperty!(s,:active,true)
 @assert getproperty(s,:active,Bool) == true
 setproperty!(s,:active,false)
@@ -322,20 +322,20 @@ setproperty!(s,:active,false)
 destroy(w)
 
 ## Entry
-e = EntryLeaf()
-w = WindowLeaf(e, "Entry")
+e = Entry_new()
+w = Window_new(e, "Entry")
 setproperty!(e,:text,"initial")
 setproperty!(e,:sensitive,false)
 destroy(w)
 
 ## Statusbar
-vbox = BoxLeaf(:v)
-w = WindowLeaf(vbox, "Statusbar")
-sb = StatusbarLeaf()
+vbox = Box_new(:v)
+w = Window_new(vbox, "Statusbar")
+sb = Statusbar_new()
 push!(vbox, sb)
 ctxid = Gtk.context_id(sb, "Statusbar example")
-bpush = ButtonLeaf("push item")
-bpop = ButtonLeaf("pop item")
+bpush = Button_new("push item")
+bpop = Button_new("pop item")
 push!(vbox, bpush)
 push!(vbox, bpop)
 sb_count = 1
@@ -355,8 +355,8 @@ destroy(w)
 
 ## Canvas & AspectFrame
 c = Canvas()
-f = AspectFrameLeaf(c, "AspectFrame", 0.5, 1, 0.5)
-w = WindowLeaf(f, "Canvas")
+f = AspectFrame_new(c, "AspectFrame", 0.5, 1, 0.5)
+w = Window_new(f, "Canvas")
 c.draw = function(_)
     ctx = getgc(c)
     set_source_rgb(ctx, 1.0, 0.0, 0.0)
@@ -365,36 +365,36 @@ end
 destroy(w)
 
 ## Menus
-file = MenuItemLeaf("_File")
-filemenu = MenuLeaf(file)
-new_ = MenuItemLeaf("New")
+file = MenuItem_new("_File")
+filemenu = Menu_new(file)
+new_ = MenuItem_new("New")
 idnew = signal_connect(new_, :activate) do widget
     println("New!")
 end
 push!(filemenu, new_)
-open_ = MenuItemLeaf("Open")
+open_ = MenuItem_new("Open")
 push!(filemenu, open_)
-push!(filemenu, SeparatorMenuItemLeaf())
-quit = MenuItemLeaf("Quit")
+push!(filemenu, SeparatorMenuItem_new())
+quit = MenuItem_new("Quit")
 push!(filemenu, quit)
-mb = MenuBarLeaf()
+mb = MenuBar_new()
 push!(mb, file)  # notice this is the "File" item, not filemenu
-win = WindowLeaf(mb, "Menus", 200, 40)
+win = Window_new(mb, "Menus", 200, 40)
 destroy(win)
 
 ## Popup menu
-contrast = MenuItemLeaf("Adjust contrast...")
-popupmenu = MenuLeaf()
+contrast = MenuItem_new("Adjust contrast...")
+popupmenu = Menu_new()
 push!(popupmenu, contrast)
 c = Canvas()
-win = WindowLeaf(c, "Popup")
+win = Window_new(c, "Popup")
 c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
 destroy(win)
 
 ## Text
-#w = WindowLeaf("Text")
+#w = Window_new("Text")
 #pack_stop_propagate(w)
-#f = FrameLeaf(w); pack(f, {:expand=>true, :fill=>"both"})
+#f = Frame_new(w); pack(f, {:expand=>true, :fill=>"both"})
 #txt = Text(w)
 #scrollbars_add(f, txt)
 #set_value(txt, "new text\n")
@@ -402,9 +402,9 @@ destroy(win)
 #destroy(w)
 
 ## tree. Listbox
-#w = WindowLeaf("Listbox")
+#w = Window_new("Listbox")
 #pack_stop_propagate(w)
-#f = FrameLeaf(w); pack(f, {:expand=>true, :fill=>"both"})
+#f = Frame_new(w); pack(f, {:expand=>true, :fill=>"both"})
 #tr = Treeview(f, choices)
 #scrollbars_add(f, tr)
 #set_value(tr, 2)
@@ -414,9 +414,9 @@ destroy(win)
 
 
 ## tree grid
-#w = WindowLeaf("Array")
+#w = Window_new("Array")
 #pack_stop_propagate(w)
-#f = FrameLeaf(w); pack(f, {:expand=>true, :fill=>"both"})
+#f = Frame_new(w); pack(f, {:expand=>true, :fill=>"both"})
 #tr = Treeview(f, hcat(choices, choices))
 #tree_key_header(tr, "right"); tree_key_width(tr, 50)
 #tree_headers(tr, ["left"], [50])
@@ -427,46 +427,46 @@ destroy(win)
 
 ## Selectors
 import Gtk.GtkFileChooserAction, Gtk.GtkResponseType
-dlg = FileChooserDialogLeaf("Select file", NullLeaf(), GtkFileChooserAction.OPEN,
+dlg = FileChooserDialog_new("Select file", Null_new(), GtkFileChooserAction.OPEN,
                         "_Cancel", GtkResponseType.CANCEL,
                         "_Open", GtkResponseType.ACCEPT)
 destroy(dlg)
 
 ## List view
-ls=ListStoreLeaf(Int32,Bool)
+ls=ListStore_new(Int32,Bool)
 push!(ls,(33,true))
-tv=TreeViewLeaf(ls)
-r1=CellRendererTextLeaf()
-r2=CellRendererToggleLeaf()
-c1=TreeViewColumnLeaf("A", r1,{"text" => 0})
-c2=TreeViewColumnLeaf("B", r2,{"active" => 1})
+tv=TreeView_new(ls)
+r1=CellRendererText_new()
+r2=CellRendererToggle_new()
+c1=TreeViewColumn_new("A", r1,{"text" => 0})
+c2=TreeViewColumn_new("B", r2,{"active" => 1})
 push!(tv,c1)
 push!(tv,c2)
-w = WindowLeaf(tv, "List View")
+w = Window_new(tv, "List View")
 destroy(w)
 
 ## Tree view
-ts=TreeStoreLeaf(String)
+ts=TreeStore_new(String)
 iter1 = push!(ts,("one",))
 iter2 = push!(ts,("two",),iter1)
 iter3 = push!(ts,("three",),iter2)
-tv=TreeViewLeaf(ts)
-r1=CellRendererTextLeaf()
-c1=TreeViewColumnLeaf("A", r1, {"text" => 0})
+tv=TreeView_new(ts)
+r1=CellRendererText_new()
+c1=TreeViewColumn_new("A", r1, {"text" => 0})
 push!(tv,c1)
-w = WindowLeaf(tv, "Tree View")
+w = Window_new(tv, "Tree View")
 destroy(w)
 
 ## Toolbar
-tb1 = ToolButtonLeaf("gtk-open")
-tb2 = ToolButtonLeaf("gtk-new")
-tb3 = ToolButtonLeaf("gtk-media-next")
-toolbar = ToolbarLeaf()
+tb1 = ToolButton_new("gtk-open")
+tb2 = ToolButton_new("gtk-new")
+tb3 = ToolButton_new("gtk-media-next")
+toolbar = Toolbar_new()
 push!(toolbar,tb1)
 unshift!(toolbar,tb2)
 push!(toolbar,tb3)
-push!(toolbar,SeparatorToolItemLeaf(), ToggleToolButtonLeaf("gtk-open"), MenuToolButtonLeaf("gtk-new"))
+push!(toolbar,SeparatorToolItem_new(), ToggleToolButton_new("gtk-open"), MenuToolButton_new("gtk-new"))
 G_.style(toolbar,GtkToolbarStyle.BOTH)
-w = WindowLeaf(toolbar, "Toolbar")
+w = Window_new(toolbar, "Toolbar")
 showall(w)
 destroy(w)

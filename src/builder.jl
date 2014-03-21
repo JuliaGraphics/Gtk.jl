@@ -1,7 +1,7 @@
 @gtktype GtkBuilder
 
-function GtkBuilderLeaf(; buffer=nothing,filename=nothing,resource=nothing)
-    builder = GtkBuilderLeaf(ccall((:gtk_builder_new,libgtk), Ptr{GObject}, () ) )
+function GtkBuilder_new(; buffer=nothing,filename=nothing,resource=nothing)
+    builder = GtkBuilder_new(ccall((:gtk_builder_new,libgtk), Ptr{GObject}, () ) )
     push!(builder,buffer=buffer,filename=filename,resource=resource)
     builder
 end

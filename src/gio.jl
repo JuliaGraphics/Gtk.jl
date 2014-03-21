@@ -1,5 +1,6 @@
 
 @Gtype GApplication libgio g_application
+const GApplication_new = GApplicationLeaf
 
 run(app::GApplication) = 
     ccall((:g_application_run,libgio),Cint, (Ptr{GObject},Cint, Ptr{Ptr{Uint8}}), app, 0, C_NULL)

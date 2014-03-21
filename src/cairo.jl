@@ -26,6 +26,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         gc_ref(widget)
     end
 end
+const GtkCanvas_new = GtkCanvas
 
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     widget.has_allocation = true

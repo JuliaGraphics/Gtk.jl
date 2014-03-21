@@ -45,12 +45,12 @@ function getindex(w::GtkBin, i::Integer)
     c::GtkWidget
 end
 
-immutable GtkNullContainerLeaf <: GtkContainer end
-function push!(::GtkNullContainerLeaf, w::GtkWidget)
+immutable GtkNullContainer_new <: GtkContainer end
+function push!(::GtkNullContainer_new, w::GtkWidget)
     p = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w)
     if p != C_NULL
         p = ccall((:gtk_container_remove,libgtk), Ptr{GObject}, (Ptr{GObject},Ptr{GObject},), p, w)
     end
     w
 end
-convert(::Type{Ptr{GObject}},::GtkNullContainerLeaf) = convert(Ptr{GObject},C_NULL)
+convert(::Type{Ptr{GObject}},::GtkNullContainer_new) = convert(Ptr{GObject},C_NULL)

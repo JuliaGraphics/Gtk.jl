@@ -1,6 +1,6 @@
 if gtk_version == 3
 @gtktype GtkApplication
-GtkApplicationLeaf(id::String, flags) = GtkApplicationLeaf(
+GtkApplication_new(id::String, flags) = GtkApplication_new(
     ccall((:gtk_application_new, libgtk), Ptr{GObject}, (Ptr{Uint8}, Cuint), bytestring(id), flags) )
 
 function push!(app::GtkApplication, win::GtkWindow)
@@ -17,11 +17,11 @@ app_menu(app::GtkApplication, app_menu::GObject) =
     ccall((:gtk_application_new, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, app_menu)
 
 @gtktype GtkApplicationWindow
-GtkApplicationWindowLeaf(app::GtkApplication) = GtkApplicationWindowLeaf(
+GtkApplicationWindow_new(app::GtkApplication) = GtkApplicationWindow_new(
     ccall((:gtk_application_window_new, libgtk), Ptr{GObject}, (Ptr{GObject},), app) )
 else
     type GtkApplication end
     type GtkApplicationWindow end
-    GtkApplicationLeaf(x...) = error("GtkApplication is not available until Gtk3.0")
-    GtkApplicationWindowLeaf(x...) = error("GtkApplicationWindow is not available until Gtk3.0")
+    GtkApplication_new(x...) = error("GtkApplication is not available until Gtk3.0")
+    GtkApplicationWindow_new(x...) = error("GtkApplicationWindow is not available until Gtk3.0")
 end

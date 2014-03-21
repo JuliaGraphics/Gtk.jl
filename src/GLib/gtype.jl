@@ -74,7 +74,6 @@ type GObjectLeaf <: GObject
     end
 end
 g_type(obj::GObject) = g_type(typeof(obj))
-new{T}(::Type{T}, args...) = T(args...)
 
 gtypes(types...) = GType[g_type(t) for t in types]
 
@@ -173,7 +172,6 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
             end
             w
         end
-        GLib.new(::Type{$einame}, args...) = $ename(args...)
         gtype_wrappers[$(QuoteNode(iname))] = $ename
         $(gtype_decl)
         nothing

@@ -19,12 +19,12 @@ push!(widget::GtkDialog, text::String, response::Integer) =
           (Ptr{GObject},Ptr{Uint8},Cint), widget, text, response)
 
 @gtktype GtkFileChooserDialog
-function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::Integer, button_text_response...)
+function GtkFileChooserDialog_new(title::String, parent::GtkContainer, action::Integer, button_text_response...)
     n = length(button_text_response)
     if !iseven(n)
         error("button_text_response must consist of text/response pairs")
     end
-    w = GtkFileChooserDialogLeaf(ccall((:gtk_file_chooser_dialog_new,libgtk), Ptr{GObject},
+    w = GtkFileChooserDialog_new(ccall((:gtk_file_chooser_dialog_new,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
                 title, parent, action, C_NULL))
     for i = 1:2:n
