@@ -1,7 +1,7 @@
 ### Getting and Setting Properties
 
 immutable GValue
-    g_type::Csize_t
+    g_type::GType
     field2::Uint64
     field3::Uint64
     GValue() = new(0,0,0)
@@ -51,7 +51,7 @@ getindex(v::GV,i::Int, ::Type{Void}) = nothing
 function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,fundamental::Bool=false)
     if isa(with_id,Tuple)
         with_id = with_id::(Symbol,Any)
-        with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),Int,()))
+        with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
     if pass_x !== None
         eval(current_module(),quote
@@ -129,13 +129,13 @@ function getindex(gv::GV, ::Type{Any})
     end
     # second pass: user defined (sub)types
     for (typ, typefn, getfn) in gvalue_types
-        if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,typefn())) # if gtyp <: expr()
+        if g_isa(gtyp, typefn())
             return getfn(gv)
         end
     end
     # last pass: check for derived fundamental types (which have not been overridden by the user)
     for (i,id) in enumerate(fundamental_ids)
-        if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,id)) # if gtyp <: id
+        if g_isa(gtyp,id)
             return fundamental_fns[i](gv)
         end
     end

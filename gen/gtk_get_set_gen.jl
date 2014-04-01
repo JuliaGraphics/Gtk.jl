@@ -130,8 +130,8 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
-    "GList"                 => :(Gtk._GList),
-    "GSList"                => :(Gtk._GSList),
+    "GList"                 => :(Gtk._GList{Void}),
+    "GSList"                => :(Gtk._GSList{Void}),
     ]
 for gtktype in keys(GtkTypeMap)
     c_typdef_to_jl[gtktype] = :(Gtk.GObject)
@@ -156,11 +156,11 @@ for typsym in values(c_typdef_to_jl)
     end
 end
 const gtklibname = (ASCIIString=>Any)[
-    "gtk" => Expr(:., :Gtk, QuoteNode(:libgtk)),
-    "gdk" => Expr(:., :Gtk, QuoteNode(:libgdk)),
-    "gobject" => Expr(:., :Gtk, QuoteNode(:libgobject)),
-    "glib" => Expr(:., :Gtk, QuoteNode(:libglib)),
-    "gdk-pixbuf" => Expr(:., :Gtk, QuoteNode(:libgdk_pixbuf)),
+    "gtk" => :(Gtk.libgtk),
+    "gdk" => :(Gtk.libgdk),
+    "gobject" => :(Gtk.GLib.libgobject),
+    "glib" => :(Gtk.GLib.libglib),
+    "gdk-pixbuf" => :(Gtk.libgdk_pixbuf),
     "deprecated" => nothing,
     ]
 
@@ -338,7 +338,7 @@ function gen_get_set(body, gtk_h)
             return list
         end
         function default_icon_list(list::Gtk.GList)
-            ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Void, (Ptr{Gtk._GList},), list)
+            ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Void, (Ptr{Gtk._GList{Void}},), list)
             return list
         end
         function position(w::Gtk.GtkWindow,x::Integer,y::Integer)

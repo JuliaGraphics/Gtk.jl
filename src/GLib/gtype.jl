@@ -37,7 +37,7 @@ const fundamental_types = (
     )
 # NOTE: in general do not cache ids, except for these fundamental values
 g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
-const fundamental_ids = tuple(Int[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
+const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
 # this constant is needed elsewhere, but doesn't have a matching Julia type so it can't be used from g_type
 const gboxed_id = g_type_from_name(:GBoxed)
 
@@ -56,6 +56,7 @@ G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
 G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
+g_isa(gtyp::GType, is_a_type::GType) = bool(ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
 g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type),false))
 
@@ -84,11 +85,8 @@ gtype_ifaces[:GObject] = GObject
 gtype_wrappers[:GObject] = GObjectLeaf
 
 let libs = Dict{String,Any}()
-global g_type
-function g_type(name::Symbol, lib, symname::Symbol)
-    if name in keys(gtype_wrappers)
-        return g_type(gtype_wrappers[name])
-    end
+global get_fn_ptr
+function get_fn_ptr(fnname, lib)
     if !isa(lib,String)
         lib = eval(current_module(), lib)
     end
@@ -96,7 +94,14 @@ function g_type(name::Symbol, lib, symname::Symbol)
     if libptr == C_NULL
         libs[lib] = libptr = dlopen(lib)
     end
-    fnptr = dlsym_e(libptr, string(symname,"_get_type"))
+    fnptr = dlsym_e(libptr, fnname)
+end
+end
+function g_type(name::Symbol, lib, symname::Symbol)
+    if name in keys(gtype_wrappers)
+        return g_type(gtype_wrappers[name])
+    end
+    fnptr = get_fn_ptr(string(symname,"_get_type"), lib)
     if fnptr != C_NULL
         ccall(fnptr, GType, ())
     else
@@ -104,7 +109,6 @@ function g_type(name::Symbol, lib, symname::Symbol)
     end
 end
 g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
-end
 
 function get_interface_decl(gtyp::GType)
     #TODO

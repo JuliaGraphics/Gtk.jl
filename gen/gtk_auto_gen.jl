@@ -1,6 +1,7 @@
 #!/usr/bin/env julia
 
 import Clang, Clang.cindex
+include("gtk_list_gen.jl")
 include("gtk_get_set_gen.jl")
 include("gtk_consts_gen.jl")
 
@@ -18,6 +19,8 @@ for gtk_version = (2, 3)
     gboxpath = "gbox$(gtk_version)"
     gconstspath = "gconsts$(gtk_version)"
     cachepath = "gtk$(gtk_version)"
+
+    g_types = gen_g_type_lists(gtk_h)
 
     body = Expr(:block,
         Expr(:import, :., :., :Gtk),
@@ -48,8 +51,7 @@ for gtk_version = (2, 3)
         serialize(cache, gbox)
         serialize(cache, gconsts)
     end
-    push!(toplevels,gbox)
-    push!(toplevels,gconsts)
+    push!(toplevels,(gbox,gconsts,g_types,gtk_h))
 end
 toplevels
 

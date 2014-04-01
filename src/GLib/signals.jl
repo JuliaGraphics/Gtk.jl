@@ -72,11 +72,11 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 gv = mutable(param_values,i)
                 gtyp = unsafe_load(gv).g_type
                 # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
-                if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,g_type(GObject)))
+                if g_isa(gtyp,g_type(GObject))
                     params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
-                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,gboxed_id))
+                elseif g_isa(gtyp,gboxed_id)
                     params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-                elseif bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,g_type(String)))
+                elseif g_isa(gtyp,g_type(String))
                     params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
                 else
                     params[i] = gv[Any]

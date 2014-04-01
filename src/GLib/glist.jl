@@ -33,7 +33,7 @@ typealias LList{L<:_LList} Union(Ptr{L}, GList{L})
 eltype{L<:_LList}(::LList{L}) = eltype(L())
 eltype{T}(::_LList{T}) = Ptr{T}
 
-convert{L}(::Type{Ptr{L}}, list::GList) = list.handle
+convert{L<:_LList}(::Type{Ptr{L}}, list::GList) = list.handle
 length{L}(list::LList{L}) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
 
 start{L}(list::LList{L}) = convert(Ptr{L},list)
