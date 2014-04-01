@@ -9,6 +9,10 @@ using .GLib.MutableTypes
 using Cairo
 
 import .GLib: setproperty!, getproperty, StringLike, bytestring
+import .GLib:
+    signal_connect, signal_handler_disconnect,
+    signal_handler_block, signal_handler_unblock,
+    signal_emit
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -78,6 +82,10 @@ using .GConstants
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
     using ..Gtk
+    import ..GLib:
+        signal_connect, signal_handler_disconnect,
+        signal_handler_block, signal_handler_unblock,
+        signal_emit
     export Gtk
     include("basic_exports.jl")
     include("short_exports.jl")

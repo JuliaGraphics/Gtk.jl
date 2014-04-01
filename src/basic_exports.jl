@@ -11,10 +11,6 @@ export new, width, height, #minsize, maxsize
 
 
 # GLib-imported event handling
-import GLib:
-    signal_connect, signal_handler_disconnect,
-    signal_handler_block, signal_handler_unblock,
-    signal_emit
 export signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     signal_emit

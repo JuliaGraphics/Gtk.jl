@@ -41,8 +41,8 @@ ccall((:g_type_init,libgobject),Void,())
 
 include("MutableTypes.jl")
 using .MutableTypes
-include("Interfaces.jl")
-using .Interfaces
+#include("Interfaces.jl")
+#using .Interfaces
 include("glist.jl")
 include("gtype.jl")
 include("gvalues.jl")
