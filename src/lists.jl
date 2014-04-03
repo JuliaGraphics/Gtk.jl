@@ -77,7 +77,7 @@ show(io::IO, iter::GtkTreeIter) = print("GtkTreeIter(...)")
 #    indices::Ptr{Cint}
 # end
 
-type GtkTreePath
+type GtkTreePath <: GBoxed
     handle::Ptr{GtkTreePath}
     function GtkTreePath(pathIn::Ptr{GtkTreePath})
         path = new(pathIn)
@@ -88,9 +88,6 @@ type GtkTreePath
 end
 GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
 copy(path::GtkTreePath) = GtkTreePath(ccall((:gtk_tree_path_copy,libgtk),Ptr{Void},(Ptr{GtkTreePath},),path))
-
-convert(::Type{Ptr{GtkTreePath}},path::GtkTreePath) = path.handle
-convert(::Type{GtkTreePath},path::Ptr{GtkTreePath}) = GtkTreePath(path)
 
 next(path::GtkTreePath) = ccall((:gtk_tree_path_next,libgtk), Void, (Ptr{GtkTreePath},),path)
 prev(path::GtkTreePath) = bool( ccall((:gtk_tree_path_prev,libgtk),Cint, (Ptr{GtkTreePath},),path))

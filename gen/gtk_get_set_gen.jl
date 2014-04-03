@@ -103,9 +103,24 @@ const GtkTypeMap = Set{Symbol}([
     :GtkTreeModel,
     :GtkTreeSortable,
     ])
-const GtkBoxedMap = (ASCIIString=>Symbol)[
-    "GtkTreePath" => :GtkTreePath,
-    ]
+const GtkBoxedMap = Set{Symbol}([
+    :GClosure,
+    :GdkFrameTimings,
+    :GdkPixbufFormat,
+    :GtkCssSection,
+    :GtkGradient,
+    :GtkIconSet,
+    :GtkIconSource,
+    :GtkPaperSize,
+    :GtkRecentInfo,
+    :GtkSelectionData,
+    :GtkSymbolicColor,
+    :GtkTargetList,
+    :GtkTextAttributes,
+    :GtkTreePath,
+    :GtkTreeRowReference,
+    :GtkWidgetPath,
+    ])
 cl_to_jl = [
     cindex.VoidType         => :Void,
     cindex.BoolType         => :Bool,
@@ -152,9 +167,9 @@ c_typdef_to_jl = (ASCIIString=>Any)[
 for gtktype in GtkTypeMap
     c_typdef_to_jl[string(gtktype)] = :(Gtk.GObject)
 end
-for (gtktype,v) in GtkBoxedMap
-    push!(GtkTypeMap,v)
-    c_typdef_to_jl[gtktype] = Expr(:., :Gtk, QuoteNode(v))
+for gtktype in GtkBoxedMap
+    push!(GtkTypeMap,gtktype)
+    c_typdef_to_jl[string(gtktype)] = Expr(:., :Gtk, QuoteNode(gtktype))
 end
 const reserved_names = Set{Symbol}([symbol(x) for x in split("
     Base Main Core Array Expr Ptr

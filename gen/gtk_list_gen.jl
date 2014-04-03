@@ -15,7 +15,7 @@ function gen_g_type_lists(gtk_h)
     for tdecl in tdecls
         sdecl = cindex.getTypeDeclaration(cindex.getCanonicalType(
             cindex.getTypedefDeclUnderlyingType(tdecl)))
-        isa(sdecl, cindex.StructDecl) || continue
+        #isa(sdecl, cindex.StructDecl) || continue
         typname = symbol(cindex.spelling(tdecl))
         header_file = cindex.cu_file(tdecl)
         libname = get(gtklibname,basename(splitdir(header_file)[1]),nothing)
@@ -31,8 +31,8 @@ function gen_g_type_lists(gtk_h)
             gtyp = g_type_from_name(typname)
             if gtyp != 0 && !(gtyp in Gtk.GLib.fundamental_ids)
                 println("WARNING: couldn't guess symname for $typname -- skipping")
+                continue
             end
-            continue
         end
         if g_isa(gtyp, g_type_from_name(:GInterface))
             push!(ifaces,(typname, :(@Giface $typname $libname $symname)))
@@ -101,7 +101,7 @@ function gen_g_type_lists(gtk_h)
         elseif g_isa(gtyp, g_type(GObject))
             push!(leafs,(typname, :(@Gtype $typname $libname $symname)))
         else
-            println("WARNING: skipping $gtyp of unknown type")
+            println("WARNING: skipping $typname struct of unknown type")
         end
     end
     leafs,ifaces,boxes,gpointers

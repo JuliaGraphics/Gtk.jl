@@ -3,7 +3,7 @@ module GLib
 import Base: convert, show, showall, showcompact, size, length, getindex, setindex!,
              start, next, done, eltype
 
-export GInterface, GType, GObject, @Gtype, @Gabstract, @Giface
+export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export Enum, GError, GValue, gvalue, make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gc_ref, gc_unref, gc_move_ref, gc_ref_closure
 export signal_connect, signal_emit, signal_handler_disconnect

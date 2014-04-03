@@ -1,5 +1,6 @@
 abstract GObject
 abstract GInterface <: GObject
+abstract GBoxed
 
 typealias Enum Int32
 typealias GType Csize_t
@@ -31,7 +32,7 @@ const fundamental_types = (
     (:gdouble,    Float64,          FloatingPoint,  :double),
     (:gchararray, Ptr{Uint8},       String,         :string),
     (:gpointer,   Ptr{Void},        Ptr,            :pointer),
-    (:GBoxed,     Ptr{Void},        None,           :boxed),
+    (:GBoxed,     Ptr{Void},        GBoxed,         :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
@@ -258,6 +259,9 @@ const jlref_quark = quark"julia_ref"
 convert(::Type{Ptr{GObject}},w::GObject) = w.handle
 convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
 eltype{T<:GObject}(::_LList{T}) = T
+
+convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = box.handle
+convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
 
 # this could be used for gtk methods returing widgets of unknown type
 # and/or might have been wrapped by julia before

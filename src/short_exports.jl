@@ -194,6 +194,18 @@ if Gtk.gtk_version >= 3
         FontChooser,
         Scrollable,
         StyleProvider
+    #boxes
+    const CssSection = GtkCssSection
+    const Gradient = GtkGradient
+    const SelectionData = GtkSelectionData
+    const SymbolicColor = GtkSymbolicColor
+    const WidgetPath = GtkWidgetPath
+    export
+        CssSection,
+        Gradient,
+        SelectionData,
+        SymbolicColor,
+        WidgetPath
 end
 
 # Gtk 2
@@ -206,3 +218,28 @@ if Gtk.gtk_version >= 2
     const Activatable = GtkActivatable
     export Activatable
 end
+
+const Closure = GClosure
+const PixbufFormat = GdkPixbufFormat
+const IconSet = GtkIconSet
+const IconSource = GtkIconSource
+const PaperSize = GtkPaperSize
+const RecentInfo = GtkRecentInfo
+const TargetList = GtkTargetList
+const TextAttributes = GtkTextAttributes
+const TreePath = GtkTreePath
+const TreeRowReference = GtkTreeRowReference
+const FrameTimings = GdkFrameTimings
+# Gtk box types
+export
+    Closure,
+    FrameTimings,
+    PixbufFormat,
+    IconSet,
+    IconSource,
+    PaperSize,
+    RecentInfo,
+    TargetList,
+    TextAttributes,
+    TreePath,
+    TreeRowReference

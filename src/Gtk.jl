@@ -28,6 +28,7 @@ include("long_leaf_exports.jl")
 include(joinpath("..","deps","ext.jl"))
 
 include("interfaces.jl")
+include("boxes.jl")
 include("gtktypes.jl")
 include("gdk.jl")
 include("events.jl")

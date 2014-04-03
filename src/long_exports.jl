@@ -90,7 +90,7 @@ export GTypePlugin,
 # Gtk3 objects
 export GtkGrid
 # Gtk3 interfaces
-export 
+export
     GtkActionable,
     GtkAppChooser,
     GtkColorChooser,
@@ -106,3 +106,21 @@ export GtkActivatable
 # Selectors
 export GtkFileChooserAction
 
+# Gtk box types
+export
+    GClosure,
+    GdkFrameTimings,
+    GdkPixbufFormat,
+    GtkCssSection,
+    GtkGradient,
+    GtkIconSet,
+    GtkIconSource,
+    GtkPaperSize,
+    GtkRecentInfo,
+    GtkSelectionData,
+    GtkSymbolicColor,
+    GtkTargetList,
+    GtkTextAttributes,
+    GtkTreePath,
+    GtkTreeRowReference,
+    GtkWidgetPath
