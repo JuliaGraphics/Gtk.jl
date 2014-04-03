@@ -5,6 +5,20 @@ include("gtk_list_gen.jl")
 include("gtk_get_set_gen.jl")
 include("gtk_consts_gen.jl")
 
+function without_linenums!(ex::Expr)
+    linenums_filter(x,ex) = true
+    linenums_filter(x::LineNumberNode,ex) = false
+    linenums_filter(x::Expr,ex) = x.head !== :line
+    linenums_filter(x::Nothing,ex) = ex.head !== :block
+    filter!((x)->linenums_filter(x,ex), ex.args)
+    for arg in ex.args
+        if isa(arg,Expr)
+            without_linenums!(arg)
+        end
+    end
+    ex
+end
+
 gtk_libdir = "/opt/local/lib"
 
 toplevels = {}
@@ -21,6 +35,11 @@ for gtk_version = (2, 3)
     cachepath = "gtk$(gtk_version)"
 
     g_types = gen_g_type_lists(gtk_h)
+    for z in g_types
+        for (s, ex) in z
+            without_linenums!(ex)
+        end
+    end
 
     body = Expr(:block,
         Expr(:import, :., :., :Gtk),
@@ -29,11 +48,13 @@ for gtk_version = (2, 3)
     gbox = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
     count_fcns = gen_get_set(body, gtk_h)
     println("Generated $gboxpath with $count_fcns function definitions")
+    without_linenums!(gbox)
 
     body = Expr(:block)
     gconsts = Expr(:toplevel,Expr(:module, true, :GConstants, body))
     count_consts = gen_consts(body, gtk_h)
     println("Generated $gconstspath with $count_consts constants")
+    without_linenums!(gconsts)
 
     open(joinpath(splitdir(@__FILE__)[1], gboxpath), "w") do cache
         Base.println(cache,"quote")

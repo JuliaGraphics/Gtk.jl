@@ -71,11 +71,37 @@ export GObject,
     GtkTreeIter,
     GtkWindow
 
+# Gtk interfaces
+export GTypePlugin,
+    GtkBuildable,
+    GtkCellEditable,
+    GtkCellLayout,
+    GtkEditable,
+    GtkFileChooser,
+    GtkOrientable,
+    GtkPrintOperationPreview,
+    GtkRecentChooser,
+    GtkToolShell,
+    GtkTreeDragDest,
+    GtkTreeDragSource,
+    GtkTreeModel,
+    GtkTreeSortable
+
 # Gtk3 objects
 export GtkGrid
+# Gtk3 interfaces
+export 
+    GtkActionable,
+    GtkAppChooser,
+    GtkColorChooser,
+    GtkFontChooser,
+    GtkScrollable,
+    GtkStyleProvider
 
 # Gtk2 objects
 export GtkTable, GtkAlignment
+# Gtk2 interfaces
+export GtkActivatable
 
 # Selectors
 export GtkFileChooserAction

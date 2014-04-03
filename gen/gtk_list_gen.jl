@@ -38,16 +38,22 @@ function gen_g_type_lists(gtk_h)
             push!(ifaces,(typname, :(@Giface $typname $libname $symname)))
         elseif g_isa(gtyp, g_type_from_name(:GBoxed))
             unref_fn = symbol(string(symname,:_free))
+            has_ref_fn = false
             if get_fn_ptr(unref_fn, libname) == C_NULL
                 unref_fn = symbol(string(symname,:_unref))
                 if get_fn_ptr(unref_fn, libname) == C_NULL
                     unref_fn = nothing
+                    ref_fn = nothing
+                else
+                    has_ref_fn = true
+                    ref_fn_sym = symbol(string(symname,:_ref))
+                    @assert get_fn_ptr(ref_fn_sym, libname) != C_NULL
+                    ref_fn = :(ccall(($(QuoteNode(ref_fn_sym)),$libname),Void,(Ptr{Void},),ref))
                 end
-                ref_fn = :(ccall(($(QuoteNode(symbol(string(symname,:_ref)))),$libname),Void,(Ptr{Void},),ref))
             else
                 ref_fn = nothing
             end
-            if length(cindex.children(sdecl)) == 0 || unref_fn !== nothing
+            if length(cindex.children(sdecl)) == 0 || has_ref_fn
                 # Opaque box
                 if unref_fn === nothing
                     println("WARNING: couldn't detect gc characteristics of $symname")
@@ -59,8 +65,12 @@ function gen_g_type_lists(gtk_h)
                         function $typname(ref::Ptr{$typname})
                             $ref_fn
                             x = new(ref)
-                            finalizer(x, (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Void,
-                                (Ptr{Void},),x.handle))
+                            $(if unref_fn !== nothing
+                                :(finalizer(x, (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Void,
+                                    (Ptr{Void},),x.handle)))
+                            else
+                                nothing
+                            end)
                             path
                         end
                     end

@@ -49,6 +49,7 @@ getindex(v::GV,i::Int, ::Type{Void}) = nothing
 #let
 #global make_gvalue, getindex
 function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,fundamental::Bool=false)
+    with_id === :error && return
     if isa(with_id,Tuple)
         with_id = with_id::(Symbol,Any)
         with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
@@ -106,6 +107,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(),:(()->$with_id)), fn])
         return fn
     end
+    return nothing
 end
 const gvalue_types = {}
 const fundamental_fns = tuple(Function[make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true) for

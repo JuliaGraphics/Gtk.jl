@@ -225,8 +225,7 @@ function convert_child_iter_to_iter(model::GtkTreeModelFilter, child_iter::TRI)
 end
 
 ### GtkTreeModel
-
-typealias GtkTreeModel Union(GtkListStore,GtkTreeStore,GtkTreeModelFilter)
+@Giface GtkTreeModel Gtk.libgtk gtk_tree_model
 
 function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
     val = mutable(GValue())
@@ -271,8 +270,7 @@ depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth,libgtk), Cint,
     (Ptr{GtkTreePath},),path)
     
 ### GtkTreeSortable
-
-typealias GtkTreeSortable Union(GtkListStore,GtkTreeStore)
+@Giface GtkTreeSortable Gtk.libgtk gtk_tree_sortable
 
 ### GtkCellRenderer
 

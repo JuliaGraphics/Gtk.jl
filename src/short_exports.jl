@@ -144,15 +144,65 @@ export G_, GObject,
     VolumeButton,
     Window
 
+const TypePlugin = GTypePlugin
+const Buildable = GtkBuildable
+const CellEditable = GtkCellEditable
+const CellLayout = GtkCellLayout
+const Editable = GtkEditable
+const FileChooser = GtkFileChooser
+const Orientable = GtkOrientable
+const PrintOperationPreview = GtkPrintOperationPreview
+const RecentChooser = GtkRecentChooser
+const ToolShell = GtkToolShell
+const TreeDragDest = GtkTreeDragDest
+const TreeDragSource = GtkTreeDragSource
+const TreeModel = GtkTreeModel
+const TreeSortable = GtkTreeSortable
+
+export
+    TypePlugin,
+    Buildable,
+    CellEditable,
+    CellLayout,
+    Editable,
+    FileChooser,
+    Orientable,
+    PrintOperationPreview,
+    RecentChooser,
+    ToolShell,
+    TreeDragDest,
+    TreeDragSource,
+    TreeModel,
+    TreeSortable
+
 # Gtk 3
 if Gtk.gtk_version >= 3
+    #objects
     const Grid = GtkGrid
     export Grid
+    #interfaces
+    const Actionable = GtkActionable
+    const AppChooser = GtkAppChooser
+    const ColorChooser = GtkColorChooser
+    const FontChooser = GtkFontChooser
+    const Scrollable = GtkScrollable
+    const StyleProvider = GtkStyleProvider
+    export
+        Actionable,
+        AppChooser,
+        ColorChooser,
+        FontChooser,
+        Scrollable,
+        StyleProvider
 end
 
 # Gtk 2
 if Gtk.gtk_version >= 2
+    #objects
     const Table = GtkTable
     const Alignment = GtkAlignment
     export Table, Aligment
+    #interfaces
+    const Activatable = GtkActivatable
+    export Activatable
 end

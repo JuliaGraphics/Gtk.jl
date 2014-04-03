@@ -1,4 +1,5 @@
 abstract GObject
+abstract GInterface <: GObject
 
 typealias Enum Int32
 typealias GType Csize_t
@@ -11,10 +12,10 @@ immutable GParamSpec
 end
 
 const fundamental_types = (
-    #(:name,      Ctype,      JuliaType,     g_value_fn)
-    #(:invalid,    Void,       Void,          :error),
-    #(:void,       Nothing,    Nothing,       :error),
-    #(:GInterface, Ptr{Void},        None,           :???),
+    #(:name,      Ctype,            JuliaType,      g_value_fn)
+    (:invalid,    Void,             Void,           :error),
+    (:void,       Nothing,          Nothing,        :error),
+    (:GInterface, Ptr{Void},        GInterface,     :error),
     (:gchar,      Int8,             Int8,           :schar),
     (:guchar,     Uint8,            Uint8,          :uchar),
     (:gboolean,   Cint,             Bool,           :boolean),
@@ -78,10 +79,11 @@ g_type(obj::GObject) = g_type(typeof(obj))
 
 gtypes(types...) = GType[g_type(t) for t in types]
 
-const gtype_ifaces = Dict{Symbol,Type}()
+const gtype_abstracts = Dict{Symbol,Type}()
 const gtype_wrappers = Dict{Symbol,Type}()
+const gtype_ifaces = Dict{Symbol,Type}()
 
-gtype_ifaces[:GObject] = GObject
+gtype_abstracts[:GObject] = GObject
 gtype_wrappers[:GObject] = GObjectLeaf
 
 let libs = Dict{String,Any}()
@@ -110,8 +112,32 @@ function g_type(name::Symbol, lib, symname::Symbol)
 end
 g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
 
-function get_interface_decl(gtyp::GType)
-    #TODO
+function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
+    if isdefined(current_module(), iname)
+        return nothing
+    end
+    parent = g_type_parent(gtyp)
+    @assert parent != 0
+    piname = g_type_name(parent)
+    quote
+        if $(QuoteNode(iname)) in keys(gtype_ifaces)
+            const $(esc(iname)) = gtype_abstracts[$(Meta.quot(iname))]
+        else
+            immutable $(esc(iname)) <: GInterface
+                handle::Ptr{GObject}
+                gc::Any
+                $(esc(iname))(x::GObject) = new(convert(Ptr{GObject},x), x)
+                # Gtk does an interface type check when calling methods. So, it's
+                # not worth repeating it here. Plus, we might as well just allow
+                # the user to lie, since we aren't using this for dispatch
+                # (like C & unlike most other languages), the user may be able 
+                # to write more generic code
+            end
+            gtype_ifaces[$(QuoteNode(iname))] = $(esc(iname))
+            $gtyp_decl
+        end
+        nothing
+    end
 end
 
 function get_itype_decl(iname::Symbol, gtyp::GType)
@@ -119,44 +145,43 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
         return nothing
     end
     if iname === :GObject
-        return :( const $(esc(iname)) = gtype_ifaces[:GObject] )
+        return :( const $(esc(iname)) = gtype_abstracts[:GObject] )
     end
     #ntypes = mutable(Cuint)
     #interfaces = ccall((:g_type_interfaces,libgobject),Ptr{GType},(GType,Ptr{Cuint}),gtyp,ntypes)
-    #println(g_type_name(gtyp), " implements ->")
     #for i = 1:ntypes[]
     #    interface = unsafe_load(interfaces,i)
-    #    println("  ",g_type_name(interface))
+    #    # what do we care to do here?!
     #end
+    #c_free(interfaces)
     parent = g_type_parent(gtyp)
     @assert parent != 0
     piname = g_type_name(parent)
     piface_decl = get_itype_decl(piname, parent)
-    :(
-        if $(Meta.quot(iname)) in keys(gtype_ifaces)
-            const $(esc(iname)) = gtype_ifaces[$(Meta.quot(iname))]
-            nothing
+    quote
+        if $(QuoteNode(iname)) in keys(gtype_abstracts)
+            const $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
         else
             $piface_decl
             abstract $(esc(iname)) <: $(esc(piname))
-            gtype_ifaces[$(Meta.quot(iname))] = $(esc(iname))
-            nothing
+            gtype_abstracts[$(QuoteNode(iname))] = $(esc(iname))
         end
-    )
+        nothing
+    end
 end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
     :( GLib.g_type(::Type{$(esc(name))}) = $(esc(symname)) )
 get_gtype_decl(name::Symbol, lib, symname::Symbol) =
     :( GLib.g_type(::Type{$(esc(name))}) =
-        ccall(($(Meta.quot(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+        ccall(($(QuoteNode(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
     ename = esc(name)
     einame = esc(iname)
-    :(begin
-        if $(Meta.quot(iname)) in keys(gtype_wrappers)
-            const $einame = gtype_ifaces[$(QuoteNode(iname))]
+    quote
+        if $(QuoteNode(iname)) in keys(gtype_wrappers)
+            const $einame = gtype_abstracts[$(QuoteNode(iname))]
         else
             $(get_itype_decl(iname, gtyp))
         end
@@ -177,9 +202,9 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
             w
         end
         gtype_wrappers[$(QuoteNode(iname))] = $ename
-        $(gtype_decl)
+        $gtype_decl
         nothing
-    end)
+    end
 end
 
 macro Gtype_decl(name,gtyp,gtype_decl)
@@ -194,7 +219,7 @@ macro Gtype(iname,lib,symname)
     end
     @assert iname === g_type_name(gtyp)
     if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
-        error("not implemented yet")
+        error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
     name = symbol(string(iname,current_module().suffix))
     gtype_decl = get_gtype_decl(name, lib, symname)
@@ -206,11 +231,22 @@ macro Gabstract(iname,lib,symname)
     if gtyp == 0
         return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
     end
-    @assert name === g_type_name(gtyp)
+    @assert iname === g_type_name(gtyp)
     Expr(:block,
         get_itype_decl(iname, gtyp),
         get_gtype_decl(iname, lib, symname))
 end
+
+macro Giface(iname,lib,symname)
+    gtyp = g_type(iname, lib, symname)
+    if gtyp == 0
+        return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
+    end
+    @assert iname === g_type_name(gtyp)
+    gtype_decl = get_gtype_decl(iname, lib, symname)
+    get_interface_decl(iname::Symbol, gtyp::GType, gtype_decl)
+end
+
 
 macro quark_str(q)
     :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), bytestring($q)) )

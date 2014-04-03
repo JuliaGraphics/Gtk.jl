@@ -173,4 +173,5 @@ end
 @gtktype GtkFontButton
 GtkFontButton_new() = GtkFontButton_new(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
 
-typealias GtkFontChooser Union(GtkFontButton)
+@Giface GtkFileChooser Gtk.libgtk gtk_file_chooser
+

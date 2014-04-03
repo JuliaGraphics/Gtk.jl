@@ -23,7 +23,8 @@ function GtkCssProvider_new(;data=nothing,filename=nothing)
     return provider
 end
 
-typealias GtkStyleProvider Union(GtkCssProvider)
+@Giface GtkStyleProvider Gtk.libgtk gtk_style_provider
+
 
 @gtktype GtkStyleContext
 GtkStyleContext_new() = GtkStyleContext_new(ccall((:gtk_style_context_new,libgtk),Ptr{GObject},()))
