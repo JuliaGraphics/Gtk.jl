@@ -87,7 +87,8 @@ module ShortNames
     import ..GLib:
         signal_connect, signal_handler_disconnect,
         signal_handler_block, signal_handler_unblock,
-        signal_emit
+        signal_emit, @g_type_delegate
+    import ..Gtk: suffix
     export Gtk
     include("basic_exports.jl")
     include("short_exports.jl")

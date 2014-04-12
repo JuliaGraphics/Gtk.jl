@@ -29,7 +29,7 @@
 #GtkComboBoxText — A simple, text-only combo box
 
 @gtktype GtkComboBoxText
-GtkComboBoxText_new(with_entry::Bool=false) = GtkComboBoxText_new(
+GtkComboBoxTextLeaf(with_entry::Bool=false) = GtkComboBoxTextLeaf(
         if with_entry
             ccall((:gtk_combo_box_text_new_with_entry,libgtk),Ptr{GObject},())
         else
@@ -99,10 +99,10 @@ string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),
 ### GtkListStore
 
 @gtktype GtkListStore
-function GtkListStore_new(types::Type...)
+function GtkListStoreLeaf(types::Type...)
     gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_list_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
-    GtkListStore_new(handle)
+    GtkListStoreLeaf(handle)
 end
 
 function push!(listStore::GtkListStore, values::Tuple)
@@ -144,10 +144,10 @@ length(listStore::GtkListStore) =
 ### GtkTreeStore
 
 @gtktype GtkTreeStore
-function GtkTreeStore_new(types::Type...)
+function GtkTreeStoreLeaf(types::Type...)
     gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_tree_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
-    GtkTreeStore_new(handle)
+    GtkTreeStoreLeaf(handle)
 end
 
 function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
@@ -202,7 +202,7 @@ depth(treeStore::GtkTreeStore, iter::TRI) =
 ### GtkTreeModelFilter
 
 @gtktype GtkTreeModelFilter
-GtkTreeModelFilter_new(child_model::GObject) = GtkTreeModelFilter_new(
+GtkTreeModelFilterLeaf(child_model::GObject) = GtkTreeModelFilterLeaf(
     ccall((:gtk_tree_model_filter_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{None}), child_model, C_NULL))
 
 function convert_iter_to_child_iter(model::GtkTreeModelFilter, filter_iter::TRI)
@@ -274,35 +274,35 @@ depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth,libgtk), Cint,
 @gtktype GtkCellRenderer
 
 @gtktype GtkCellRendererAccel
-GtkCellRendererAccel_new() = GtkCellRendererAccel_new(
+GtkCellRendererAccelLeaf() = GtkCellRendererAccelLeaf(
     ccall((:gtk_cell_renderer_accel_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererCombo
-GtkCellRendererCombo_new() = GtkCellRendererCombo_new(
+GtkCellRendererComboLeaf() = GtkCellRendererComboLeaf(
     ccall((:gtk_cell_renderer_combo_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererPixbuf
-GtkCellRendererPixbuf_new() = GtkCellRendererPixbuf_new(
+GtkCellRendererPixbufLeaf() = GtkCellRendererPixbufLeaf(
     ccall((:gtk_cell_renderer_pixbuf_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererProgress
-GtkCellRendererProgress_new() = GtkCellRendererProgress_new(
+GtkCellRendererProgressLeaf() = GtkCellRendererProgressLeaf(
     ccall((:gtk_cell_renderer_progress_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererSpin
-GtkCellRendererSpin_new() = GtkCellRendererSpin_new(
+GtkCellRendererSpinLeaf() = GtkCellRendererSpinLeaf(
     ccall((:gtk_cell_renderer_spin_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererText
-GtkCellRendererText_new() = GtkCellRendererText_new(
+GtkCellRendererTextLeaf() = GtkCellRendererTextLeaf(
     ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererToggle
-GtkCellRendererToggle_new() = GtkCellRendererToggle_new(
+GtkCellRendererToggleLeaf() = GtkCellRendererToggleLeaf(
     ccall((:gtk_cell_renderer_toggle_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkCellRendererSpinner
-GtkCellRendererSpinner_new() = GtkCellRendererSpinner_new(
+GtkCellRendererSpinnerLeaf() = GtkCellRendererSpinnerLeaf(
     ccall((:gtk_cell_renderer_spinner_new,libgtk),Ptr{GObject},()))
 
 ### GtkTreeViewColumn
@@ -310,9 +310,9 @@ GtkCellRendererSpinner_new() = GtkCellRendererSpinner_new(
 typealias KVMapping Union(Dict, ((TypeVar(:K),TypeVar(:V))...), Vector{(TypeVar(:K), TypeVar(:V))})
 
 @gtktype GtkTreeViewColumn
-GtkTreeViewColumn_new() = GtkTreeViewColumn_new(ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
-function GtkTreeViewColumn_new(renderer::GtkCellRenderer, mapping::KVMapping)
-    treeColumn = GtkTreeViewColumn_new()
+GtkTreeViewColumnLeaf() = GtkTreeViewColumnLeaf(ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
+function GtkTreeViewColumnLeaf(renderer::GtkCellRenderer, mapping::KVMapping)
+    treeColumn = GtkTreeViewColumnLeaf()
     unshift!(treeColumn,renderer)
     for (k,v) in mapping
         add_attribute(treeColumn,renderer,string(k),v)
@@ -320,8 +320,8 @@ function GtkTreeViewColumn_new(renderer::GtkCellRenderer, mapping::KVMapping)
     treeColumn
 end
 
-function GtkTreeViewColumn_new(title::String,renderer::GtkCellRenderer, mapping::KVMapping)
-    setproperty!(GtkTreeViewColumn_new(renderer,mapping), :title, title)
+function GtkTreeViewColumnLeaf(title::String,renderer::GtkCellRenderer, mapping::KVMapping)
+    setproperty!(GtkTreeViewColumnLeaf(renderer,mapping), :title, title)
 end
 
 empty!(treeColumn::GtkTreeViewColumn) =
@@ -381,8 +381,8 @@ unselectall!(selection::GtkTreeSelection) =
 ### GtkTreeView
 
 @gtktype GtkTreeView
-GtkTreeView_new() = GtkTreeView_new(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
-GtkTreeView_new(treeStore::GtkTreeModel) = GtkTreeView_new(
+GtkTreeViewLeaf() = GtkTreeViewLeaf(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
+GtkTreeViewLeaf(treeStore::GtkTreeModel) = GtkTreeViewLeaf(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
 
 function push!(treeView::GtkTreeView,treeColumns::GtkTreeViewColumn...)

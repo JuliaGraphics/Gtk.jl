@@ -22,7 +22,7 @@
 if gtk_version == 3
     ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
     @gtktype GtkGrid
-    GtkGrid_new() = GtkGrid_new(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
+    GtkGridLeaf() = GtkGridLeaf(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
     function getindex(grid::GtkGrid, i::Integer, j::Integer)
         x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GObject}, (Ptr{GObject}, Cint, Cint), grid, i-1, j-1)
@@ -55,13 +55,16 @@ if gtk_version == 3
     end
 else
     type GtkGrid end
-    GtkGrid_new(x...) = error("GtkGrid is not available until Gtk3.0")
+    GtkGridLeaf(x...) = error("GtkGrid is not available until Gtk3.0")
+    macro GtkGrid(args...)
+        :( GtkGridLeaf($(args...)) )
+    end
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 @gtktype GtkTable
-GtkTable_new(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTable_new(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
-GtkTable_new(homogeneous::Bool=false) = GtkTable_new(0,0,homogeneous)
+GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
+GtkTableLeaf(homogeneous::Bool=false) = GtkTableLeaf(0,0,homogeneous)
 setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j::Union(R,Range1{R})) =
     ccall((:gtk_table_attach_defaults, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
@@ -72,35 +75,35 @@ setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range1{T}), j
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
 @gtktype GtkAlignment
-GtkAlignment_new(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
-    GtkAlignment_new(ccall((:gtk_alignment_new, libgtk), Ptr{GObject},
+GtkAlignmentLeaf(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
+    GtkAlignmentLeaf(ccall((:gtk_alignment_new, libgtk), Ptr{GObject},
         (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale))
 
 ### GtkFrame — A bin with a decorative frame and optional label
 @gtktype GtkFrame
-GtkFrame_new(label::StringLike) = GtkFrame_new(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
+GtkFrameLeaf(label::StringLike) = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(label)))
-GtkFrame_new() = GtkFrame_new(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
+GtkFrameLeaf() = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), C_NULL))
 
 ### GtkAspectFrame
 @gtktype GtkAspectFrame
-GtkAspectFrame_new(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
-    GtkAspectFrame_new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
+GtkAspectFrameLeaf(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
+    GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
-GtkAspectFrame_new(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
-    GtkAspectFrame_new(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
+GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
+    GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
         (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
 @gtktype GtkBox
 if gtk_version == 3
-    GtkBox_new(vertical::Bool, spacing=0) =
-        GtkBox_new(ccall((:gtk_box_new, libgtk), Ptr{GObject},
+    GtkBoxLeaf(vertical::Bool, spacing=0) =
+        GtkBoxLeaf(ccall((:gtk_box_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
 else
-    GtkBox_new(vertical::Bool, spacing=0) =
-        GtkBox_new(
+    GtkBoxLeaf(vertical::Bool, spacing=0) =
+        GtkBoxLeaf(
             if vertical
                 ccall((:gtk_vbox_new, libgtk), Ptr{GObject},
                     (Cint, Cint), false, spacing)
@@ -114,12 +117,12 @@ end
 ### GtkButtonBox
 @gtktype GtkButtonBox
 if gtk_version == 3
-    GtkButtonBox_new(vertical::Bool) =
-        GtkButtonBox_new(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
+    GtkButtonBoxLeaf(vertical::Bool) =
+        GtkButtonBoxLeaf(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
             (Cint,), vertical))
 else
-     GtkButtonBox_new(vertical::Bool) =
-        GtkButtonBox_new(
+     GtkButtonBoxLeaf(vertical::Bool) =
+        GtkButtonBoxLeaf(
             if vertical
                 ccall((:gtk_vbutton_box_new, libgtk), Ptr{GObject},())
             else
@@ -134,12 +137,12 @@ end
 ### GtkPaned
 @gtktype GtkPaned
 if gtk_version == 3
-    GtkPaned_new(vertical::Bool, spacing=0) =
-        GtkPaned_new(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
+    GtkPanedLeaf(vertical::Bool, spacing=0) =
+        GtkPanedLeaf(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
 else
-    GtkPaned_new(vertical::Bool) =
-        GtkPaned_new(
+    GtkPanedLeaf(vertical::Bool) =
+        GtkPanedLeaf(
             if vertical
                 ccall((:gtk_vpaned_new, libgtk), Ptr{GObject},())
             else
@@ -181,11 +184,11 @@ end
 
 ### GtkLayout
 @gtktype GtkLayout
-function GtkLayout_new(width::Real, height::Real)
+function GtkLayoutLeaf(width::Real, height::Real)
     layout = ccall((:gtk_layout_new, libgtk), Ptr{GObject},
         (Ptr{Void},Ptr{Void}), C_NULL, C_NULL)
     ccall((:gtk_layout_set_size,libgtk),Void,(Ptr{GObject},Cuint,Cuint),layout,width,height)
-    GtkLayout_new(layout)
+    GtkLayoutLeaf(layout)
 end
 setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put,libgtk),Void,
     (Ptr{GObject},Ptr{GObject},Cint,Cint), layout, child, i, j)
@@ -200,13 +203,13 @@ height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
 @gtktype GtkExpander
-GtkExpander_new(title::StringLike) =
-    GtkExpander_new(ccall((:gtk_expander_new, libgtk), Ptr{GObject},
+GtkExpanderLeaf(title::StringLike) =
+    GtkExpanderLeaf(ccall((:gtk_expander_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 ### GtkNotebook
 @gtktype GtkNotebook
-GtkNotebook_new() = GtkNotebook_new(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
+GtkNotebookLeaf() = GtkNotebookLeaf(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
 function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,StringLike), label::Union(GtkWidget,StringLike))
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
@@ -237,15 +240,18 @@ pagenumber(w::GtkNotebook, child::GtkWidget) =
 ### GtkOverlay
 if gtk_version == 3
     @gtktype GtkOverlay # this is a GtkBin, except it behaves more like a container
-    GtkOverlay_new() = GtkOverlay_new(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
+    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
-    GtkOverlay_new(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlay_new(), w)
+    GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
     function push!(w::GtkOverlay, x::GtkWidget)
         ccall((:gtk_overlay_add_overlay,libgtk), Cint,
             (Ptr{GObject}, Ptr{GObject}), w, x)
     end
 else
     type GtkOverlay end
-    GtkOverlay_new(x...) = error("GtkOverlay is not available until Gtk3.2")
+    GtkOverlayLeaf(x...) = error("GtkOverlay is not available until Gtk3.2")
+    macro GtkOverlay(args...)
+        :( GtkOverlayLeaf($(args...)) )
+    end
 end
 

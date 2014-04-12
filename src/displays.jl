@@ -145,7 +145,6 @@ bstride(a::MatrixStrided,i) = (i == 1 ? sizeof(eltype(a)) : (i == 2 ? a.rowstrid
 bstride(a,i) = stride(a,i)*sizeof(eltype(a))
 
 @Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
-const GdkPixbuf_new = GdkPixbufLeaf
 
 # Example constructors:
 #GdkPixbuf(filename="", width=-1, height=-1, preserve_aspect_ratio=true)
@@ -154,7 +153,7 @@ const GdkPixbuf_new = GdkPixbufLeaf
 #GdkPixbuf(xpm_data=[...])
 #GdkPixbuf(data=[...],has_alpha=true)
 #GdkPixbuf(width=1,height=1,has_alpha=true)
-function GdkPixbuf_new(;stream=nothing,resource_path=nothing,filename=nothing,xpm_data=nothing,inline_data=nothing,data=nothing,
+function GdkPixbufLeaf(;stream=nothing,resource_path=nothing,filename=nothing,xpm_data=nothing,inline_data=nothing,data=nothing,
         width=-1,height=-1,preserve_aspect_ratio=true,has_alpha=nothing)
     source_count = (stream!==nothing) + (resource_path!==nothing) + (filename!==nothing) +
         (xpm_data!==nothing) + (inline_data!==nothing) + (data!==nothing)
@@ -212,13 +211,13 @@ function GdkPixbuf_new(;stream=nothing,resource_path=nothing,filename=nothing,xp
         pixbuf = ccall((:gdk_pixbuf_new,libgdk_pixbuf),Ptr{GObject},
             (Cint,Cint,Cint,Cint,Cint),0,alpha,8,width,height)
     end
-    return GdkPixbuf_new(pixbuf)
+    return GdkPixbufLeaf(pixbuf)
 end
 #GdkPixbufLoader for new with type/mimetype
 #GdkPixbuf(callback, stream, width=-1, height=-1, preserve_aspect_ratio=true)
 
-copy(img::GdkPixbuf) = GdkPixbuf_new(ccall((:gdk_pixbuf_copy,libgdk_pixbuf),Ptr{GObject},(Ptr{GObject},),img))
-slice(img::GdkPixbuf,x,y) = GdkPixbuf_new(ccall((:gdk_pixbuf_new_subpixbuf,libgdk_pixbuf),Ptr{GObject},
+copy(img::GdkPixbuf) = GdkPixbufLeaf(ccall((:gdk_pixbuf_copy,libgdk_pixbuf),Ptr{GObject},(Ptr{GObject},),img))
+slice(img::GdkPixbuf,x,y) = GdkPixbufLeaf(ccall((:gdk_pixbuf_new_subpixbuf,libgdk_pixbuf),Ptr{GObject},
     (Ptr{GObject},Cint,Cint,Cint,Cint),img,first(x)-1,first(y)-1,length(x),length(y)))
 width(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_width,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
 height(img::GdkPixbuf) = ccall((:gdk_pixbuf_get_height,libgdk_pixbuf),Cint,(Ptr{GObject},),img)
@@ -261,10 +260,10 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 #TODO: image transformations, rotations, compositing
 
 @gtktype GtkImage
-GtkImage_new(pixbuf::GdkPixbuf) = GtkImage_new(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
-GtkImage_new(filename::String) = GtkImage_new(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
+GtkImageLeaf(pixbuf::GdkPixbuf) = GtkImageLeaf(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
+GtkImageLeaf(filename::String) = GtkImageLeaf(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
-function GtkImage_new(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:INVALID)
+function GtkImageLeaf(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:INVALID)
     source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing) + (stock_id!==nothing)
     @assert(source_count <= 1,
         "GdkPixbuf must have at most one resource_path, filename, stock_id, or icon_name argument")
@@ -280,23 +279,23 @@ function GtkImage_new(;resource_path=nothing,filename=nothing,icon_name=nothing,
     else
         img = ccall((:gtk_image_new,libgtk),Ptr{GObject},())
     end
-    return GtkImage_new(img)
+    return GtkImageLeaf(img)
 end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
-GdkPixbuf_new(img::GtkImage) = GdkPixbuf_new(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
+GdkPixbufLeaf(img::GtkImage) = GdkPixbufLeaf(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
 
 @gtktype GtkProgressBar
-GtkProgressBar_new() = GtkProgressBar_new(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
+GtkProgressBarLeaf() = GtkProgressBarLeaf(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
 pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
 @gtktype GtkSpinner
-GtkSpinner_new() = GtkSpinner_new(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
+GtkSpinnerLeaf() = GtkSpinnerLeaf(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
 start(spinner::GtkSpinner) = ccall((:gtk_spinner_start,libgtk),Void,(Ptr{GObject},),spinner)
 stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop,libgtk),Void,(Ptr{GObject},),spinner)
 
 @gtktype GtkStatusbar
-GtkStatusbar_new() = GtkStatusbar_new(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
+GtkStatusbarLeaf() = GtkStatusbarLeaf(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
     ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
         status,bytestring(source))
@@ -315,8 +314,8 @@ empty!(status::GtkStatusbar,context) =
         status,context_id(status,context),context_id(context))
 
 #@gtktype GtkInfoBar
-#GtkInfoBar_new() = GtkInfoBar_new(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
+#GtkInfoBarLeaf() = GtkInfoBarLeaf(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
 @gtktype GtkStatusIcon
-GtkStatusIcon_new() = GtkStatusIcon_new(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
+GtkStatusIconLeaf() = GtkStatusIconLeaf(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
 

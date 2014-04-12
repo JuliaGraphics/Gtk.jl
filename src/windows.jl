@@ -1,5 +1,5 @@
 @gtktype GtkWindow
-function GtkWindow_new(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
+function GtkWindowLeaf(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
     hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(Enum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
@@ -11,7 +11,7 @@ function GtkWindow_new(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::
         ccall((:gtk_window_set_resizable,libgtk),Void,(Ptr{GObject},Bool),hnd,false)
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32),hnd,w,h)
     end
-    widget = GtkWindow_new(hnd)
+    widget = GtkWindowLeaf(hnd)
     show(widget)
     widget
 end
@@ -31,16 +31,16 @@ function splice!(win::GtkWindow, accel_group::GtkAccelGroup)
 end
 
 @gtktype GtkScrolledWindow
-GtkScrolledWindow_new() = GtkScrolledWindow_new(
+GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
     ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
                 C_NULL,C_NULL))
 
-function GtkDialog_new(title::StringLike, parent::GtkContainer, flags::Integer, button_text_response...)
+function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, button_text_response...)
     n = length(button_text_response)
     if !iseven(n)
         error("button_text_response must consist of text/response pairs")
     end
-    w = GtkDialog_new(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
+    w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
                 title, parent, flags, C_NULL))
     for i = 1:2:n
@@ -50,17 +50,17 @@ function GtkDialog_new(title::StringLike, parent::GtkContainer, flags::Integer, 
 end
 
 @gtktype GtkAboutDialog
-GtkAboutDialog_new() = GtkAboutDialog_new(
+GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkMessageDialog
-function GtkMessageDialog_new(parent::GtkContainer, flags::Integer, typ::Integer,
+function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
                           message::StringLike, button_text_response...)
     n = length(button_text_response)
     if !iseven(n)
         error("button_text_response must consist of text/response pairs")
     end
-    w = GtkMessageDialog_new(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
+    w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
                 (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
                 parent, flags, typ, 0, bytestring(message) ))
     for i = 1:2:n

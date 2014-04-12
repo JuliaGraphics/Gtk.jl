@@ -41,12 +41,27 @@ ccall((:g_type_init,libgobject),Void,())
 
 include("MutableTypes.jl")
 using .MutableTypes
-#include("Interfaces.jl")
-#using .Interfaces
 include("glist.jl")
 include("gtype.jl")
 include("gvalues.jl")
 include("gerror.jl")
 include("signals.jl")
+
+export @g_type_delegate
+macro g_type_delegate(eq)
+    @assert isa(eq,Expr) && eq.head == :(=) && length(eq.args) == 2
+    new = eq.args[1]
+    real = eq.args[2]
+    newleaf = esc(symbol(string(new,current_module().suffix)))
+    realleaf = esc(symbol(string(real,current_module().suffix)))
+    new = esc(new)
+    macroreal = QuoteNode(symbol(string('@',real)))
+    quote
+        const $newleaf = $realleaf
+        macro $new(args...)
+            Expr(:macrocall, $macroreal, map(esc,args)...)
+        end
+    end
+end
 
 end

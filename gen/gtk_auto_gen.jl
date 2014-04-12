@@ -23,7 +23,7 @@ gtk_libdir = "/opt/local/lib"
 
 toplevels = {}
 cppargs = []
-for gtk_version = (2, 3)
+let gtk_version = Gtk.gtk_version
     header = joinpath(gtk_libdir,"..","include","gtk-$gtk_version.0","gtk","gtk.h")
     args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
     global gtk_h, gtk_macro_h

@@ -9,10 +9,10 @@
 #GtkEditable — Interface for text-editing widgets
 
 @gtktype GtkEntry
-GtkEntry_new() = GtkEntry_new(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
+GtkEntryLeaf() = GtkEntryLeaf(ccall((:gtk_entry_new,libgtk),Ptr{GObject},()))
 
 @gtktype GtkEntryCompletion 
-GtkEntryCompletion_new() = GtkEntryCompletion_new(ccall((:gtk_entry_completion_new,libgtk),Ptr{GObject},()))
+GtkEntryCompletionLeaf() = GtkEntryCompletionLeaf(ccall((:gtk_entry_completion_new,libgtk),Ptr{GObject},()))
 
 complete(completion::GtkEntryCompletion) = 
     ccall((:gtk_entry_completion_complete,libgtk),Void,(Ptr{GObject},),completion)
@@ -20,10 +20,10 @@ complete(completion::GtkEntryCompletion) =
 @gtktype GtkRange
 @gtktype GtkScale
 if gtk_version == 3
-    GtkScale_new(vertical::Bool,min,max,step) = GtkScale_new(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
+    GtkScaleLeaf(vertical::Bool,min,max,step) = GtkScaleLeaf(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
             (Cint,Cdouble,Cdouble,Cdouble),vertical,min,max,step))
 else
-    GtkScale_new(vertical::Bool,min,max,step) = GtkScale_new(
+    GtkScaleLeaf(vertical::Bool,min,max,step) = GtkScaleLeaf(
         if vertical
             ccall((:gtk_vscale_new_with_range,libgtk),Ptr{GObject},
                 (Cdouble,Cdouble,Cdouble),min,max,step)
@@ -32,7 +32,7 @@ else
                 (Cdouble,Cdouble,Cdouble),min,max,step)
         end)
 end
-GtkScale_new(vertical::Bool,scale::Ranges) = GtkScale_new(vertical,minimum(scale),maximum(scale),step(scale))
+GtkScaleLeaf(vertical::Bool,scale::Ranges) = GtkScaleLeaf(vertical,minimum(scale),maximum(scale),step(scale))
 function push!(scale::GtkScale, value, position::Symbol, markup::String)
     ccall((:gtk_scale_add_mark,libgtk),Void,
         (Ptr{GObject},Cdouble,Enum,Ptr{Uint8}),
@@ -48,20 +48,20 @@ end
 empty!(scale::GtkScale) = ccall((:gtk_scale_clear_marks,libgtk),Void,(Ptr{GObject},),scale)
 
 @gtktype GtkAdjustment
-GtkAdjustment_new(value,lower,upper,step_increment,page_increment,page_size) =
-    GtkAdjustment_new(ccall((:gtk_adjustment_new,libgtk), Ptr{GObject},
+GtkAdjustmentLeaf(value,lower,upper,step_increment,page_increment,page_size) =
+    GtkAdjustmentLeaf(ccall((:gtk_adjustment_new,libgtk), Ptr{GObject},
           (Float64,Float64,Float64,Float64,Float64,Float64),
           value,lower,upper,step_increment,page_increment,page_size))
 
-GtkAdjustment_new(scale::GtkScale) = convert(GtkAdjustment_new,
+GtkAdjustmentLeaf(scale::GtkScale) = convert(GtkAdjustmentLeaf,
     ccall((:gtk_range_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), scale))
 
 @gtktype GtkSpinButton
-GtkSpinButton_new(min,max,step) = GtkSpinButton_new(
+GtkSpinButtonLeaf(min,max,step) = GtkSpinButtonLeaf(
     ccall((:gtk_spin_button_new_with_range,libgtk),Ptr{GObject},(Cdouble,Cdouble,Cdouble),min,max,step))
-GtkSpinButton_new(scale::Ranges) = GtkSpinButton_new(minimum(scale),maximum(scale),step(scale))
+GtkSpinButtonLeaf(scale::Ranges) = GtkSpinButtonLeaf(minimum(scale),maximum(scale),step(scale))
 
-GtkAdjustment_new(spinButton::GtkSpinButton) = convert(GtkAdjustment_new,
+GtkAdjustmentLeaf(spinButton::GtkSpinButton) = convert(GtkAdjustmentLeaf,
     ccall((:gtk_spin_button_get_adjustment,libgtk),Ptr{GObject},(Ptr{GObject},), spinButton))
     
 @Giface GtkEditable Gtk.libgtk gtk_editable

@@ -47,34 +47,36 @@ There is also a more [detailed description](doc/usage.md) in tutorial style, as 
 
 Gtk object can be referenced by their Gtk names (which almost always have a name like `GtkWindow`), or their "short name" (which is generally just the Gtk name without the "Gtk", for example, `Window`). You can call `using Gtk` to import the regular names, or `using Gtk.ShortNames` to import the shorter names. You can also call `import Gtk`, and then access either the regular or short names (e.g. `Gtk.Window` or `Gtk.GtkWindow`).
 
-The concrete types are the Gtk object name with a suffix of `Leaf` appended (to remind the user that this is a "leaf" in the Julia type-tree). For example, to refer to the concrete `GtkWindow` type, the user would write `Gtk.GtkWindowLeaf`. These are not exported because the user should rarely need to reference them directly. However, you are likely to come across this nomenclature, because it is part of how a GObject is represented when printed in the terminal.
+The concrete types are the Gtk object name with a suffix of `Leaf` appended (to remind the user that this is a "leaf" in the Julia type-tree). For example, to refer to the concrete `GtkWindow` type, the user would write `Gtk.GtkWindowLeaf`.
 
-### Constructing a Gtk.Object_new
+### Constructing a Gtk.@Object
 
-Gtk object constructors (by convention), are the name of the Gtk object (interface) name, with a suffix of `_new` appended. For example, to construct a new window, the user would invoke `Gtk.Window_new()`.
+Gtk object constructors (by convention), are the name of the Gtk object (interface) name, with a suffix of `Leaf` appended. For example, to construct a new window, the user would invoke `Gtk.WindowLeaf()`.
+
+Alternatively, the user can use the macro form of the widget name to construct a new `GObject`, as shown in the example below.
 
 All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding `setproperty!` method (see below).
 
-    w = GtkWindow_new(title="Hello World")
+    w = @GtkWindow(title="Hello World")
 
 ### Objects are containers for their [child_elements...]
 
 All objects in Gtk are intended to behave uniformly. This means that all objects will try to act as container objects for whatever they 'contain'. Indexing into an object (by number), or iterating the object will return a list of its contents or child objects. This also means that constructors are called with information on the elements that they contain. For example, when you create a button, you can specify either the embedded text or another widget!
 
-    Gtk.Button_new("This is a button")
-    Gtk.Button_new(Gtk.Label_new("Click me"))
+    Gtk.@Button("This is a button")
+    Gtk.@Button(Gtk.@Label("Click me"))
 
-On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a `GtkContainer`. Of special note is the anti-object `GtkNullContainer_new` or simply `Null_new`. This is not actually a `GObject`. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although standard operations like `splice!` and `delete!` also exist, and are typically preferable for readability).
+On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a `GtkContainer`. Of special note is the anti-object `GtkNullContainer` or simply `Null`. This is not actually a `GObject`. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although standard operations like `splice!` and `delete!` also exist, and are typically preferable for readability).
 
 The optimal pattern for creating objects generally depends upon the usage. However, you may find the following pattern useful for creating layout hierarchies:
 
-    w=Gtk.Window_new() |>
-        (f=Gtk.Box_new(:h) |>
-            (b=Gtk.Button_new("1")) |>
-            (c=Gtk.Button_new("2")) |>
-            (f2=Gtk.Box_new(:v) |>
-                Gtk.Label_new("3") |>
-                Gtk.Label_new("4"))) |>
+    w=Gtk.@Window() |>
+        (f=Gtk.@Box(:h) |>
+            (b=Gtk.@Button("1")) |>
+            (c=Gtk.@Button("2")) |>
+            (f2=Gtk.@Box(:v) |>
+                Gtk.@Label("3") |>
+                Gtk.@Label("4"))) |>
         showall
 
 ### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
@@ -87,7 +89,7 @@ When retrieving a property, you must specify the output type. Specifying the inp
 
 Some Examples:
 
-    w = GtkWindow_new("Title")
+    w = @GtkWindow("Title")
     show(STDOUT, w) # without the STDOUT parameter, show(w) would
                     # make the window visible on the screen, instead
                     # of printing the information in the REPL
@@ -150,7 +152,7 @@ Note: the return type and argument types do not need to match the spec. However,
 
     > warning: this API has not been completely finalized
     > warning: this API uses 0-based indexing
-    > note: this API will be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
+    > note: this API will likely be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
 
 ``Gtk._`` (not exported), ``Gtk.G_`` (exported by `Gtk.ShortNames`), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the `GObject`'s. The difference between a get and set method is based upon the number of arguments.
 
@@ -244,7 +246,7 @@ You can subclass an existing Gtk type in Julia using the following code pattern:
         handle::Ptr{Gtk.GObject}
         other_fields
         function MyWidget(label)
-            btn = GtkButton_new(label)
+            btn = @GtkButton(label)
             Gtk.gc_move_ref(new(btn), btn)
         end
     end

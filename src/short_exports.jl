@@ -39,6 +39,7 @@ const MenuItem = GtkMenuItem
 const MenuToolButton = GtkMenuToolButton
 const MessageDialog = GtkMessageDialog
 const Notebook = GtkNotebook
+const Null = GtkNullContainer
 const Overlay = GtkOverlay
 const Paned = GtkPaned
 const Pixbuf = GdkPixbuf
@@ -112,6 +113,7 @@ export G_, GObject,
     MenuToolButton,
     MessageDialog,
     Notebook,
+    Null,
     Overlay,
     Paned,
     Pixbuf,

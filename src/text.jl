@@ -14,25 +14,25 @@
 #TODO: GtkAccel manager objects
 
 @gtktype GtkLabel
-GtkLabel_new(title) = GtkLabel_new(
+GtkLabelLeaf(title) = GtkLabelLeaf(
     ccall((:gtk_label_new,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(title)))
 
 @gtktype GtkTextBuffer
-GtkTextBuffer_new() = GtkTextBuffer_new(
+GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
 
 @gtktype GtkTextView
-GtkTextView_new(buffer::GtkTextBuffer=GtkTextBuffer()) = GtkTextView_new(
+GtkTextViewLeaf(buffer::GtkTextBuffer=GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 
 @gtktype GtkTextMark
-GtkTextMark_new(left_gravity::Bool=false) = GtkTextMark_new(
+GtkTextMarkLeaf(left_gravity::Bool=false) = GtkTextMarkLeaf(
     ccall((:gtk_text_mark_new,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),C_NULL,left_gravity))
 
 @gtktype GtkTextTag
-GtkTextTag_new() = GtkTextTag_new(
+GtkTextTagLeaf() = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{Uint8},),C_NULL))
-GtkTextTag_new(name::String) = GtkTextTag_new(
+GtkTextTagLeaf(name::String) = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(name)))
 
 immutable GtkTextIter

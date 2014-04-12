@@ -13,10 +13,20 @@ function gen_g_type_lists(gtk_h)
     boxes = (Symbol,Expr)[]
     gpointers = (Symbol,Expr)[]
     for tdecl in tdecls
-        sdecl = cindex.getTypeDeclaration(cindex.getCanonicalType(
-            cindex.getTypedefDeclUnderlyingType(tdecl)))
-        #isa(sdecl, cindex.StructDecl) || continue
-        typname = symbol(cindex.spelling(tdecl))
+        ty = cindex.getTypedefDeclUnderlyingType(tdecl)
+        if isa(ty,cindex.Pointer)
+            ty = cindex.getPointeeType(ty)
+            isptr = true
+        else
+            isptr = false
+        end
+        sdecl = cindex.getTypeDeclaration(cindex.getCanonicalType(ty))
+        isa(sdecl, cindex.StructDecl) || continue
+        typname = cindex.spelling(tdecl)
+        if endswith(typname,"Iface")||endswith(typname,"Class")||endswith(typname,"Private")
+            continue
+        end
+        typname = symbol(typname)
         header_file = cindex.cu_file(tdecl)
         libname = get(gtklibname,basename(splitdir(header_file)[1]),nothing)
         libname == nothing && continue
@@ -35,8 +45,9 @@ function gen_g_type_lists(gtk_h)
             end
         end
         if g_isa(gtyp, g_type_from_name(:GInterface))
+            @assert !isptr
             push!(ifaces,(typname, :(@Giface $typname $libname $symname)))
-        elseif g_isa(gtyp, g_type_from_name(:GBoxed))
+        elseif gtyp == 0 || g_isa(gtyp, g_type_from_name(:GBoxed))
             unref_fn = symbol(string(symname,:_free))
             has_ref_fn = false
             if get_fn_ptr(unref_fn, libname) == C_NULL
@@ -53,7 +64,7 @@ function gen_g_type_lists(gtk_h)
             else
                 ref_fn = nothing
             end
-            if length(cindex.children(sdecl)) == 0 || has_ref_fn
+            if length(cindex.children(sdecl)) == 0 || has_ref_fn || isptr
                 # Opaque box
                 if unref_fn === nothing
                     println("WARNING: couldn't detect gc characteristics of $symname")
@@ -99,8 +110,10 @@ function gen_g_type_lists(gtk_h)
                 end
             end
         elseif g_isa(gtyp, g_type(GObject))
+            @assert !isptr
             push!(leafs,(typname, :(@Gtype $typname $libname $symname)))
         else
+            if isptr; typname = "Ptr{$typname}" end
             println("WARNING: skipping $typname struct of unknown type")
         end
     end
