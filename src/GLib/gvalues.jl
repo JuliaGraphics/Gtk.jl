@@ -1,7 +1,7 @@
 ### Getting and Setting Properties
 
 immutable GValue
-    g_type::Csize_t
+    g_type::GType
     field2::Uint64
     field3::Uint64
     GValue() = new(0,0,0)
@@ -49,9 +49,10 @@ getindex(v::GV,i::Int, ::Type{Void}) = nothing
 #let
 #global make_gvalue, getindex
 function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,fundamental::Bool=false)
+    with_id === :error && return
     if isa(with_id,Tuple)
         with_id = with_id::(Symbol,Any)
-        with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),Int,()))
+        with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
     if pass_x !== None
         eval(current_module(),quote
@@ -106,6 +107,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(),:(()->$with_id)), fn])
         return fn
     end
+    return nothing
 end
 const gvalue_types = {}
 const fundamental_fns = tuple(Function[make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true) for
@@ -129,13 +131,13 @@ function getindex(gv::GV, ::Type{Any})
     end
     # second pass: user defined (sub)types
     for (typ, typefn, getfn) in gvalue_types
-        if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,typefn())) # if gtyp <: expr()
+        if g_isa(gtyp, typefn())
             return getfn(gv)
         end
     end
     # last pass: check for derived fundamental types (which have not been overridden by the user)
     for (i,id) in enumerate(fundamental_ids)
-        if bool(ccall((:g_type_is_a,libgobject),Cint,(Int,Int),gtyp,id)) # if gtyp <: id
+        if g_isa(gtyp,id)
             return fundamental_fns[i](gv)
         end
     end
@@ -144,7 +146,7 @@ function getindex(gv::GV, ::Type{Any})
 end
 #end
 
-function getproperty{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
+function getproperty{T}(w::GObject, name::StringLike, ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
@@ -154,21 +156,21 @@ function getproperty{T}(w::GObject, name::Union(String,Symbol), ::Type{T})
 end
 
 
-setproperty!{T}(w::GObject, name::Union(String,Symbol), ::Type{T}, value) = setproperty!(w, name, convert(T,value))
-function setproperty!(w::GObject, name::Union(String,Symbol), value)
+setproperty!{T}(w::GObject, name::StringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
+function setproperty!(w::GObject, name::StringLike, value)
     ccall((:g_object_set_property, libgobject), Void,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
     w
 end
 
-@deprecate getindex(w::GObject, name::Union(String,Symbol), T::Type) getproperty(w,name,T)
-@deprecate setindex!(w::GObject, value, name::Union(String,Symbol), T::Type) setproperty!(w,name,T,value)
-@deprecate setindex!(w::GObject, value, name::Union(String,Symbol)) setproperty!(w,name,value)
+@deprecate getindex(w::GObject, name::StringLike, T::Type) getproperty(w,name,T)
+@deprecate setindex!(w::GObject, value, name::StringLike, T::Type) setproperty!(w,name,T,value)
+@deprecate setindex!(w::GObject, value, name::StringLike) setproperty!(w,name,value)
 
 
 function show(io::IO, w::GObject)
     print(io,typeof(w),'(')
-    if convert(Ptr{GObjectI},w) == C_NULL
+    if convert(Ptr{GObject},w) == C_NULL
         print(io,"<NULL>)")
         return
     end

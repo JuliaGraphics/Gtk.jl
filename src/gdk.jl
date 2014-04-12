@@ -15,7 +15,7 @@ immutable GdkPoint
 end
 # GdkPoint is not a GBoxed type
 
-gdk_window(w::GtkWidgetI) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
+gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
 baremodule GdkKeySyms
   const VoidSymbol = 0xffffff
@@ -68,9 +68,9 @@ baremodule GdkKeySyms
   const Hyper_R = 0xffee
 end
 
-abstract GdkEventI
-make_gvalue(GdkEventI, Ptr{GdkEventI}, :boxed, (:gdk_event,:libgdk))
-function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
+abstract GdkEvent
+make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event,:libgdk))
+function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     e = unsafe_load(convert(Ptr{GdkEventAny},evt))
     if     e.event_type == GdkEventType.KEY_PRESS ||
            e.event_type == GdkEventType.KEY_RELEASE
@@ -92,13 +92,13 @@ function convert(::Type{GdkEventI}, evt::Ptr{GdkEventI})
     end
 end
 
-immutable GdkEventAny <: GdkEventI
+immutable GdkEventAny <: GdkEvent
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
 end
 
-immutable GdkEventButton <: GdkEventI
+immutable GdkEventButton <: GdkEvent
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -113,7 +113,7 @@ immutable GdkEventButton <: GdkEventI
     y_root::Float64
 end
 
-immutable GdkEventScroll <: GdkEventI
+immutable GdkEventScroll <: GdkEvent
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -129,7 +129,7 @@ immutable GdkEventScroll <: GdkEventI
     delta_y::Float64
 end
 
-immutable GdkEventKey <: GdkEventI
+immutable GdkEventKey <: GdkEvent
     event_type::Enum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -145,7 +145,7 @@ end
 
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
-immutable GdkEventMotion <: GdkEventI
+immutable GdkEventMotion <: GdkEvent
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -160,7 +160,7 @@ immutable GdkEventMotion <: GdkEventI
   y_root::Float64
 end
 
-immutable GdkEventCrossing <: GdkEventI
+immutable GdkEventCrossing <: GdkEvent
   event_type::Enum
   gdk_window::Ptr{Void}
   send_event::Int8

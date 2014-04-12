@@ -16,7 +16,7 @@ function gtk_doevent()
     end
 end
 
-function init()
+function __init__()
     GError() do error_check
         ccall((:gtk_init_with_args,libgtk), Bool,
             (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
@@ -27,17 +27,17 @@ function init()
     Base.start_timer(timeout,.1,.005)
 end
 
-add_events(widget::GtkWidgetI, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Enum),widget,mask)
+add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Enum),widget,mask)
 
 # widget[:event] = function(ptr, obj)
 #    stuff
 # end
-#function setindex!(w::GObject,cb::Function,sig::Union(String,Symbol),vargs...)
+#function setindex!(w::GObject,cb::Function,sig::StringLike,vargs...)
 #    signal_connect(cb,w,sig,vargs...)
 #end
 
 
-function on_signal_resize(resize_cb::Function, widget::GtkWidgetI, vargs...)
+function on_signal_resize(resize_cb::Function, widget::GtkWidget, vargs...)
     signal_connect(resize_cb, widget, "size-allocate", Void, (Ptr{GdkRectangle},), vargs...)
 end
 
@@ -45,11 +45,11 @@ function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
     signal_connect(destroy_cb, widget, "destroy", Void, (), vargs...)
 end
 
-function on_signal_button_press(press_cb::Function, widget::GtkWidgetI, vargs...)
+function on_signal_button_press(press_cb::Function, widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_PRESS)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
-function on_signal_button_release(release_cb::Function, widget::GtkWidgetI, vargs...)
+function on_signal_button_release(release_cb::Function, widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_RELEASE)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
@@ -71,7 +71,7 @@ function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gt
     ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
-function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
+function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
         include=0, exclude=GdkModifierType.BUTTONS, after::Bool=false, closure::T=w)
     exclude &= ~include
     mask = GdkEventMask.POINTER_MOTION_HINT
@@ -97,7 +97,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidgetI,
     signal_connect(notify_motion, widget, "motion-notify-event", Cint, (Ptr{GdkEventMotion},), after, closure)
 end
 
-function reveal(c::GtkWidgetI, immediate::Bool=true)
+function reveal(c::GtkWidget, immediate::Bool=true)
     #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&allocation(c))
     #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
     #    gdk_window(c), region, true)
@@ -118,7 +118,7 @@ type MouseHandler
     button3release::Function
     motion::Function
     button1motion::Function
-    widget::GtkWidgetI
+    widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
