@@ -16,14 +16,14 @@ In addition to this expository document, there is a [property/hierarchy browser]
 
 A new window can be created as
 ```
-win = Window("My window")
+win = @Window("My window")
 ```
 
 ![window](figures/mywindow.png)
 
 You can optionally specify its width, height, whether it should be resizable, and whether it is a "toplevel" window or a "popup":
 ```
-popup = Window("SomeDialog", 400, 200, false, false)
+popup = @Window("SomeDialog", 400, 200, false, false)
 ```
 would create a fixed-size popup window (which, among other things, does not have any decorations).
 
@@ -37,7 +37,7 @@ destroy(popup)
 
 If you're following along, you probably noticed that creating `win` caused quite a lot of output:
 ```
-GtkWindow(name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=FALSE, has-focus=FALSE, is-focus=FALSE, can-default=FALSE, has-default=FALSE, receives-default=FALSE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_QUEUE, child, type=GTK_WINDOW_TOPLEVEL, title="My window", role=NULL, resizable=TRUE, modal=FALSE, window-position=GTK_WIN_POS_NONE, default-width=-1, default-height=-1, destroy-with-parent=FALSE, hide-titlebar-when-maximized=FALSE, icon, icon-name=NULL, screen, type-hint=GDK_WINDOW_TYPE_HINT_NORMAL, skip-taskbar-hint=FALSE, skip-pager-hint=FALSE, urgency-hint=FALSE, accept-focus=TRUE, focus-on-map=TRUE, decorated=TRUE, deletable=TRUE, gravity=GDK_GRAVITY_NORTH_WEST, transient-for, attached-to, opacity=1.000000, has-resize-grip=TRUE, resize-grip-visible=TRUE, application, ubuntu-no-proxy=FALSE, is-active=FALSE, has-toplevel-focus=FALSE, startup-id, mnemonics-visible=TRUE, focus-visible=TRUE, )
+@GtkWindow(name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=FALSE, has-focus=FALSE, is-focus=FALSE, can-default=FALSE, has-default=FALSE, receives-default=FALSE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_QUEUE, child, type=GTK_WINDOW_TOPLEVEL, title="My window", role=NULL, resizable=TRUE, modal=FALSE, window-position=GTK_WIN_POS_NONE, default-width=-1, default-height=-1, destroy-with-parent=FALSE, hide-titlebar-when-maximized=FALSE, icon, icon-name=NULL, screen, type-hint=GDK_WINDOW_TYPE_HINT_NORMAL, skip-taskbar-hint=FALSE, skip-pager-hint=FALSE, urgency-hint=FALSE, accept-focus=TRUE, focus-on-map=TRUE, decorated=TRUE, deletable=TRUE, gravity=GDK_GRAVITY_NORTH_WEST, transient-for, attached-to, opacity=1.000000, has-resize-grip=TRUE, resize-grip-visible=TRUE, application, ubuntu-no-proxy=FALSE, is-active=FALSE, has-toplevel-focus=FALSE, startup-id, mnemonics-visible=TRUE, focus-visible=TRUE, )
 ```
 This shows you a list of properties of the object. For example, notice that the `title` property is set to `"My window"`. We can change the title in the following way:
 ```
@@ -84,7 +84,7 @@ Many widgets in Gtk can act as containers: for example, windows contain other wi
 
 For example, let's add a frame:
 ```
-f = Frame("A frame")
+f = @Frame("A frame")
 ```
 If you check your window, you won't see anything. That's because the frame has not yet been associated with any container. Let's do that and see what happens:
 ```
@@ -95,7 +95,7 @@ push!(win, f)
 
 Let's add a button:
 ```
-ok = Button("OK")
+ok = @Button("OK")
 push!(f, ok)
 ```
 
@@ -109,9 +109,9 @@ delete!(f, ok)
 
 "Container" objects can also be initialized to contain a child:
 ```
-ok = Button("OK")
-frame = Frame(ok, "A frame")
-win = Window(frame, "My window")
+ok = @Button("OK")
+frame = @Frame(ok, "A frame")
+win = @Window(frame, "My window")
 ```
 This only works to add a single (or the first) child of a container.
 
@@ -121,9 +121,9 @@ A frame can contain only one child widget. If we want several buttons inside the
 
 To support multiple buttons, let's add a box and then fill it with two buttons:
 ```
-hbox = BoxLayout(:h)  # :h makes a horizontal layout, :v a vertical layout
+hbox = @BoxLayout(:h)  # :h makes a horizontal layout, :v a vertical layout
 push!(f, hbox)
-cancel = Button("Cancel")
+cancel = @Button("Cancel")
 push!(hbox, cancel)
 push!(hbox, ok)
 ```
@@ -155,9 +155,9 @@ Note that these aren't evenly-sized, and that doesn't change if we set the `canc
 
 ```
 destroy(hbox)
-ok = Button("OK")
-cancel = Button("Cancel")
-hbox = ButtonBox(:h)
+ok = @Button("OK")
+cancel = @Button("Cancel")
+hbox = @ButtonBox(:h)
 push!(f, hbox)
 push!(hbox, cancel)
 push!(hbox, ok)
@@ -171,12 +171,12 @@ which may be closer to what you had in mind.
 
 More generally, you can arrange items in a grid:
 ```
-win = Window("A new window")
-g = Grid()   # gtk3-only (use Table() for gtk2)
-a = Entry()  # a widget for entering text
+win = @Window("A new window")
+g = @Grid()   # gtk3-only (use @Table() for gtk2)
+a = @Entry()  # a widget for entering text
 setproperty!(a, :text, "This is Gtk!")
-b = CheckButton("Check me!")
-c = Scale(false, 0:10)     # a slider
+b = @CheckButton("Check me!")
+c = @Scale(false, 0:10)     # a slider
 # Now let's place these graphical elements into the Grid:
 g[1,1] = a    # cartesian coordinates, g[x,y]
 g[2,1] = b
@@ -222,8 +222,8 @@ to make something happen.
 
 Let's do a simple example:
 ```
-b = Button("Press me")
-win = Window(b, "Callbacks")
+b = @Button("Press me")
+win = @Window(b, "Callbacks")
 id = signal_connect(b, "clicked") do widget
     println(widget, " was clicked!")
 end
@@ -265,8 +265,8 @@ Alternatively, you can temporarily enable or disable individual handlers with `s
 The arguments of the callback depend on the signal type.
 For example, instead of using the `"clicked"` signal---for which the Julia handler should be defined with just a single argument---we could have used `"button-press-event"`:
 ```
-b = Button("Pick a mouse button")
-win = Window(b, "Callbacks")
+b = @Button("Pick a mouse button")
+win = @Window(b, "Callbacks")
 id = signal_connect(b, "button-press-event") do widget, event
     println("You pressed button ", event.button)
 end
@@ -301,8 +301,8 @@ If you examine the `Scale`'s [properties](https://developer.gnome.org/gtk3/stabl
 you might be surprised to not see any that deal with its value or range of acceptable values.
 This is because a `Scale` contains another more basic type, `Adjustment`, responsible for holding these properties:
 ```
-sc = Scale(false,0:10)   # range in integer steps, from 0 to 10
-adj = Adjustment(sc)
+sc = @Scale(false,0:10)   # range in integer steps, from 0 to 10
+adj = @Adjustment(sc)
 setproperty!(adj,:upper,11)         # now this scale goes to 11!
 setproperty!(adj,:value,7)
 win = Window(sc,"Scale")
@@ -314,28 +314,28 @@ win = Window(sc,"Scale")
 In Gtk, the core element is the `MenuItem`.
 Let's say we want to create a file menu; we might begin by creating the item:
 ```
-file = MenuItem("_File")
+file = @MenuItem("_File")
 ```
 The underscore in front of the "F" means that we will be able to select this item using `Alt+F`.
 The file menu will have items inside of it, of course, so let's create a submenu associated with this item:
 ```
-filemenu = Menu(file)
+filemenu = @Menu(file)
 ```
 Now let's populate it with entries:
 ```
-new_ = MenuItem("New")
+new_ = @MenuItem("New")
 push!(filemenu, new_)
-open_ = MenuItem("Open")
+open_ = @MenuItem("Open")
 push!(filemenu, open_)
-push!(filemenu, SeparatorMenuItem())
-quit = MenuItem("Quit")
+push!(filemenu, @SeparatorMenuItem())
+quit = @MenuItem("Quit")
 push!(filemenu, quit)
 ```
 Finally, let's place our file item inside another type of menu, the `MenuBar`:
 ```
-mb = MenuBar()
+mb = @MenuBar()
 push!(mb, file)  # notice this is the "File" item, not filemenu
-win = Window(mb, "Menus", 200, 40)
+win = @Window(mb, "Menus", 200, 40)
 ```
 ![menu](figures/menu.png)
 
@@ -345,8 +345,8 @@ Generic drawing is done on a `Canvas`. You control what appears on this canvas b
 
 ```
 using Gtk.ShortNames, Base.Graphics
-c = Canvas()
-win = Window(c, "Canvas")
+c = @Canvas()
+win = @Window(c, "Canvas")
 draw(c) do widget
     ctx = getgc(c)
     h = height(c)

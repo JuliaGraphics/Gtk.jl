@@ -160,9 +160,9 @@ Note: the return type and argument types do not need to match the spec. However,
 
 Example usage:
 
-    bytestring(Gtk._.title(Window_new("my title")))
-    G_.title(Window_new("my title"), "my new title")
-    GAccessor.size(Window_new("what size?"))
+    bytestring(Gtk._.title(WindowLeaf("my title")))
+    G_.title(WindowLeaf("my title"), "my new title")
+    GAccessor.size(WindowLeaf("what size?"))
 
 Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.
 
@@ -176,7 +176,7 @@ Note that because these are auto-generated, you will often need to do your own g
     .  .  .  +- GtkTextRange
     .  +- GError
     .  +- GObject
-    .  .  +- GObject_new{Name}
+    .  .  +- GObjectLeaf{Name}
     .  .  +- GdkPixbuf
     .  .  +- GtkStatusIcon
     .  .  +- GtkTextBuffer
