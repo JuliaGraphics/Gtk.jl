@@ -28,7 +28,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
 end
 const GtkCanvasLeaf = GtkCanvas
 macro GtkCanvas(args...)
-    :( GtkCanvas($(args...)) )
+    :( GtkCanvas($(map(esc,args)...)) )
 end
 
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)

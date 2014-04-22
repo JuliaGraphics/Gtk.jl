@@ -62,7 +62,7 @@ GtkRadioButtonLeaf(group::GtkRadioButton,label::String) =
 GtkRadioButtonLeaf(group::GtkRadioButton,child::GtkWidget,vargs...) =
     push!(GtkRadioButtonLeaf(group,vargs...), child)
 
-type GtkRadioButtonGroupLeaf <: GtkContainer # NOT a native @gtktype
+type GtkRadioButtonGroup <: GtkContainer # NOT a native @gtktype
     # when iterating/indexing elements will be in reverse / *random* order
 
     # the behavior is specified as undefined if the first
@@ -70,25 +70,28 @@ type GtkRadioButtonGroupLeaf <: GtkContainer # NOT a native @gtktype
     # do not rely on the current behavior, since it may change
     handle::GtkContainer
     anchor::GtkRadioButton
-    GtkRadioButtonGroupLeaf(layout::GtkContainer) = new(layout)
+    GtkRadioButtonGroup(layout::GtkContainer) = new(layout)
 end
-const GtkRadioButtonGroup_new = GtkRadioButtonGroupLeaf
-GtkRadioButtonGroupLeaf() = GtkRadioButtonGroupLeaf(GtkBoxLeaf(true))
-function GtkRadioButtonGroupLeaf(elem::Vector, active::Int=1)
-    grp = GtkRadioButtonGroupLeaf()
+const GtkRadioButtonGroupLeaf = GtkRadioButtonGroup
+macro GtkRadioButtonGroup(args...)
+    :( GtkRadioButtonGroup($(map(esc,args)...)) )
+end
+GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBoxLeaf(true))
+function GtkRadioButtonGroup(elem::Vector, active::Int=1)
+    grp = GtkRadioButtonGroup()
     for (i,e) in enumerate(elem)
         push!(grp, e, i==active)
     end
     grp
 end
-convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroup_new) = convert(Ptr{GObject},grp.handle)
-show(io::IO,::GtkRadioButtonGroupLeaf) = print(io,"GtkRadioButtonGroupLeaf()")
-function push!(grp::GtkRadioButtonGroup_new,e::GtkRadioButton,active::Bool)
+convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroup) = convert(Ptr{GObject},grp.handle)
+show(io::IO,::GtkRadioButtonGroup) = print(io,"GtkRadioButtonGroup()")
+function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton,active::Bool)
     push!(grp, e)
     gtk_toggle_button_set_active(e, active)
     grp
 end
-function push!(grp::GtkRadioButtonGroup_new,e::GtkRadioButton)
+function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     if isdefined(grp,:anchor)
         setproperty!(e,:group,grp.anchor)
     else
@@ -97,7 +100,7 @@ function push!(grp::GtkRadioButtonGroup_new,e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup_new,label,active::Union(Bool,Nothing)=nothing)
+function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothing)
     if isdefined(grp,:anchor)
         e = GtkRadioButtonLeaf(grp.anchor, label)
     else
@@ -109,7 +112,7 @@ function push!(grp::GtkRadioButtonGroup_new,label,active::Union(Bool,Nothing)=no
     push!(grp.handle, e)
     grp
 end
-function start(grp::GtkRadioButtonGroup_new)
+function start(grp::GtkRadioButtonGroup)
     if isempty(grp)
         list = convert(Ptr{_GList{GtkRadioButton}},C_NULL)
     else
@@ -118,12 +121,12 @@ function start(grp::GtkRadioButtonGroup_new)
     end
     list
 end
-next(w::GtkRadioButtonGroup_new,s) = next(s,s)
-done(w::GtkRadioButtonGroup_new,s) = done(s,s)
-length(w::GtkRadioButtonGroup_new) = length(start(w))
-getindex!(w::GtkRadioButtonGroup_new, i::Integer) = convert(GtkRadioButton,start(w)[i])
-isempty(grp::GtkRadioButtonGroup_new) = !isdefined(grp,:anchor)
-function getproperty(grp::GtkRadioButtonGroup_new,name::StringLike)
+next(w::GtkRadioButtonGroup,s) = next(s,s)
+done(w::GtkRadioButtonGroup,s) = done(s,s)
+length(w::GtkRadioButtonGroup) = length(start(w))
+getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
+isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
+function getproperty(grp::GtkRadioButtonGroup,name::StringLike)
     k = symbol(name)
     if k == :active
         for b in grp
@@ -133,7 +136,7 @@ function getproperty(grp::GtkRadioButtonGroup_new,name::StringLike)
         end
         error("no active elements in GtkRadioGroup")
     end
-    error("GtkRadioButtonGroup_new has no property $name")
+    error("GtkRadioButtonGroup has no property $name")
 end
 
 function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)

@@ -333,7 +333,10 @@ function gc_ref{T<:GObject}(x::T)
     addref = function()
         ccall((:g_object_ref_sink,libgobject),Ptr{GObject},(Ptr{GObject},),x)
         finalizer(x,function(x)
-                global gc_preserve_gtk
+                global gc_preserve_gtk, exiting
+                if exiting
+                    return # unnecessary to cleanup if we are about to die anyways
+                end
                 if x.handle != C_NULL
                     gc_preserve_gtk[x] = x # convert to a strong-reference
                     ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x) # may clear the strong reference

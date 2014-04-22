@@ -8,6 +8,8 @@ function __init__()
         closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
     end
     ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
+    global exiting = false
+    atexit(()->global exiting = true)
 end
 
 # id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
