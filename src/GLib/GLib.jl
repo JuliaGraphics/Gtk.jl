@@ -19,6 +19,10 @@ bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own))
 
+if VERSION < v"0.3-"
+    QuoteNode(x) = Base.qn(x)
+end
+
 function concrete_subtypes(T::DataType...)
     queue = [T...]
     subt = Set{DataType}()

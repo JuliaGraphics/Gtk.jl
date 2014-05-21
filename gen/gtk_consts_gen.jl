@@ -50,10 +50,11 @@ function gen_consts(body, gtk_h)
                 else
                     shortdecl = decl[lprefix:end]
                 end
+                jldecl = Expr(:const, Expr(:(=), symbol(decl), Expr(:call, :(Main.Base.int32), cindex.value(child))))
                 if ismatch(r"^[A-Za-z]", shortdecl)
-                    push!(consts.args, Expr(:const, Expr(:(=), symbol(shortdecl), Expr(:const, Expr(:(=), symbol(decl), cindex.value(child))))))
+                    push!(consts.args, Expr(:const, Expr(:(=), symbol(shortdecl), jldecl)))
                 else
-                    push!(consts.args, Expr(:const, Expr(:(=), symbol(decl), cindex.value(child))))
+                    push!(consts.args, jldecl)
                 end
             end
             if name == :GdkModifierType

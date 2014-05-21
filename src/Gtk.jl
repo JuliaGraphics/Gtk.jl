@@ -13,6 +13,9 @@ import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     signal_emit
+if VERSION < v"0.3-"
+    QuoteNode(x) = Base.qn(x)
+end
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!,
              start, next, done, parent, isempty, empty!, first, last, in,
@@ -87,7 +90,8 @@ module ShortNames
     import ..GLib:
         signal_connect, signal_handler_disconnect,
         signal_handler_block, signal_handler_unblock,
-        signal_emit, @g_type_delegate
+        signal_emit
+    import ..GLib.@g_type_delegate
     import ..Gtk: suffix
     export Gtk
     include("basic_exports.jl")
@@ -95,5 +99,8 @@ module ShortNames
     include("short_leaf_exports.jl")
 end
 using .ShortNames
-
+if VERSION < v"0.3-"
+  GLib.__init__()
+  Gtk.__init__()
+end
 end

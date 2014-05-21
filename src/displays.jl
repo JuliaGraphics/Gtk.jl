@@ -9,12 +9,14 @@
 
 immutable RGB
     r::Uint8; g::Uint8; b::Uint8
+    RGB(r,g,b) = new(r,g,b)
 end
 convert(::Type{RGB},x::Unsigned) = RGB(uint8(x),uint8(x>>8),uint8(x>>16))
 convert{U<:Unsigned}(::Type{U},x::RGB) = convert(U,(x.r)|(x.g>>8)|(x.b>>16))
 
 immutable RGBA
     r::Uint8; g::Uint8; b::Uint8; a::Uint8
+    RGBA(r,g,b) = new(r,g,b)
 end
 convert(::Type{RGBA},x::Unsigned) = RGBA(uint8(x),uint8(x>>8),uint8(x>>16),uint8(x>>24))
 convert{U<:Unsigned}(::Type{U},x::RGBA) = convert(U,(x.r)|(x.g>>8)|(x.b>>16)|(x.a>>24))
