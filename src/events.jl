@@ -1,6 +1,6 @@
 
-gtk_doevent(timer,::Int32) = gtk_doevent()
-function gtk_doevent()
+gtk_doevent(timer,::Int32) = gtk_doevent(timer)
+function gtk_doevent(timer=nothing)
     try
         while (ccall((:gtk_events_pending,libgtk), Cint, ())) == true
             #println("event! $(time())")
