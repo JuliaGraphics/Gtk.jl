@@ -37,7 +37,7 @@ destroy(popup)
 
 If you're following along, you probably noticed that creating `win` caused quite a lot of output:
 ```
-@GtkWindow(name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=FALSE, has-focus=FALSE, is-focus=FALSE, can-default=FALSE, has-default=FALSE, receives-default=FALSE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_QUEUE, child, type=GTK_WINDOW_TOPLEVEL, title="My window", role=NULL, resizable=TRUE, modal=FALSE, window-position=GTK_WIN_POS_NONE, default-width=-1, default-height=-1, destroy-with-parent=FALSE, hide-titlebar-when-maximized=FALSE, icon, icon-name=NULL, screen, type-hint=GDK_WINDOW_TYPE_HINT_NORMAL, skip-taskbar-hint=FALSE, skip-pager-hint=FALSE, urgency-hint=FALSE, accept-focus=TRUE, focus-on-map=TRUE, decorated=TRUE, deletable=TRUE, gravity=GDK_GRAVITY_NORTH_WEST, transient-for, attached-to, opacity=1.000000, has-resize-grip=TRUE, resize-grip-visible=TRUE, application, ubuntu-no-proxy=FALSE, is-active=FALSE, has-toplevel-focus=FALSE, startup-id, mnemonics-visible=TRUE, focus-visible=TRUE, )
+GtkWindowLeaf(name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=FALSE, has-focus=FALSE, is-focus=FALSE, can-default=FALSE, has-default=FALSE, receives-default=FALSE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_QUEUE, child, type=GTK_WINDOW_TOPLEVEL, title="My window", role=NULL, resizable=TRUE, modal=FALSE, window-position=GTK_WIN_POS_NONE, default-width=-1, default-height=-1, destroy-with-parent=FALSE, hide-titlebar-when-maximized=FALSE, icon, icon-name=NULL, screen, type-hint=GDK_WINDOW_TYPE_HINT_NORMAL, skip-taskbar-hint=FALSE, skip-pager-hint=FALSE, urgency-hint=FALSE, accept-focus=TRUE, focus-on-map=TRUE, decorated=TRUE, deletable=TRUE, gravity=GDK_GRAVITY_NORTH_WEST, transient-for, attached-to, opacity=1.000000, has-resize-grip=TRUE, resize-grip-visible=TRUE, application, ubuntu-no-proxy=FALSE, is-active=FALSE, has-toplevel-focus=FALSE, startup-id, mnemonics-visible=TRUE, focus-visible=TRUE, )
 ```
 This shows you a list of properties of the object. For example, notice that the `title` property is set to `"My window"`. We can change the title in the following way:
 ```
@@ -89,14 +89,18 @@ f = @Frame("A frame")
 If you check your window, you won't see anything. That's because the frame has not yet been associated with any container. Let's do that and see what happens:
 ```
 push!(win, f)
+showall(win)
 ```
 
 ![window](figures/frame.png)
+
+Note the `showall`, which is required to get the display to update with your changes. In some of the examples below, we'll omit this step, but you should call `showall` any time you want to see the window in its current state.
 
 Let's add a button:
 ```
 ok = @Button("OK")
 push!(f, ok)
+showall(win)
 ```
 
 ![window](figures/okbutton.png)
@@ -121,11 +125,14 @@ A frame can contain only one child widget. If we want several buttons inside the
 
 To support multiple buttons, let's add a box and then fill it with two buttons:
 ```
-hbox = @Box(false)  # false makes a horizontal layout, true a vertical layout
+win = @Window("New title") |> (f = @Frame("A frame"))
+hbox = @Box(:h)  # :h makes a horizontal layout, :v a vertical layout
 push!(f, hbox)
 cancel = @Button("Cancel")
+ok = @Button("OK")
 push!(hbox, cancel)
 push!(hbox, ok)
+showall(win)
 ```
 You might see something like this:
 
@@ -139,7 +146,7 @@ julia> length(hbox)
 julia> getproperty(hbox[1], :label, String)
 "Cancel"
 
-julia> getproperty(hbox[2],:label,String)
+julia> getproperty(hbox[2], :label, String)
 "OK"
 ```
 
@@ -184,7 +191,7 @@ g[1:2,2] = c  # spans both columns
 setproperty!(g, :column_homogeneous, true) # setproperty!(g,:homogeoneous,true) for gtk2
 setproperty!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
 push!(win, g)
-showall(win)   # essential for indicating that it's time to show the layout
+showall(win)
 ```
 ![window](figures/grid.png)
 
@@ -200,7 +207,7 @@ but you can force them to be of the same size by setting properties like `column
 We can get the parent object:
 ```
 julia> parent(hbox)
-GtkFrame(name=...
+GtkFrameLeaf(name=...
 ```
 
 Calling `parent` on a top-level object yields an error, but you can check to see if the object has a parent using `hasparent`.
@@ -208,7 +215,7 @@ Calling `parent` on a top-level object yields an error, but you can check to see
 Likewise, it's possible to get the children:
 ```
 for child in hbox
-    println(setproperty!(child,:label,String))
+    println(getproperty(child,:label,String))
 end
 ```
 
@@ -305,7 +312,7 @@ sc = @Scale(false,0:10)   # range in integer steps, from 0 to 10
 adj = @Adjustment(sc)
 setproperty!(adj,:upper,11)         # now this scale goes to 11!
 setproperty!(adj,:value,7)
-win = Window(sc,"Scale")
+win = @Window(sc,"Scale")
 ```
 ![scale](figures/scale.png)
 
