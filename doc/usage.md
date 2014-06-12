@@ -121,7 +121,7 @@ A frame can contain only one child widget. If we want several buttons inside the
 
 To support multiple buttons, let's add a box and then fill it with two buttons:
 ```
-hbox = @BoxLayout(:h)  # :h makes a horizontal layout, :v a vertical layout
+hbox = @Box(false)  # false makes a horizontal layout, true a vertical layout
 push!(f, hbox)
 cancel = @Button("Cancel")
 push!(hbox, cancel)
