@@ -6,7 +6,7 @@ Not all of these are implemented as objects in this package, but you can still a
 *   [Widgets](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget.properties)
     *   [Containers](https://developer.gnome.org/gtk3/stable/GtkContainer.html#GtkContainer.properties)
         *   Multi-object containers:
-            *   [BoxLayout](https://developer.gnome.org/gtk3/stable/GtkBox.html#GtkBox.properties), a vertical or horizontal container
+            *   [Box](https://developer.gnome.org/gtk3/stable/GtkBox.html#GtkBox.properties), a vertical or horizontal container
             *   [Grid](https://developer.gnome.org/gtk3/stable/GtkGrid.html#GtkGrid.properties) (Gtk3 only), a 2d container
             *   [Table](https://developer.gnome.org/gtk3/stable/GtkTable.html#GtkTable.properties), a 2d container
             *   [Notebook](https://developer.gnome.org/gtk3/stable/GtkNotebook.html#GtkNotebook.properties), a tabbed container
