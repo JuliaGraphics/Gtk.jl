@@ -39,6 +39,27 @@ Try any of the following lines until something is successful:
 
 On some distributions you can also install a `devhelp` package to have a local copy of the Gtk documentation.
 
+## Precompilation
+
+Startup time for packages that use Gtk can be dramatically reduced by precompiling Gtk.
+For this to work, you need to be building Julia from source, and you need to be using
+at least Julia version 0.3.
+
+In your Julia `base/` directory, create (or append to) a file called `userimg.jl` the line
+
+    Base.require("Gtk")
+
+Then build Julia as you normally would; the Gtk module will be available when julia starts.
+
+In some cases, it might be necessary to add the library path, for example:
+
+    Base.push!(Base.DL_LOAD_PATH, "/usr/lib/x86_64-linux_gnu")
+    Base.require("Gtk")
+    Base.pop!(Base.DL_LOAD_PATH)
+
+The `"/usr/lib/x86_64-linux_gnu"` needs to be replaced with the location of the GTK libraries on your system.
+However, when the library is in a standard location, this step can be skipped.
+
 ## Overview
 
 This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
