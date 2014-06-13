@@ -167,6 +167,16 @@ Example usage:
 Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.
 
 
+### Constants
+
+Interaction with GTK sometimes requires constants, which are bundled into the `Gtk.GConstants` module.
+`GConstants` in turn contains modules corresponding to each GTK `enum` type.
+For example, constants corresponding to the [GdkEventMask](https://developer.gnome.org/gdk3/stable/gdk3-Events.html#GdkEventMask)
+are in `Gtk.GConstants.GdkEventMask`. Each constant can be referred to by its full Gtk name or by a shortened name,
+for example `GDK_KEY_PRESS_MASK` can also be used as `KEY_PRESS`. The rule for generating the shortened name is that
+any prefix common to the entire `enum` is stripped off, as well as any trailing `_MASK` if that ending is common to
+all elements in the enum.
+
 ## Gtk Object Tree
 
     +- Any
