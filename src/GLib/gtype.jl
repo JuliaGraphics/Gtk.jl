@@ -259,7 +259,6 @@ end
 macro quark_str(q)
     :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), bytestring($q)) )
 end
-const jlref_quark = quark"julia_ref"
 
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object
@@ -276,7 +275,7 @@ function convert{T<:GObject}(::Type{T}, hnd::Ptr{GObject})
     if hnd == C_NULL
         error("cannot convert null pointer to GObject")
     end
-    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark)
+    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark::Uint32)
     if x != C_NULL
         return unsafe_pointer_to_objref(x)::T
     end
@@ -350,7 +349,7 @@ function gc_ref{T<:GObject}(x::T)
     ref = get(gc_preserve_gtk,x,nothing)
     if isa(ref,Nothing)
         ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark, x,
+            (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark::Uint32, x,
             cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
         addref()
     elseif !isa(ref,WeakRef)
@@ -375,13 +374,13 @@ end
 function gc_unref(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
-    ref = ccall((:g_object_get_qdata,libgobject),Ptr{Void},(Ptr{GObject},Uint32),x,jlref_quark)
+    ref = ccall((:g_object_get_qdata,libgobject),Ptr{Void},(Ptr{GObject},Uint32),x,jlref_quark::Uint32)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
         ccall((:g_object_weak_ref,libgobject),Void,(Ptr{GObject},Ptr{Void},Any),x,cfunction(gc_unref_weak,Void,(typeof(x),)),x)
     else
-        ccall((:g_object_steal_qdata,libgobject),Any,(Ptr{GObject},Uint32),x,jlref_quark)
+        ccall((:g_object_steal_qdata,libgobject),Any,(Ptr{GObject},Uint32),x,jlref_quark::Uint32)
         gc_unref_weak(x)
     end
     nothing

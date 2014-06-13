@@ -1,6 +1,7 @@
 sizeof_gclosure = 0
 function __init__()
     ccall((:g_type_init,libgobject),Void,())
+    global jlref_quark = quark"julia_ref"
     global sizeof_gclosure = WORD_SIZE
     closure = C_NULL
     while closure == C_NULL
@@ -8,6 +9,8 @@ function __init__()
         closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
     end
     ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
+    global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
+        (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
     global exiting = false
     atexit(()->global exiting = true)
 end
@@ -54,7 +57,7 @@ function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk
     ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
         (Ptr{Void}, Any, Ptr{Void}), closuref, cb, gc_ref_closure(cb))
     ccall((:g_closure_set_marshal,libgobject), Void,
-        (Ptr{Void}, Ptr{Void}), closuref, JuliaClosureMarshal)
+        (Ptr{Void}, Ptr{Void}), closuref, JuliaClosureMarshal::Ptr{Void})
     return ccall((:g_signal_connect_closure,libgobject), Culong,
         (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Cint), w, bytestring(sig), closuref, after)
 end
@@ -105,8 +108,6 @@ function GClosureMarshal(closuref, return_value, n_param_values,
     end
     return nothing
 end
-const JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
-    (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
 
 # Signals API for the cb pointer
 # Gtk 2
