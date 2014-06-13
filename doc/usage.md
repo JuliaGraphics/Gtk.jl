@@ -316,6 +316,34 @@ win = @Window(sc,"Scale")
 ```
 ![scale](figures/scale.png)
 
+### Canvases
+
+Generic drawing is done on a `Canvas`. You control what appears on this canvas by defining a `draw` function:
+
+```
+using Gtk.ShortNames, Base.Graphics
+c = @Canvas()
+win = @Window(c, "Canvas")
+draw(c) do widget
+    ctx = getgc(c)
+    h = height(c)
+    w = width(c)
+    # Paint red rectangle
+    rectangle(ctx, 0, 0, w, h/2)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+    # Paint blue rectangle
+    rectangle(ctx, 0, 3h/4, w, h/4)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+end
+```
+This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
+
+![canvas](figures/canvas.png)
+
+See Julia's standard-library documentation for more information on graphics.
+
 ### Menus
 
 In Gtk, the core element is the `MenuItem`.
@@ -346,30 +374,32 @@ win = @Window(mb, "Menus", 200, 40)
 ```
 ![menu](figures/menu.png)
 
-### Canvases
+### Popup menus
 
-Generic drawing is done on a `Canvas`. You control what appears on this canvas by defining a `draw` function:
+We can create a canvas that, when right-clicked, reveals a context menu:
 
 ```
 using Gtk.ShortNames, Base.Graphics
+# Fill a canvas with red
 c = @Canvas()
 win = @Window(c, "Canvas")
 draw(c) do widget
     ctx = getgc(c)
-    h = height(c)
-    w = width(c)
-    # Paint red rectangle
-    rectangle(ctx, 0, 0, w, h/2)
     set_source_rgb(ctx, 1, 0, 0)
-    fill(ctx)
-    # Paint blue rectangle
-    rectangle(ctx, 0, 3h/4, w, h/4)
-    set_source_rgb(ctx, 0, 0, 1)
-    fill(ctx)
+    paint(ctx)
 end
+# Define the popup menu
+popupmenu = @Menu()
+printcolor = @MenuItem("Print color")
+push!(popupmenu, printcolor)
+push!(popupmenu, @MenuItem("Do nothing"))
+# This next line is crucial: otherwise your popup menu shows as a thin bar
+showall(popupmenu)
+# Associate actions with right-click and selection
+c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+signal_connect(printcolor, :activate) do widget
+    println("Red!")
+end
+showall(win)
 ```
-This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
-
-![canvas](figures/canvas.png)
-
-See Julia's standard-library documentation for more information on graphics.
+![popupmenu](figures/popup.png)
