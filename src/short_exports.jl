@@ -26,6 +26,7 @@ const Entry = GtkEntry
 const EntryCompletion = GtkEntryCompletion
 const Expander = GtkExpander
 const FileChooserDialog = GtkFileChooserDialog
+const FileFilter = GtkFileFilter
 const FontButton = GtkFontButton
 const Frame = GtkFrame
 const Image = GtkImage
@@ -100,6 +101,7 @@ export G_, GObject,
     EntryCompletion,
     Expander,
     FileChooserDialog,
+    FileFilter,
     FontButton,
     Frame,
     Image,

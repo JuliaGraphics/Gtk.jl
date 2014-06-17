@@ -35,17 +35,38 @@ end
 
 run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
 
-function makefilters(dlgp, filters::Union(AbstractVector,Tuple))
+@gtktype GtkFileFilter
+function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern::ByteString = "", mimetype::ByteString = "")
+    filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
+    if !isempty(pattern)
+        name == nothing && (name = pattern)
+        for p in split(pattern, ",")
+            ccall((:gtk_file_filter_add_pattern,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, p)
+        end
+    elseif !isempty(mimetype)
+        name == nothing && (name = mimetype)
+        for m in split(mimetype, ",")
+            ccall((:gtk_file_filter_add_mime_type,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, m)
+        end
+    else
+        ccall((:gtk_file_filter_add_pixbuf_formats,libgtk), Void, (Ptr{GObject},), filt)
+    end
+    ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, isempty(name) || name==nothing ? C_NULL : name)
+    filt
+end
+GtkFileFilterLeaf(pattern::ByteString; name::Union(ByteString,Nothing) = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
+
+GtkFileFilterLeaf(filter::GtkFileFilterLeaf) = filter
+
+function makefilters(dlgp::GtkFileChooser, filters::Union(AbstractVector,Tuple))
     for f in filters
-        filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
-        ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, f)
-        ccall((:gtk_file_filter_add_pattern,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, f)
-        ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, filt)
+        ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, @GtkFileFilter(f))
     end
 end
 
 function open_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[], multiple::Bool = false)
-    if parent == nothing
+    haveparent = parent != nothing
+    if !haveparent
         parent = @GtkWindow()
         visible(parent, false)
     end
@@ -61,26 +82,28 @@ function open_dialog(title::String; parent = nothing, filters::Union(AbstractVec
     local selection
     if response == GConstants.GtkResponseType.ACCEPT
         if multiple
-            selection = Any[]
+            selection = UTF8String[]
             for f in GLib.GList(ccall((:gtk_file_chooser_get_filenames,libgtk), Ptr{_GSList{Uint8}}, (Ptr{GObject},), dlgp))
-                push!(selection, bytestring(f))
+                push!(selection, GLib.bytestring(f, true))
             end
         else
             selection = bytestring(GAccessor.filename(dlgp))
         end
     else
         if multiple
-            selection = ASCIIString[]
+            selection = UTF8String[]
         else
-            selection = ""
+            selection = utf8("")
         end
     end
     destroy(dlg)
+    !haveparent && destroy(parent)
     selection
 end
 
 function save_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[])
-    if parent == nothing
+    haveparent = parent != nothing
+    if !haveparent
         parent = @GtkWindow()
         visible(parent, false)
     end
@@ -93,12 +116,12 @@ function save_dialog(title::String; parent = nothing, filters::Union(AbstractVec
     end
     ccall((:gtk_file_chooser_set_do_overwrite_confirmation,libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
     response = run(dlg)
-    local selection
     if response == GConstants.GtkResponseType.ACCEPT
         selection = bytestring(GAccessor.filename(dlgp))
     else
-        selection = ""
+        selection = utf8("")
     end
     destroy(dlg)
+    !haveparent && destroy(parent)
     selection
 end
