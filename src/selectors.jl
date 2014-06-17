@@ -34,3 +34,71 @@ function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::I
 end
 
 run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
+
+function makefilters(dlgp, filters::Union(AbstractVector,Tuple))
+    for f in filters
+        filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
+        ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, f)
+        ccall((:gtk_file_filter_add_pattern,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, f)
+        ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, filt)
+    end
+end
+
+function open_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[], multiple::Bool = false)
+    if parent == nothing
+        parent = @GtkWindow()
+        visible(parent, false)
+    end
+    dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
+                                "_Cancel", GConstants.GtkResponseType.CANCEL,
+                                "_Open",   GConstants.GtkResponseType.ACCEPT)
+    setproperty!(dlg, :select_multiple, multiple)
+    dlgp = GtkFileChooser(dlg)
+    if !isempty(filters)
+        makefilters(dlgp, filters)
+    end
+    response = run(dlg)
+    local selection
+    if response == GConstants.GtkResponseType.ACCEPT
+        if multiple
+            selection = Any[]
+            for f in GLib.GList(ccall((:gtk_file_chooser_get_filenames,libgtk), Ptr{_GSList{Uint8}}, (Ptr{GObject},), dlgp))
+                push!(selection, bytestring(f))
+            end
+        else
+            selection = bytestring(GAccessor.filename(dlgp))
+        end
+    else
+        if multiple
+            selection = ASCIIString[]
+        else
+            selection = ""
+        end
+    end
+    destroy(dlg)
+    selection
+end
+
+function save_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[])
+    if parent == nothing
+        parent = @GtkWindow()
+        visible(parent, false)
+    end
+    dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
+                                "_Cancel", GConstants.GtkResponseType.CANCEL,
+                                "_Save",   GConstants.GtkResponseType.ACCEPT)
+    dlgp = GtkFileChooser(dlg)
+    if !isempty(filters)
+        makefilters(dlgp, filters)
+    end
+    ccall((:gtk_file_chooser_set_do_overwrite_confirmation,libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
+    response = run(dlg)
+    local selection
+    if response == GConstants.GtkResponseType.ACCEPT
+        selection = bytestring(GAccessor.filename(dlgp))
+    else
+        selection = ""
+    end
+    destroy(dlg)
+    selection
+end
