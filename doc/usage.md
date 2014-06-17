@@ -288,16 +288,23 @@ id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate,
 
 ## Usage without the REPL
 
-To write applications that you run as Julia scripts, e.g., from the command line as `julia myapplication.jl`, insert
+If you're using Gtk from command-line scripts, one problem you may enounter is that julia quits before you have a chance to see or interact with your windows. In such cases, the following design pattern can be helpful:
 
 ```
+win = @Window("gtkwait")
+
+# Put your GUI code here
+
 if !isinteractive()
-    wait(Condition())
+    c = Condition()
+    signal_connect(win, :destroy) do widget
+        notify(c)
+    end
+    wait(c)
 end
 ```
 
-at the end of your script. That will prevent `julia` from exiting before the user even sees the window(s).
-
+By waiting on a `Condition`, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit).
 
 ## Specific graphical elements
 
