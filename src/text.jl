@@ -22,7 +22,7 @@ GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
 
 @gtktype GtkTextView
-GtkTextViewLeaf(buffer::GtkTextBuffer=GtkTextBuffer()) = GtkTextViewLeaf(
+GtkTextViewLeaf(buffer::GtkTextBuffer=@GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 
 @gtktype GtkTextMark
