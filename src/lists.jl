@@ -119,25 +119,31 @@ function GtkListStoreLeaf(types::Type...)
     GtkListStoreLeaf(handle)
 end
 
+
+
+function list_store_set_values(store::GtkListStoreLeaf, iter, values)
+    for (i,value) in enumerate(values)
+        ccall((:gtk_list_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
+              store,iter,i-1, Gtk.gvalue(value))
+    end
+end
+
 function push!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
     ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, iter)
-    for (i,value) in enumerate(values)
-        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,iter,i-1,gvalue(value))
-    end
+
+    list_store_set_values(listStore, iter, values)
     iter[]
 end
 
 function unshift!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
     ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, iter)
-    for (i,value) in enumerate(values)
-        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,iter,i-1,gvalue(value))
-    end
+    list_store_set_values(listStore, iter, values)
     iter[]
 end
+
+
 
 function delete!(listStore::GtkListStore, iter::TRI)
     # not sure what to do with the return value here
@@ -147,6 +153,28 @@ end
 
 empty!(listStore::GtkListStore) =
     ccall((:gtk_list_store_clear,libgtk), Void, (Ptr{GObject},),listStore)
+
+## index
+
+## insert into a list store after index
+function Base.insert!(listStore::GtkListStoreLeaf, index::Int, values)
+    index < 1 && return(unshift!(listStore, values))
+
+    index = min(index, length(listStore))
+    iter = Gtk.mutable(GtkTreeIter)
+    siter = iter_from_index(listStore, index)
+    ccall((:gtk_list_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), listStore, iter, siter)
+    list_store_set_values(listStore, iter, values)
+    iter
+end
+
+function Base.splice!(listStore::GtkListStoreLeaf, index::Int)
+    iter = iter_from_index(listStore, index)
+    delete!(listStore, iter)
+end
+
+
+
 
 isvalid(listStore::GtkListStore, iter::TRI) = 
     bool( ccall((:gtk_list_store_iter_is_valid,libgtk), Cint, 
