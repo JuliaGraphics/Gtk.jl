@@ -117,7 +117,7 @@ end
 
 function unshift!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
-    ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
+    ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, iter)
     for (i,value) in enumerate(values)
         ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
               listStore,iter,i-1,gvalue(value))
