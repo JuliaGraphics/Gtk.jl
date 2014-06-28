@@ -194,6 +194,15 @@ end
 
 iter_from_index(store::GtkTreeStoreLeaf, index::Vector{Int}) = iter_from_string_index(store, join(index.-1, ":"))
 
+function tree_store_set_values(treeStore::GtkTreeStoreLeaf, iter, values)
+    for (i,value) in enumerate(values)
+        ccall((:gtk_tree_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
+              treeStore,iter,i-1,Gtk.gvalue(value))
+    end
+    iter[]
+end
+
+
 function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter = mutable(GtkTreeIter)
     if parent == nothing
@@ -201,10 +210,8 @@ function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     else
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
     end    
-    for (i,value) in enumerate(values)
-        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,iter,i-1,gvalue(value))
-    end
+
+    tree_store_set_values(treeStore, iter, values)
     iter[]
 end
 
@@ -214,11 +221,9 @@ function unshift!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, iter, C_NULL)
     else
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
-    end    
-    for (i,value) in enumerate(values)
-        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,iter,i-1,gvalue(value))
-    end
+    end   
+
+    tree_store_set_values(treeStore, iter, values)
     iter[]
 end
 
