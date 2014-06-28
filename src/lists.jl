@@ -233,6 +233,31 @@ function delete!(treeStore::GtkTreeStore, iter::TRI)
     treeStore
 end
 
+
+## insert by index
+## index can be :parent or :sibling
+## insertion can be :after or :before
+
+function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol::after)
+
+    fn = (where == :after ? :gtk_tree_store_insert_after : :gtk_tree_store_insert_before
+
+    piter = iter_from_index(treeStore, index)
+    iter =  Gtk.mutable(GtkTreeIter)
+    if how == :parent
+        ccall((:fn,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+    else
+        ccall((:fn,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+    end
+    tree_store_set_values(treeStore, iter, values)
+end
+    
+
+function Base.splice!(treeStore::GtkTreeStoreLeaf, index::Vector{Int})
+    iter = iter_from_index(treeStore, index)
+    delete!(treeStore, iter)
+end
+    
 empty!(treeStore::GtkTreeStore) =
     ccall((:gtk_tree_store_clear,libgtk), Void, (Ptr{GObject},),treeStore)
 
