@@ -96,6 +96,20 @@ down(path::GtkTreePath) = ccall((:gtk_tree_path_down,libgtk), Void, (Ptr{GtkTree
 string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8}, 
                                             (Ptr{GtkTreePath},),path))
 
+### add indices for a store 1-based
+
+## Get an iter corresponding to an index specified as a string
+function iter_from_string_index(store, index::String)
+    iter = Gtk.mutable(GtkTreeIter)
+    Gtk.G_.iter_from_string(GtkTreeModel(store), iter, index)
+    if !isvalid(store, iter)
+        error("invalid index: $index")
+    end
+    iter
+end
+## index is integer for list, vector of ints for tree
+iter_from_index(store::GtkListStoreLeaf, index::Int) = iter_from_string_index(store, string(index-1))
+
 ### GtkListStore
 
 @gtktype GtkListStore
@@ -149,6 +163,8 @@ function GtkTreeStoreLeaf(types::Type...)
     handle = ccall((:gtk_tree_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
     GtkTreeStoreLeaf(handle)
 end
+
+iter_from_index(store::GtkTreeStoreLeaf, index::Vector{Int}) = iter_from_string_index(store, join(index.-1, ":"))
 
 function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter = mutable(GtkTreeIter)
