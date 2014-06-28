@@ -107,8 +107,6 @@ function iter_from_string_index(store, index::String)
     end
     iter
 end
-## index is integer for list, vector of ints for tree
-iter_from_index(store::GtkListStoreLeaf, index::Int) = iter_from_string_index(store, string(index-1))
 
 ### GtkListStore
 
@@ -119,6 +117,8 @@ function GtkListStoreLeaf(types::Type...)
     GtkListStoreLeaf(handle)
 end
 
+## index is integer for a liststore, vector of ints for tree
+iter_from_index(store::GtkListStoreLeaf, index::Int) = iter_from_string_index(store, string(index-1))
 
 
 function list_store_set_values(store::GtkListStoreLeaf, iter, values)
@@ -154,7 +154,7 @@ end
 empty!(listStore::GtkListStore) =
     ccall((:gtk_list_store_clear,libgtk), Void, (Ptr{GObject},),listStore)
 
-## index
+## by index
 
 ## insert into a list store after index
 function Base.insert!(listStore::GtkListStoreLeaf, index::Int, values)
@@ -237,18 +237,25 @@ end
 ## insert by index
 ## index can be :parent or :sibling
 ## insertion can be :after or :before
+function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol=:after)
 
-function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol::after)
-
-    fn = (where == :after ? :gtk_tree_store_insert_after : :gtk_tree_store_insert_before
 
     piter = iter_from_index(treeStore, index)
     iter =  Gtk.mutable(GtkTreeIter)
     if how == :parent
-        ccall((:fn,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+        if where == :after
+            ccall((:gtk_tree_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+        else
+            ccall((:gtk_tree_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+        end
     else
-        ccall((:fn,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+        if where == :after
+            ccall((:gtk_tree_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+        else
+            ccall((:gtk_tree_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+        end
     end
+    
     tree_store_set_values(treeStore, iter, values)
 end
     
