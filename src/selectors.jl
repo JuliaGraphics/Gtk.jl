@@ -35,17 +35,20 @@ end
 
 run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
 
+const SingleComma = r"(?<!,),(?!,)"
 @gtktype GtkFileFilter
 function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern::ByteString = "", mimetype::ByteString = "")
     filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
     if !isempty(pattern)
         name == nothing && (name = pattern)
-        for p in split(pattern, ",")
+        for p in split(pattern, SingleComma)
+            p = replace(p, ",,", ",")   # escape sequence for , is ,,
             ccall((:gtk_file_filter_add_pattern,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, p)
         end
     elseif !isempty(mimetype)
         name == nothing && (name = mimetype)
-        for m in split(mimetype, ",")
+        for m in split(mimetype, SingleComma)
+            m = replace(m, ",,", ",")
             ccall((:gtk_file_filter_add_mime_type,libgtk), Void, (Ptr{GObject}, Ptr{Uint8}), filt, m)
         end
     else
