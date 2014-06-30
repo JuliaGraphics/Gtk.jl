@@ -410,3 +410,39 @@ end
 showall(win)
 ```
 ![popupmenu](figures/popup.png)
+
+## File dialogs
+
+Gtk.jl supports the GtkFileChooserDialog.
+It also provides two functions, `open_dialog` and `save_dialog`, making this functionality easier to use.
+The syntax of these two functions are as follows:
+
+```
+open_dialog(title; parent = nothing, filters = ASCIIString[], multiple = false)
+save_dialog(title; parent = nothing, filters = ASCIIString[])
+```
+
+If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
+Otherwise, for standalone usage in scripts, do not set the parent.
+
+The main flexibility comes from the filters, which can be specified as a Tuple or Vector.
+A filter can be specified as a string, in which case it specifies a globbing pattern, for example `"*.png"`.
+You can specify multiple match types for a single filter by separating the patterns with a comma, for example `"*.png,*.jpg"`.
+You can alternatively specify MIME types, or if no specification is provided it defaults to types supported by `GdkPixbuf`.
+The generic specification of a filter is
+```
+@FileFilter(; name = nothing, pattern = "", mimetype = "")
+```
+
+Here are some examples:
+```
+open_dialog("Pick a file")
+open_dialog("Pick some files", multiple=true)
+open_dialog("Pick a file", filters=("*.jl",))
+open_dialog("Pick some text files", filters=("*.txt,*.csv",), multiple=true)
+open_dialog("Pick a file", filters=(@FileFilter(mimetype="text/csv"),))
+open_dialog("Pick an image file", filters=("*.png", "*.jpg", @FileFilter("*.png,*.jpg", name="All supported formats")))
+open_dialog("Pick an image file", filters=(@FileFilter(name="Supported image formats"),))
+
+save_dialog("Save as...", filters=(@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
+```
