@@ -349,6 +349,7 @@ bpush = @Button("push item")
 bpop = @Button("pop item")
 push!(vbox, bpush)
 push!(vbox, bpop)
+showall(w)
 sb_count = 1
 function cb_sbpush(ptr,evt,id)
     global sb_count
@@ -362,7 +363,6 @@ function cb_sbpop(ptr,evt,id)
 end
 on_signal_button_press(cb_sbpush, bpush, false, ctxid)
 on_signal_button_press(cb_sbpop, bpop, false, ctxid)
-showall(w)
 destroy(w)
 
 ## Canvas & AspectFrame

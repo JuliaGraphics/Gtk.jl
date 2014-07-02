@@ -20,7 +20,7 @@ end
 # end
 function signal_connect(cb::Function,w::GObject,sig::StringLike,
         RT::Type,param_types::Tuple,after::Bool=false,closure=w) #TODO: assert that length(param_types) is correct
-    if isgeneric(cb)
+    if isgeneric(cb) && !isbits(closure)
         callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,typeof(closure)))
         return ccall((:g_signal_connect_data,libgobject), Culong,
             (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),

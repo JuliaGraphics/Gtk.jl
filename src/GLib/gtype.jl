@@ -264,7 +264,9 @@ end
 # of type Ptr{GObject} corresponding to the GLib object
 convert(::Type{Ptr{GObject}},w::GObject) = w.handle
 convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
-eltype{T<:GObject}(::_LList{T}) = T
+eltype{T<:GObject}(::Type{_LList{T}}) = T
+ref_to{T<:GObject}(::Type{T}, x) = gc_ref(convert(Ptr{GObject},x))
+empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
 convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = box.handle
 convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
@@ -273,7 +275,7 @@ convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
 # and/or might have been wrapped by julia before
 function convert{T<:GObject}(::Type{T}, hnd::Ptr{GObject})
     if hnd == C_NULL
-        error("cannot convert null pointer to GObject")
+        error(UndefRefError())
     end
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark::Uint32)
     if x != C_NULL
@@ -313,11 +315,13 @@ end
 const gc_preserve = ObjectIdDict() # reference counted closures
 function gc_ref(x::ANY)
     global gc_preserve
+    isbits(x) && error("can't gc-preserve an isbits object")
     gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
     x
 end
 function gc_unref(x::ANY)
     global gc_preserve
+    @assert !isbits(x)
     count = get(gc_preserve, x, 0)::Int-1
     if count <= 0
         delete!(gc_preserve, x)
@@ -326,6 +330,10 @@ function gc_unref(x::ANY)
 end
 gc_ref_closure{T}(x::T) = (gc_ref(x);cfunction(gc_unref, Void, (T, Ptr{Void})))
 gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+
+# generally, you shouldn't need to call gc_ref(::Ptr)
+gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
+gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
 
 const gc_preserve_gtk = WeakKeyDict{GObject,Union(Bool,GObject)}() # gtk objects
 function gc_ref{T<:GObject}(x::T)
@@ -339,7 +347,7 @@ function gc_ref{T<:GObject}(x::T)
                 end
                 if x.handle != C_NULL
                     gc_preserve_gtk[x] = x # convert to a strong-reference
-                    ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x) # may clear the strong reference
+                    gc_unref(convert(Ptr{GObject},x)) # may clear the strong reference
                 else
                     delete!(gc_preserve_gtk, x) # x is invalid, ensure we are dead
                 end
@@ -392,8 +400,10 @@ function gc_force_floating(x::GObject)
     ccall((:g_object_force_floating,libgobject),Void,(Ptr{GObject},),x)
 end
 function gc_move_ref(new::GObject, old::GObject)
-    @assert old.handle == new.handle != C_NULL
+    h = convert(Ptr{GObject}, new)
+    @assert h == convert(Ptr{GObject}, old) != C_NULL
+    gc_ref(h)
     gc_unref(old)
-    gc_force_floating(new)
     gc_ref(new)
+    gc_unref(h)
 end

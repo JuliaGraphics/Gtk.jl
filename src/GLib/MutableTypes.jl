@@ -1,5 +1,5 @@
 module MutableTypes
-export mutable, Mutable
+export mutable, Mutable, deref
 
 abstract Mutable{T}
 type MutableX{T} <: Mutable{T}
@@ -33,15 +33,14 @@ _addrof{T}(b::T) = ccall(:jl_value_ptr,Ptr{T},(Ptr{Any},),&b)
 Base.cconvert{P<:Ptr,T}(::Type{P}, b::MutableX{T}) = isbits(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
 Base.cconvert{P<:Ptr,T,N}(::Type{P}, b::MutableA{T,N}) = convert(P, pointer(b.x, b.i))
 
-Base.unsafe_load(b::MutableX) = b.x
-Base.unsafe_load(b::MutableA) = b.x[b.i]
+deref(b::MutableX) = b.x
+deref(b::MutableA) = b.x[b.i]
+
+Base.unsafe_load(b::Mutable) = deref(b)
+Base.getindex(b::Mutable) = deref(b)
 
 Base.unsafe_store!(b::MutableX, x) = (b.x = x)
 Base.unsafe_store!(b::MutableA, x) = (b.x[b.i] = x)
-
-Base.getindex(b::MutableX) = b.x
-Base.getindex(b::MutableA) = b.x[b.i]
-
 Base.setindex!{T}(b::MutableX{T}, x::T) = (b.x = x)
 Base.setindex!{T,N}(b::MutableA{T,N}, x::T) = (b.x[b.i] = x)
 

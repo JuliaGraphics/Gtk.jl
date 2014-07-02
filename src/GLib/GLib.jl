@@ -1,7 +1,8 @@
 module GLib
 
-import Base: convert, show, showall, showcompact, size, length, getindex, setindex!,
-             start, next, done, eltype
+import Base: convert, show, showall, showcompact, size, length, getindex, setindex!, get,
+             start, next, done, eltype, isempty, endof, ndims, stride, strides,
+             empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export Enum, GError, GValue, gvalue, make_gvalue, g_type
