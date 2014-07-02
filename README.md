@@ -64,7 +64,8 @@ However, when the library is in a standard location, this step can be skipped.
 
 This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
 
-There is also a more [detailed description](doc/usage.md) in tutorial style, as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
+There is also a more detailed description in [tutorial style](doc/usage.md), as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
+People interested in extending the functionality of this package may be interested in the [developer documentation](doc/developer.md).
 
 ### Referring to Gtk.Objects
 
