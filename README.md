@@ -17,13 +17,13 @@ The easiest method of installation is to use `WinRPM.jl`:
      RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
      ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
 
-You may need to repeat the last two steps every time you restart julia, or put these two lines in your $HOME/.juliarc.jl file
+You may need to repeat the last two steps every time you restart julia, or put these two lines in your `$HOME/.juliarc.jl` file
 
 ### OS X
 
 I use MacPorts:
 
-1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my "/opt/local/etc/macports/variants.conf" file as "+no_x11 -x11 +quartz" before installing anything, to minimize conflicts and maximize Quartz)
+1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my `/opt/local/etc/macports/variants.conf` file as `+no_x11 -x11 +quartz` before installing anything, to minimize conflicts and maximize Quartz usage)
 2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
 If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
@@ -47,22 +47,24 @@ at least Julia version 0.3.
 
 In your Julia `base/` directory, create (or append to) a file called `userimg.jl` the line
 
-    Base.require("Gtk")
+    require("Gtk")
 
 Then build Julia as you normally would; the Gtk module will be available when julia starts.
 
-In some cases, it might be necessary to add the library path, for example:
+In some cases, it might be necessary to add the path to the folder containing the Gtk shared libraries, for example:
 
-    Base.push!(Base.DL_LOAD_PATH, "/usr/lib/x86_64-linux_gnu")
-    Base.require("Gtk")
-    Base.pop!(Base.DL_LOAD_PATH)
+    push!(DL_LOAD_PATH, "/usr/lib/x86_64-linux_gnu")
+    require("Gtk")
+    pop!(DL_LOAD_PATH)
 
 The `"/usr/lib/x86_64-linux_gnu"` needs to be replaced with the location of the GTK libraries on your system.
-However, when the library is in a standard location, this step can be skipped.
+However, when the library is in a standard location -- such as `/usr/lib`, `/usr/local/lib`, or `/usr/lib/x86_64-linux_gnu` (on some systems) -- this step can be skipped.
 
 ## Overview
 
 This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
+
+It is always safe to alter the properties of a Gtk object defined in Gtk.jl outside of calling the functions provided therein, such as through another program language, or direct ccall's.
 
 There is also a more detailed description in [tutorial style](doc/usage.md), as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
 People interested in extending the functionality of this package may be interested in the [developer documentation](doc/developer.md).
@@ -191,8 +193,8 @@ Note that because these are auto-generated, you will often need to do your own g
 
 ### Constants
 
-Interaction with GTK sometimes requires constants, which are bundled into the `Gtk.GConstants` module.
-`GConstants` in turn contains modules corresponding to each GTK `enum` type.
+Interaction with Gtk sometimes requires constants, which are bundled into the `Gtk.GConstants` module.
+`GConstants` in turn contains modules corresponding to each Gtk `enum` type.
 For example, constants corresponding to the [GdkEventMask](https://developer.gnome.org/gdk3/stable/gdk3-Events.html#GdkEventMask)
 are in `Gtk.GConstants.GdkEventMask`. Each constant can be referred to by its full Gtk name or by a shortened name,
 for example `GDK_KEY_PRESS_MASK` can also be used as `KEY_PRESS`. The rule for generating the shortened name is that
@@ -268,51 +270,4 @@ all elements in the enum.
     .  +- MouseHandler
     .  +- RGB
     .  +- RGBA
-
-
-### Extending Gtk's functionality
-
-#### New Gtk Types
-
-You can subclass an existing Gtk type in Julia using the following code pattern:
-
-    type MyWidget <: Gtk.GtkButton
-        handle::Ptr{Gtk.GObject}
-        other_fields
-        function MyWidget(label)
-            btn = @GtkButton(label)
-            Gtk.gc_move_ref(new(btn), btn)
-        end
-    end
-
-This creates a `MyWidget` type which inherits its behavior from `GtkButton`. The `gc_move_ref` call transfers ownership of the `GObject` handle from `GtkButton` to `MyWidget` in a gc-safe manner. Afterwards, the `btn` object is invalid and converting from the `Ptr{GtkObject}` to `GtkObject` will return the `MyWidget` object.
-
-New native Gtk types can be most easily added by invoking the `Gtk.@GTypes` macro:
-
-     Gtk.@GTypes GTypeName library_variable sym_name
-     Gtk.@GTypes GTypeName library_variable gtyp_getter_expr
-
-and then defining the appropriate outer constructors. Note that the `@GTypes` macro expects a variable `suffix` to be defined in the current module, which will be appended to the name of the type to create a unique type instance.
-
-Please pay attention to existing constructors that already exist to avoid user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
-
-#### New GValue<->Julia auto-conversions
-
-New GValue-to-Julia conversions can be implemented via the `Gtk.make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true)` function. This adds all of the appropriate methods to getindex, setindex!, and gvalue to handle converting this value to and from a GValue.
-
-- `pass_x` is the Julia type
-- `as_ctype` is the type for ccall
-- `to_gtype` is the name of the `g_value_get_*` `g_value_set_*` method to use
-- `with_id` specifies the type identifier. It must resolve to an Int, but can either be a variable, and Integer, or a tuple of the type name and library where the `_get_type` function can be called
-- `allow_reverse` specifies whether this entry should be used for auto-unpacking
-
-Note that this calls eval on its arguments in the current module, so if you want to use a symbol from Gtk (such as `Gtk.libgtk`, make sure you give the fully qualified name). You will also need to ensure the appropriate convert methods exist to translate from `pass_x` to `as_ctype` and back. `make_gvalue` does a few automatic transformations:
-
-- if the `to_gtype` is `:string` or `:static_string`, make_gvalue will insert calls to bytestring
-- if the `to_gtype` is `:pointer` or `:boxed`, make_gvalue will insert code (a call to `Gtk.mutable`) that converts from `Type` -> `Ptr{Type}` in the `setindex!` method. Providing a conversion from `Ptr{Type}` -> `Type` must be handled by the user.
-
-For example:
-
-    Gtk.make_gvalue(Gtk.GdkRectangle, Ptr{Gtk.GdkRectangle}, :boxed, (:gdk_rectangle,:(Gtk.libgdk)))
-    Base.convert(::Type{Gtk.GdkRectangle}, rect::Ptr{Gtk.GdkRectangle}) = unsafe_load(rect)
 
