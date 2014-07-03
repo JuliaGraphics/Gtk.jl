@@ -25,7 +25,7 @@ function mutable{T,N}(x::Array{T,N}, i=1)
     end
 end
 mutable{T<:Ptr,N}(x::Array{T,N}, i=1) = mutable(x[i])
-mutable{T}(x::Ptr{T}, i=1) = mutable(x+(i-1)*sizeof(T))
+mutable{T}(x::Ptr{T}, i=1) = x+(i-1)*sizeof(T)
 mutable{T}(x::T, i) = (i == 1 ? mutable(x) : error("Object only has one element"))
 
 _addrof{T}(b::T) = ccall(:jl_value_ptr,Ptr{T},(Ptr{Any},),&b)
