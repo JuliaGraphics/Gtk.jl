@@ -96,6 +96,18 @@ down(path::GtkTreePath) = ccall((:gtk_tree_path_down,libgtk), Void, (Ptr{GtkTree
 string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8}, 
                                             (Ptr{GtkTreePath},),path))
 
+### add indices for a store 1-based
+
+## Get an iter corresponding to an index specified as a string
+function iter_from_string_index(store, index::String)
+    iter = Gtk.mutable(GtkTreeIter)
+    Gtk.G_.iter_from_string(GtkTreeModel(store), iter, index)
+    if !isvalid(store, iter)
+        error("invalid index: $index")
+    end
+    iter
+end
+
 ### GtkListStore
 
 @gtktype GtkListStore
@@ -105,25 +117,33 @@ function GtkListStoreLeaf(types::Type...)
     GtkListStoreLeaf(handle)
 end
 
+## index is integer for a liststore, vector of ints for tree
+iter_from_index(store::GtkListStoreLeaf, index::Int) = iter_from_string_index(store, string(index-1))
+
+
+function list_store_set_values(store::GtkListStoreLeaf, iter, values)
+    for (i,value) in enumerate(values)
+        ccall((:gtk_list_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
+              store,iter,i-1, Gtk.gvalue(value))
+    end
+end
+
 function push!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
     ccall((:gtk_list_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, iter)
-    for (i,value) in enumerate(values)
-        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,iter,i-1,gvalue(value))
-    end
+
+    list_store_set_values(listStore, iter, values)
     iter[]
 end
 
 function unshift!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
-    ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, &iter)
-    for (i,value) in enumerate(values)
-        ccall((:gtk_list_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              listStore,iter,i-1,gvalue(value))
-    end
+    ccall((:gtk_list_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter}), listStore, iter)
+    list_store_set_values(listStore, iter, values)
     iter[]
 end
+
+
 
 function delete!(listStore::GtkListStore, iter::TRI)
     # not sure what to do with the return value here
@@ -133,6 +153,28 @@ end
 
 empty!(listStore::GtkListStore) =
     ccall((:gtk_list_store_clear,libgtk), Void, (Ptr{GObject},),listStore)
+
+## by index
+
+## insert into a list store after index
+function Base.insert!(listStore::GtkListStoreLeaf, index::Int, values)
+    index < 1 && return(unshift!(listStore, values))
+
+    index = min(index, length(listStore))
+    iter = Gtk.mutable(GtkTreeIter)
+    siter = iter_from_index(listStore, index)
+    ccall((:gtk_list_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), listStore, iter, siter)
+    list_store_set_values(listStore, iter, values)
+    iter
+end
+
+function Base.splice!(listStore::GtkListStoreLeaf, index::Int)
+    iter = iter_from_index(listStore, index)
+    delete!(listStore, iter)
+end
+
+
+
 
 isvalid(listStore::GtkListStore, iter::TRI) = 
     bool( ccall((:gtk_list_store_iter_is_valid,libgtk), Cint, 
@@ -150,6 +192,17 @@ function GtkTreeStoreLeaf(types::Type...)
     GtkTreeStoreLeaf(handle)
 end
 
+iter_from_index(store::GtkTreeStoreLeaf, index::Vector{Int}) = iter_from_string_index(store, join(index.-1, ":"))
+
+function tree_store_set_values(treeStore::GtkTreeStoreLeaf, iter, values)
+    for (i,value) in enumerate(values)
+        ccall((:gtk_tree_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
+              treeStore,iter,i-1,Gtk.gvalue(value))
+    end
+    iter[]
+end
+
+
 function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     iter = mutable(GtkTreeIter)
     if parent == nothing
@@ -157,10 +210,8 @@ function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
     else
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
     end    
-    for (i,value) in enumerate(values)
-        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,iter,i-1,gvalue(value))
-    end
+
+    tree_store_set_values(treeStore, iter, values)
     iter[]
 end
 
@@ -170,11 +221,9 @@ function unshift!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, iter, C_NULL)
     else
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
-    end    
-    for (i,value) in enumerate(values)
-        ccall((:gtk_tree_store_set_value,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{GValue}),
-              treeStore,iter,i-1,gvalue(value))
-    end
+    end   
+
+    tree_store_set_values(treeStore, iter, values)
     iter[]
 end
 
@@ -184,6 +233,38 @@ function delete!(treeStore::GtkTreeStore, iter::TRI)
     treeStore
 end
 
+
+## insert by index
+## index can be :parent or :sibling
+## insertion can be :after or :before
+function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol=:after)
+
+
+    piter = iter_from_index(treeStore, index)
+    iter =  Gtk.mutable(GtkTreeIter)
+    if how == :parent
+        if where == :after
+            ccall((:gtk_tree_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+        else
+            ccall((:gtk_tree_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, piter, C_NULL)
+        end
+    else
+        if where == :after
+            ccall((:gtk_tree_store_insert_after,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+        else
+            ccall((:gtk_tree_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+        end
+    end
+    
+    tree_store_set_values(treeStore, iter, values)
+end
+    
+
+function Base.splice!(treeStore::GtkTreeStoreLeaf, index::Vector{Int})
+    iter = iter_from_index(treeStore, index)
+    delete!(treeStore, iter)
+end
+    
 empty!(treeStore::GtkTreeStore) =
     ccall((:gtk_tree_store_clear,libgtk), Void, (Ptr{GObject},),treeStore)
 
