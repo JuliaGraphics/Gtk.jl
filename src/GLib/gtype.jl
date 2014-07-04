@@ -266,6 +266,7 @@ convert(::Type{Ptr{GObject}},w::GObject) = w.handle
 convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
 eltype{T<:GObject}(::Type{_LList{T}}) = T
 ref_to{T<:GObject}(::Type{T}, x) = gc_ref(convert(Ptr{GObject},x))
+deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
 empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
 convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = box.handle
