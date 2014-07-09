@@ -71,7 +71,7 @@ show(io::IO, iter::GtkTreeIter) = print("GtkTreeIter(...)")
 ### GtkTreePath
 
 # for debugging purpose
-# type _GtkTreePath
+# immutable _GtkTreePath
 #    depth::Cint
 #    alloc::Cint
 #    indices::Ptr{Cint}
@@ -82,12 +82,12 @@ type GtkTreePath <: GBoxed
     function GtkTreePath(pathIn::Ptr{GtkTreePath})
         path = new(pathIn)
         finalizer(path, (x::GtkTreePath)->ccall((:gtk_tree_path_free,libgtk),Void,
-            (Ptr{Void},),x.handle))
-        path        
+            (Ptr{GtkTreePath},),x.handle))
+        path
     end
 end
-GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{Void},()))
-copy(path::GtkTreePath) = GtkTreePath(ccall((:gtk_tree_path_copy,libgtk),Ptr{Void},(Ptr{GtkTreePath},),path))
+GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{GtkTreePath},()))
+copy(path::GtkTreePath) = GtkTreePath(ccall((:gtk_tree_path_copy,libgtk),Ptr{GtkTreePath},(Ptr{GtkTreePath},),path))
 
 next(path::GtkTreePath) = ccall((:gtk_tree_path_next,libgtk), Void, (Ptr{GtkTreePath},),path)
 prev(path::GtkTreePath) = bool( ccall((:gtk_tree_path_prev,libgtk),Cint, (Ptr{GtkTreePath},),path))
