@@ -2,6 +2,7 @@
 gtk_doevent(timer,::Int32) = gtk_doevent(timer)
 function gtk_doevent(timer=nothing)
     try
+        sigatomic_begin()
         while (ccall((:gtk_events_pending,libgtk), Cint, ())) == true
             quit = ccall((:gtk_main_iteration,libgtk), Cint, ()) == true
             if quit
@@ -10,33 +11,48 @@ function gtk_doevent(timer=nothing)
             end
         end
     catch err
-        Base.display_error(err, catch_backtrace())
-        println()
+        try
+            Base.display_error(err, catch_backtrace())
+            println()
+        end
     end
+    sigatomic_end()
 end
 
 gtk_yield(src,cond,data) = gtk_yield(data)
 function gtk_yield(data)
-    reenable_sigint() do
+    try
+        sigatomic_end()
         yield()
-    end
-    while !isempty(Base.Workqueue)
-        gtk_doevent()
-        reenable_sigint() do
+        while !isempty(Base.Workqueue)
+            gtk_doevent()
             yield()
         end
+    catch err
+        try
+            Base.display_error(err, catch_backtrace())
+            println()
+        end
     end
+    sigatomic_begin()
     int32(true)
 end
 
 function gtk_main()
     try
-        disable_sigint() do
-            ccall((:gtk_main,libgtk),Void,())
-        end
-    catch ex
-        Base.showerror(STDERR, ex, catch_backtrace())
+        sigatomic_begin()
+        ccall((:gtk_main,libgtk),Void,())
+    catch err
+        Base.display_error(err, catch_backtrace())
+        println()
+        rethrow(err)
+    finally
+        sigatomic_end()
     end
+end
+
+function gtk_quit()
+    ccall((:gtk_quit,libgtk),Void,())
 end
 
 function __init__()
@@ -57,7 +73,7 @@ function __init__()
             id = ccall((:g_timeout_add,GLib.libglib),Cint,(Cuint,Ptr{Void},Ptr{Void}),
                 50,cfunction(gtk_yield,Cint,(Ptr{Void},)),3)
         end
-        @schedule gtk_main()
+        global gtk_main_task = @schedule gtk_main()
     else
         global timeout
         timeout = Base.Timer(gtk_doevent)

@@ -65,6 +65,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                          param_values, invocation_hint, marshal_data)
     @assert sizeof_gclosure > 0
     try
+        sigatomic_end()
         closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
         cb = unsafe_load(closure_env, 1)
         gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
@@ -105,6 +106,8 @@ function GClosureMarshal(closuref, return_value, n_param_values,
         end
     catch e
         Base.display_error(e,catch_backtrace())
+    finally
+        sigatomic_begin()
     end
     return nothing
 end
