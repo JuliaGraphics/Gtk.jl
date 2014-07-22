@@ -15,15 +15,54 @@ function gtk_doevent(timer=nothing)
     end
 end
 
+gtk_yield(src,cond,data) = gtk_yield(data)
+function gtk_yield(data)
+    reenable_sigint() do
+        yield()
+    end
+    while !isempty(Base.Workqueue)
+        gtk_doevent()
+        reenable_sigint() do
+            yield()
+        end
+    end
+    int32(true)
+end
+
+function gtk_main()
+    try
+        disable_sigint() do
+            ccall((:gtk_main,libgtk),Void,())
+        end
+    catch ex
+        Base.showerror(STDERR, ex, catch_backtrace())
+    end
+end
+
 function __init__()
     GError() do error_check
         ccall((:gtk_init_with_args,libgtk), Bool,
             (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
-    global timeout
-    timeout = Base.Timer(gtk_doevent)
-    Base.start_timer(timeout,.1,.005)
+    if true # enable experimental polling backend
+        fd = ccall(:uv_backend_fd,Cint,(Ptr{Void},),Base.eventloop())
+        if fd >= 0
+            ccall((:g_timeout_add_seconds,GLib.libglib),Cint,(Cuint,Ptr{Void},Ptr{Void}),
+                1,cfunction(gtk_yield,Cint,(Ptr{Void},)),1)
+            chan = ccall((:g_io_channel_unix_new,GLib.libglib),Ptr{Void},(Cint,),fd)
+            id = ccall((:g_io_add_watch,GLib.libglib),Cuint,(Ptr{Void},Cint,Ptr{Void},Ptr{Void}),
+                chan,typemax(Cint),cfunction(gtk_yield,Cint,(Ptr{Void},Ptr{Void},Ptr{Void})),2)
+        else
+            id = ccall((:g_timeout_add,GLib.libglib),Cint,(Cuint,Ptr{Void},Ptr{Void}),
+                50,cfunction(gtk_yield,Cint,(Ptr{Void},)),3)
+        end
+        @schedule gtk_main()
+    else
+        global timeout
+        timeout = Base.Timer(gtk_doevent)
+        Base.start_timer(timeout,0.25,0.05)
+    end
 end
 
 add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Enum),widget,mask)
