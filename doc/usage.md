@@ -319,7 +319,7 @@ sc = @Scale(false,0:10)   # range in integer steps, from 0 to 10
 adj = @Adjustment(sc)
 setproperty!(adj,:upper,11)         # now this scale goes to 11!
 setproperty!(adj,:value,7)
-win = @Window(sc,"Scale")
+win = @Window(sc,"Scale") |> showall
 ```
 ![scale](figures/scale.png)
 
@@ -344,6 +344,7 @@ draw(c) do widget
     set_source_rgb(ctx, 0, 0, 1)
     fill(ctx)
 end
+show(c)
 ```
 This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
 
@@ -378,6 +379,7 @@ Finally, let's place our file item inside another type of menu, the `MenuBar`:
 mb = @MenuBar()
 push!(mb, file)  # notice this is the "File" item, not filemenu
 win = @Window(mb, "Menus", 200, 40)
+showall(mb)
 ```
 ![menu](figures/menu.png)
 
