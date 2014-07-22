@@ -3,7 +3,6 @@ gtk_doevent(timer,::Int32) = gtk_doevent(timer)
 function gtk_doevent(timer=nothing)
     try
         while (ccall((:gtk_events_pending,libgtk), Cint, ())) == true
-            #println("event! $(time())")
             quit = ccall((:gtk_main_iteration,libgtk), Cint, ()) == true
             if quit
                 #TODO: emit_event("gtk quit")
@@ -23,7 +22,7 @@ function __init__()
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
     global timeout
-    timeout = Base.TimeoutAsyncWork(gtk_doevent)
+    timeout = Base.Timer(gtk_doevent)
     Base.start_timer(timeout,.1,.005)
 end
 
