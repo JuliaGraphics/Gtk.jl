@@ -23,7 +23,7 @@ You may need to repeat the last two steps every time you restart julia, or put t
 
 I use MacPorts:
 
-1. `port install gtk2 +no_x11 +quartz -x11 gtk3 +no_x11 +quartz -x11` (this may require that you first remove Cairo and Pango, I like to put this in my `/opt/local/etc/macports/variants.conf` file as `+no_x11 -x11 +quartz` before installing anything, to minimize conflicts and maximize Quartz usage)
+1. `port install gtk2 +quartz gtk3 +quartz` (this may require that you first remove Cairo and Pango via `sudo port deactivate active` for example, I like to put this in my `/opt/local/etc/macports/variants.conf` file as `+quartz` before installing anything, to minimize conflicts and maximize usage of the native Quartz)
 2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
 If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
