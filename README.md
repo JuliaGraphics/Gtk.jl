@@ -11,7 +11,17 @@ Prior to using this library, you must install a semi-recent version of `libgtk` 
 
 The necessary libraries will be downloaded and installed automatically when you run `Pkg.add("Gtk")`.
 
- 
+
+In case you run into some problem with the automatic installation, you can install manually 
+using `WinRPM.jl`:
+
+     Pkg.add("WinRPM")
+     using WinRPM
+     WinRPM.install(["gtk2","gtk3"])
+     RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
+     ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
+
+You may need to repeat the last two steps every time you restart julia, or put these two lines in your `$HOME/.juliarc.jl` file
 
 ### OS X
 
