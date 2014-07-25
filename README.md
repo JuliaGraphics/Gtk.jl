@@ -9,7 +9,11 @@ Prior to using this library, you must install a semi-recent version of `libgtk` 
 
 ### Windows
 
-The easiest method of installation is to use `WinRPM.jl`:
+The necessary libraries will be downloaded and installed automatically when you run `Pkg.add("Gtk")`.
+
+
+In case you run into some problem with the automatic installation, you can install manually 
+using `WinRPM.jl`:
 
      Pkg.add("WinRPM")
      using WinRPM
