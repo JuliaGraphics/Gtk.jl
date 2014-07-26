@@ -1,20 +1,3 @@
-sizeof_gclosure = 0
-function __init__()
-    ccall((:g_type_init,libgobject),Void,())
-    global jlref_quark = quark"julia_ref"
-    global sizeof_gclosure = WORD_SIZE
-    closure = C_NULL
-    while closure == C_NULL
-        sizeof_gclosure += WORD_SIZE
-        closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
-    end
-    ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
-    global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
-        (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
-    global exiting = false
-    atexit(()->global exiting = true)
-end
-
 # id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
@@ -64,8 +47,7 @@ end
 function GClosureMarshal(closuref, return_value, n_param_values,
                          param_values, invocation_hint, marshal_data)
     @assert sizeof_gclosure > 0
-    try
-        sigatomic_end()
+    g_siginterruptible() do
         closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
         cb = unsafe_load(closure_env, 1)
         gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
@@ -104,10 +86,6 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 return_value[] = gvalue(retval)
             end
         end
-    catch e
-        Base.display_error(e,catch_backtrace())
-    finally
-        sigatomic_begin()
     end
     return nothing
 end
@@ -142,3 +120,167 @@ function signal_emit(w::GObject, sig::StringLike, RT::Type, args...)
     ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
     return_value[RT]
 end
+
+g_sigatom_flag = false
+function g_sigatom(f::Base.Callable)
+    global g_sigatom_flag
+    @assert !g_sigatom_flag
+    try
+        g_sigatom_flag = true
+        sigatomic_begin()
+        f()
+    catch err
+        @assert g_sigatom_flag
+        sigatomic_end()
+        g_sigatom_flag = false
+        Base.display_error(err, catch_backtrace())
+        println()
+        rethrow(err)
+    end
+    @assert g_sigatom_flag
+    g_sigatom_flag = false
+    sigatomic_end()
+end
+
+function g_siginterruptible(f::Base.Callable)
+    global g_sigatom_flag
+    prev = g_sigatom_flag
+    try
+        if prev
+            g_sigatom_flag = false
+            sigatomic_end()
+        end
+        f()
+    catch err
+        try
+            Base.display_error(err, catch_backtrace())
+            println()
+        end
+    end
+    if prev
+        sigatomic_begin()
+        g_sigatom_flag = true
+    end
+end
+
+type _GPollFD
+  @windows ? fd::Int : fd::Cint
+  events::Cushort
+  revents::Cushort
+  _GPollFD(fd, ev) = new(fd, ev, 0)
+end
+
+type _GSourceFuncs
+    prepare::Ptr{Void}
+    check::Ptr{Void}
+    dispatch::Ptr{Void}
+    finalize::Ptr{Void}
+    closure_callback::Ptr{Void}
+    closure_marshal::Ptr{Void}
+end
+function new_gsource(source_funcs::_GSourceFuncs)
+    sizeof_gsource = WORD_SIZE
+    gsource = C_NULL
+    while gsource == C_NULL
+        sizeof_gsource += WORD_SIZE
+        gsource = ccall((:g_source_new,GLib.libglib),Ptr{Void},(Ptr{_GSourceFuncs},Int),&source_funcs,sizeof_gsource)
+    end
+    gsource
+end
+
+event_processing = false
+event_pending = false
+expiration = 0
+function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
+    global event_pending, event_processing, expiration, uv_pollfd
+    local tmout_ms::Cint
+    if event_processing
+        tmout_ms = -1
+    elseif event_pending::Bool || !isempty(Base.Workqueue)
+        tmout_ms = 0
+    else
+        tmout_ms = ccall(:uv_backend_timeout,Cint,(Ptr{Void},),Base.eventloop())
+        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 2500
+        if tmout_ms < 0 || tmout_ms > tmout_min
+            tmout_ms = tmout_min
+        end
+    end
+    unsafe_store!(timeout, tmout_ms)
+    if tmout_ms > 0
+        now = ccall((:g_source_get_time,GLib.libglib),Int64,(Ptr{Void},),src)
+        expiration = convert(Int64,now + tmout_ms*1000)
+    else
+        expiration = convert(Int64,0)
+    end
+    int32(tmout_ms == 0)
+end
+if VERSION < v"0.3-"
+    isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] == Base.roottask)
+else
+    isempty_workqueue() = isempty(Base.Workqueue)
+end
+function uv_check(src::Ptr{Void})
+    global event_pending, event_processing, expiration
+    if expiration::Int64 == 0
+        timeout_expired = true
+    else
+        now = ccall((:g_source_get_time,GLib.libglib),Int64,(Ptr{Void},),src)
+        timeout_expired = (expiration::Int64 <= now);
+    end
+    event_pending = event_pending || uv_pollfd.revents != 0 || !isempty_workqueue() || timeout_expired
+    int32(!event_processing::Bool && event_pending::Bool)
+end
+function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
+    global event_processing, event_pending
+    event_processing = true
+    event_pending = false
+    ret = ccall(callback,Cint,(T,),data)
+    event_processing = false
+    ret
+end
+
+function g_yield(data)
+    g_siginterruptible() do
+        yield()
+    end
+    int32(true)
+end
+
+sizeof_gclosure = 0
+function __init__()
+    ccall((:g_type_init,libgobject),Void,())
+    global jlref_quark = quark"julia_ref"
+    global sizeof_gclosure = WORD_SIZE
+    closure = C_NULL
+    while closure == C_NULL
+        sizeof_gclosure += WORD_SIZE
+        closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
+    end
+    ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
+
+    global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
+        (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
+    global exiting = false
+    atexit(()->global exiting = true)
+
+    global uv_sourcefuncs = _GSourceFuncs(
+        cfunction(uv_prepare,Cint,(Ptr{Void},Ptr{Cint})),
+        cfunction(uv_check,Cint,(Ptr{Void},)),
+        cfunction(uv_dispatch,Cint,(Ptr{Void},Ptr{Void},Int)),
+        C_NULL, C_NULL, C_NULL)
+    src = new_gsource(uv_sourcefuncs)
+    ccall((:g_source_set_can_recurse,GLib.libglib),Void,(Ptr{Void},Cint),src,true)
+    ccall((:g_source_set_name,GLib.libglib),Void,(Ptr{Void},Ptr{Uint8}),src,"uv loop")
+    ccall((:g_source_set_callback,GLib.libglib),Void,(Ptr{Void},Ptr{Void},Uint,Ptr{Void}),
+        src,cfunction(g_yield,Cint,(Uint,)),1,C_NULL)
+
+    uv_fd = @windows ? -1 : ccall(:uv_backend_fd,Cint,(Ptr{Void},),Base.eventloop())
+    global uv_pollfd = _GPollFD(uv_fd, typemax(Cushort))
+    if (uv_pollfd::_GPollFD).fd != -1
+        ccall((:g_source_add_poll,GLib.libglib),Void,(Ptr{Void},Ptr{_GPollFD}),src,&(uv_pollfd::_GPollFD))
+    end
+
+    ccall((:g_source_attach,GLib.libglib),Cuint,(Ptr{Void},Ptr{Void}),src,C_NULL)
+    ccall((:g_source_unref,GLib.libglib),Void,(Ptr{Void},),src)
+end
+
