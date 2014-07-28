@@ -67,12 +67,7 @@ function makefilters(dlgp::GtkFileChooser, filters::Union(AbstractVector,Tuple))
     end
 end
 
-function open_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[], multiple::Bool = false)
-    haveparent = parent != nothing
-    if !haveparent
-        parent = @GtkWindow()
-        visible(parent, false)
-    end
+function open_dialog(title::String; parent = GtkNullContainer(), filters::Union(AbstractVector,Tuple) = ASCIIString[], multiple::Bool = false)
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
                                 "_Cancel", GConstants.GtkResponseType.CANCEL,
                                 "_Open",   GConstants.GtkResponseType.ACCEPT)
@@ -100,16 +95,10 @@ function open_dialog(title::String; parent = nothing, filters::Union(AbstractVec
         end
     end
     destroy(dlg)
-    !haveparent && destroy(parent)
     selection
 end
 
-function save_dialog(title::String; parent = nothing, filters::Union(AbstractVector,Tuple) = ASCIIString[])
-    haveparent = parent != nothing
-    if !haveparent
-        parent = @GtkWindow()
-        visible(parent, false)
-    end
+function save_dialog(title::String; parent = GtkNullContainer(), filters::Union(AbstractVector,Tuple) = ASCIIString[])
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
                                 "_Cancel", GConstants.GtkResponseType.CANCEL,
                                 "_Save",   GConstants.GtkResponseType.ACCEPT)
@@ -125,6 +114,5 @@ function save_dialog(title::String; parent = nothing, filters::Union(AbstractVec
         selection = utf8("")
     end
     destroy(dlg)
-    !haveparent && destroy(parent)
     selection
 end
