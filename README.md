@@ -17,7 +17,22 @@ using `WinRPM.jl`:
 
      Pkg.add("WinRPM")
      using WinRPM
-     WinRPM.install(["gtk2","gtk3"])
+     WinRPM.install(["gtk2","gtk3",
+          "hicolor-icon-theme",
+          "tango-icon-theme",
+          "glib2-tools",
+          "glib2-devel",
+          "gnome-icon-theme",
+          "gnome-icon-theme-extras",
+          "gnome-icon-theme-symbolic",
+          "gtk3-devel",
+          "gtk2-devel",
+          "gtk3-tools",
+          "gtk2-tools",
+          "pango-tools",
+          "gdk-pixbuf-query-loaders",
+          "gtk2-lang"
+          "gtk3-lang"])
      RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
      ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
 
