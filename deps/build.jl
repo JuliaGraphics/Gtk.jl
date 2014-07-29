@@ -27,13 +27,6 @@ end
 @osx_only begin
     using Homebrew
     provides(Homebrew.HB, "gtk+3", gtk, os = :Darwin)
-
-    # Append to XDG_DATA_DIRS to get us the proper paths setup for glib schemas
-    if "XDG_DATA_DIRS" in ENV
-        ENV["XDG_DATA_DIRS"] *= ":" * joinpath(Homebrew.brew_prefix, "share")
-    else
-        ENV["XDG_DATA_DIRS"] = joinpath(Homebrew.brew_prefix, "share")
-    end
 end
 
 if OS_NAME == :Windows
