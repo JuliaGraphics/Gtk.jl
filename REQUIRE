@@ -1,2 +1,5 @@
 Cairo 0.2.2
 julia 0.2-
+BinDeps
+@windows WinRPM
+@osx Homebrew
