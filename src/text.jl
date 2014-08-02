@@ -358,7 +358,7 @@ function user_action(f::Function, buffer::GtkTextBuffer)
 end
 
 function create_tag(buffer::GtkTextBuffer, tag_name::String; properties...)
-    tag = GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
+    tag = @GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
                 (Ptr{GObject},Ptr{Uint8},Ptr{Void}),
                 buffer, bytestring(tag_name), C_NULL))
     for (k,v) in properties
