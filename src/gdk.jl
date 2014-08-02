@@ -1,4 +1,4 @@
-immutable GdkRectangle
+immutable GdkRectangle <: GBoxed
     x::Int32
     y::Int32
     width::Int32
@@ -68,7 +68,7 @@ baremodule GdkKeySyms
   const Hyper_R = 0xffee
 end
 
-abstract GdkEvent
+abstract GdkEvent <: GBoxed
 make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event,:libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     e = unsafe_load(convert(Ptr{GdkEventAny},evt))

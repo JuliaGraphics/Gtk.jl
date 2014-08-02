@@ -114,6 +114,7 @@ const fundamental_fns = tuple(Function[make_gvalue(juliatype, ctype, g_value_fn,
     (i,(name, ctype, juliatype, g_value_fn)) in enumerate(fundamental_types)]...)
 make_gvalue(Symbol, Ptr{Uint8}, :static_string, :(g_type(String)), false)
 make_gvalue(Type, GType, :gtype, (:g_gtype,:libgobject))
+make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
 
 function getindex(gv::GV, ::Type{Any})
     gtyp = unsafe_load(gv).g_type
