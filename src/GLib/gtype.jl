@@ -43,8 +43,6 @@ const fundamental_types = (
 # NOTE: in general do not cache ids, except for these fundamental values
 g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
-# this constant is needed elsewhere, but doesn't have a matching Julia type so it can't be used from g_type
-const gboxed_id = g_type_from_name(:GBoxed)
 
 g_type(gtyp::GType) = gtyp
 let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
