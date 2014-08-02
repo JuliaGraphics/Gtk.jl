@@ -13,8 +13,14 @@ function splice!(app::GtkApplication, win::GtkWindow)
     app
 end
 
-app_menu(app::GtkApplication, app_menu::GObject) =
-    ccall((:gtk_application_new, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, app_menu)
+set_menubar(app::GtkApplication, menubar::GObject) =
+    ccall((:gtk_application_set_menubar, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, menubar)
+
+set_app_menu(app::GtkApplication, app_menu::GObject) =
+    ccall((:gtk_application_set_app_menu, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, app_menu)
+
+run(app::GtkApplication) = 
+    ccall((:g_application_run, libgio), Cint, (Ptr{GObject}, Cint, Ptr{Uint8}), app, 0, C_NULL)
 
 @gtktype GtkApplicationWindow
 GtkApplicationWindowLeaf(app::GtkApplication) = GtkApplicationWindowLeaf(

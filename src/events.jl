@@ -17,9 +17,9 @@ function __init__()
 
     # if g_main_depth > 0, a glib main-loop is already running,
     # so we don't need to start a new one
-    if ccall((:g_main_depth,GLib.libglib),Cint,()) == 0
-        global gtk_main_task = @schedule gtk_main()
-    end
+    #if ccall((:g_main_depth,GLib.libglib),Cint,()) == 0
+    #    global gtk_main_task = @schedule gtk_main()
+    #end
 end
 
 
