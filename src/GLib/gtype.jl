@@ -411,4 +411,5 @@ function gc_move_ref(new::GObject, old::GObject)
     gc_unref(old)
     gc_ref(new)
     gc_unref(h)
+    new
 end
