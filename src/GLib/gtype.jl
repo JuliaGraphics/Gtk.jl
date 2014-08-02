@@ -1,6 +1,9 @@
 abstract GObject
 abstract GInterface <: GObject
 abstract GBoxed
+type GBoxedUnkown<:GBoxed
+    handle::Ptr{GBoxed}
+end
 
 typealias Enum Int32
 typealias GType Csize_t
@@ -32,7 +35,7 @@ const fundamental_types = (
     (:gdouble,    Float64,          FloatingPoint,  :double),
     (:gchararray, Ptr{Uint8},       String,         :string),
     (:gpointer,   Ptr{Void},        Ptr,            :pointer),
-    (:GBoxed,     Ptr{Void},        GBoxed,         :boxed),
+    (:GBoxed,     Ptr{GBoxed},      GBoxed,         :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
@@ -269,8 +272,11 @@ ref_to{T<:GObject}(::Type{T}, x) = gc_ref(convert(Ptr{GObject},x))
 deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
 empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
-convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = box.handle
+convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = convert(Ptr{T},box.handle)
+convert{T<:GBoxed}(::Type{T},unbox::Ptr{GBoxed}) = convert(T,convert(Ptr{T},unbox))
 convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
+convert{T<:GBoxed}(::Type{GBoxed},unbox::Ptr{T}) = GBoxedUnkown(unbox)
+convert{T<:GBoxed}(::Type{T},unbox::GBoxedUnkown) = convert(T, unbox.handle)
 
 # this could be used for gtk methods returing widgets of unknown type
 # and/or might have been wrapped by julia before
