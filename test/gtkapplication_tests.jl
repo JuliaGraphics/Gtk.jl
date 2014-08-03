@@ -59,10 +59,7 @@ signal_connect(app,"activate") do a, args...
   end
   push!( Gtk.GActionMap(a), Gtk.GAction(quitAction) )
 
-  #quitIt = G_.object(builder, "menu_item_quit")
-  #signal_connect(quitIt, :activate) do widget
-  #   exit()
-  #end
+  Gtk.add_accelerator(a, "<Primary>q", "app.quit")
 
   showall(w)
 end

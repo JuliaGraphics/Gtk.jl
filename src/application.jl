@@ -38,6 +38,15 @@ function splice!(app::GtkApplication, win::GtkWindow)
     app
 end
 
+add_accelerator(app::GtkApplication, accelerator::String, action_name::String, parameter=C_NULL) =
+    ccall((:gtk_application_add_accelerator, libgtk), Void, (Ptr{GObject}, Ptr{Uint8}, Ptr{Uint8}, Ptr{Uint8}), 
+           app, bytestring(accelerator), bytestring(action_name), parameter)
+
+
+remove_accelerator(app::GtkApplication, action_name::String, parameter=C_NULL) =
+    ccall((:gtk_application_remove_accelerator, libgtk), Void, (Ptr{GObject}, Ptr{Uint8}, Ptr{Uint8}), 
+           bytestring(action_name), parameter)
+
 set_menubar(app::GtkApplication, menubar::GObject) =
     ccall((:gtk_application_set_menubar, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, menubar)
 
