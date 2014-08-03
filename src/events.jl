@@ -5,7 +5,7 @@ function gtk_main()
 end
 
 function gtk_quit()
-    ccall((:gtk_quit,libgtk),Void,())
+    ccall((:gtk_main_quit,libgtk),Void,())
 end
 
 function __init__()
