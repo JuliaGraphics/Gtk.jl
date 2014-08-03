@@ -62,7 +62,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
                 if g_isa(gtyp,g_type(GObject))
                     params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
-                elseif g_isa(gtyp,gboxed_id)
+                elseif g_isa(gtyp,g_type(GBoxed))
                     params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
                 elseif g_isa(gtyp,g_type(String))
                     params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
@@ -188,60 +188,89 @@ function new_gsource(source_funcs::_GSourceFuncs)
     gsource
 end
 
-event_processing = false
-event_pending = false
-expiration = 0
-function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
-    global event_pending, event_processing, expiration, uv_pollfd
-    local tmout_ms::Cint
-    if event_processing
-        tmout_ms = -1
-    elseif event_pending::Bool || !isempty(Base.Workqueue)
-        tmout_ms = 0
-    else
-        tmout_ms = ccall(:uv_backend_timeout,Cint,(Ptr{Void},),Base.eventloop())
-        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 2500
-        if tmout_ms < 0 || tmout_ms > tmout_min
-            tmout_ms = tmout_min
-        end
-    end
-    unsafe_store!(timeout, tmout_ms)
-    if tmout_ms > 0
-        now = ccall((:g_source_get_time,GLib.libglib),Int64,(Ptr{Void},),src)
-        expiration = convert(Int64,now + tmout_ms*1000)
-    else
-        expiration = convert(Int64,0)
-    end
-    int32(tmout_ms == 0)
-end
+expiration = uint64(0)
 if VERSION < v"0.3-"
     isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] == Base.roottask)
 else
     isempty_workqueue() = isempty(Base.Workqueue)
 end
-function uv_check(src::Ptr{Void})
-    global event_pending, event_processing, expiration
-    if expiration::Int64 == 0
-        timeout_expired = true
+function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
+    global expiration, uv_pollfd
+    local tmout_ms::Cint
+    evt = Base.eventloop()
+    if !isempty_workqueue()
+        tmout_ms = 0
+    elseif ccall(:uv_loop_alive,Cint,(Ptr{Void},),evt) == 0
+        tmout_ms = -1
+    elseif uv_pollfd.revents != 0
+        tmout_ms = 0
+    elseif @windows ? (VERSION < v"0.3-") : false # uv_backend_timeout broken on windows before Julia v0.3-rc2
+        tmout_ms = 10
     else
-        now = ccall((:g_source_get_time,GLib.libglib),Int64,(Ptr{Void},),src)
-        timeout_expired = (expiration::Int64 <= now);
+        tmout_ms = ccall(:uv_backend_timeout,Cint,(Ptr{Void},),evt)
+        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 5000
+        if tmout_ms < 0 || tmout_ms > tmout_min
+            tmout_ms = tmout_min
+        end
     end
-    event_pending = event_pending || uv_pollfd.revents != 0 || !isempty_workqueue() || timeout_expired
-    int32(!event_processing::Bool && event_pending::Bool)
+    timeout != C_NULL && unsafe_store!(timeout, tmout_ms)
+    if tmout_ms < 0
+        expiration = typemax(Uint64)
+    elseif tmout_ms > 0
+        now = ccall((:g_source_get_time,GLib.libglib),Uint64,(Ptr{Void},),src)
+        expiration = convert(Uint64,now + tmout_ms*1000)
+    else #tmout_ms == 0
+        expiration = uint64(0)
+    end
+    int32(tmout_ms == 0)
+end
+function uv_check(src::Ptr{Void})
+    global expiration
+    ex = expiration::Uint64
+    if !isempty_workqueue()
+        return int32(1)
+    elseif ccall(:uv_loop_alive,Cint,(Ptr{Void},),Base.eventloop()) == 0
+        return int32(0)
+    elseif ex == 0
+        return int32(1)
+    elseif uv_pollfd.revents != 0
+        return int32(1)
+    else
+        now = ccall((:g_source_get_time,GLib.libglib),Uint64,(Ptr{Void},),src)
+        return int32(ex <= now)
+    end
 end
 function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
-    global event_processing, event_pending
-    event_processing = true
-    event_pending = false
     ret = ccall(callback,Cint,(T,),data)
-    event_processing = false
     ret
 end
 
+yield_stack = Task[] # need to make sure we return to g_loop_run_run in the same order we were called
+if VERSION < v"0.3-"
+    function schedule_and_wait(task::Task)
+        task.runnable || schedule(task)
+        wait()
+    end
+else
+    function schedule_and_wait(task::Task)
+        # unfair scheduler version of Base.schedule_and_wait
+        if task.state == :runnable
+            yieldto(task)
+        else
+            wait()
+        end
+    end
+end
 function g_yield(data)
+    global yield_stack
+    ct = current_task()
+    push!(yield_stack, ct)
     g_siginterruptible() do
         yield()
+    end
+    newtask = pop!(yield_stack)
+    if newtask != ct
+        schedule_and_wait(newtask)
     end
     int32(true)
 end
