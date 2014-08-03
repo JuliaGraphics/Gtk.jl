@@ -41,7 +41,24 @@ signal_connect(app,"activate") do a, args...
 
   Gtk.set_menubar(app, menubar)
   Gtk.set_app_menu(app, appmenu)
-  
+
+  ls=@ListStore(Int32,Bool)
+  push!(ls,(33,true))
+  tv=@TreeView(TreeModel(ls))
+  r1=@CellRendererText()
+  r2=@CellRendererToggle()
+  c1=@TreeViewColumn("A", r1,{"text" => 0})
+  c2=@TreeViewColumn("B", r2,{"active" => 1})
+  push!(tv,c1)
+  push!(tv,c2)
+  push!(w, tv)  
+
+  quitAction = Gtk.@GSimpleAction("quit")
+  signal_connect(quitAction, :activate) do widget...
+     exit()
+  end
+  push!( Gtk.GActionMap(a), Gtk.GAction(quitAction) )
+
   #quitIt = G_.object(builder, "menu_item_quit")
   #signal_connect(quitIt, :activate) do widget
   #   exit()

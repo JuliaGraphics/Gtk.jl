@@ -439,7 +439,8 @@ function selected(selection::GtkTreeSelection)
     if !ret
         error("No selection of GtkTreeSelection")
     end
-    convert(GtkTreeModel, model[]), iter[]
+    #convert(GtkTreeModel, model[]), iter[]
+    model[], iter[]
 end
 
 length(selection::GtkTreeSelection) =
