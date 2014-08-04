@@ -10,6 +10,12 @@ if gtk_version == 3
 push!(action_map::GActionMap, action::GAction) = 
   ccall((:g_action_map_add_action, libgio), Void, (Ptr{GObject}, Ptr{GObject}), action_map, action)
 
+splice!(action_map::GActionMap, action_name::String) = 
+  ccall((:g_action_map_remove_action, libgio), Void, (Ptr{GObject}, Ptr{Uint8}), action_map, bytestring(action_name))
+
+lookup(action_map::GActionMap, action_name::String) = 
+  ccall((:g_action_map_lookup_action, libgio), Ptr{GObject}, (Ptr{GObject}, Ptr{Uint8}), action_map, bytestring(action_name))
+
 ### GApplication
 
 @Gtype GApplication Gtk.libgio g_application
