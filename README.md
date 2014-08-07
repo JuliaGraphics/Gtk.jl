@@ -31,7 +31,7 @@ using `WinRPM.jl`:
           "gtk2-tools",
           "pango-tools",
           "gdk-pixbuf-query-loaders",
-          "gtk2-lang"
+          "gtk2-lang",
           "gtk3-lang"])
      RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
      ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
