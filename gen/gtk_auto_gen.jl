@@ -68,7 +68,7 @@ let gtk_version = Gtk.gtk_version
         println(cache)
         Base.println(cache,"end")
     end
-    open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia$(VERSION.major)_$(VERSION.minor)"), "w") do cache
+    open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia_ser$(Base.ser_version)"), "w") do cache
         serialize(cache, gbox)
         serialize(cache, gconsts)
     end

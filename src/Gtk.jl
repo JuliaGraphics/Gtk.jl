@@ -67,7 +67,7 @@ end
 
 export GAccessor
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
-    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_julia$(VERSION.major)_$(VERSION.minor)")
+    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_ser$(Base.ser_version)")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)
