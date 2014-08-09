@@ -191,8 +191,13 @@ end
 expiration = uint64(0)
 if VERSION < v"0.3-"
     isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] == Base.roottask)
+    function uv_loop_alive(evt)
+        ccall(:uv_stop,Void,(Ptr{Void},),evt)
+        ccall(:uv_run,Cint,(Ptr{Void},Cint),evt,2) != 0
+    end
 else
     isempty_workqueue() = isempty(Base.Workqueue)
+    uv_loop_alive(evt) = ccall(:uv_loop_alive,Cint,(Ptr{Void},),evt) != 0
 end
 function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
     global expiration, uv_pollfd
@@ -200,7 +205,7 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
     evt = Base.eventloop()
     if !isempty_workqueue()
         tmout_ms = 0
-    elseif ccall(:uv_loop_alive,Cint,(Ptr{Void},),evt) == 0
+    elseif !uv_loop_alive(evt)
         tmout_ms = -1
     elseif uv_pollfd.revents != 0
         tmout_ms = 0
@@ -229,7 +234,7 @@ function uv_check(src::Ptr{Void})
     ex = expiration::Uint64
     if !isempty_workqueue()
         return int32(1)
-    elseif ccall(:uv_loop_alive,Cint,(Ptr{Void},),Base.eventloop()) == 0
+    elseif !uv_loop_alive(Base.eventloop())
         return int32(0)
     elseif ex == 0
         return int32(1)
