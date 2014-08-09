@@ -69,7 +69,7 @@ function gen_consts(body, gtk_h)
         if ismatch(r"^G\w*[A-Za-z]$", name)
             tokens = cindex.tokenize(mdecl)
             if length(tokens) == 2 && isa(tokens[2], cindex.Literal)
-                tok2 = Clang.wrap_c.lex_exprn(tokens, 2)[1]
+                tok2 = Clang.wrap_c.handle_macro_exprn(tokens, 2)[1]
                 tok2 = replace(tok2, "\$", "\\\$")
                 push!(body.args, Expr(:const, Expr(:(=), symbol(name), parse(tok2))))
             else
