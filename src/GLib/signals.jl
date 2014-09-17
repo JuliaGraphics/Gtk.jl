@@ -1,5 +1,8 @@
 sizeof_gclosure = 0
 function __init__()
+    if isdefined(GLib,:__init__bindeps__)
+        GLib.__init__bindeps__()
+    end
     ccall((:g_type_init,libgobject),Void,())
     global jlref_quark = quark"julia_ref"
     global sizeof_gclosure = WORD_SIZE

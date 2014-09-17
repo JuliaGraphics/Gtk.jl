@@ -20,22 +20,22 @@ end
 
 @windows_only begin
     using WinRPM
-    provides(WinRPM.RPM,"gtk3", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows )
+    provides(WinRPM.RPM,"gtk3", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
 end
 
 @osx_only begin
     using Homebrew
-    provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload = 
+    provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
     """
-    function __init__()
+    function __init__bindeps__()
         if "XDG_DATA_DIRS" in ENV
             ENV["XDG_DATA_DIRS"] *= ":" * joinpath("$(Homebrew.brew_prefix)", "share")
         else
             ENV["XDG_DATA_DIRS"] = joinpath("$(Homebrew.brew_prefix)", "share")
         end
     end
-    """ )
+    """)
     provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
     provides(Homebrew.HB, "gdk-pixbuf", gdk_pixbuf, os = :Darwin)
 end
