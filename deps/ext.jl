@@ -4,7 +4,7 @@ const _depspath = joinpath(dirname(@__FILE__), "deps.jl")
 
 if isfile(_depspath)
     include(_depspath)
-else 
+else
     if gtk_version == 3
         if OS_NAME == :Windows
             const libgtk = "libgtk-3-0"

@@ -281,7 +281,7 @@ function g_yield(data)
 end
 
 sizeof_gclosure = 0
-function __init__()
+function __init__gtype__()
     ccall((:g_type_init,libgobject),Void,())
     global jlref_quark = quark"julia_ref"
     global sizeof_gclosure = WORD_SIZE
@@ -291,12 +291,9 @@ function __init__()
         closure = ccall((:g_closure_new_simple,libgobject),Ptr{Void},(Int,Ptr{Void}),sizeof_gclosure,C_NULL)
     end
     ccall((:g_closure_sink,libgobject),Void,(Ptr{Void},),closure)
+end
 
-    global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
-        (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
-    global exiting = false
-    atexit(()->global exiting = true)
-
+function __init__gmainloop__()
     global uv_sourcefuncs = _GSourceFuncs(
         cfunction(uv_prepare,Cint,(Ptr{Void},Ptr{Cint})),
         cfunction(uv_check,Cint,(Ptr{Void},)),
@@ -318,3 +315,14 @@ function __init__()
     ccall((:g_source_unref,GLib.libglib),Void,(Ptr{Void},),src)
 end
 
+function __init__()
+    if isdefined(GLib,:__init__bindeps__)
+        GLib.__init__bindeps__()
+    end
+    global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
+        (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
+    global exiting = false
+    atexit(()->global exiting = true)
+    __init__gtype__()
+    __init__gmainloop__()
+end
