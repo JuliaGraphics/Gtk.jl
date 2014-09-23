@@ -15,6 +15,8 @@ immutable GParamSpec
   owner_type::GType
 end
 
+GVariant = Void
+
 const fundamental_types = (
     #(:name,      Ctype,            JuliaType,      g_value_fn)
     (:invalid,    Void,             Void,           :error),
@@ -38,7 +40,7 @@ const fundamental_types = (
     (:GBoxed,     Ptr{GBoxed},      GBoxed,         :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
-    #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
+    (:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for these fundamental values
 g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{Uint8},),name)
