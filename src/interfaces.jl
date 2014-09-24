@@ -9,6 +9,10 @@
 @Giface GtkToolShell Gtk.libgtk gtk_tool_shell
 @Giface GtkTreeDragDest Gtk.libgtk gtk_tree_drag_dest
 @Giface GtkTreeDragSource Gtk.libgtk gtk_tree_drag_source
+@Giface GtkEditable Gtk.libgtk gtk_editable
+@Giface GtkTreeModel Gtk.libgtk gtk_tree_model
+@Giface GtkTreeSortable Gtk.libgtk gtk_tree_sortable
+@Giface GtkFileChooser Gtk.libgtk gtk_file_chooser
 
 if gtk_version == 3
     @Giface GtkActionable Gtk.libgtk gtk_actionable
@@ -16,6 +20,7 @@ if gtk_version == 3
     @Giface GtkColorChooser Gtk.libgtk gtk_color_chooser
     @Giface GtkFontChooser Gtk.libgtk gtk_font_chooser
     @Giface GtkScrollable Gtk.libgtk gtk_scrollable
+    @Giface GtkStyleProvider Gtk.libgtk gtk_style_provider
 else
     type GtkActionable end
     GtkActionable(x...) = error("GtkActionable is not available until Gtk3")
@@ -27,6 +32,8 @@ else
     GtkFontChooser(x...) = error("GtkFontChooser is not available until Gtk3")
     type GtkScrollable end
     GtkScrollable(x...) = error("GtkScrollable is not available until Gtk3")
+    type GtkStyleProvider end
+    GtkStyleProvider(x...) = error("GtkStyleProvider is not available until Gtk3")
 end
 
 # Gtk-2

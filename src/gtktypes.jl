@@ -1,8 +1,24 @@
+function _gtksubtype_constructors(name::Symbol)
+    cm = current_module()
+    ename = symbol(string(name,cm.(:suffix)))
+    typ = cm.(ename)
+    if GLib.g_isa(typ, GtkOrientable)
+        @eval $ename(orientation::Symbol,vargs...) = $ename(
+            (orientation==:v ? true :
+            (orientation==:h ? false :
+            error("invalid $($ename) orientation $orientation"))),vargs...)
+    end
+    if isdefined(Gtk,:GtkContainer) && GLib.g_isa(typ, GtkContainer)
+        @eval $ename(child::GtkWidget,vargs...) = push!($ename(vargs...),child)
+    end
+end
+
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = symbol(join([lowercase(s) for s in groups],"_"))
     quote
         @Gtype $(esc(name)) libgtk $(esc(symname))
+        _gtksubtype_constructors($(QuoteNode(name)))
     end
 end
 @gtktype GtkWidget
@@ -11,75 +27,130 @@ end
 @gtktype GtkDialog
 @gtktype GtkMenuShell
 
-convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},GtkLabelLeaf(w))
-
-destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
-parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
-hasparent(w::GtkWidget) = ccall((:gtk_widget_get_parent,libgtk), Ptr{Void}, (Ptr{GObject},), w) != C_NULL
-function toplevel(w::GtkWidget)
-    p = convert(Ptr{GObject}, w)
-    pp = p
-    while pp != C_NULL
-        p = pp
-        pp = ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), p)
-    end
-    convert(GtkWidget, p)
-end
-function allocation(widget::Gtk.GtkWidget)
-    allocation_ = Array(GdkRectangle)
-    ccall((:gtk_widget_get_allocation,libgtk), Void, (Ptr{GObject},Ptr{GdkRectangle}), widget, allocation_)
-    return allocation_[1]
-end
-if gtk_version > 3
-    width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width,libgtk),Cint,(Ptr{GObject},),w)
-    height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height,libgtk),Cint,(Ptr{GObject},),w)
-    size(w::GtkWidget) = (width(w),height(w))
-else
-    width(w::GtkWidget) = allocation(w).width
-    height(w::GtkWidget) = allocation(w).height
-    size(w::GtkWidget) = (a=allocation(w);(a.width,a.height))
-end
-
-### Functions and methods common to all GtkWidget objects
-visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
-visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
-show(w::GtkWidget) = (ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
-showall(w::GtkWidget) = (ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)
-
-# TODO Use Pango type PangoFontDescription once it is wrapped
-modifyfont(w::GtkWidget, font_desc::Ptr{Void}) = 
-   ccall((:gtk_widget_modify_font,libgtk),Void,(Ptr{GObject},Ptr{Void}),w,font_desc)
-
-function getproperty{T}(w::GtkContainer, name::StringLike, child::GtkWidget, ::Type{T})
-    v = gvalue(T)
-    ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
-    val = v[T]
-    ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
-    return val
-end
-
-#property(w::GtkContainer, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
-setproperty!{T}(w::GtkContainer, name::StringLike, child::GtkWidget, ::Type{T}, value) = setproperty!(w, name, child, convert(T,value))
-function setproperty!(w::GtkContainer, name::StringLike, child::GtkWidget, value)
-    ccall((:gtk_container_child_set_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
-    w
-end
-
-@deprecate getindex(w::GtkContainer, child::GtkWidget, name::StringLike, T::Type) getproperty(w,name,child,T)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike, T::Type) setproperty!(w,name,child,T,value)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike) setproperty!(w,name,child,value)
-
 @gtktype GtkAccelGroup
-GtkAccelGroupLeaf() = GtkAccelGroupLeaf(
-    ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
+@gtktype GtkBuilder
+@gtktype GtkButton
+@gtktype GtkCheckButton
+@gtktype GtkToggleButton
+@gtktype GtkRadioButton
+@gtktype GtkLinkButton
+@gtktype GtkVolumeButton
+@gtktype GtkFontButton
+@gtktype GtkDrawingArea
+@gtktype GtkImage
+@gtktype GtkProgressBar
+@gtktype GtkSpinner
+@gtktype GtkStatusbar
+@gtktype GtkStatusIcon
+#TODO: @gtktype GtkInfoBar
+@gtktype GtkEntry
+@gtktype GtkEntryCompletion
+@gtktype GtkRange
+@gtktype GtkScale
+@gtktype GtkAdjustment
+@gtktype GtkSpinButton
+@gtktype GtkTable
+@gtktype GtkAlignment
+@gtktype GtkFrame
+@gtktype GtkAspectFrame
+@gtktype GtkBox
+@gtktype GtkButtonBox
+@gtktype GtkPaned
+@gtktype GtkLayout
+@gtktype GtkExpander
+@gtktype GtkNotebook
+@gtktype GtkComboBoxText
+@gtktype GtkListStore
+@gtktype GtkTreeStore
+@gtktype GtkTreeModelFilter
+@gtktype GtkCellRenderer
+@gtktype GtkCellRendererAccel
+@gtktype GtkCellRendererCombo
+@gtktype GtkCellRendererPixbuf
+@gtktype GtkCellRendererProgress
+@gtktype GtkCellRendererSpin
+@gtktype GtkCellRendererText
+@gtktype GtkCellRendererToggle
+@gtktype GtkCellRendererSpinner
+@gtktype GtkTreeViewColumn
+@gtktype GtkTreeSelection
+@gtktype GtkTreeView
+@gtktype GtkTreeModelSort
+@gtktype GtkCellView
+@gtktype GtkIconView
+@gtktype GtkMenuItem
+@gtktype GtkSeparatorMenuItem
+@gtktype GtkMenu
+@gtktype GtkMenuBar
+@gtktype GtkFileChooserDialog
+@gtktype GtkFileFilter
+@gtktype GtkLabel
+@gtktype GtkTextBuffer
+@gtktype GtkTextView
+@gtktype GtkTextMark
+@gtktype GtkTextTag
+@gtktype GtkToolbar
+@gtktype GtkToolItem
+@gtktype GtkToolButton
+@gtktype GtkToggleToolButton
+@gtktype GtkMenuToolButton
+@gtktype GtkSeparatorToolItem
+@gtktype GtkWindow
+@gtktype GtkScrolledWindow
+@gtktype GtkAboutDialog
+@gtktype GtkMessageDialog
+@Gtype GApplication libgio g_application
+@Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
+#TODO: @gtktype GtkScaleButton
 
-function push!(w::GtkWidget, accel_signal::StringLike, accel_group::GtkAccelGroup,
-               accel_key::Integer, accel_mods::Integer, accel_flags::Integer)
-    ccall((:gtk_widget_add_accelerator,libgtk), Void,
-         (Ptr{GObject}, Ptr{Uint8}, Ptr{GObject}, Cuint, Cint, Cint), 
-          w, bytestring(accel_signal), accel_group, accel_key, accel_mods, accel_flags)
-    w
-end  
+if gtk_version == 3
+@gtktype GtkApplication
+@gtktype GtkApplicationWindow
+@gtktype GtkSwitch
+@gtktype GtkGrid
+@gtktype GtkOverlay # this is a GtkBin, although it behaves more like a container
+@gtktype GtkCellArea
+@gtktype GtkCellAreaBox
+@gtktype GtkCellAreaContext
+@gtktype GtkCssProvider
+@gtktype GtkStyleContext
+else
+    type GtkApplication end
+    GtkApplicationLeaf(x...) = error("GtkApplication is not available until Gtk3.0")
+    macro GtkApplication(args...)
+        :( GtkApplicationLeaf($(args...)) )
+    end
+
+    type GtkApplicationWindow end
+    GtkApplicationWindowLeaf(x...) = error("GtkApplicationWindow is not available until Gtk3.0")
+    macro GtkApplicationWindow(args...)
+        :( GtkApplicationWindowLeaf($(args...)) )
+    end
+
+    @g_type_delegate GtkSwitch = GtkToggleButton
+
+    type GtkGrid end
+    GtkGridLeaf(x...) = error("GtkGrid is not available until Gtk3.0")
+    macro GtkGrid(args...)
+        :( GtkGridLeaf($(args...)) )
+    end
+
+    type GtkOverlay end
+    GtkOverlayLeaf(x...) = error("GtkOverlay is not available until Gtk3.2")
+    macro GtkOverlay(args...)
+        :( GtkOverlayLeaf($(args...)) )
+    end
+
+    type GtkCssProvider end
+    GtkCssProviderLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
+    macro GtkCssProvider(args...)
+        :( GtkCssProviderLeaf($(args...)) )
+    end
+
+    type GtkStyleContext end
+    GtkStyleContextLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
+    macro GtkStyleContext(args...)
+        :( GtkStyleContextLeaf($(args...)) )
+    end
+end
 

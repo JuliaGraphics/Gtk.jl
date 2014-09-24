@@ -146,8 +146,6 @@ convert{P<:Ptr}(::Type{P}, a::MatrixStrided) = convert(P, a.p)
 bstride(a::MatrixStrided,i) = (i == 1 ? sizeof(eltype(a)) : (i == 2 ? a.rowstride : 0))
 bstride(a,i) = stride(a,i)*sizeof(eltype(a))
 
-@Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
-
 # Example constructors:
 #GdkPixbuf(filename="", width=-1, height=-1, preserve_aspect_ratio=true)
 #GdkPixbuf(resource_path="", width=-1, height=-1, preserve_aspect_ratio=true)
@@ -261,7 +259,6 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 
 #TODO: image transformations, rotations, compositing
 
-@gtktype GtkImage
 GtkImageLeaf(pixbuf::GdkPixbuf) = GtkImageLeaf(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
 GtkImageLeaf(filename::String) = GtkImageLeaf(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
 
@@ -286,17 +283,14 @@ end
 empty!(img::GtkImage) = ccall((:gtk_image_clear,libgtk),Void,(Ptr{GObject},),img)
 GdkPixbufLeaf(img::GtkImage) = GdkPixbufLeaf(ccall((:gtk_image_get_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),img))
 
-@gtktype GtkProgressBar
 GtkProgressBarLeaf() = GtkProgressBarLeaf(ccall((:gtk_progress_bar_new,libgtk),Ptr{GObject},()))
 pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse,libgtk),Void,(Ptr{GObject},),progress)
 
-@gtktype GtkSpinner
 GtkSpinnerLeaf() = GtkSpinnerLeaf(ccall((:gtk_spinner_new,libgtk),Ptr{GObject},()))
 
 start(spinner::GtkSpinner) = ccall((:gtk_spinner_start,libgtk),Void,(Ptr{GObject},),spinner)
 stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop,libgtk),Void,(Ptr{GObject},),spinner)
 
-@gtktype GtkStatusbar
 GtkStatusbarLeaf() = GtkStatusbarLeaf(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
     ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
@@ -315,9 +309,6 @@ empty!(status::GtkStatusbar,context) =
     ccall((:gtk_statusbar_remove_all,libgtk),Ptr{GObject},(Ptr{GObject},Cuint,Cuint),
         status,context_id(status,context),context_id(context))
 
-#@gtktype GtkInfoBar
 #GtkInfoBarLeaf() = GtkInfoBarLeaf(ccall((:gtk_info_bar_new,libgtk),Ptr{GObject},())
 
-@gtktype GtkStatusIcon
 GtkStatusIconLeaf() = GtkStatusIconLeaf(ccall((:gtk_status_icon_new,libgtk),Ptr{GObject},()))
-

@@ -13,23 +13,18 @@
 
 #TODO: GtkAccel manager objects
 
-@gtktype GtkLabel
 GtkLabelLeaf(title) = GtkLabelLeaf(
     ccall((:gtk_label_new,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(title)))
 
-@gtktype GtkTextBuffer
 GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
 
-@gtktype GtkTextView
 GtkTextViewLeaf(buffer::GtkTextBuffer=@GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 
-@gtktype GtkTextMark
 GtkTextMarkLeaf(left_gravity::Bool=false) = GtkTextMarkLeaf(
     ccall((:gtk_text_mark_new,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),C_NULL,left_gravity))
 
-@gtktype GtkTextTag
 GtkTextTagLeaf() = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{Uint8},),C_NULL))
 GtkTextTagLeaf(name::String) = GtkTextTagLeaf(
@@ -342,10 +337,10 @@ function splice!(text::GtkTextBuffer)
     text
 end
 
-begin_user_action(buffer::GtkTextBuffer) = 
+begin_user_action(buffer::GtkTextBuffer) =
   ccall((:gtk_text_buffer_begin_user_action,libgtk),Void,(Ptr{GObject},),buffer)
-  
-end_user_action(buffer::GtkTextBuffer) = 
+
+end_user_action(buffer::GtkTextBuffer) =
   ccall((:gtk_text_buffer_end_user_action,libgtk),Void,(Ptr{GObject},),buffer)
 
 function user_action(f::Function, buffer::GtkTextBuffer)

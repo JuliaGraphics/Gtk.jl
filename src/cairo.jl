@@ -1,5 +1,4 @@
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
-@gtktype GtkDrawingArea
 type GtkCanvas <: GtkDrawingArea # NOT an @GType
     handle::Ptr{GObject}
     has_allocation::Bool
