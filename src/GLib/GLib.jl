@@ -1,5 +1,12 @@
 module GLib
 
+if false
+function include(x)
+    println("including $x")
+    @time Base.include(x)
+end
+end
+
 import Base: convert, show, showall, showcompact, size, length, getindex, setindex!, get,
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!

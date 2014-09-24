@@ -46,7 +46,8 @@ const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in f
 
 g_type(gtyp::GType) = gtyp
 let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
-    for (i,(name, ctype, juliatype, g_value_fn)) in enumerate(fundamental_types)
+    for i = 1:length(fundamental_types)
+        (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         if juliatype !== None
             push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
         end

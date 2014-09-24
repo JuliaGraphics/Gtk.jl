@@ -110,8 +110,10 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     return nothing
 end
 const gvalue_types = {}
-const fundamental_fns = tuple(Function[make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true) for
-    (i,(name, ctype, juliatype, g_value_fn)) in enumerate(fundamental_types)]...)
+const fundamental_fns = tuple(Function[begin
+        (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
+        make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
+    end for i in 1:length(fundamental_types)]...)
 make_gvalue(Symbol, Ptr{Uint8}, :static_string, :(g_type(String)), false)
 make_gvalue(Type, GType, :gtype, (:g_gtype,:libgobject))
 make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
@@ -155,7 +157,6 @@ function getproperty{T}(w::GObject, name::StringLike, ::Type{T})
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
     return val
 end
-
 
 setproperty!{T}(w::GObject, name::StringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
 function setproperty!(w::GObject, name::StringLike, value)
