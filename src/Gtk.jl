@@ -33,6 +33,7 @@ include(joinpath("..","deps","ext.jl"))
 include("interfaces.jl")
 include("boxes.jl")
 include("gtktypes.jl")
+include("base.jl")
 include("gdk.jl")
 include("events.jl")
 include("container.jl")
@@ -53,21 +54,9 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-for container in GLib.concrete_subtypes(GtkContainer)
-    container = container.name.name
-    @eval $container(child::GtkWidget,vargs...) = push!($container(vargs...),child)
-end
-for orientable in GLib.concrete_subtypes(GtkPaned, GtkScale, GtkBox)
-    orientable = orientable.name.name
-    @eval $orientable(orientation::Symbol,vargs...) = $orientable(
-            (orientation==:v ? true :
-            (orientation==:h ? false :
-            error("invalid $($orientable) orientation $orientation"))),vargs...)
-end
-
 export GAccessor
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
-    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_ser$(Base.ser_version)")
+    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_julia_ser$(Base.ser_version)")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)

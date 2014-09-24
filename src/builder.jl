@@ -1,4 +1,3 @@
-@gtktype GtkBuilder
 
 function GtkBuilderLeaf(; buffer=nothing,filename=nothing,resource=nothing)
     builder = GtkBuilderLeaf(ccall((:gtk_builder_new,libgtk), Ptr{GObject}, () ) )
@@ -18,19 +17,19 @@ function push!(builder::GtkBuilder;buffer=nothing,filename=nothing,resource=noth
           return ret != 0
         end
     elseif filename !== nothing
-        GError() do error_check    
+        GError() do error_check
           ret = ccall((:gtk_builder_add_from_file ,libgtk), Cuint,
             (Ptr{GObject}, Ptr{Uint8}, Ptr{Ptr{GError}}),
             builder, bytestring(filename), error_check)
-          return ret != 0  
-        end            
-    elseif resource !== nothing    
-        GError() do error_check    
+          return ret != 0
+        end
+    elseif resource !== nothing
+        GError() do error_check
           ret = ccall((:gtk_builder_add_from_resource ,libgtk), Cuint,
             (Ptr{GObject}, Ptr{Uint8}, Ptr{Ptr{GError}}),
             builder, bytestring(resource), error_check)
           return ret != 0
-        end          
+        end
     end
     return builder
 end

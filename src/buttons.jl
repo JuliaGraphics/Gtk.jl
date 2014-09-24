@@ -13,37 +13,30 @@
 #GtkSwitch — A "light switch" style toggle
 #GtkLockButton — A widget to unlock or lock privileged operations
 
-@gtktype GtkButton
 GtkButtonLeaf() = GtkButtonLeaf(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
 GtkButtonLeaf(title::String) =
     GtkButtonLeaf(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
-@gtktype GtkCheckButton
 GtkCheckButtonLeaf() = GtkCheckButtonLeaf(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))
 GtkCheckButtonLeaf(title::String) =
     GtkCheckButtonLeaf(ccall((:gtk_check_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
-@gtktype GtkToggleButton
 GtkToggleButtonLeaf() = GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new,libgtk),Ptr{GObject},()))
 GtkToggleButtonLeaf(title::String) =
     GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{Uint8},), bytestring(title)))
 
 if gtk_version >= 3
-    @gtktype GtkSwitch
     GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
     function GtkSwitchLeaf(active::Bool)
         b = GtkSwitchLeaf()
         ccall((:gtk_switch_set_active,libgtk),Void,(Ptr{GObject},Cint),b,active)
         b
     end
-else
-    @g_type_delegate GtkSwitch = GtkToggleButton
 end
 
-@gtktype GtkRadioButton
 GtkRadioButtonLeaf(group::Ptr{Void}=C_NULL) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new,libgtk),Ptr{GObject},
         (Ptr{Void},),group))
@@ -145,7 +138,6 @@ function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
     b
 end
 
-@gtktype GtkLinkButton
 GtkLinkButtonLeaf(uri::String) =
     GtkLinkButtonLeaf(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
         (Ptr{Uint8},),bytestring(uri)))
@@ -163,9 +155,6 @@ function GtkLinkButtonLeaf(uri::String,visited::Bool)
     b
 end
 
-#TODO: @gtktype GtkScaleButton
-
-@gtktype GtkVolumeButton
 GtkVolumeButtonLeaf() = GtkVolumeButtonLeaf(ccall((:gtk_volume_button_new,libgtk),Ptr{GObject},()))
 function GtkVolumeButtonLeaf(value::Real) # 0<=value<=1
     b = GtkVolumeButtonLeaf()
@@ -173,8 +162,5 @@ function GtkVolumeButtonLeaf(value::Real) # 0<=value<=1
     b
 end
 
-@gtktype GtkFontButton
 GtkFontButtonLeaf() = GtkFontButtonLeaf(ccall((:gtk_font_button_new,libgtk),Ptr{GObject},()))
-
-@Giface GtkFileChooser Gtk.libgtk gtk_file_chooser
 

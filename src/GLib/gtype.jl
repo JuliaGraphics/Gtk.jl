@@ -60,6 +60,7 @@ G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 g_isa(gtyp::GType, is_a_type::GType) = bool(ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type))
+g_isa(gtyp, is_a_type) = g_isa(g_type(gtyp), g_type(is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
 g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type),false))
 
@@ -132,7 +133,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
                 # Gtk does an interface type check when calling methods. So, it's
                 # not worth repeating it here. Plus, we might as well just allow
                 # the user to lie, since we aren't using this for dispatch
-                # (like C & unlike most other languages), the user may be able 
+                # (like C & unlike most other languages), the user may be able
                 # to write more generic code
             end
             gtype_ifaces[$(QuoteNode(iname))] = $(esc(iname))
@@ -173,9 +174,9 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
 end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
-    :( GLib.g_type(::Type{$(esc(name))}) = $(esc(symname)) )
+    :( GLib.g_type{T<:$(esc(name))}(::Type{T}) = $(esc(symname)) )
 get_gtype_decl(name::Symbol, lib, symname::Symbol) =
-    :( GLib.g_type(::Type{$(esc(name))}) =
+    :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
         ccall(($(QuoteNode(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
@@ -230,8 +231,8 @@ macro Gtype(iname,lib,symname)
     if !g_type_test_flags(gtyp, G_TYPE_FLAG_CLASSED)
         error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
+    gtype_decl = get_gtype_decl(iname, lib, symname)
     name = symbol(string(iname,current_module().suffix))
-    gtype_decl = get_gtype_decl(name, lib, symname)
     get_type_decl(name, iname, gtyp, gtype_decl)
 end
 

@@ -25,24 +25,6 @@ if VERSION < v"0.3-"
     QuoteNode(x) = Base.qn(x)
 end
 
-function concrete_subtypes(T::DataType...)
-    queue = [T...]
-    subt = Set{DataType}()
-    while !isempty(queue)
-        x = pop!(queue)
-        if isa(x,DataType)
-            if x.abstract
-                for s in Base.subtypes(x)
-                    push!(queue, s)
-                end
-            else
-                push!(subt, x)
-            end
-        end
-    end
-    return subt
-end
-
 ccall((:g_type_init,libgobject),Void,())
 
 include("MutableTypes.jl")

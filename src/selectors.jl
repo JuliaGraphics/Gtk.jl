@@ -18,7 +18,6 @@ push!(widget::GtkDialog, text::String, response::Integer) =
     ccall((:gtk_dialog_add_button,libgtk), Ptr{GObject},
           (Ptr{GObject},Ptr{Uint8},Cint), widget, text, response)
 
-@gtktype GtkFileChooserDialog
 function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::Integer, button_text_response...)
     n = length(button_text_response)
     if !iseven(n)
@@ -36,7 +35,6 @@ end
 run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
 
 const SingleComma = r"(?<!,),(?!,)"
-@gtktype GtkFileFilter
 function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern::ByteString = "", mimetype::ByteString = "")
     filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
     if !isempty(pattern)

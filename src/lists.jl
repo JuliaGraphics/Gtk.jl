@@ -28,7 +28,6 @@
 #GtkComboBox — A widget used to choose from a list of items
 #GtkComboBoxText — A simple, text-only combo box
 
-@gtktype GtkComboBoxText
 GtkComboBoxTextLeaf(with_entry::Bool=false) = GtkComboBoxTextLeaf(
         if with_entry
             ccall((:gtk_combo_box_text_new_with_entry,libgtk),Ptr{GObject},())
@@ -95,7 +94,7 @@ next(path::GtkTreePath) = ccall((:gtk_tree_path_next,libgtk), Void, (Ptr{GtkTree
 prev(path::GtkTreePath) = bool( ccall((:gtk_tree_path_prev,libgtk),Cint, (Ptr{GtkTreePath},),path))
 up(path::GtkTreePath) = bool( ccall((:gtk_tree_path_up,libgtk),Cint, (Ptr{GtkTreePath},),path))
 down(path::GtkTreePath) = ccall((:gtk_tree_path_down,libgtk), Void, (Ptr{GtkTreePath},),path)
-string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8}, 
+string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8},
                                             (Ptr{GtkTreePath},),path))
 
 ### add indices for a store 1-based
@@ -112,7 +111,6 @@ end
 
 ### GtkListStore
 
-@gtktype GtkListStore
 function GtkListStoreLeaf(types::Type...)
     gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_list_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
@@ -178,8 +176,8 @@ end
 
 
 
-isvalid(listStore::GtkListStore, iter::TRI) = 
-    bool( ccall((:gtk_list_store_iter_is_valid,libgtk), Cint, 
+isvalid(listStore::GtkListStore, iter::TRI) =
+    bool( ccall((:gtk_list_store_iter_is_valid,libgtk), Cint,
 	     (Ptr{GObject},Ptr{GtkTreeIter}),listStore, mutable(iter)))
 
 length(listStore::GtkListStore) =
@@ -187,7 +185,6 @@ length(listStore::GtkListStore) =
 
 ### GtkTreeStore
 
-@gtktype GtkTreeStore
 function GtkTreeStoreLeaf(types::Type...)
     gtypes = GLib.gtypes(types...)
     handle = ccall((:gtk_tree_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
@@ -211,7 +208,7 @@ function push!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, iter, C_NULL)
     else
         ccall((:gtk_tree_store_append,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
-    end    
+    end
 
     tree_store_set_values(treeStore, iter, values)
     iter[]
@@ -223,7 +220,7 @@ function unshift!(treeStore::GtkTreeStore, values::Tuple, parent=nothing)
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void}), treeStore, iter, C_NULL)
     else
         ccall((:gtk_tree_store_prepend,libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), treeStore, iter, &parent)
-    end   
+    end
 
     tree_store_set_values(treeStore, iter, values)
     iter[]
@@ -240,8 +237,6 @@ end
 ## index can be :parent or :sibling
 ## insertion can be :after or :before
 function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol=:after)
-
-
     piter = iter_from_index(treeStore, index)
     iter =  Gtk.mutable(GtkTreeIter)
     if how == :parent
@@ -257,21 +252,21 @@ function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; h
             ccall((:gtk_tree_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{Void},Ptr{GtkTreeIter}), treeStore, iter, C_NULL, piter)
         end
     end
-    
+
     tree_store_set_values(treeStore, iter, values)
 end
-    
+
 
 function Base.splice!(treeStore::GtkTreeStoreLeaf, index::Vector{Int})
     iter = iter_from_index(treeStore, index)
     delete!(treeStore, iter)
 end
-    
+
 empty!(treeStore::GtkTreeStore) =
     ccall((:gtk_tree_store_clear,libgtk), Void, (Ptr{GObject},),treeStore)
 
 isvalid(treeStore::GtkTreeStore, iter::TRI) =
-    bool( ccall((:gtk_tree_store_iter_is_valid,libgtk), Cint, 
+    bool( ccall((:gtk_tree_store_iter_is_valid,libgtk), Cint,
 	     (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter)))
 
 isancestor(treeStore::GtkTreeStore, iter::TRI, descendant::TRI) =
@@ -281,17 +276,16 @@ isancestor(treeStore::GtkTreeStore, iter::TRI, descendant::TRI) =
 
 depth(treeStore::GtkTreeStore, iter::TRI) =
     ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter))
-  
+
 ### GtkTreeModelFilter
 
-@gtktype GtkTreeModelFilter
 GtkTreeModelFilterLeaf(child_model::GObject) = GtkTreeModelFilterLeaf(
     ccall((:gtk_tree_model_filter_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{None}), child_model, C_NULL))
 
 function convert_iter_to_child_iter(model::GtkTreeModelFilter, filter_iter::TRI)
     child_iter = mutable(GtkTreeIter)
     ccall((:gtk_tree_model_filter_convert_iter_to_child_iter,libgtk),Void,
-          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), 
+          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}),
           model, child_iter, mutable(filter_iter))
     child_iter[]
 end
@@ -299,13 +293,12 @@ end
 function convert_child_iter_to_iter(model::GtkTreeModelFilter, child_iter::TRI)
     filter_iter = mutable(GtkTreeIter)
     ccall((:gtk_tree_model_filter_convert_child_iter_to_iter,libgtk),Void,
-          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), 
+          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}),
           model,  &filter_iter, mutable(child_iter))
     filter_iter[]
 end
 
 ### GtkTreeModel
-@Giface GtkTreeModel Gtk.libgtk gtk_tree_model
 
 function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
     val = mutable(GValue())
@@ -341,50 +334,39 @@ end
 
 #TODO: Replace by accessor (accessor is wrong)
 function path(treeModel::GtkTreeModel, iter::TRI)
-  GtkTreePath( ccall((:gtk_tree_model_get_path,libgtk), Ptr{GtkTreePath}, 
+  GtkTreePath( ccall((:gtk_tree_model_get_path,libgtk), Ptr{GtkTreePath},
                             (Ptr{GObject},Ptr{GtkTreeIter}),
                             treeModel,mutable(iter)))
 end
 
-depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth,libgtk), Cint, 
+depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth,libgtk), Cint,
     (Ptr{GtkTreePath},),path)
-    
+
 ### GtkTreeSortable
-@Giface GtkTreeSortable Gtk.libgtk gtk_tree_sortable
 
 ### GtkCellRenderer
 
-@gtktype GtkCellRenderer
-
-@gtktype GtkCellRendererAccel
 GtkCellRendererAccelLeaf() = GtkCellRendererAccelLeaf(
     ccall((:gtk_cell_renderer_accel_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererCombo
 GtkCellRendererComboLeaf() = GtkCellRendererComboLeaf(
     ccall((:gtk_cell_renderer_combo_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererPixbuf
 GtkCellRendererPixbufLeaf() = GtkCellRendererPixbufLeaf(
     ccall((:gtk_cell_renderer_pixbuf_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererProgress
 GtkCellRendererProgressLeaf() = GtkCellRendererProgressLeaf(
     ccall((:gtk_cell_renderer_progress_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererSpin
 GtkCellRendererSpinLeaf() = GtkCellRendererSpinLeaf(
     ccall((:gtk_cell_renderer_spin_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererText
 GtkCellRendererTextLeaf() = GtkCellRendererTextLeaf(
     ccall((:gtk_cell_renderer_text_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererToggle
 GtkCellRendererToggleLeaf() = GtkCellRendererToggleLeaf(
     ccall((:gtk_cell_renderer_toggle_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkCellRendererSpinner
 GtkCellRendererSpinnerLeaf() = GtkCellRendererSpinnerLeaf(
     ccall((:gtk_cell_renderer_spinner_new,libgtk),Ptr{GObject},()))
 
@@ -392,7 +374,6 @@ GtkCellRendererSpinnerLeaf() = GtkCellRendererSpinnerLeaf(
 
 typealias KVMapping Union(Dict, ((TypeVar(:K),TypeVar(:V))...), Vector{(TypeVar(:K), TypeVar(:V))})
 
-@gtktype GtkTreeViewColumn
 GtkTreeViewColumnLeaf() = GtkTreeViewColumnLeaf(ccall((:gtk_tree_view_column_new,libgtk),Ptr{GObject},()))
 function GtkTreeViewColumnLeaf(renderer::GtkCellRenderer, mapping::KVMapping)
     treeColumn = GtkTreeViewColumnLeaf()
@@ -422,14 +403,12 @@ function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand:
     treeColumn
 end
 
-add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, 
+add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer,
               attribute::String, column::Integer) =
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
           (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),column)
 
 ### GtkTreeSelection
-
-@gtktype GtkTreeSelection
 
 function selected(selection::GtkTreeSelection)
     model = mutable(Ptr{GtkTreeModel})
@@ -448,13 +427,13 @@ length(selection::GtkTreeSelection) =
 hasselection(selection::GtkTreeSelection) = length(selection) > 0
 
 select!(selection::GtkTreeSelection, iter::TRI) =
-    ccall((:gtk_tree_selection_select_iter,libgtk), Void, 
+    ccall((:gtk_tree_selection_select_iter,libgtk), Void,
           (Ptr{GObject},Ptr{GtkTreeIter}),selection, mutable(iter))
-          
+
 unselect!(selection::GtkTreeSelection, iter::TRI) =
-    ccall((:gtk_tree_selection_unselect_iter,libgtk), Void, 
+    ccall((:gtk_tree_selection_unselect_iter,libgtk), Void,
           (Ptr{GObject},Ptr{GtkTreeIter}),selection, mutable(iter))
-    
+
 selectall!(selection::GtkTreeSelection) =
     ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
 
@@ -463,7 +442,6 @@ unselectall!(selection::GtkTreeSelection) =
 
 ### GtkTreeView
 
-@gtktype GtkTreeView
 GtkTreeViewLeaf() = GtkTreeViewLeaf(ccall((:gtk_tree_view_new,libgtk),Ptr{GObject},()))
 GtkTreeViewLeaf(treeStore::GtkTreeModel) = GtkTreeViewLeaf(
    ccall((:gtk_tree_view_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},),treeStore))
@@ -478,26 +456,26 @@ end
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     pathPtr = mutable(Ptr{GtkTreePath})
-    path = GtkTreePath() 
-    
+    path = GtkTreePath()
+
     ret = bool( ccall((:gtk_tree_view_get_path_at_pos,libgtk),Cint,
                       (Ptr{GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
                        treeView,x,y,pathPtr,C_NULL,C_NULL,C_NULL) )
     if ret
-      path = convert(GtkTreePath, pathPtr[])   
+      path = convert(GtkTreePath, pathPtr[])
     end
     ret, path
 end
 
 ### To be done
-
-if gtk_version == 3
-    @gtktype GtkCellArea
-    @gtktype GtkCellAreaBox
-    @gtktype GtkCellAreaContext
-end
-
-@gtktype GtkTreeModelSort
-
-@gtktype GtkCellView
-@gtktype GtkIconView
+#
+#if gtk_version == 3
+#    GtkCellArea
+#    GtkCellAreaBox
+#    GtkCellAreaContext
+#end
+#
+#GtkTreeModelSort
+#
+#GtkCellView
+#GtkIconView

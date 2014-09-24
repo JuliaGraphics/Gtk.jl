@@ -1,4 +1,3 @@
-@gtktype GtkWindow
 function GtkWindowLeaf(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
     hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(Enum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
@@ -30,7 +29,6 @@ function splice!(win::GtkWindow, accel_group::GtkAccelGroup)
   accel_group
 end
 
-@gtktype GtkScrolledWindow
 GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
     ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
                 C_NULL,C_NULL))
@@ -49,11 +47,9 @@ function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, 
     w
 end
 
-@gtktype GtkAboutDialog
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-@gtktype GtkMessageDialog
 function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
                           message::StringLike, button_text_response...)
     n = length(button_text_response)
