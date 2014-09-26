@@ -448,6 +448,8 @@ destroy(dlg)
 ## List view
 ls=@ListStore(Int32,Bool)
 push!(ls,(33,true))
+push!(ls,(44,true))
+insert!(ls, 2, (35, false))
 tv=@TreeView(TreeModel(ls))
 r1=@CellRendererText()
 r2=@CellRendererToggle()
@@ -456,7 +458,20 @@ c2=@TreeViewColumn("B", r2,{"active" => 1})
 push!(tv,c1)
 push!(tv,c2)
 w = @Window(tv, "List View")|>showall
+
+
+## selection
+selmodel = Gtk.G_.selection(tv)
+@assert hasselection(selmodel) == false
+select!(selmodel, Gtk.iter_from_index(ls, 1)[])
+@assert hasselection(selmodel) == true
+iter = selected(selmodel)
+@assert ls[iter, 1] == 33
+deleteat!(ls, iter)
+@assert isvalid(ls, iter) == false
+
 destroy(w)
+
 
 ## Tree view
 ts=@TreeStore(String)
