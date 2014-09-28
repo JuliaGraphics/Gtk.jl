@@ -5,288 +5,465 @@ Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stab
 
 ## Installation
 
-Prior to using this library, you must install a semi-recent version of `libgtk` on your computer. While this interface currently defaults to using `Gtk+-3`, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable to `2`.
+Install within Julia using
 
-### Windows
+    Pkg.add("Gtk")
 
-The necessary libraries will be downloaded and installed automatically when you run `Pkg.add("Gtk")`.
-
-
-In case you run into some problem with the automatic installation, you can install manually 
-using `WinRPM.jl`:
-
-     Pkg.add("WinRPM")
-     using WinRPM
-     WinRPM.install(["gtk2","gtk3",
-          "hicolor-icon-theme",
-          "tango-icon-theme",
-          "glib2-tools",
-          "glib2-devel",
-          "gnome-icon-theme",
-          "gnome-icon-theme-extras",
-          "gnome-icon-theme-symbolic",
-          "gtk3-devel",
-          "gtk2-devel",
-          "gtk3-tools",
-          "gtk2-tools",
-          "pango-tools",
-          "gdk-pixbuf-query-loaders",
-          "gtk2-lang",
-          "gtk3-lang"])
-     RPMbindir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
-     ENV["PATH"]=ENV["PATH"]*";"*RPMbindir
-
-You may need to repeat the last two steps every time you restart julia, or put these two lines in your `$HOME/.juliarc.jl` file
-
-### OS X
-
-I use MacPorts:
-
-1. `port install gtk2 +quartz gtk3 +quartz` (this may require that you first remove Cairo and Pango via `sudo port deactivate active` for example, I like to put this in my `/opt/local/etc/macports/variants.conf` file as `+quartz` before installing anything, to minimize conflicts and maximize usage of the native Quartz)
-2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
-
-If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
-
-### Linux
-
-Try any of the following lines until something is successful:
-
-     aptitude install libgtk2.0-0 libgtk-3-0
-     apt-get install libgtk2.0-0 libgtk-3-0
-     yum install gtk2 gtk3
-     pkg install gtk2 gtk3
-
-On some distributions you can also install a `devhelp` package to have a local copy of the Gtk documentation.
+If this produces errors, please see [installation troubleshooting](doc/installation.md).
 
 ## Precompilation
 
-Startup time for packages that use Gtk can be dramatically reduced by precompiling Gtk.
-For this to work, you need to be building Julia from source, and you need to be using
-at least Julia version 0.3.
+Startup time for packages that use Gtk can be dramatically reduced by [precompiling Gtk](doc/precompilation.md).
 
-In your Julia `base/` directory, create (or append to) a file called `userimg.jl` the line
+## Usage
 
-    require("Gtk")
-
-Then build Julia as you normally would; the Gtk module will be available when julia starts.
-
-In some cases, it might be necessary to add the path to the folder containing the Gtk shared libraries, for example:
-
-    push!(DL_LOAD_PATH, "/usr/lib/x86_64-linux_gnu")
-    require("Gtk")
-    pop!(DL_LOAD_PATH)
-
-The `"/usr/lib/x86_64-linux_gnu"` needs to be replaced with the location of the GTK libraries on your system.
-However, when the library is in a standard location -- such as `/usr/lib`, `/usr/local/lib`, or `/usr/lib/x86_64-linux_gnu` (on some systems) -- this step can be skipped.
-
-## Overview
-
-This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.
-
-It is always safe to alter the properties of a Gtk object defined in Gtk.jl outside of calling the functions provided therein, such as through another program language, or direct ccall's.
-
-There is also a more detailed description in [tutorial style](doc/usage.md), as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
+There is a [technical overview](doc/overview.md), as well as a [property/hierarchy browser](doc/properties.md) and [function reference](doc/function_reference.md).
 People interested in extending the functionality of this package may be interested in the [developer documentation](doc/developer.md).
 
-### Referring to Gtk.Objects
+What follows below is a user-oriented tutorial. Begin with
+```
+using Gtk
+```
+or, if you prefer more generic names,
+```
+using Gtk.ShortNames
+```
+For example, the "long name" `GtkWindow` becomes `Window`, `GtkFrame` becomes `Frame`, etc. In the remainder of the documentation, we'll use the short names.
 
-Gtk object can be referenced by their Gtk names (which almost always have a name like `GtkWindow`), or their "short name" (which is generally just the Gtk name without the "Gtk", for example, `Window`). You can call `using Gtk` to import the regular names, or `using Gtk.ShortNames` to import the shorter names. You can also call `import Gtk`, and then access either the regular or short names (e.g. `Gtk.Window` or `Gtk.GtkWindow`).
+### Creating and destroying a window
 
-The concrete types are the Gtk object name with a suffix of `Leaf` appended (to remind the user that this is a "leaf" in the Julia type-tree). For example, to refer to the concrete `GtkWindow` type, the user would write `Gtk.GtkWindowLeaf`.
+A new window can be created as
+```
+win = @Window("My window")
+```
 
-### Constructing a Gtk.@Object
+![window](doc/figures/mywindow.png)
 
-Gtk object constructors (by convention), are the name of the Gtk object (interface) name, with a suffix of `Leaf` appended. For example, to construct a new window, the user would invoke `Gtk.WindowLeaf()`.
+You can optionally specify its width, height, whether it should be resizable, and whether it is a "toplevel" window or a "popup":
+```
+popup = @Window("SomeDialog", 400, 200, false, false)
+```
+would create a fixed-size popup window (which, among other things, does not have any decorations).
 
-Alternatively, the user can use the macro form of the widget name to construct a new `GObject`, as shown in the example below.
+The window can be "closed" by
+```
+destroy(popup)
+```
+`destroy` deletes any widget, not just windows.
 
-All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding `setproperty!` method (see below).
+### Object properties
 
-    w = @GtkWindow(title="Hello World")
+If you're following along, you probably noticed that creating `win` caused quite a lot of output:
+```
+GtkWindowLeaf(name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=FALSE, has-focus=FALSE, is-focus=FALSE, can-default=FALSE, has-default=FALSE, receives-default=FALSE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_QUEUE, child, type=GTK_WINDOW_TOPLEVEL, title="My window", role=NULL, resizable=TRUE, modal=FALSE, window-position=GTK_WIN_POS_NONE, default-width=-1, default-height=-1, destroy-with-parent=FALSE, hide-titlebar-when-maximized=FALSE, icon, icon-name=NULL, screen, type-hint=GDK_WINDOW_TYPE_HINT_NORMAL, skip-taskbar-hint=FALSE, skip-pager-hint=FALSE, urgency-hint=FALSE, accept-focus=TRUE, focus-on-map=TRUE, decorated=TRUE, deletable=TRUE, gravity=GDK_GRAVITY_NORTH_WEST, transient-for, attached-to, opacity=1.000000, has-resize-grip=TRUE, resize-grip-visible=TRUE, application, ubuntu-no-proxy=FALSE, is-active=FALSE, has-toplevel-focus=FALSE, startup-id, mnemonics-visible=TRUE, focus-visible=TRUE, )
+```
+This shows you a list of properties of the object. For example, notice that the `title` property is set to `"My window"`. We can change the title in the following way:
+```
+setproperty!(win, :title, "New title")
+```
+and now we have:
 
-### Objects are containers for their [child_elements...]
+![window](doc/figures/newtitle.png)
 
-All objects in Gtk are intended to behave uniformly. This means that all objects will try to act as container objects for whatever they 'contain'. Indexing into an object (by number), or iterating the object will return a list of its contents or child objects. This also means that constructors are called with information on the elements that they contain. For example, when you create a button, you can specify either the embedded text or another widget!
+To get the property, you have to specify the return type as a second argument:
+```
+julia> getproperty(win, :title, String)
+"New title"
+```
+This is necessary because Gtk, a C library, maintains the state; you have to specify what type of Julia object you want to create from the pointers it passes back.
 
-    Gtk.@Button("This is a button")
-    Gtk.@Button(Gtk.@Label("Click me"))
+To access particular properties, you can either use symbols, like `:title`, or strings, like `"title"`.
+When using symbols, you'll need to convert any Gtk names that use `-` into names with `_`:
 
-On the flip side, you can assign child widgets to indices, or `push!` them onto the list of child widgets, for any object which derives from a `GtkContainer`. Of special note is the anti-object `GtkNullContainer` or simply `Null`. This is not actually a `GObject`. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although standard operations like `splice!` and `delete!` also exist, and are typically preferable for readability).
+```
+julia> getproperty(win, :double_buffered, Bool)
+true
+```
 
-The optimal pattern for creating objects generally depends upon the usage. However, you may find the following pattern useful for creating layout hierarchies:
+Some properties have convenience methods, for example:
+```
+julia> visible(win)
+true
 
-    w=Gtk.@Window() |>
-        (f=Gtk.@Box(:h) |>
-            (b=Gtk.@Button("1")) |>
-            (c=Gtk.@Button("2")) |>
-            (f2=Gtk.@Box(:v) |>
-                Gtk.@Label("3") |>
-                Gtk.@Label("4"))) |>
-        showall
+julia> visible(win, false)
 
-### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
+julia> visible(win)
+false
 
-     > warning: this API uses 0-based indexing
+julia> visible(win, true)
+```
+This sequence makes the window disappear and then reappear.
 
-The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a `GtkObject` at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
+The properties of common objects are linked on the [properties page](properties.md).
 
-When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
 
-Some Examples:
+### Adding and removing objects
 
-    w = @GtkWindow("Title")
-    show(STDOUT, w) # without the STDOUT parameter, show(w) would
-                    # make the window visible on the screen, instead
-                    # of printing the information in the REPL
-    getproperty(w,:title,String)
-    setproperty!(w,:title,"New title")
-    setproperty!(w,:urgency_hint,Bool,true)
+Many widgets in Gtk can act as containers: for example, windows contain other widgets. New objects are created in "isolation," and attached to their parent containers using `push!`. 
 
-### Objects can signal events
+For example, let's add a frame:
+```
+f = @Frame("A frame")
+```
+If you check your window, you won't see anything. That's because the frame has not yet been associated with any container. Let's do that and see what happens:
+```
+push!(win, f)
+showall(win)
+```
 
-There are two entry points to the API for handling signals: Simple and robust OR fast and precise.
+![window](doc/figures/frame.png)
 
-You can remove signal handlers by their id using `signal_handler_disconnect` or temporarily block them by id using `signal_handler_block` and `signal_handler_unblock`
+Note the `showall`, which is required to get the display to update with your changes. In some of the examples below, we'll omit this step, but you should call `showall` any time you want to see the window in its current state.
 
-#### Easy Event Handlers
+Let's add a button:
+```
+ok = @Button("OK")
+push!(f, ok)
+showall(win)
+```
 
-Upon entry to the signal handler, Julia will unpack the arguments it received into native types:
+![window](doc/figures/okbutton.png)
 
-    id = signal_connect(widget, :event) do obj, args...
-        println("That tickles: $args")
-        nothing
+We can remove our `ok` button from the frame:
+```
+delete!(f, ok)
+```
+(You can verify that it doesn't show in the window anymore.) However, `ok` still exists, and you can put it somewhere else if you wish.
+
+"Container" objects can also be initialized to contain a child:
+```
+ok = @Button("OK")
+frame = @Frame(ok, "A frame")
+win = @Window(frame, "My window")
+```
+This only works to add a single (or the first) child of a container.
+
+### Layout
+
+A frame can contain only one child widget. If we want several buttons inside the frame, we have to create a layout that can hold multiple objects. Layouts also organize the arrangement of widgets in a specified geometry.
+
+To support multiple buttons, let's add a box and then fill it with two buttons:
+```
+win = @Window("New title") |> (f = @Frame("A frame"))
+hbox = @Box(:h)  # :h makes a horizontal layout, :v a vertical layout
+push!(f, hbox)
+cancel = @Button("Cancel")
+ok = @Button("OK")
+push!(hbox, cancel)
+push!(hbox, ok)
+showall(win)
+```
+You might see something like this:
+
+![window](doc/figures/twobuttons1.png)
+
+We can address individual "slots" in this container:
+```
+julia> length(hbox)
+2
+
+julia> getproperty(hbox[1], :label, String)
+"Cancel"
+
+julia> getproperty(hbox[2], :label, String)
+"OK"
+```
+
+This layout may not be exactly what you'd like. Perhaps you'd like the `ok` button to fill the available space, and to insert some blank space between them:
+
+```
+setproperty!(hbox,:expand,ok,true)
+setproperty!(hbox,:spacing,10)
+```
+The first line sets the `expand` property of the `ok` button within the `hbox` container.
+
+Note that these aren't evenly-sized, and that doesn't change if we set the `cancel` button's `expand` property to `true`. `ButtonBox` is created specifically for this purpose, so let's use it instead:
+
+```
+destroy(hbox)
+ok = @Button("OK")
+cancel = @Button("Cancel")
+hbox = @ButtonBox(:h)
+push!(f, hbox)
+push!(hbox, cancel)
+push!(hbox, ok)
+```
+
+Now we get this:
+
+![window](doc/figures/twobuttons2.png)
+
+which may be closer to what you had in mind.
+
+More generally, you can arrange items in a grid:
+```
+win = @Window("A new window")
+g = @Grid()   # gtk3-only (use @Table() for gtk2)
+a = @Entry()  # a widget for entering text
+setproperty!(a, :text, "This is Gtk!")
+b = @CheckButton("Check me!")
+c = @Scale(false, 0:10)     # a slider
+# Now let's place these graphical elements into the Grid:
+g[1,1] = a    # cartesian coordinates, g[x,y]
+g[2,1] = b
+g[1:2,2] = c  # spans both columns
+setproperty!(g, :column_homogeneous, true) # setproperty!(g,:homogeoneous,true) for gtk2
+setproperty!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
+push!(win, g)
+showall(win)
+```
+![window](doc/figures/grid.png)
+
+The `g[x,y] = obj` assigns the location to the indicated `x,y` positions in the grid
+(note that indexing is cartesian rather than row/column; most graphics packages address the screen using
+cartesian coordinates where 0,0 is in the upper left).
+A range is used to indicate a span of grid cells.
+By default, each row/column will use only as much space as required to contain the objects,
+but you can force them to be of the same size by setting properties like `column_homogeneous`.
+
+#### Inspecting and manipulating the graphics hierarchy
+
+We can get the parent object:
+```
+julia> parent(hbox)
+GtkFrameLeaf(name=...
+```
+
+Calling `parent` on a top-level object yields an error, but you can check to see if the object has a parent using `hasparent`.
+
+Likewise, it's possible to get the children:
+```
+for child in hbox
+    println(getproperty(child,:label,String))
+end
+```
+
+### Callbacks and signals
+
+A button is not much use if it doesn't do anything.
+Gtk+ uses _signals_ as a method for communicating that something of interest has happened.
+Most signals will be _emitted_ as a consequence of user interaction: clicking on a button,
+closing a window, or just moving the mouse. You _connect_ your signals to particular functions
+to make something happen.
+
+Let's do a simple example:
+```
+b = @Button("Press me")
+win = @Window(b, "Callbacks")
+id = signal_connect(b, "clicked") do widget
+    println(widget, " was clicked!")
+end
+```
+`signal_connect` specifies that a callback function should be run when the `"clicked"`
+signal is received. In this case, we used the `do` syntax to define the function, but
+we could alternatively have passed the function as `id = signal_connect(func, b, "clicked")`.
+
+If you try this, and click on the button, you should see something like the following:
+```
+julia> GtkButton(action-name=NULL, action-target, related-action, use-action-appearance=TRUE, name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=TRUE, has-focus=TRUE, is-focus=TRUE, can-default=FALSE, has-default=FALSE, receives-default=TRUE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_PARENT, child, label="Press me", image, relief=GTK_RELIEF_NORMAL, use-underline=TRUE, use-stock=FALSE, focus-on-click=TRUE, xalign=0.500000, yalign=0.500000, image-position=GTK_POS_LEFT, ) was clicked!
+```
+That's quite a lot of output; let's just print the label of the button:
+```
+id2 = signal_connect(b, "clicked") do widget
+    println("\"", getproperty(widget,:label,String), "\" was clicked!")
+end
+```
+Now you get something like this:
+```
+julia> GtkButton(action-name=NULL, action-target, related-action, use-action-appearance=TRUE, name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=TRUE, has-focus=TRUE, is-focus=TRUE, can-default=FALSE, has-default=FALSE, receives-default=TRUE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_PARENT, child, label="Press me", image, relief=GTK_RELIEF_NORMAL, use-underline=TRUE, use-stock=FALSE, focus-on-click=TRUE, xalign=0.500000, yalign=0.500000, image-position=GTK_POS_LEFT, ) was clicked!
+"Press me" was clicked!
+```
+Notice that _both_ of the callback functions executed.
+Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://developer.gnome.org/gobject/stable/gobject-Signals.html#gobject-Signals.description).
+Callbacks for some [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
+
+The `"clicked"` signal doesn't provide a return value, so other callbacks will always be run.
+However, we can disconnect the first signal handler:
+```
+signal_handler_disconnect(b, id)
+```
+Now clicking on the button just yields
+```
+julia> "Press me" was clicked!
+```
+Alternatively, you can temporarily enable or disable individual handlers with `signal_handler_block` and `signal_handler_unblock`.
+
+The arguments of the callback depend on the signal type.
+For example, instead of using the `"clicked"` signal---for which the Julia handler should be defined with just a single argument---we could have used `"button-press-event"`:
+```
+b = @Button("Pick a mouse button")
+win = @Window(b, "Callbacks")
+id = signal_connect(b, "button-press-event") do widget, event
+    println("You pressed button ", event.button)
+end
+```
+Note that this signal requires two arguments, here `widget` and `event`, and that `event` contained useful information.
+Arguments and their meaning are described along with their corresponding [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed).
+Note that you should omit the final `user_data` argument described in the Gtk documentation;
+keep in mind that you can always address other variables from inside your function block, or define the callback in terms of an anonymous function:
+```
+id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
+```
+
+### Usage without the REPL
+
+If you're using Gtk from command-line scripts, one problem you may enounter is that julia quits before you have a chance to see or interact with your windows. In such cases, the following design pattern can be helpful:
+
+```
+win = @Window("gtkwait")
+
+# Put your GUI code here
+
+if !isinteractive()
+    c = Condition()
+    signal_connect(win, :destroy) do widget
+        notify(c)
     end
+    wait(c)
+end
+```
 
-See section on [Extending Gtk's Functionality with new GValue<->Julia auto-conversions](#new-gvalue-julia-auto-conversions) at the end of this document for details on the auto-unpacking implementation.
+By waiting on a `Condition`, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit).
 
-#### Fast Event Handlers
+### Specific graphical elements
 
-If you want pre-optimized event handlers, you will need to specify the interface types when creating the signal handlers. (There are a few `on_signal_` convenience functions which do this, often in conjunction with setting other flags needed for the signal handler to function). You will often find it necessary to refer to the Gtk documentation for the signals API for Gtk callbacks:
+#### Scales
 
-- Gtk+ 2
-  -  [Gtk2 Object Closures](https://developer.gnome.org/gtk2/stable/GObject.html#GObject-destroy)
-  -  [Gtk2 Widget Closures](https://developer.gnome.org/gtk2/stable/GtkWidget.html#GtkWidget-accel-closures-changed)
-- Gtk+ 3
-  -  [Gtk3 Widget Closures](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed)
+Above we showed how to create a `Scale` (slider) object.
+If you examine the `Scale`'s [properties](https://developer.gnome.org/gtk3/stable/GtkScale.html#GtkScale.properties),
+you might be surprised to not see any that deal with its value or range of acceptable values.
+This is because a `Scale` contains another more basic type, `Adjustment`, responsible for holding these properties:
+```
+sc = @Scale(false,0:10)   # range in integer steps, from 0 to 10
+adj = @Adjustment(sc)
+setproperty!(adj,:upper,11)         # now this scale goes to 11!
+setproperty!(adj,:value,7)
+win = @Window(sc,"Scale") |> showall
+```
+![scale](doc/figures/scale.png)
 
-Note that the ArgType argument only specifies the type for the middle arguments. The type of the first and last arguments are determined automatically.
+#### Canvases
 
-Example:
+Generic drawing is done on a `Canvas`. You control what appears on this canvas by defining a `draw` function:
 
-    function on_signal_event(ptr, args, widget)
-        println("That tickles")
-        nothing
-    end
-    id = signal_connect(widget, :event, Void, (ArgType,))
-    ## OR
-    id = signal_connect(widget, :event, Void, (ArgType,)) do ptr, args, obj
-        println("That tickles")
-        nothing
-    end
+```
+using Gtk.ShortNames, Base.Graphics
+c = @Canvas()
+win = @Window(c, "Canvas")
+draw(c) do widget
+    ctx = getgc(c)
+    h = height(c)
+    w = width(c)
+    # Paint red rectangle
+    rectangle(ctx, 0, 0, w, h/2)
+    set_source_rgb(ctx, 1, 0, 0)
+    fill(ctx)
+    # Paint blue rectangle
+    rectangle(ctx, 0, 3h/4, w, h/4)
+    set_source_rgb(ctx, 0, 0, 1)
+    fill(ctx)
+end
+show(c)
+```
+This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
 
-### Events can be emitted
+![canvas](doc/figures/canvas.png)
 
-In addition to listening for events, you can trigger your own:
+See Julia's standard-library documentation for more information on graphics.
 
-    #syntax: signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
-    signal_emit(widget, :event, Void, 42)
+#### Menus
 
-Note: the return type and argument types do not need to match the spec. However, the length of the args list MUST exactly match the length of the ArgType's list.
+In Gtk, the core element is the `MenuItem`.
+Let's say we want to create a file menu; we might begin by creating the item:
+```
+file = @MenuItem("_File")
+```
+The underscore in front of the "F" means that we will be able to select this item using `Alt+F`.
+The file menu will have items inside of it, of course, so let's create a submenu associated with this item:
+```
+filemenu = @Menu(file)
+```
+Now let's populate it with entries:
+```
+new_ = @MenuItem("New")
+push!(filemenu, new_)
+open_ = @MenuItem("Open")
+push!(filemenu, open_)
+push!(filemenu, @SeparatorMenuItem())
+quit = @MenuItem("Quit")
+push!(filemenu, quit)
+```
+Finally, let's place our file item inside another type of menu, the `MenuBar`:
+```
+mb = @MenuBar()
+push!(mb, file)  # notice this is the "File" item, not filemenu
+win = @Window(mb, "Menus", 200, 40)
+showall(mb)
+```
+![menu](doc/figures/menu.png)
 
-### Objects have get and set accessor methods
+#### Popup menus
 
-    > warning: this API has not been completely finalized
-    > warning: this API uses 0-based indexing
-    > note: this API will likely be exposed in a later version as ``Window[:title] = "My Title"``, ``Window[:title,String]``
+We can create a canvas that, when right-clicked, reveals a context menu:
 
-``Gtk._`` (not exported), ``Gtk.G_`` (exported by `Gtk.ShortNames`), and ``Gtk.GAccessor`` (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the `GObject`'s. The difference between a get and set method is based upon the number of arguments.
+```
+using Gtk.ShortNames, Base.Graphics
+# Fill a canvas with red
+c = @Canvas()
+win = @Window(c, "Canvas")
+draw(c) do widget
+    ctx = getgc(c)
+    set_source_rgb(ctx, 1, 0, 0)
+    paint(ctx)
+end
+# Define the popup menu
+popupmenu = @Menu()
+printcolor = @MenuItem("Print color")
+push!(popupmenu, printcolor)
+push!(popupmenu, @MenuItem("Do nothing"))
+# This next line is crucial: otherwise your popup menu shows as a thin bar
+showall(popupmenu)
+# Associate actions with right-click and selection
+c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
+signal_connect(printcolor, :activate) do widget
+    println("Red!")
+end
+showall(win)
+```
+![popupmenu](doc/figures/popup.png)
 
-Example usage:
+#### File dialogs
 
-    bytestring(Gtk._.title(WindowLeaf("my title")))
-    G_.title(WindowLeaf("my title"), "my new title")
-    GAccessor.size(WindowLeaf("what size?"))
+Gtk.jl supports the GtkFileChooserDialog.
+It also provides two functions, `open_dialog` and `save_dialog`, making this functionality easier to use.
+The syntax of these two functions are as follows:
 
-Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.
+```
+open_dialog(title; parent = nothing, filters = ASCIIString[], multiple = false)
+save_dialog(title; parent = nothing, filters = ASCIIString[])
+```
 
+If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
+Otherwise, for standalone usage in scripts, do not set the parent.
 
-### Constants
+The main flexibility comes from the filters, which can be specified as a Tuple or Vector.
+A filter can be specified as a string, in which case it specifies a globbing pattern, for example `"*.png"`.
+You can specify multiple match types for a single filter by separating the patterns with a comma, for example `"*.png,*.jpg"`.
+You can alternatively specify MIME types, or if no specification is provided it defaults to types supported by `GdkPixbuf`.
+The generic specification of a filter is
+```
+@FileFilter(; name = nothing, pattern = "", mimetype = "")
+```
 
-Interaction with Gtk sometimes requires constants, which are bundled into the `Gtk.GConstants` module.
-`GConstants` in turn contains modules corresponding to each Gtk `enum` type.
-For example, constants corresponding to the [GdkEventMask](https://developer.gnome.org/gdk3/stable/gdk3-Events.html#GdkEventMask)
-are in `Gtk.GConstants.GdkEventMask`. Each constant can be referred to by its full Gtk name or by a shortened name,
-for example `GDK_KEY_PRESS_MASK` can also be used as `KEY_PRESS`. The rule for generating the shortened name is that
-any prefix common to the entire `enum` is stripped off, as well as any trailing `_MASK` if that ending is common to
-all elements in the enum.
+Here are some examples:
+```
+open_dialog("Pick a file")
+open_dialog("Pick some files", multiple=true)
+open_dialog("Pick a file", filters=("*.jl",))
+open_dialog("Pick some text files", filters=("*.txt,*.csv",), multiple=true)
+open_dialog("Pick a file", filters=(@FileFilter(mimetype="text/csv"),))
+open_dialog("Pick an image file", filters=("*.png", "*.jpg", @FileFilter("*.png,*.jpg", name="All supported formats")))
+open_dialog("Pick an image file", filters=(@FileFilter(name="Supported image formats"),))
 
-## Gtk Object Tree
-
-    +- Any
-    .  +- AbstractArray = AbstractArray{GValue,1}
-    .  .  +- MatrixStrided = MatrixStrided{T}
-    .  .  +- Ranges = Ranges{T}
-    .  .  .  +- GtkTextRange
-    .  +- GError
-    .  +- GObject
-    .  .  +- GObjectLeaf{Name}
-    .  .  +- GdkPixbuf
-    .  .  +- GtkStatusIcon
-    .  .  +- GtkTextBuffer
-    .  .  +- GtkTextMark
-    .  .  +- GtkTextTag
-    .  .  +- GtkWidget
-    .  .  .  +- GtkCanvas
-    .  .  .  +- GtkComboBoxText
-    .  .  .  +- GtkContainer
-    .  .  .  .  +- GtkBin
-    .  .  .  .  .  +- GtkAlignment
-    .  .  .  .  .  +- GtkAspectFrame
-    .  .  .  .  .  +- GtkButton
-    .  .  .  .  .  +- GtkCheckButton
-    .  .  .  .  .  +- GtkExpander
-    .  .  .  .  .  +- GtkFrame
-    .  .  .  .  .  +- GtkLinkButton
-    .  .  .  .  .  +- GtkRadioButton
-    .  .  .  .  .  +- GtkToggleButton
-    .  .  .  .  .  +- GtkVolumeButton
-    .  .  .  .  .  +- GtkWindow
-    .  .  .  .  .  .  +- GtkDialog
-    .  .  .  .  .  .  .  +- GtkFileChooserDialog
-    .  .  .  .  +- GtkBox
-    .  .  .  .  .  +- GtkButtonBox
-    .  .  .  .  .  +- GtkStatusbar
-    .  .  .  .  +- GtkGrid
-    .  .  .  .  +- GtkLayout
-    .  .  .  .  +- GtkNotebook
-    .  .  .  .  +- GtkNullContainer
-    .  .  .  .  +- GtkOverlay
-    .  .  .  .  +- GtkPaned
-    .  .  .  .  +- GtkRadioButtonGroup
-    .  .  .  .  +- GtkTable
-    .  .  .  +- GtkEntry
-    .  .  .  +- GtkImage
-    .  .  .  +- GtkLabel
-    .  .  .  +- GtkProgressBar
-    .  .  .  +- GtkScale
-    .  .  .  +- GtkSpinButton
-    .  .  .  +- GtkSpinner
-    .  .  .  +- GtkSwitch
-    .  .  .  +- GtkTextView
-    .  +- GParamSpec
-    .  +- GSList{T}
-    .  +- GValue
-    .  +- GdkEvent
-    .  .  +- GdkEventAny
-    .  .  +- GdkEventButton
-    .  .  +- GdkEventCrossing
-    .  .  +- GdkEventKey
-    .  .  +- GdkEventMotion
-    .  .  +- GdkEventScroll
-    .  +- GdkPoint
-    .  +- GdkRectangle
-    .  +- GtkTextIter
-    .  +- MouseHandler
-    .  +- RGB
-    .  +- RGBA
-
+save_dialog("Save as...", filters=(@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
+```
