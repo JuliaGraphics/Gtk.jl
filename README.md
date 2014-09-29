@@ -467,3 +467,15 @@ open_dialog("Pick an image file", filters=(@FileFilter(name="Supported image for
 
 save_dialog("Save as...", filters=(@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
 ```
+
+#### Message dialogs
+
+Gtk.jl also supports GtkMessageDialog and provides several convenience functions:  `info_dialog`, `ask_dialog`, `warn_dialog`, and `error_dialog`.  Each inputs a string and an optional parent container, and returns nothing, except for `ask_dialog` which returns true if the user clicked `yes`.
+
+
+```
+info_dialog("Julia rocks!")
+ask_dialog('Do you like chocolate ice cream?) && println("That's my favorite too.")
+warn_dialog("Oops!... I did it again", win)
+
+```

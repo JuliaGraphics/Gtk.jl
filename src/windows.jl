@@ -50,19 +50,40 @@ end
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
-                          message::StringLike, button_text_response...)
-    n = length(button_text_response)
-    if !iseven(n)
-        error("button_text_response must consist of text/response pairs")
-    end
-    w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
+function GtkMessageDialogLeaf(parent::GtkContainer, flag::Integer, typ::Integer,
+                          button::Integer, message::StringLike)
+    GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
                 (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
-                parent, flags, typ, 0, bytestring(message) ))
-    for i = 1:2:n
-        push!(w, button_text_response[i], button_text_response[i+1])
-    end
-    w
+                parent, flag, typ, button, bytestring(message) ))
+end
+
+function info_dialog(message::String; parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
+	    GtkMessageType.INFO, GtkButtonsType.OK, message)
+    response = run(dlg)
+    destroy(dlg)
+end
+
+function ask_dialog(message::String; parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
+	    GtkMessageType.QUESTION, GtkButtonsType.YES_NO, message)
+    response = run(dlg)
+    destroy(dlg)
+    response == GtkResponseType.YES
+end
+
+function warn_dialog(message::String; parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
+	    GtkMessageType.WARNING, GtkButtonsType.OK, message)
+    response = run(dlg)
+    destroy(dlg)
+end
+
+function error_dialog(message::String; parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
+	    GtkMessageType.ERROR, GtkButtonsType.OK, message)
+    response = run(dlg)
+    destroy(dlg)
 end
 
 #GtkSeparator — A separator widget
