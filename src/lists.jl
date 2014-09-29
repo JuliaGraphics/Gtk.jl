@@ -301,7 +301,7 @@ depth(treeStore::GtkTreeStore, iter::TRI) =
 ### GtkTreeModelFilter
 
 GtkTreeModelFilterLeaf(child_model::GObject) = GtkTreeModelFilterLeaf(
-    ccall((:gtk_tree_model_filter_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{None}), child_model, C_NULL))
+    ccall((:gtk_tree_model_filter_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{Void}), child_model, C_NULL))
 
 function convert_iter_to_child_iter(model::GtkTreeModelFilter, filter_iter::TRI)
     child_iter = mutable(GtkTreeIter)
