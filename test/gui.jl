@@ -465,7 +465,7 @@ w = @Window(tv, "List View")|>showall
 ## selection
 selmodel = Gtk.G_.selection(tv)
 @assert hasselection(selmodel) == false
-select!(selmodel, Gtk.iter_from_index(ls, 1)[])
+select!(selmodel, Gtk.iter_from_index(ls, 1))
 @assert hasselection(selmodel) == true
 iter = selected(selmodel)
 @assert ls[iter, 1] == 33
@@ -485,6 +485,13 @@ r1=@CellRendererText()
 c1=@TreeViewColumn("A", r1, {"text" => 0})
 push!(tv,c1)
 w = @Window(tv, "Tree View")|>showall
+
+
+iter = Gtk.iter_from_index(ts, [1]) 
+ts[iter,1] = "ONE"
+@assert ts[iter,1] == "ONE"         
+@assert map(i -> ts[i, 1], Gtk.walktree(ts, iter)) == ["two", "three"]
+
 destroy(w)
 
 ## Toolbar
