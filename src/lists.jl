@@ -366,46 +366,42 @@ ncolumns(treeModel::GtkTreeModel) =
     ccall((:gtk_tree_model_get_n_columns,libgtk), Cint, (Ptr{GObject},),treeModel)
 
 ## add in gtk_tree_model iter functions to traverse tree
-## where a gtk function passes an iter and returns a boolean, we pass back (Bool, iter)
 
-## First iter [1]
-function get_iter_first(treeModel::GtkTreeModel)
-    iter = mutable(GtkTreeIter)
+## Most gtk function pass in a Mutable Iter and return a bool
+## Update iter to point to first iterm
+function get_iter_first(treeModel::GtkTreeModel, iter=Mutable{GtkTreeIter})
     ret = ccall((:gtk_tree_model_get_iter_first, libgtk), Bool,
           (Ptr{GObject},Ptr{GtkTreeIter}), 
           treeModel, iter)
-    ret, iter[]
+    ret
 end
 
 ## return (Bool, iter)
-function get_iter_next(treeModel::GtkTreeModel, iter::TRI)
-    iter = mutable(copy(iter))
+function get_iter_next(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter})
     ret = ccall((:gtk_tree_model_iter_next, libgtk), Bool,
                 (Ptr{GObject}, Ptr{GtkTreeIter}), 
                 treeModel, iter)
-    ret, iter[]
+    ret
 end
-next(treeModel::GtkTreeModel, iter::TRI) = get_iter_next(treeModel, iter)
+next(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = get_iter_next(treeModel, iter)
 
-## return iter pointing to previous. Invalidates previous
-## return (Bool, GtkTreeIter)
-function get_iter_previous(treeModel::GtkTreeModel, iter::TRI)
-    iter = mutable(copy(iter))
+## update iter to point to previous.
+## return Bool
+function get_iter_previous(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter})
     ret = ccall((:gtk_tree_model_iter_previous, libgtk), Bool,
           (Ptr{GObject}, Ptr{GtkTreeIter}), 
           treeModel, iter)
-    ret, iter[]
+    ret
 end
-prev(treeModel::GtkTreeModel, iter::TRI) = get_iter_previous(treeModel, iter)
+prev(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = get_iter_previous(treeModel, iter)
 
-## return iter pointing to first child of parent iter
-## return (Bool, GtkTreeIter)
-function iter_children(treeModel::GtkTreeModel, piter::TRI)
-    iter = mutable(GtkTreeIter)
+## update iter to point to first child of parent iter
+## return Bool
+function iter_children(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI)
     ret = ccall((:gtk_tree_model_iter_children, libgtk), Bool,
                 (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}), 
                 treeModel, iter, mutable(piter))
-    ret, iter[]
+    ret
 end
 
 
@@ -426,24 +422,23 @@ function iter_n_children(treeModel::GtkTreeModel, iter::TRI)
 end
 length(treeModel::GtkTreeModel, iter::TRI) = iter_n_children(treeModel, iter)
 
-## return (Bool, iter pointing to nth child n in 1:nchildren)
-function iter_nth_child(treeModel::GtkTreeModel, piter::TRI, n::Int)
-    iter = mutable(GtkTreeIter)
+## update iter pointing to nth child n in 1:nchildren)
+## return boolean
+function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI, n::Int)
     ret = ccall((:gtk_tree_model_iter_nth_child, libgtk), Bool,
           (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Cint), 
           treeModel, iter, mutable(piter), n - 1) # 0-based
-    ret, iter[]
+    ret
 end
 
-## return (Bool, GtkTreeIter)
-function iter_parent(treeModel::GtkTreeModel, citer::TRI)
-    iter = mutable(GtkTreeIter)
+## return Bool
+function iter_parent(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, citer::TRI)
     ret = ccall((:gtk_tree_model_iter_parent, libgtk), Bool,
                 (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}), 
                 treeModel, iter, mutable(citer))
-    ret, iter[]
+    ret
 end
-parent(treeModel::GtkTreeModel, iter::TRI) = iter_parent(treeModel, iter)
+parent(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, citer::TRI) = iter_parent(treeModel, iter, citer)
 
 ## string is of type "0:1:0" (0-based)
 function get_string_from_iter(treeModel::GtkTreeModel, iter::TRI)
@@ -464,73 +459,84 @@ index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_
 type TreeIterator
     store::GtkTreeStore
     model::GtkTreeModel
-    iter::Union(Nothing, GtkTreeIter)
+    iter::Union(Nothing, TRI)
     next
 end
 
 function walktree(store::GtkTreeStore, iter=nothing; method::Symbol=:depth_first)
     model = GtkTreeModel(store)
 
-    if isa(iter, Nothing)
+    if iter === Nothing
         return TreeIterator(store, model, nothing, nothing)
     end
 
-    !Gtk.iter_has_child(model, iter) && error("Iter must be a parent")
-    TreeIterator(store, model, iter, nothing)
+    Gtk.iter_has_child(model, iter) || error("Iter must be a parent")
+    TreeIterator(store, model, copy(iter), nothing)
 end
   
 ## iterator interface
 function Base.start(x::TreeIterator)
-    x.iter
+    isa(x.iter, Nothing) ? nothing : mutable(copy(x.iter))
 end
 
 function Base.done(x::TreeIterator, state)
-    if isa(state, Nothing)
-        ret, x.next = Gtk.get_iter_first(x.model)
-        return(false) # special case root
+    iter = mutable(GtkTreeIter)
+
+    if isa(state, Nothing)      # special case root
+        ret = Gtk.get_iter_first(x.model, iter)
+        if ret
+            x.next = iter
+            return(false) 
+        else
+            return(true)        # no children of root, empty tree
+        end
     end
 
+    state = copy(state)
     ## we are not done if:
     ## * state has child, 
-    ret, nstate = Gtk.iter_children(x.model, state)
-    if ret
-        x.next = nstate
+    if iter_has_child(x.model, state)
+        iter = mutable(GtkTreeIter)
+        Gtk.iter_children(x.model, iter, state)
+        x.next = iter
         return(false)
     end
 
-    ## has a sibling
-    ret, nstate = next(x.model, state)
+    ## has a sibling?
+    cstate = copy(state)
+    ret = next(x.model, cstate)
     if ret
-        x.next = nstate
+        x.next = cstate
         return(false)
     end
 
     ## walking back we have a sibling
-    function can_walk_back(iter)
-        ret, piter = parent(x.model, iter)
-        !ret && return((false, piter))
-        isa(x.iter, Nothing) && return((true, piter))
-        if isancestor(x.store, x.iter, piter)
-            return((true, piter))
+    function can_walk_back(iter) ## updates iter
+        ret = parent(x.model, iter, copy(iter))
+        !ret && return(false)
+        isa(x.iter, Nothing) && return(true)
+        if isancestor(x.store, x.iter, iter)
+            return(true)
         else
-            return((false, piter))
+            return(false)
         end
     end
         
-    ret, pstate = can_walk_back(state)
+    ret = can_walk_back(state)
     while ret
-        has_sibling, siter = next(x.model, pstate)
+        cstate = copy(state)
+        has_sibling = next(x.model, cstate)
         if has_sibling
-            x.next = siter
+            x.next = cstate
             return(false)
         end
-        ret, pstate = can_walk_back(pstate)
+        ret = can_walk_back(state)
     end
     return(true)
 end
 
 function Base.next(x::TreeIterator, state)
-    return(x.next, x.next)
+    return(copy(x.next), copy(x.next))
 end
 
 
