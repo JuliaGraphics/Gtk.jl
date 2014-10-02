@@ -59,30 +59,36 @@ end
 
 function info_dialog(message::String; parent = GtkNullContainer())
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.INFO, GtkButtonsType.OK, message)
-    response = run(dlg)
+	    GtkMessageType.INFO, GtkButtonsType.CLOSE, message)
+    run(dlg)
     destroy(dlg)
 end
 
-function ask_dialog(message::String; parent = GtkNullContainer())
+function ask_dialog(message::String, button_text_response...; parent = GtkNullContainer())
+    n = length(button_text_response)
+    @assert iseven(n)
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.QUESTION, GtkButtonsType.YES_NO, message)
+	    GtkMessageType.QUESTION,
+	    n==0 ? GtkButtonsType.YES_NO : GtkButtonsType.NONE, message)
+    for i = 1:2:n
+        push!(dlg, button_text_response[i], button_text_response[i+1])
+    end
     response = run(dlg)
     destroy(dlg)
-    response == GtkResponseType.YES
+    response == (n==0 ? GtkResponseType.YES : button_text_response[2])
 end
 
 function warn_dialog(message::String; parent = GtkNullContainer())
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.WARNING, GtkButtonsType.OK, message)
-    response = run(dlg)
+	    GtkMessageType.WARNING, GtkButtonsType.CLOSE, message)
+    run(dlg)
     destroy(dlg)
 end
 
 function error_dialog(message::String; parent = GtkNullContainer())
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.ERROR, GtkButtonsType.OK, message)
-    response = run(dlg)
+	    GtkMessageType.ERROR, GtkButtonsType.CLOSE, message)
+    run(dlg)
     destroy(dlg)
 end
 
