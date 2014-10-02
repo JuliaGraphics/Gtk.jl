@@ -464,18 +464,18 @@ index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_
 type TreeIterator
     store::GtkTreeStore
     model::GtkTreeModel
-    iter::Union(Nothing, GtkTreeIter)
+    iter
     next
 end
 
 function walktree(store::GtkTreeStore, iter=nothing; method::Symbol=:depth_first)
     model = GtkTreeModel(store)
 
-    if isa(iter, Nothing)
+    if iter === Nothing
         return TreeIterator(store, model, nothing, nothing)
     end
 
-    !Gtk.iter_has_child(model, iter) && error("Iter must be a parent")
+    Gtk.iter_has_child(model, iter) !! error("Iter must be a parent")
     TreeIterator(store, model, iter, nothing)
 end
   
