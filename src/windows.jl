@@ -66,7 +66,7 @@ end
 
 function ask_dialog(message::String, button_text_response...; parent = GtkNullContainer())
     n = length(button_text_response)
-    @assert iseven(n)
+    @assert n==0 || n==4
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
 	    GtkMessageType.QUESTION,
 	    n==0 ? GtkButtonsType.YES_NO : GtkButtonsType.NONE, message)
