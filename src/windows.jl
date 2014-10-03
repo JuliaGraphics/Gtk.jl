@@ -46,44 +46,39 @@ end
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
-        message::StringLike, buttons)
+function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ::Integer, parent = GtkNullContainer())
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
         (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
-        parent, flags, typ, GtkButtonsType.NONE, bytestring(message) ))
+        parent, flags, typ, GtkButtonsType.NONE, C_NULL))
+    setproperty!(w, :text, bytestring(message))
     for (k,v) in buttons
         push!(w, k, v)
     end
     w
 end
 
-function info_dialog(message::String; parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.INFO, GtkButtonsType.CLOSE, message)
-    run(dlg)
-    destroy(dlg)
-end
+ask_dialog(message::String, parent = GtkNullContainer()) =
+        ask_dialog(message, "Yes", "No", parent)
 
-function ask_dialog(message::String, yes_text="Yes", no_text="No"; parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.QUESTION, message, ((yes_text,1), (no_text,2)))
+function ask_dialog(message::String, yes_text, no_text, parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(message, ((yes_text,1), (no_text,2)),
+            GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.QUESTION, parent)
     response = run(dlg)
     destroy(dlg)
     response == 1
 end
 
-function warn_dialog(message::String; parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.WARNING, GtkButtonsType.CLOSE, message)
-    run(dlg)
-    destroy(dlg)
+for (func, flag) in (
+        (:info_dialog, GtkMessageType.INFO),
+        (:warn_dialog, GtkMessageType.WARNING),
+        (:error_dialog, GtkMessageType.ERROR))
+    @eval function $func(message::String, parent = GtkNullContainer())
+        w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
+            (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
+            parent, GtkDialogFlags.DESTROY_WITH_PARENT,
+            $flag, GtkButtonsType.CLOSE, C_NULL))
+        setproperty!(w, :text, bytestring(message))
+        run(w)
+        destroy(w)
+    end
 end
-
-function error_dialog(message::String; parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.ERROR, GtkButtonsType.CLOSE, message)
-    run(dlg)
-    destroy(dlg)
-end
-
-#GtkSeparator — A separator widget
