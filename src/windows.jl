@@ -33,16 +33,12 @@ GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
     ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
                 C_NULL,C_NULL))
 
-function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, button_text_response...)
-    n = length(button_text_response)
-    if !iseven(n)
-        error("button_text_response must consist of text/response pairs")
-    end
+function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons)
     w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
                 title, parent, flags, C_NULL))
-    for i = 1:2:n
-        push!(w, button_text_response[i], button_text_response[i+1])
+    for key in keys(buttons)
+        push!(w, key, buttons[key])
     end
     w
 end
@@ -55,6 +51,17 @@ function GtkMessageDialogLeaf(parent::GtkContainer, flag::Integer, typ::Integer,
     GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
                 (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
                 parent, flag, typ, button, bytestring(message) ))
+end
+
+function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
+        message::StringLike, buttons)
+    w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
+        (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
+        parent, flags, typ, 0, bytestring(message) ))
+    for key in keys(buttons)
+        push!(w, key, buttons[key])
+    end
+    w
 end
 
 function info_dialog(message::String; parent = GtkNullContainer())
