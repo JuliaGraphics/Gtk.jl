@@ -46,13 +46,6 @@ end
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-function GtkMessageDialogLeaf(parent::GtkContainer, flag::Integer, typ::Integer,
-                          button::Integer, message::StringLike)
-    GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
-                (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
-                parent, flag, typ, button, bytestring(message) ))
-end
-
 function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer,
         message::StringLike, buttons)
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
