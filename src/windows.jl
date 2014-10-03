@@ -37,8 +37,8 @@ function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, 
     w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
                 title, parent, flags, C_NULL))
-    for key in keys(buttons)
-        push!(w, key, buttons[key])
+    for (k,v) in buttons
+        push!(w, k, v)
     end
     w
 end
@@ -50,9 +50,9 @@ function GtkMessageDialogLeaf(parent::GtkContainer, flags::Integer, typ::Integer
         message::StringLike, buttons)
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
         (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
-        parent, flags, typ, 0, bytestring(message) ))
-    for key in keys(buttons)
-        push!(w, key, buttons[key])
+        parent, flags, typ, GtkButtonsType.NONE, bytestring(message) ))
+    for (k,v) in buttons
+        push!(w, k, v)
     end
     w
 end
@@ -64,11 +64,9 @@ function info_dialog(message::String; parent = GtkNullContainer())
     destroy(dlg)
 end
 
-function ask_dialog(message::String, yes_text="yes", no_text="no"; parent = GtkNullContainer())
+function ask_dialog(message::String, yes_text="Yes", no_text="No"; parent = GtkNullContainer())
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.QUESTION, GtkButtonsType.NONE, message)
-    push!(dlg, yes_text, 1)
-    push!(dlg, no_text, 2)
+	    GtkMessageType.QUESTION, message, ((yes_text,1), (no_text,2)))
     response = run(dlg)
     destroy(dlg)
     response == 1
