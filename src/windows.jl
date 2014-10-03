@@ -64,18 +64,14 @@ function info_dialog(message::String; parent = GtkNullContainer())
     destroy(dlg)
 end
 
-function ask_dialog(message::String, button_text_response...; parent = GtkNullContainer())
-    n = length(button_text_response)
-    @assert n==0 || n==4
+function ask_dialog(message::String, yes_text="yes", no_text="no"; parent = GtkNullContainer())
     dlg = @GtkMessageDialog(parent, GtkDialogFlags.DESTROY_WITH_PARENT,
-	    GtkMessageType.QUESTION,
-	    n==0 ? GtkButtonsType.YES_NO : GtkButtonsType.NONE, message)
-    for i = 1:2:n
-        push!(dlg, button_text_response[i], button_text_response[i+1])
-    end
+	    GtkMessageType.QUESTION, GtkButtonsType.NONE, message)
+    push!(dlg, yes_text, 1)
+    push!(dlg, no_text, 2)
     response = run(dlg)
     destroy(dlg)
-    response == (n==0 ? GtkResponseType.YES : button_text_response[2])
+    response == 1
 end
 
 function warn_dialog(message::String; parent = GtkNullContainer())
