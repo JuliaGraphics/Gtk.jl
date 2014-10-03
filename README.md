@@ -476,6 +476,6 @@ Gtk.jl also supports GtkMessageDialog and provides several convenience functions
 ```
 info_dialog("Julia rocks!")
 ask_dialog('Do you like chocolate ice cream?) && println("That's my favorite too.")
-warn_dialog("Oops!... I did it again", win)
+warn_dialog("Oops!... I did it again", parent=win)
 
 ```
