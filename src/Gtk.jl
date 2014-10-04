@@ -37,6 +37,7 @@ include("base.jl")
 include("gdk.jl")
 include("events.jl")
 include("container.jl")
+include("windows.jl")
 include("layout.jl")
 include("displays.jl")
 include("lists.jl")
@@ -71,8 +72,6 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
 end
 const _ = GAccessor
 using .GConstants
-
-include("windows.jl")
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames

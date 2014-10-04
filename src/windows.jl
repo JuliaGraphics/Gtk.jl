@@ -33,10 +33,14 @@ GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
     ccall((:gtk_scrolled_window_new,libgtk),Ptr{GObject},(Ptr{GObject},Ptr{GObject}),
                 C_NULL,C_NULL))
 
-function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons)
+#if VERSION >= v"0.4-"
+#GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons::=>...; kwargs...) =
+#    GtkDialogLeaf(title, parent, flags, buttons; kwargs...)
+#end
+function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons; kwargs...)
     w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
-                title, parent, flags, C_NULL))
+                title, parent, flags, C_NULL); kwargs...)
     for (k,v) in buttons
         push!(w, k, v)
     end
@@ -46,11 +50,11 @@ end
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ::Integer, parent = GtkNullContainer())
+function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ::Integer, parent = GtkNullContainer(); kwargs...)
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
         (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
-        parent, flags, typ, GtkButtonsType.NONE, C_NULL))
-    setproperty!(w, :text, bytestring(message))
+        parent, flags, typ, GtkButtonsType.NONE, C_NULL); kwargs...)
+    setproperty!(w, :text, message)
     for (k,v) in buttons
         push!(w, k, v)
     end
@@ -58,10 +62,10 @@ function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ:
 end
 
 ask_dialog(message::String, parent = GtkNullContainer()) =
-        ask_dialog(message, "Yes", "No", parent)
+        ask_dialog(message, "No", "Yes", parent)
 
-function ask_dialog(message::String, yes_text, no_text, parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(message, ((yes_text,1), (no_text,2)),
+function ask_dialog(message::String, no_text, yes_text, parent = GtkNullContainer())
+    dlg = @GtkMessageDialog(message, ((no_text,0), (yes_text,1)),
             GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.QUESTION, parent)
     response = run(dlg)
     destroy(dlg)
@@ -69,15 +73,15 @@ function ask_dialog(message::String, yes_text, no_text, parent = GtkNullContaine
 end
 
 for (func, flag) in (
-        (:info_dialog, GtkMessageType.INFO),
-        (:warn_dialog, GtkMessageType.WARNING),
-        (:error_dialog, GtkMessageType.ERROR))
+        (:info_dialog, :(GtkMessageType.INFO)),
+        (:warn_dialog, :(GtkMessageType.WARNING)),
+        (:error_dialog, :(GtkMessageType.ERROR)))
     @eval function $func(message::String, parent = GtkNullContainer())
         w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
             (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
             parent, GtkDialogFlags.DESTROY_WITH_PARENT,
             $flag, GtkButtonsType.CLOSE, C_NULL))
-        setproperty!(w, :text, bytestring(message))
+        setproperty!(w, :text, message)
         run(w)
         destroy(w)
     end
