@@ -138,6 +138,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
                 # to write more generic code
             end
             gtype_ifaces[$(QuoteNode(iname))] = $(esc(iname))
+            local T #to prevent Julia-0.2 from name-mangling <:T
             $gtyp_decl
         end
         nothing
@@ -198,7 +199,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
                 gc_ref(new(handle))
             end
         end
-        local kwargs #to prevent Julia-0.2 from name-mangling kwargs
+        local kwargs, T #to prevent Julia-0.2 from name-mangling kwargs, <:T
         function $ename(args...; kwargs...)
             if isempty(kwargs)
                 error(MethodError($ename, args))
