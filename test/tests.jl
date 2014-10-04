@@ -1,5 +1,6 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Base.Graphics
+import Gtk.deleteat!
 
 ## Window
 w = @Window("Window", 400, 300)

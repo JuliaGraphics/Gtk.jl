@@ -17,8 +17,8 @@ if VERSION < v"0.3-"
     QuoteNode(x) = Base.qn(x)
 end
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
-             insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!,
-             start, next, done, parent, isempty, empty!, first, last, in,
+             insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!, deleteat!,
+             select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string
 import Base.Graphics: width, height, getgc
 import Cairo: destroy
