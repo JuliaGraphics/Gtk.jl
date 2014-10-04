@@ -144,7 +144,7 @@ function unshift!(listStore::GtkListStore, values::Tuple)
 end
 
 ## insert before
-function Base.insert!(listStore::GtkListStoreLeaf, iter::TRI, values)
+function insert!(listStore::GtkListStoreLeaf, iter::TRI, values)
     newiter = Gtk.mutable(GtkTreeIter)
     ccall((:gtk_list_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), listStore, newiter, iter)
     list_store_set_values(listStore, newiter, values)
@@ -158,7 +158,7 @@ function delete!(listStore::GtkListStore, iter::TRI)
     listStore
 end
 
-Base.deleteat!(listStore::GtkListStore, iter::TRI) = delete!(listStore, iter)
+deleteat!(listStore::GtkListStore, iter::TRI) = delete!(listStore, iter)
 
 
 empty!(listStore::GtkListStore) =
@@ -167,18 +167,16 @@ empty!(listStore::GtkListStore) =
 ## by index
 
 ## insert into a list store after index
-function Base.insert!(listStore::GtkListStoreLeaf, index::Int, values)
+function insert!(listStore::GtkListStoreLeaf, index::Int, values)
     index > length(listStore) && return(push!(listStore, values))
 
     iter = iter_from_index(listStore, index)
     insert!(listStore, iter, values)
 end
 
-Base.deleteat!(listStore::GtkListStoreLeaf, index::Int) = delete!(listStore, iter_from_index(listStore, index))
-Base.pop!(listStore::GtkListStoreLeaf) = deleteat!(listStore, length(listStore))
-Base.shift!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
-
-
+deleteat!(listStore::GtkListStoreLeaf, index::Int) = delete!(listStore, iter_from_index(listStore, index))
+pop!(listStore::GtkListStoreLeaf) = deleteat!(listStore, length(listStore))
+shift!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
 
 
 isvalid(listStore::GtkListStore, iter::TRI) =
@@ -190,10 +188,10 @@ length(listStore::GtkListStore) =
 
 size(listStore::GtkListStore) = (length(listStore), ncolumns(GtkTreeModel(listStore)))
 
-Base.getindex(listStore::GtkListStore, iter::TRI, column::Integer) = getindex(GtkTreeModel(listStore), iter, column)
-Base.getindex(listStore::GtkListStore, iter::TRI) = getindex(GtkTreeModel(listStore), iter)
-Base.getindex(listStore::GtkListStore, row::Int, column) = getindex(listStore, iter_from_index(listStore, row), column)
-Base.getindex(listStore::GtkListStore, row::Int) = getindex(listStore, iter_from_index(listStore, row))
+getindex(listStore::GtkListStore, iter::TRI, column::Integer) = getindex(GtkTreeModel(listStore), iter, column)
+getindex(listStore::GtkListStore, iter::TRI) = getindex(GtkTreeModel(listStore), iter)
+getindex(listStore::GtkListStore, row::Int, column) = getindex(listStore, iter_from_index(listStore, row), column)
+getindex(listStore::GtkListStore, row::Int) = getindex(listStore, iter_from_index(listStore, row))
 
 
 
@@ -242,7 +240,7 @@ end
 
 ## index can be :parent or :sibling
 ## insertion can be :after or :before
-function Base.insert!(treeStore::GtkTreeStoreLeaf, piter::TRI, values; how::Symbol=:parent, where::Symbol=:after)
+function insert!(treeStore::GtkTreeStoreLeaf, piter::TRI, values; how::Symbol=:parent, where::Symbol=:after)
 
     iter =  Gtk.mutable(GtkTreeIter)
     if how == :parent
@@ -269,16 +267,16 @@ function delete!(treeStore::GtkTreeStore, iter::TRI)
     treeStore
 end
 
-Base.deleteat!(treeStore::GtkTreeStore, iter::TRI) = delete!(treeStore, iter)
+deleteat!(treeStore::GtkTreeStore, iter::TRI) = delete!(treeStore, iter)
 
 ## insert by index
-function Base.insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol=:after)
+function insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol=:parent, where::Symbol=:after)
     piter = iter_from_index(treeStore, index)
     insert!(treeStore, iter, values; how=how, where=where)
 end
 
 
-function Base.splice!(treeStore::GtkTreeStoreLeaf, index::Vector{Int})
+function splice!(treeStore::GtkTreeStoreLeaf, index::Vector{Int})
     iter = iter_from_index(treeStore, index)
     delete!(treeStore, iter)
 end
@@ -472,7 +470,7 @@ length(selection::GtkTreeSelection) =
 
 hasselection(selection::GtkTreeSelection) = length(selection) > 0
 
-Base.select!(selection::GtkTreeSelection, iter::TRI) =
+select!(selection::GtkTreeSelection, iter::TRI) =
     ccall((:gtk_tree_selection_select_iter,libgtk), Void,
           (Ptr{GObject},Ptr{GtkTreeIter}),selection, mutable(iter))
 
