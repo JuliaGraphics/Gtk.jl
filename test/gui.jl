@@ -443,8 +443,8 @@ destroy(win)
 ## Selectors
 import Gtk.GtkFileChooserAction, Gtk.GtkResponseType
 dlg = @FileChooserDialog("Select file", @Null(), GtkFileChooserAction.OPEN,
-                        "_Cancel", GtkResponseType.CANCEL,
-                        "_Open", GtkResponseType.ACCEPT)
+                        (("_Cancel", GtkResponseType.CANCEL),
+                         ("_Open", GtkResponseType.ACCEPT)))
 destroy(dlg)
 
 ## List view

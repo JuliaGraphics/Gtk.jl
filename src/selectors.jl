@@ -14,20 +14,22 @@
 #GtkFontSelectionDialog — A dialog box for selecting fonts
 #GtkInputDialog — Configure devices for the XInput extension
 
-push!(widget::GtkDialog, text::String, response::Integer) =
+function push!(widget::GtkDialog, text::String, response::Integer)
     ccall((:gtk_dialog_add_button,libgtk), Ptr{GObject},
           (Ptr{GObject},Ptr{Uint8},Cint), widget, text, response)
+    widget
+end
 
-function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::Integer, button_text_response...)
-    n = length(button_text_response)
-    if !iseven(n)
-        error("button_text_response must consist of text/response pairs")
-    end
+#if VERSION >= v"0.4-"
+#GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::Integer, button_text_response::=>...; kwargs...) =
+#    GtkFileChooserDialogLeaf(title::String, parent, action, button_text_response; kwargs...)
+#end
+function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::Integer, button_text_response; kwargs...)
     w = GtkFileChooserDialogLeaf(ccall((:gtk_file_chooser_dialog_new,libgtk), Ptr{GObject},
                 (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
-                title, parent, action, C_NULL))
-    for i = 1:2:n
-        push!(w, button_text_response[i], button_text_response[i+1])
+                title, parent, action, C_NULL); kwargs...)
+    for (k,v) in button_text_response
+        push!(w, k, v)
     end
     w
 end
@@ -36,7 +38,7 @@ run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), 
 
 const SingleComma = r"(?<!,),(?!,)"
 function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern::ByteString = "", mimetype::ByteString = "")
-    filt = ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ())
+    filt = GtkFileFilterLeaf(ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ()))
     if !isempty(pattern)
         name == nothing && (name = pattern)
         for p in split(pattern, SingleComma)
@@ -57,24 +59,24 @@ function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern:
 end
 GtkFileFilterLeaf(pattern::ByteString; name::Union(ByteString,Nothing) = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
 
-GtkFileFilterLeaf(filter::GtkFileFilterLeaf) = filter
+GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 
-function makefilters(dlgp::GtkFileChooser, filters::Union(AbstractVector,Tuple))
+function makefilters!(dlgp::GtkFileChooser, filters::Union(AbstractVector,Tuple))
     for f in filters
         ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, @GtkFileFilter(f))
     end
 end
 
-function open_dialog(title::String, parent = GtkNullContainer(); filters::Union(AbstractVector,Tuple) = ASCIIString[], multiple::Bool = false)
+function open_dialog(title::String, parent = GtkNullContainer(), filters::Union(AbstractVector,Tuple) = ASCIIString[]; kwargs...)
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
-                                "_Cancel", GConstants.GtkResponseType.CANCEL,
-                                "_Open",   GConstants.GtkResponseType.ACCEPT)
-    setproperty!(dlg, :select_multiple, multiple)
+                                (("_Cancel", GConstants.GtkResponseType.CANCEL),
+                                 ("_Open",   GConstants.GtkResponseType.ACCEPT)); kwargs...)
     dlgp = GtkFileChooser(dlg)
     if !isempty(filters)
-        makefilters(dlgp, filters)
+        makefilters!(dlgp, filters)
     end
     response = run(dlg)
+    multiple = getproperty(dlg, :select_multiple, Bool)
     local selection
     if response == GConstants.GtkResponseType.ACCEPT
         if multiple
@@ -96,13 +98,13 @@ function open_dialog(title::String, parent = GtkNullContainer(); filters::Union(
     selection
 end
 
-function save_dialog(title::String, parent = GtkNullContainer(); filters::Union(AbstractVector,Tuple) = ASCIIString[])
+function save_dialog(title::String, parent = GtkNullContainer(), filters::Union(AbstractVector,Tuple) = ASCIIString[]; kwargs...)
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
-                                "_Cancel", GConstants.GtkResponseType.CANCEL,
-                                "_Save",   GConstants.GtkResponseType.ACCEPT)
+                                (("_Cancel", GConstants.GtkResponseType.CANCEL),
+                                 ("_Save",   GConstants.GtkResponseType.ACCEPT)), kwargs...)
     dlgp = GtkFileChooser(dlg)
     if !isempty(filters)
-        makefilters(dlgp, filters)
+        makefilters!(dlgp, filters)
     end
     ccall((:gtk_file_chooser_set_do_overwrite_confirmation,libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
     response = run(dlg)
