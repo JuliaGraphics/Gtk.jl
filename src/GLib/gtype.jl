@@ -287,7 +287,7 @@ function convert{T<:GObject}(::Type{T}, hnd::Ptr{GObject})
     end
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark::Uint32)
     if x != C_NULL
-        return unsafe_pointer_to_objref(x)::T
+        return gc_ref(unsafe_pointer_to_objref(x)::T)
     end
     wrap_gobject(hnd)::T
 end
@@ -303,7 +303,6 @@ function wrap_gobject(hnd::Ptr{GObject})
     T = gtype_wrappers[typname]
     return T(hnd)
 end
-
 
 ### Miscellaneous types
 baremodule GConnectFlags
@@ -339,7 +338,7 @@ end
 gc_ref_closure{T}(x::T) = (gc_ref(x);cfunction(gc_unref, Void, (T, Ptr{Void})))
 gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
-# generally, you shouldn't need to call gc_ref(::Ptr)
+# generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
 
@@ -368,11 +367,11 @@ function gc_ref{T<:GObject}(x::T)
             (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark::Uint32, x,
             cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
         addref()
-    elseif !isa(ref,WeakRef)
+    elseif ref === true
+        # already gc-protected, nothing to do
+    else
         # oops, we previously deleted the link, but now it's back
         addref()
-    else
-        # already gc-protected, nothing to do
     end
     x
 end
