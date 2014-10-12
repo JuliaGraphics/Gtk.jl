@@ -22,6 +22,18 @@ end
     using WinRPM
     provides(WinRPM.RPM,"gtk3", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
+
+    # install some other quasi-required packages
+    WinRPM.install([
+        "glib2-tools","gtk3-tools","gtk2-tools",
+        "pango-tools","gdk-pixbuf-query-loaders",
+        "hicolor-icon-theme","tango-icon-theme",
+        "gnome-icon-theme","gnome-icon-theme-extras",
+        "gnome-icon-theme-symbolic",])
+
+    # compile the schemas
+    libdir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
+    run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
 end
 
 @osx_only begin
