@@ -107,9 +107,9 @@ function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothin
 end
 function start(grp::GtkRadioButtonGroup)
     if isempty(grp)
-        list = convert(Ptr{_GList{GtkRadioButton}},C_NULL)
+        list = convert(Ptr{_GSList{GtkRadioButton}},C_NULL)
     else
-        list = ccall((:gtk_radio_button_get_group,libgtk), Ptr{_GList{GtkRadioButton}},
+        list = ccall((:gtk_radio_button_get_group,libgtk), Ptr{_GSList{GtkRadioButton}},
             (Ptr{GObject},), grp.anchor)
     end
     list
