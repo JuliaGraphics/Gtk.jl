@@ -91,6 +91,7 @@ Depending on where you acquired your `GLib.GList`, you will need to select the a
  2. Wrapping the pointer in a call to `GLib.GList(ptr)` will free the list when the returned `GList` object reference is garbage-collected `[transfer-container]`
  3. Wrapping the pointer instead in a call to `glist_iter(ptr)` will wrap the list in GC-safe iterator. By contrast to calling `GLib.GList(ptr)`, this method is necessary if the user is unlikely to be able to maintain the a reference to the returned object for the life of the iterator. Instances where this is true include iterators (hence the name), since this function is often used to create iterators: `start(x) = glist_iter(get_ptr_to_glist(x))`. `[transfer-container]`
  4. To both 2 and 3, you can supply an additional boolean parameter `transfer-full`, to have Julia also dereference and free the individual elements `[transfer-full]`
+ 5. WARNING: ensure the choice of `_GSList` vs `_GList` matches the Gtk API exactly. Using the wrong one will corrupt the GSlice allocator.
  
 ### Julia-allocated GLists
 

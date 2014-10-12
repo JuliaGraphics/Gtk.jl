@@ -448,7 +448,7 @@ function selected_rows(selection::GtkTreeSelection)
     model = mutable(Ptr{GtkTreeModel})
 
     paths = Gtk.GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, Gtk.libgtk), 
-                                Ptr{Gtk._GSList{Gtk.GtkTreePath}},
+                                Ptr{Gtk._GList{Gtk.GtkTreePath}},
                                 (Ptr{GObject}, Ptr{GtkTreeModel}), 
                                 selection, model))
     
