@@ -342,7 +342,7 @@ gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
 
-const gc_preserve_gtk = WeakKeyDict{GObject,Union(Bool,GObject)}() # gtk objects
+const gc_preserve_gtk = Dict{Union(WeakRef,GObject),Bool}() # gtk objects
 function gc_ref{T<:GObject}(x::T)
     global gc_preserve_gtk
     addref = function()
@@ -353,25 +353,26 @@ function gc_ref{T<:GObject}(x::T)
                     return # unnecessary to cleanup if we are about to die anyways
                 end
                 if x.handle != C_NULL
-                    gc_preserve_gtk[x] = x # convert to a strong-reference
+                    gc_preserve_gtk[x] = true # convert to a strong-reference
                     gc_unref(convert(Ptr{GObject},x)) # may clear the strong reference
                 else
                     delete!(gc_preserve_gtk, x) # x is invalid, ensure we are dead
                 end
             end)
-        gc_preserve_gtk[x] = true # record the existence of the object, but allow the finalizer
+        gc_preserve_gtk[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
     end
-    ref = get(gc_preserve_gtk,x,nothing)
-    if isa(ref,Nothing)
+    strong = get(gc_preserve_gtk, x, nothing)
+    if strong === nothing
+        # we haven't seen this before, setup the metadata
         ccall((:g_object_set_qdata_full, libgobject), Void,
             (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark::Uint32, x,
             cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
         addref()
-    elseif ref === true
-        # already gc-protected, nothing to do
-    else
+    elseif strong
         # oops, we previously deleted the link, but now it's back
         addref()
+    else
+        # already gc-protected, nothing to do
     end
     x
 end

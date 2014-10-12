@@ -37,12 +37,12 @@ GList{L<:_LList}(list::Ptr{L},transfer_full::Bool=false) = GList{L}(list,transfe
 typealias LList{L<:_LList} Union(Ptr{L}, GList{L})
 eltype{L<:_LList}(::LList{L}) = eltype(L)
 
-deref{L<:_LList}(item::Ptr{L}) = deref_to(L, unsafe_load(item).data)
-deref_to{T}(::Type{T}, x::Ptr) = unsafe_pointer_to_objref(x)::T
+deref{L<:_LList}(item::Ptr{L}) = deref_to(L, unsafe_load(item).data) # extract something from the glist (automatically determine type)
+deref_to{T}(::Type{T}, x::Ptr) = unsafe_pointer_to_objref(x)::T # helper for extracting something from the glist (to type T)
 deref_to{L<:_LList}(::Type{L}, x::Ptr) = convert(eltype(L),deref_to(_listdatatype(L), x))
-ref_to{T}(::Type{T}, x) = pointer_from_objref(gc_ref(x))
+ref_to{T}(::Type{T}, x) = pointer_from_objref(gc_ref(x)) # create a reference to something for putting in the glist
 ref_to{L<:_LList}(::Type{L}, x) = ref_to(_listdatatype(L), x)
-empty!(li::Ptr{_LList}) = gc_unref(deref(li))
+empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
 empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{super(L)}, li))
 
 ## Standard Iteration protocol
