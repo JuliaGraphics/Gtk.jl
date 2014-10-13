@@ -20,7 +20,7 @@ end
 
 @windows_only begin
     using WinRPM
-    provides(WinRPM.RPM,"gtk3", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
+    provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
 
     # install some other quasi-required packages
