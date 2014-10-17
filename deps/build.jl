@@ -29,7 +29,8 @@ end
         "pango-tools","gdk-pixbuf-query-loaders",
         "hicolor-icon-theme","tango-icon-theme",
         "gnome-icon-theme","gnome-icon-theme-extras",
-        "gnome-icon-theme-symbolic",])
+        "gnome-icon-theme-symbolic",];
+        yes = isinteractive())
 
     # compile the schemas
     libdir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
