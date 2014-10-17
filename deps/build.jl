@@ -30,7 +30,7 @@ end
         "hicolor-icon-theme","tango-icon-theme",
         "gnome-icon-theme","gnome-icon-theme-extras",
         "gnome-icon-theme-symbolic",];
-        yes = isinteractive())
+        yes = !isinteractive()) # don't prompt for unattended installs
 
     # compile the schemas
     libdir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
