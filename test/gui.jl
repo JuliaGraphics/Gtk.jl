@@ -490,7 +490,7 @@ w = @Window(tv, "Tree View")|>showall
 iter = Gtk.iter_from_index(ts, [1]) 
 ts[iter,1] = "ONE"
 @assert ts[iter,1] == "ONE"         
-@assert map(i -> ts[i, 1], Gtk.walktree(ts, iter)) == ["two", "three"]
+@assert map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
 
 destroy(w)
 
