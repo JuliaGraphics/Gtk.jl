@@ -146,7 +146,7 @@ function g_sigatom(f::Base.Callable)
             @assert !prev # assert that we are going to end up in g_wait, otherwise PANIC!
             @assert gtk_work === nothing
             gtk_work = f
-            queue_return()
+            _set_return()
             ret = yieldto(gtk_stack)
         end
     catch err
@@ -178,15 +178,15 @@ end
 ## g_siginterruptible(f)
 
 if VERSION < v"0.3-"
-    set_waiting(t::Task) = t.runnable = false
-    set_runnable(t::Task) = t.runnable = true
-    queue_return() = global gtk_return = current_task()
-    get_return() = gtk_return::Task
+    _set_waiting(t::Task) = t.runnable = false
+    _set_runnable(t::Task) = t.runnable = true
+    _set_return() = global gtk_return = current_task()
+    _get_return() = gtk_return::Task
 else
-    set_waiting(t::Task) = t.state = :waiting
-    set_runnable(t::Task) = t.state = :runnable
-    gtk_return() = nothing
-    get_return() = current_task().last
+    _set_waiting(t::Task) = t.state = :waiting
+    _set_runnable(t::Task) = t.state = :runnable
+    _set_return() = nothing
+    _get_return() = current_task().last
 end
 
 function g_siginterruptible(f::Base.Callable)
@@ -212,14 +212,14 @@ function g_siginterruptible(f::Base.Callable)
                 t = Task(f)
                 t.donenotify = c
                 ct = current_task()
-                set_waiting(ct)
+                _set_waiting(ct)
                 push!(c.waitq, ct)
                 schedule(t)
                 wait()
             end
             while gtk_work !== nothing # came from g_sigatom, not scheduler -- run thunk, don't return yet
                 @assert g_sigatom_flag # verify that we got here from g_sigatom, otherwise PANIC!
-                last = get_return()
+                last = _get_return()
                 try
                     gtk_f = gtk_work
                     gtk_work = nothing
@@ -228,13 +228,13 @@ function g_siginterruptible(f::Base.Callable)
                         filter!(x->x!==ct, Base.Workqueue)
                     else
                         filter!(x->x!==ct, c.waitq)
-                        set_runnable(ct)
+                        _set_runnable(ct)
                     end
                     res = gtk_f()
                     if f === yield || istaskdone(t)
                         schedule(current_task())
                     else
-                        set_waiting(ct)
+                        _set_waiting(ct)
                         push!(c.waitq, ct)
                     end
                     yieldto(last, res)
@@ -243,14 +243,14 @@ function g_siginterruptible(f::Base.Callable)
                         schedule(current_task())
                     else
                         push!(c.waitq, ct)
-                        set_waiting(ct)
+                        _set_waiting(ct)
                     end
                     Base.throwto(last, e)
                 end
             end
             if f !== yield
                 ct = current_task()
-                set_runnable(ct)
+                _set_runnable(ct)
                 filter!(x->x!==ct, c.waitq)
                 @assert istaskdone(t)
                 if t.state == :failed
@@ -262,7 +262,7 @@ function g_siginterruptible(f::Base.Callable)
         ct = current_task()
         filter!(x->x!==ct, Base.Workqueue)
         if f !== yield
-            set_runnable(ct)
+            _set_runnable(ct)
             filter!(x->x!==ct, c.waitq)
         end
         try
@@ -304,20 +304,20 @@ end
 
 expiration = uint64(0)
 if VERSION < v"0.3-"
-    isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] === Base.Scheduler)
+    _isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] === Base.Scheduler)
     function uv_loop_alive(evt)
         ccall(:uv_stop,Void,(Ptr{Void},),evt)
         ccall(:uv_run,Cint,(Ptr{Void},Cint),evt,2) != 0
     end
 else
-    isempty_workqueue() = isempty(Base.Workqueue)
+    _isempty_workqueue() = isempty(Base.Workqueue)
     uv_loop_alive(evt) = ccall(:uv_loop_alive,Cint,(Ptr{Void},),evt) != 0
 end
 function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
     global expiration, uv_pollfd
     local tmout_ms::Cint
     evt = Base.eventloop()
-    if !isempty_workqueue()
+    if !_isempty_workqueue()
         tmout_ms = 0
     elseif !uv_loop_alive(evt)
         tmout_ms = -1
@@ -346,7 +346,7 @@ end
 function uv_check(src::Ptr{Void})
     global expiration
     ex = expiration::Uint64
-    if !isempty_workqueue()
+    if !_isempty_workqueue()
         return int32(1)
     elseif !uv_loop_alive(Base.eventloop())
         return int32(0)
