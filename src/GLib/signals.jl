@@ -146,6 +146,7 @@ function g_sigatom(f::Base.Callable)
             @assert !prev # assert that we are going to end up in g_wait, otherwise PANIC!
             @assert gtk_work === nothing
             gtk_work = f
+            queue_return()
             ret = yieldto(gtk_stack)
         end
     catch err
@@ -168,15 +169,25 @@ function g_sigatom(f::Base.Callable)
     return ret
 end
 
-#=
-== when the user calls g_sigatom on a stack, it becomes the gtk_stack (until return).
-== it is not possible to be on that stack without g_sigatom_flag set,
-== nor to be off that stack with g_sigatom_flag set
-== the only condition necessary to ensure this invariant is that the user never calls
-== yield() (or wait(), or I/O) from the gtk_stack. this means that any callbacks must
-== ensure they are not on the gtk_stack if they might throw errors or block, by calling
-== g_siginterruptible(f)
-=#
+## when the user calls g_sigatom on a stack, it becomes the gtk_stack (until return).
+## it is not possible to be on that stack without g_sigatom_flag set,
+## nor to be off that stack with g_sigatom_flag set
+## the only condition necessary to ensure this invariant is that the user never calls
+## yield() (or wait(), or I/O) from the gtk_stack. this means that any callbacks must
+## ensure they are not on the gtk_stack if they might throw errors or block, by calling
+## g_siginterruptible(f)
+
+if VERSION < v"0.3-"
+    set_waiting(t::Task) = t.runnable = false
+    set_runnable(t::Task) = t.runnable = true
+    queue_return() = global gtk_return = current_task()
+    get_return() = gtk_return::Task
+else
+    set_waiting(t::Task) = t.state = :waiting
+    set_runnable(t::Task) = t.state = :runnable
+    gtk_return() = nothing
+    get_return() = current_task().last
+end
 
 function g_siginterruptible(f::Base.Callable)
     global g_sigatom_flag, gtk_stack, gtk_work
@@ -201,27 +212,29 @@ function g_siginterruptible(f::Base.Callable)
                 t = Task(f)
                 t.donenotify = c
                 ct = current_task()
-                ct.state = :waiting
+                set_waiting(ct)
                 push!(c.waitq, ct)
                 schedule(t)
                 wait()
             end
             while gtk_work !== nothing # came from g_sigatom, not scheduler -- run thunk, don't return yet
                 @assert g_sigatom_flag # verify that we got here from g_sigatom, otherwise PANIC!
-                last = current_task().last
+                last = get_return()
                 try
                     gtk_f = gtk_work
                     gtk_work = nothing
                     ct = current_task()
                     if f === yield || istaskdone(t)
                         filter!(x->x!==ct, Base.Workqueue)
-                        res = gtk_f()
-                        schedule(current_task())
                     else
                         filter!(x->x!==ct, c.waitq)
-                        current_task().state = :runnable
-                        res = gtk_f()
-                        current_task().state = :waiting
+                        set_runnable(ct)
+                    end
+                    res = gtk_f()
+                    if f === yield || istaskdone(t)
+                        schedule(current_task())
+                    else
+                        set_waiting(ct)
                         push!(c.waitq, ct)
                     end
                     yieldto(last, res)
@@ -230,14 +243,14 @@ function g_siginterruptible(f::Base.Callable)
                         schedule(current_task())
                     else
                         push!(c.waitq, ct)
-                        current_task().state = :waiting
+                        set_waiting(ct)
                     end
                     Base.throwto(last, e)
                 end
             end
             if f !== yield
                 ct = current_task()
-                ct.state = :runnable
+                set_runnable(ct)
                 filter!(x->x!==ct, c.waitq)
                 @assert istaskdone(t)
                 if t.state == :failed
@@ -247,10 +260,9 @@ function g_siginterruptible(f::Base.Callable)
         end
     catch err
         ct = current_task()
-        if f === yield
-            filter!(x->x!==ct, Base.Workqueue)
-        else
-            ct.state = :runnable
+        filter!(x->x!==ct, Base.Workqueue)
+        if f !== yield
+            set_runnable(ct)
             filter!(x->x!==ct, c.waitq)
         end
         try
@@ -292,7 +304,7 @@ end
 
 expiration = uint64(0)
 if VERSION < v"0.3-"
-    isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] == Base.roottask)
+    isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] === Base.Scheduler)
     function uv_loop_alive(evt)
         ccall(:uv_stop,Void,(Ptr{Void},),evt)
         ccall(:uv_run,Cint,(Ptr{Void},Cint),evt,2) != 0

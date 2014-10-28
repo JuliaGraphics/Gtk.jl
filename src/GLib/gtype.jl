@@ -352,13 +352,13 @@ function gc_ref{T<:GObject}(x::T)
                 if exiting
                     return # unnecessary to cleanup if we are about to die anyways
                 end
+                delete!(gc_preserve_gtk,x)
                 if x.handle != C_NULL
                     gc_preserve_gtk[x] = true # convert to a strong-reference
                     gc_unref(convert(Ptr{GObject},x)) # may clear the strong reference
-                else
-                    delete!(gc_preserve_gtk, x) # x is invalid, ensure we are dead
                 end
             end)
+        delete!(gc_preserve_gtk,x)
         gc_preserve_gtk[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
     end
     strong = get(gc_preserve_gtk, x, nothing)
