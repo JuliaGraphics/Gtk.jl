@@ -34,7 +34,9 @@ function GtkFileChooserDialogLeaf(title::String, parent::GtkContainer, action::I
     w
 end
 
-run(widget::GtkDialog) = ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
+run(widget::GtkDialog) = GLib.g_sigatom() do
+    ccall((:gtk_dialog_run,libgtk), Cint, (Ptr{GObject},), widget)
+end
 
 const SingleComma = r"(?<!,),(?!,)"
 function GtkFileFilterLeaf(; name::Union(ByteString,Nothing) = nothing, pattern::ByteString = "", mimetype::ByteString = "")

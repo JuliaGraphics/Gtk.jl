@@ -1,7 +1,5 @@
-function gtk_main()
-    GLib.g_sigatom() do
-        ccall((:gtk_main,libgtk),Void,())
-    end
+gtk_main() = GLib.g_sigatom() do
+    ccall((:gtk_main,libgtk),Void,())
 end
 
 function gtk_quit()
@@ -17,8 +15,8 @@ function __init__()
 
     # if g_main_depth > 0, a glib main-loop is already running,
     # so we don't need to start a new one
-    if ccall((:g_main_depth,GLib.libglib),Cint,()) == 0
-        global gtk_main_task = @schedule gtk_main()
+    if ccall((:g_main_depth,GLib.libglib),Cint,()) == 0 && isinteractive()
+        global gtk_main_task = schedule(Task(gtk_main))
     end
 end
 

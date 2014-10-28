@@ -121,42 +121,144 @@ function signal_emit(w::GObject, sig::StringLike, RT::Type, args...)
     return_value[RT]
 end
 
+gtk_stack = nothing # need to call g_loop_run from only one stack
+gtk_work = nothing
 g_sigatom_flag = false
 function g_sigatom(f::Base.Callable)
-    global g_sigatom_flag
-    @assert !g_sigatom_flag
-    try
-        g_sigatom_flag = true
+    # don't yield() from f inside g_sigatom, use g_siginterruptible(yield) if unsure
+    global g_sigatom_flag, gtk_stack, gtk_work
+    prev = g_sigatom_flag
+    stk = gtk_stack
+    if !prev
         sigatomic_begin()
-        f()
+        g_sigatom_flag = true
+    end
+    local ret
+    try
+        ct = current_task()
+        if gtk_stack === nothing
+            @assert !prev
+            gtk_stack = ct
+            ret = f()
+        elseif gtk_stack === ct
+            ret = f()
+        else
+            @assert !prev # assert that we are going to end up in g_wait, otherwise PANIC!
+            @assert gtk_work === nothing
+            gtk_work = f
+            ret = yieldto(gtk_stack)
+        end
     catch err
+        gtk_stack = stk
         @assert g_sigatom_flag
-        sigatomic_end()
-        g_sigatom_flag = false
+        if !prev
+            g_sigatom_flag = false
+            sigatomic_end()
+        end
         Base.display_error(err, catch_backtrace())
         println()
         rethrow(err)
     end
+    gtk_stack = stk
     @assert g_sigatom_flag
-    g_sigatom_flag = false
-    sigatomic_end()
+    if !prev
+        g_sigatom_flag = false
+        sigatomic_end()
+    end
+    return ret
 end
 
+#=
+== when the user calls g_sigatom on a stack, it becomes the gtk_stack (until return).
+== it is not possible to be on that stack without g_sigatom_flag set,
+== nor to be off that stack with g_sigatom_flag set
+== the only condition necessary to ensure this invariant is that the user never calls
+== yield() (or wait(), or I/O) from the gtk_stack. this means that any callbacks must
+== ensure they are not on the gtk_stack if they might throw errors or block, by calling
+== g_siginterruptible(f)
+=#
+
 function g_siginterruptible(f::Base.Callable)
-    global g_sigatom_flag
+    global g_sigatom_flag, gtk_stack, gtk_work
     prev = g_sigatom_flag
+    @assert prev $ (current_task() !== gtk_stack)
+    local c
     try
-        if prev
+        if !prev
+            # also know that current_task() !== gtk_stack
+            # so nothing fancy, just call and return (with try/catch protection)
+            f()
+            return
+        else
+            # also know that current_task() === gtk_stack
+            # so we want call this on an alternative stack
             g_sigatom_flag = false
             sigatomic_end()
+            if f === yield
+                yield()
+            else
+                c = Condition()
+                t = Task(f)
+                t.donenotify = c
+                ct = current_task()
+                ct.state = :waiting
+                push!(c.waitq, ct)
+                schedule(t)
+                wait()
+            end
+            while gtk_work !== nothing # came from g_sigatom, not scheduler -- run thunk, don't return yet
+                @assert g_sigatom_flag # verify that we got here from g_sigatom, otherwise PANIC!
+                last = current_task().last
+                try
+                    gtk_f = gtk_work
+                    gtk_work = nothing
+                    ct = current_task()
+                    if f === yield || istaskdone(t)
+                        filter!(x->x!==ct, Base.Workqueue)
+                        res = gtk_f()
+                        schedule(current_task())
+                    else
+                        filter!(x->x!==ct, c.waitq)
+                        current_task().state = :runnable
+                        res = gtk_f()
+                        current_task().state = :waiting
+                        push!(c.waitq, ct)
+                    end
+                    yieldto(last, res)
+                catch e
+                    if f === yield || istaskdone(t)
+                        schedule(current_task())
+                    else
+                        push!(c.waitq, ct)
+                        current_task().state = :waiting
+                    end
+                    Base.throwto(last, e)
+                end
+            end
+            if f !== yield
+                ct = current_task()
+                ct.state = :runnable
+                filter!(x->x!==ct, c.waitq)
+                @assert istaskdone(t)
+                if t.state == :failed
+                    Base.display_error(t.exception, backtrace())
+                end
+            end
         end
-        f()
     catch err
+        ct = current_task()
+        if f === yield
+            filter!(x->x!==ct, Base.Workqueue)
+        else
+            ct.state = :runnable
+            filter!(x->x!==ct, c.waitq)
+        end
         try
             Base.display_error(err, catch_backtrace())
             println()
         end
     end
+    @assert !g_sigatom_flag
     if prev
         sigatomic_begin()
         g_sigatom_flag = true
@@ -246,38 +348,12 @@ function uv_check(src::Ptr{Void})
     end
 end
 function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
-    ret = ccall(callback,Cint,(T,),data)
-    ret
+    return ccall(callback,Cint,(T,),data)
 end
 
-yield_stack = Task[] # need to make sure we return to g_loop_run_run in the same order we were called
-if VERSION < v"0.3-"
-    function schedule_and_wait(task::Task)
-        task.runnable || schedule(task)
-        wait()
-    end
-else
-    function schedule_and_wait(task::Task)
-        # unfair scheduler version of Base.schedule_and_wait
-        if task.state == :runnable
-            yieldto(task)
-        else
-            wait()
-        end
-    end
-end
 function g_yield(data)
-    global yield_stack
-    ct = current_task()
-    push!(yield_stack, ct)
-    g_siginterruptible() do
-        yield()
-    end
-    newtask = pop!(yield_stack)
-    if newtask != ct
-        schedule_and_wait(newtask)
-    end
-    int32(true)
+    g_siginterruptible(yield)
+    return int32(true)
 end
 
 sizeof_gclosure = 0
@@ -313,6 +389,7 @@ function __init__gmainloop__()
 
     ccall((:g_source_attach,GLib.libglib),Cuint,(Ptr{Void},Ptr{Void}),src,C_NULL)
     ccall((:g_source_unref,GLib.libglib),Void,(Ptr{Void},),src)
+    nothing
 end
 
 function __init__()
@@ -325,4 +402,5 @@ function __init__()
     atexit(()->global exiting = true)
     __init__gtype__()
     __init__gmainloop__()
+    nothing
 end
