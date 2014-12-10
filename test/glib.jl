@@ -6,13 +6,12 @@ hnd = ccall((:gtk_window_new, Gtk.libgtk),Ptr{GObject},(Cint,),0)
 
 wrap = convert(GObject, hnd)
 #detect type and create wrapper (if neccessary) at runtime
-@assert string(typeof(wrap)) == "GtkWindowLeaf"
+@assert isa(wrap, GtkWindowLeaf)
 
 wrap2 = convert(GObject, hnd)
 @assert wrap == wrap2
 
 repr = Base.print_to_string(wrap) #should display properties
-@assert beginswith(repr,"GtkWindowLeaf(")
 @assert endswith(repr,')')
 @assert contains(repr,"name=\"\"")
 @assert contains(repr,"visible=FALSE")
