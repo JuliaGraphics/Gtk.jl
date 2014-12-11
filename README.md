@@ -1,5 +1,8 @@
 ##Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
-Gui building, using the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
+
+[![Build Status](https://travis-ci.org/JuliaLang/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaLang/Gtk.jl)
+
+GUI building, using the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
 <br>
 Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stable](https://developer.gnome.org/gtk/stable)
 
@@ -99,7 +102,7 @@ The properties of common objects are linked on the [properties page](properties.
 
 ### Adding and removing objects
 
-Many widgets in Gtk can act as containers: for example, windows contain other widgets. New objects are created in "isolation," and attached to their parent containers using `push!`. 
+Many widgets in Gtk can act as containers: for example, windows contain other widgets. New objects are created in "isolation," and attached to their parent containers using `push!`.
 
 For example, let's add a frame:
 ```
