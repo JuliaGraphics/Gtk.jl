@@ -109,7 +109,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     end
     return nothing
 end
-const gvalue_types = {}
+const gvalue_types = Any[]
 const fundamental_fns = tuple(Function[begin
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
