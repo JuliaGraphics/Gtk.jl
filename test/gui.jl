@@ -33,6 +33,16 @@ w = @Window(
 showall(w)
 destroy(w)
 
+## Initially Hidden Canvas
+nb = @Notebook()
+vbox = @Box(:v)
+c = @Canvas()
+push!(nb, vbox, "A")
+push!(nb, c, "B")
+w = @Window("TestDataViewer",600,600)
+push!(w,nb)
+showall(w)
+
 # Labelframe
 f = @Frame("Label")
 w = @Window(f, "Labelframe", 400, 400)

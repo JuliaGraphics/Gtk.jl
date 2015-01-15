@@ -13,11 +13,13 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32), da, w, h)
         widget = new(da, false, MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
+        signal_connect(notify_realize,widget,"realize",Void,())
+        signal_connect(notify_unrealize,widget,"unrealize",Void,())
         on_signal_resize(notify_resize, widget)
         if gtk_version == 3
             signal_connect(canvas_on_draw_event,widget,"draw",Cint,(Ptr{Void},))
         else
-            signal_connect(canvas_on_expose_event,widget,"expose-event",Void,(Ptr{Void},))
+            signal_connect(canvas_on_expose_event,widget,"expose-event",Cint,(Ptr{Void},))
         end
         on_signal_button_press(mousedown_cb, widget, false, widget.mouse)
         on_signal_button_release(mouseup_cb, widget, false, widget.mouse)
@@ -30,10 +32,20 @@ macro GtkCanvas(args...)
     :( GtkCanvas($(map(esc,args)...)) )
 end
 
-function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
+function notify_realize(::Ptr{GObject}, widget::GtkCanvas)
     widget.has_allocation = true
     widget.back = cairo_surface_for(widget)
     widget.backcc = CairoContext(widget.back)
+    draw(widget, false)
+    nothing
+end
+
+function notify_unrealize(::Ptr{GObject}, widget::GtkCanvas)
+    widget.has_allocation = false
+    nothing
+end
+
+function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     if isa(widget.resize,Function)
         widget.resize(widget)
     end
@@ -43,17 +55,15 @@ end
 
 function resize(config::Function, widget::GtkCanvas)
     widget.resize = config
-    if widget.has_allocation
-        if isa(widget.resize, Function)
-            widget.resize(widget)
-        end
-        draw(widget, false)
-    end
+    widget.resize(widget)
+    draw(widget, false)
+    nothing
 end
 
 function draw(redraw::Function, widget::GtkCanvas)
     widget.draw = redraw
     draw(widget, false)
+    nothing
 end
 
 function draw(widget::GtkCanvas, immediate::Bool=true)
@@ -87,7 +97,7 @@ function canvas_on_expose_event(::Ptr{GObject},e::Ptr{Void},widget::GtkCanvas) #
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
     ccall((:cairo_destroy,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
-    nothing
+    int32(false) # propagate the event further
 end
 
 getgc(c::GtkCanvas) = c.backcc
