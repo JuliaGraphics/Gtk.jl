@@ -350,7 +350,7 @@ win = @Window(sc,"Scale") |> showall
 Generic drawing is done on a `Canvas`. You control what appears on this canvas by defining a `draw` function:
 
 ```
-using Gtk.ShortNames, Base.Graphics
+using Gtk.ShortNames, Graphics
 c = @Canvas()
 win = @Window(c, "Canvas")
 draw(c) do widget

@@ -1,5 +1,5 @@
 ## Tests
-using Gtk.ShortNames, Gtk.GConstants, Base.Graphics
+using Gtk.ShortNames, Gtk.GConstants, Graphics
 import Gtk.deleteat!
 
 ## Window
