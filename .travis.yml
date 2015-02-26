@@ -1,19 +1,13 @@
-language: cpp
-compiler:
-  - clang
+language: julia
+os:
+    - osx
+    - linux
+julia:
+    - release
+    - nightly
 notifications:
-  email: false
-env:
-  matrix:
-    - JULIAVERSION="juliareleases"
-    - JULIAVERSION="julianightlies"
-before_install:
-  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
-  - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
-  - sudo apt-get update -qq -y
-  - sudo apt-get install curl libpcre3-dev julia -y
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    email: false
 script:
-  - julia -e 'versioninfo(); Pkg.init(); Pkg.clone(pwd()); Pkg.build("Gtk")'
-  - julia -e 'rm(joinpath(Pkg.dir("Gtk"), "deps", "deps.jl"))'
-  - xvfb-run julia -e 'Pkg.test("Gtk")'
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("Gtk"); Pkg.test("Gtk"; coverage=true)'
+    - julia -e 'cd(Pkg.dir("Gtk")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
