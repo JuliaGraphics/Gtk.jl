@@ -47,44 +47,46 @@ end
 function GClosureMarshal(closuref, return_value, n_param_values,
                          param_values, invocation_hint, marshal_data)
     @assert sizeof_gclosure > 0
-    g_siginterruptible() do
-        closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
-        cb = unsafe_load(closure_env, 1)
-        gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
-        params = Array(Any, n_param_values)
-        if gtk_calling_convention
-            # compatibility mode, if we must
-            param_types,closure = unsafe_load(closure_env, 2)::Array{Any,1}
-            length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
-            for i = 1:n_param_values
-                gv = mutable(param_values,i)
-                gtyp = unsafe_load(gv).g_type
-                # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
-                if g_isa(gtyp,g_type(GObject))
-                    params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
-                elseif g_isa(gtyp,g_type(GBoxed))
-                    params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-                elseif g_isa(gtyp,g_type(String))
-                    params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-                else
-                    params[i] = gv[Any]
-                end
-                if i > 1
-                    params[i] = convert(param_types[i-1], params[i])
-                end
+    closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
+    cb = unsafe_load(closure_env, 1)
+    gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
+    params = Array(Any, n_param_values)
+    if gtk_calling_convention
+        # compatibility mode, if we must
+        param_types,closure = unsafe_load(closure_env, 2)::Array{Any,1}
+        length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
+        for i = 1:n_param_values
+            gv = mutable(param_values,i)
+            gtyp = unsafe_load(gv).g_type
+            # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
+            if g_isa(gtyp,g_type(GObject))
+                params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
+            elseif g_isa(gtyp,g_type(GBoxed))
+                params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+            elseif g_isa(gtyp,g_type(String))
+                params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+            else
+                params[i] = gv[Any]
             end
-            push!(params, closure)
-        else
-            for i = 1:n_param_values
-                params[i] = mutable(param_values,i)[Any]
+            if i > 1
+                params[i] = convert(param_types[i-1], params[i])
             end
         end
+        push!(params, closure)
+    else
+        for i = 1:n_param_values
+            params[i] = mutable(param_values,i)[Any]
+        end
+    end
+    local retval = nothing
+    g_siginterruptible() do
+        # note: make sure not to leak any of the GValue objects into this task switch, since many of them were alloca'd
         retval = cb(params...) # widget, args...
-        if return_value != C_NULL && retval !== nothing
-            gtyp = unsafe_load(return_value).g_type
-            if gtyp != g_type(Void) && gtyp != 0
-                return_value[] = gvalue(retval)
-            end
+    end
+    if return_value != C_NULL && retval !== nothing
+        gtyp = unsafe_load(return_value).g_type
+        if gtyp != g_type(Void) && gtyp != 0
+            return_value[] = gvalue(retval)
         end
     end
     return nothing
@@ -275,6 +277,7 @@ function g_siginterruptible(f::Base.Callable)
         sigatomic_begin()
         g_sigatom_flag = true
     end
+    nothing
 end
 
 type _GPollFD
