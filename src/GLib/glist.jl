@@ -20,19 +20,20 @@ eltype{L<:_LList}(::Type{L}) = eltype(super(L))
 _listdatatype{T}(::Type{_LList{T}}) = T
 _listdatatype{L<:_LList}(::Type{L}) = _listdatatype(super(L))
 
-type GList{L<:_LList} <: AbstractVector{eltype(L)}
+type GList{L<:_LList,T} <: AbstractVector{T}
     handle::Ptr{L}
     transfer_full::Bool
-    function GList(handle,transfer_full::Bool)
+    function GList(handle, transfer_full::Bool) # if transfer_full == true, then also free the elements when finalizing the list
         # this function assumes the caller will take care of holding a pointer to the returned object
         # until it wants to be garbage collected
-        l = new(handle,transfer_full)
+        @assert T == eltype(L)
+        l = new(handle, transfer_full)
         finalizer(l, empty!)
         l
     end
 end
-GList{T}(list::Type{T}) = GList{_GList{T}}(C_NULL,true)
-GList{L<:_LList}(list::Ptr{L},transfer_full::Bool=false) = GList{L}(list,transfer_full)
+GList{T}(list::Type{T}) = GList(convert(Ptr{_GList{T}}, C_NULL), true)
+GList{L<:_LList}(list::Ptr{L},transfer_full::Bool=false) = GList{L, eltype(L)}(list, transfer_full)
 
 typealias LList{L<:_LList} Union(Ptr{L}, GList{L})
 eltype{L<:_LList}(::LList{L}) = eltype(L)
@@ -47,12 +48,12 @@ empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{super(L)}, li))
 
 ## Standard Iteration protocol
 start{L}(list::LList{L}) = convert(Ptr{L},list)
-next{T}(::LList,s::Ptr{T}) = (deref(s), unsafe_load(s).next)
+next{T}(::LList,s::Ptr{T}) = (deref(s), unsafe_load(s).next) # return (value, state)
 done(::LList,s::Ptr) = (s==C_NULL)
 
-function glist_iter{L<:_LList}(list::Ptr{L},transfer_full::Bool=false)
+function glist_iter{L<:_LList}(list::Ptr{L}, transfer_full::Bool=false)
     # this function pairs every list element with the list head, to forestall garbage collection
-    (GList(list,transfer_full),list)
+    (GList(list, transfer_full), list)
 end
 function next{L<:_LList}(::LList,s::(LList,Ptr{L}))
     (deref(s[2]), (s[1],unsafe_load(s[2]).next))
@@ -60,7 +61,8 @@ end
 done{L<:_LList}(::LList,s::(LList,Ptr{L})) = done(s[1],s[2])
 
 ## Standard Array-like declarations
-show{L}(io::IO, list::GList{L}) = print(io, "GList($(L.parameters[1]); eltype=$(eltype(list)), length=$(length(list)))")
+show{L,T}(io::IO, list::GList{L,T}) = print(io, "GList{$L => $T}(length=$(length(list)), transfer_full=$(list.transfer_full))")
+show{L,T}(io::IO, list::Type{GList{L,T}}) = print(io, "GList{$L => $T}")
 convert{L<:_LList}(::Type{Ptr{L}}, list::GList) = list.handle
 endof(list::LList) = length(list)
 ndims(list::LList) = 1
@@ -81,8 +83,8 @@ setindex!(list::GList,x,i::Real) = setindex!(list,x,nth(list,i))
 ### Non-modifying functions
 length{L<:_GSList}(list::LList{L}) = int(ccall((:g_slist_length,libglib),Cuint,(Ptr{L},),list))
 length{L<:_GList}(list::LList{L}) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
-copy{L<:_GSList}(list::GList{L}) = GList{L}(ccall((:g_slist_copy,libglib),Ptr{L},(Ptr{L},),list))
-copy{L<:_GList}(list::GList{L}) = GList{L}(ccall((:g_list_copy,libglib),Ptr{L},(Ptr{L},),list))
+copy{L<:_GSList}(list::GList{L}) = typeof(list)(ccall((:g_slist_copy,libglib),Ptr{L},(Ptr{L},),list), false)
+copy{L<:_GList}(list::GList{L}) = typeof(list)(ccall((:g_list_copy,libglib),Ptr{L},(Ptr{L},),list), false)
 check_undefref(p::Ptr) = (p==C_NULL ? error(UndefRefError()) : p)
 nth_first{L<:_GSList}(list::LList{L}) =
     check_undefref(ccall((:g_slist_first,libglib),Ptr{L},(Ptr{L},Cuint),list))
@@ -118,7 +120,7 @@ function empty!{L<:_GSList}(list::GList{L})
             s = start(list)
             while !done(list,s)
                 empty!(s)
-                s = next(list,s)[1]
+                s = next(list,s)[2]
             end
         end
         ccall((:g_slist_free,libglib),Void,(Ptr{L},),list)
@@ -132,7 +134,7 @@ function empty!{L<:_GList}(list::GList{L})
             s = start(list)
             while !done(list,s)
                 empty!(s)
-                s = next(list,s)[1]
+                s = next(list,s)[2]
             end
         end
         ccall((:g_list_free,libglib),Void,(Ptr{L},),list)
@@ -178,14 +180,14 @@ function setindex!{L<:_GSList}(list::GList{L}, item, i::Ptr{L})
     list.transfer_full && empty!(i)
     idx = unsafe_load(i)
     idx = L(ref_to(L,item), idx.next)
-    unsafe_store(i,idx)
+    unsafe_store!(i,idx)
     list
 end
 function setindex!{L<:_GList}(list::GList{L}, item, i::Ptr{L})
     list.transfer_full && empty!(i)
     idx = unsafe_load(i)
     idx = L(ref_to(L,item), idx.next, idx.prev)
-    unsafe_store(i,idx)
+    unsafe_store!(i,idx)
     list
 end
 

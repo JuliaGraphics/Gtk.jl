@@ -7,7 +7,7 @@ function include(x)
 end
 end
 
-import Base: convert, show, showall, showcompact, size, length, getindex, setindex!, get,
+import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
              sigatomic_begin, sigatomic_end
