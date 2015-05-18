@@ -1,5 +1,5 @@
 function GtkWindowLeaf(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
-    hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(Enum,),
+    hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(GEnum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
         ccall((:gtk_window_set_title,libgtk),Void,(Ptr{GObject},Ptr{Uint8}),hnd,title)

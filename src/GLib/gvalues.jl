@@ -34,7 +34,7 @@ function gvalues(xs...)
 end
 
 function setindex!(dest::GV, src::GV)
-    bool(ccall((:g_value_transform,libgobject),Cint,(Ptr{GValue},Ptr{GValue}),src,dest))
+    ccall((:g_value_transform,libgobject),Cint,(Ptr{GValue},Ptr{GValue}),src,dest) != 0
     src
 end
 
@@ -51,7 +51,7 @@ getindex(v::GV,i::Int, ::Type{Void}) = nothing
 function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,fundamental::Bool=false)
     with_id === :error && return
     if isa(with_id,Tuple)
-        with_id = with_id::(Symbol,Any)
+        with_id = with_id::TupleType(Symbol,Any)
         with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
     if pass_x !== None
@@ -174,7 +174,7 @@ function show(io::IO, w::GObject)
     const READABLE   = 0x00000001
     const DEPRECATED = 0x80000000
     print(io,typeof(w),'(')
-    if convert(Ptr{GObject},w) == C_NULL
+    if unsafe_convert(Ptr{GObject},w) == C_NULL
         print(io,"<NULL>)")
         return
     end
@@ -193,8 +193,8 @@ function show(io::IO, w::GObject)
         print(io,bytestring(param.name))
         if (param.flags & READABLE) != 0 &&
            (param.flags & DEPRECATED) == 0 &&
-           bool(ccall((:g_value_type_transformable,libgobject),Cint,
-                (Int,Int),param.value_type,g_type(String)))
+           (ccall((:g_value_type_transformable,libgobject),Cint,
+                (Int,Int),param.value_type,g_type(String)) != 0)
             ccall((:g_object_get_property,libgobject), Void,
                 (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, param.name, v)
             str = ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{GValue},), v)

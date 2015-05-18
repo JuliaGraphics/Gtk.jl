@@ -57,4 +57,4 @@ function push!(::GtkNullContainer, w::GtkWidget)
     end
     w
 end
-convert(::Type{Ptr{GObject}},::GtkNullContainer) = convert(Ptr{GObject},C_NULL)
+unsafe_convert(::Type{Ptr{GObject}},::GtkNullContainer) = convert(Ptr{GObject},C_NULL)

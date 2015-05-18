@@ -21,7 +21,7 @@ function __init__()
 end
 
 
-add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},Enum),widget,mask)
+add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},GEnum),widget,mask)
 
 # widget[:event] = function(ptr, obj)
 #    stuff
@@ -54,11 +54,15 @@ type Gtk_signal_motion{T}
     include::Uint32
     exclude::Uint32
 end
-function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion)
+function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion{T})
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
-        ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
+        if isbits(T) && VERSION >= v"0.4"
+            ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T), p, eventp, closure.closure)
+        else
+            ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
+        end
     else
         ret = int32(false)
     end
@@ -82,9 +86,13 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
     end
     add_events(widget, mask)
     @assert Base.isstructtype(T)
+    if isbits(T) || VERSION < v"0.4-"
+        cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
+    else
+        cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))
+    end
     closure = Gtk_signal_motion{T}(
-        closure,
-        cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T)),
+        closure, cb,
         uint32(include),
         uint32(exclude)
         )

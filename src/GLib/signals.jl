@@ -1,18 +1,25 @@
-# id = signal_connect(widget, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
+# id = VERSION >= v"0.4-"get, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect(cb::Function,w::GObject,sig::StringLike,
-        RT::Type,param_types::Tuple,after::Bool=false,closure=w) #TODO: assert that length(param_types) is correct
-    if isgeneric(cb) && !isbits(closure)
-        callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,typeof(closure)))
-        return ccall((:g_signal_connect_data,libgobject), Culong,
-            (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Any, Ptr{Void}, Enum),
-                w,
-                bytestring(sig),
-                callback,
-                closure,
-                gc_ref_closure(closure),
-                after*GConnectFlags.AFTER)
+function signal_connect{CT,RT}(cb::Function,w::GObject,sig::StringLike,
+        ::Type{RT},param_types::Tuple,after::Bool=false,closure::CT=w) #TODO: assert that length(param_types) is correct
+    if isgeneric(cb)
+        if !isbits(closure) || VERSION >= v"0.4-"
+            if VERSION >= v"0.4-"
+                callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
+            else
+                callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,CT))
+            end
+            ref, deref = gc_ref_closure(closure)
+            return ccall((:g_signal_connect_data,libgobject), Culong,
+                (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
+                    w,
+                    bytestring(sig),
+                    callback,
+                    ref,
+                    deref,
+                    after*GConnectFlags.AFTER)
+        end
     end
     # oops, Julia doesn't support this natively yet -- fake it instead
     return _signal_connect(cb, w, sig, after, true,param_types,closure)
@@ -32,13 +39,15 @@ function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk
     if gtk_call_conv
         env = Any[param_types,closure]
         unsafe_store!(closure_env, env, 2)
+        ref_env, deref_env = gc_ref_closure(env)
         ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
-            (Ptr{Void}, Any, Ptr{Void}), closuref, env, gc_ref_closure(env))
+            (Ptr{Void}, Ptr{Void}, Ptr{Void}), closuref, ref_env, deref_env)
     else
         unsafe_store!(convert(Ptr{Int},closure_env), 0, 2)
     end
+    ref_cb, deref_cb = gc_ref_closure(cb)
     ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
-        (Ptr{Void}, Any, Ptr{Void}), closuref, cb, gc_ref_closure(cb))
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), closuref, ref_cb, deref_cb)
     ccall((:g_closure_set_marshal,libgobject), Void,
         (Ptr{Void}, Ptr{Void}), closuref, JuliaClosureMarshal::Ptr{Void})
     return ccall((:g_signal_connect_closure,libgobject), Culong,

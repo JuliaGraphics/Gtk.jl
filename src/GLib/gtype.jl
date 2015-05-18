@@ -5,7 +5,7 @@ type GBoxedUnkown<:GBoxed
     handle::Ptr{GBoxed}
 end
 
-typealias Enum Int32
+typealias GEnum Int32
 typealias GType Csize_t
 immutable GParamSpec
   g_type_instance::Ptr{Void}
@@ -29,8 +29,8 @@ const fundamental_types = (
     (:gulong,     Culong,           None,           :ulong),
     (:gint64,     Int64,            Signed,         :int64),
     (:guint64,    Uint64,           Unsigned,       :uint64),
-    (:GEnum,      Enum,             None,           :enum),
-    (:GFlags,     Enum,             None,           :flags),
+    (:GEnum,      GEnum,            None,           :enum),
+    (:GFlags,     GEnum,            None,           :flags),
     (:gfloat,     Float32,          Float32,        :float),
     (:gdouble,    Float64,          FloatingPoint,  :double),
     (:gchararray, Ptr{Uint8},       String,         :string),
@@ -60,12 +60,12 @@ G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
 G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
-g_isa(gtyp::GType, is_a_type::GType) = bool(ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type))
+g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type) != 0
 g_isa(gtyp, is_a_type) = g_isa(g_type(gtyp), g_type(is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
 g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{Uint8},(GType,),g_type),false))
 
-g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType,Enum), g_type, flag)
+g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType, GEnum), g_type, flag)
 const G_TYPE_FLAG_CLASSED           = 1 << 0
 const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
 const G_TYPE_FLAG_DERIVABLE         = 1 << 2
@@ -76,7 +76,7 @@ type GObjectLeaf <: GObject
         if handle == C_NULL
             error("Cannot construct $gname with a NULL pointer")
         end
-        gc_ref(new(handle))
+        return gobject_ref(new(handle))
     end
 end
 g_type(obj::GObject) = g_type(typeof(obj))
@@ -130,7 +130,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
             immutable $(esc(iname)) <: GInterface
                 handle::Ptr{GObject}
                 gc::Any
-                $(esc(iname))(x::GObject) = new(convert(Ptr{GObject},x), x)
+                $(esc(iname))(x::GObject) = new(unsafe_convert(Ptr{GObject},x), x)
                 # Gtk does an interface type check when calling methods. So, it's
                 # not worth repeating it here. Plus, we might as well just allow
                 # the user to lie, since we aren't using this for dispatch
@@ -196,7 +196,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
                 if handle == C_NULL
                     error($("Cannot construct $name with a NULL pointer"))
                 end
-                gc_ref(new(handle))
+                return gobject_ref(new(handle))
             end
         end
         local kwargs, T #to prevent Julia-0.2 from name-mangling kwargs, <:T
@@ -266,14 +266,14 @@ end
 
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object
-convert(::Type{Ptr{GObject}},w::GObject) = w.handle
+unsafe_convert(::Type{Ptr{GObject}},w::GObject) = w.handle
 convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
 eltype{T<:GObject}(::Type{_LList{T}}) = T
-ref_to{T<:GObject}(::Type{T}, x) = gc_ref(convert(Ptr{GObject},x))
+ref_to{T<:GObject}(::Type{T}, x) = gobject_ref(unsafe_convert(Ptr{GObject},x))
 deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
 empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
-convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = convert(Ptr{T},box.handle)
+unsafe_convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = convert(Ptr{T},box.handle)
 convert{T<:GBoxed}(::Type{T},unbox::Ptr{GBoxed}) = convert(T,convert(Ptr{T},unbox))
 convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
 convert{T<:GBoxed}(::Type{GBoxed},unbox::Ptr{T}) = GBoxedUnkown(unbox)
@@ -287,7 +287,7 @@ function convert{T<:GObject}(::Type{T}, hnd::Ptr{GObject})
     end
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark::Uint32)
     if x != C_NULL
-        return gc_ref(unsafe_pointer_to_objref(x)::T)
+        return gobject_ref(unsafe_pointer_to_objref(x)::T)
     end
     wrap_gobject(hnd)::T
 end
@@ -320,30 +320,60 @@ end
 
 ### Garbage collection [prevention]
 const gc_preserve = ObjectIdDict() # reference counted closures
-function gc_ref(x::ANY)
-    global gc_preserve
-    isbits(x) && error("can't gc-preserve an isbits object")
-    gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
-    x
-end
-function gc_unref(x::ANY)
-    global gc_preserve
-    @assert !isbits(x)
-    count = get(gc_preserve, x, 0)::Int-1
-    if count <= 0
-        delete!(gc_preserve, x)
+if VERSION >= v"0.4-"
+    function gc_ref(x::ANY)
+        global gc_preserve
+        local ref::Ref{Any}, cnt::Int
+        if x in keys(gc_preserve)
+            ref, cnt = gc_preserve[x]::Tuple{Ref{Any},Int}
+        else
+            ref = Ref{Any}(x)
+            cnt = 0
+        end
+        gc_preserve[x] = (ref, cnt+1)
+        return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any},ref)))
     end
-    nothing
+    function gc_unref(x::ANY)
+        global gc_preserve
+        ref, cnt = gc_preserve[x]::Tuple{Ref{Any},Int}
+        @assert cnt > 0
+        if cnt == 1
+            delete!(gc_preserve, x)
+        else
+            gc_preserve[x] = (ref, cnt-1)
+        end
+        nothing
+    end
+    gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Ref{T}, Ptr{Void})))
+else
+    function gc_ref(x::ANY)
+        global gc_preserve
+        isbits(x) && error("can't gc-preserve an isbits object")
+        gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
+        return pointer_from_objref(x)
+    end
+    function gc_unref(x::ANY)
+        global gc_preserve
+        @assert !isbits(x)
+        cnt = gc_preserve[x]::Int
+        @assert cnt > 0
+        if cnt == 1
+            delete!(gc_preserve, x)
+        else
+            gc_preserve[x] = cnt-1
+        end
+        nothing
+    end
+    gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (T, Ptr{Void})))
 end
-gc_ref_closure{T}(x::T) = (gc_ref(x);cfunction(gc_unref, Void, (T, Ptr{Void})))
-gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+_gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
 
 const gc_preserve_gtk = Dict{Union(WeakRef,GObject),Bool}() # gtk objects
-function gc_ref{T<:GObject}(x::T)
+function gobject_ref{T<:GObject}(x::T)
     global gc_preserve_gtk
     addref = function()
         ccall((:g_object_ref_sink,libgobject),Ptr{GObject},(Ptr{GObject},),x)
@@ -355,7 +385,7 @@ function gc_ref{T<:GObject}(x::T)
                 delete!(gc_preserve_gtk,x)
                 if x.handle != C_NULL
                     gc_preserve_gtk[x] = true # convert to a strong-reference
-                    gc_unref(convert(Ptr{GObject},x)) # may clear the strong reference
+                    gc_unref(unsafe_convert(Ptr{GObject},x)) # may clear the strong reference
                 end
             end)
         delete!(gc_preserve_gtk,x)
@@ -364,9 +394,14 @@ function gc_ref{T<:GObject}(x::T)
     strong = get(gc_preserve_gtk, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
+        if VERSION >= v"0.4-"
+            deref = cfunction(gc_unref, Void, (Ref{T},))
+        else
+            deref = cfunction(gc_unref, Void, (T,))
+        end
         ccall((:g_object_set_qdata_full, libgobject), Void,
             (Ptr{GObject}, Uint32, Any, Ptr{Void}), x, jlref_quark::Uint32, x,
-            cfunction(gc_unref, Void, (T,))) # add a circular reference to the Julia object in the GObject
+            deref) # add a circular reference to the Julia object in the GObject
         addref()
     elseif strong
         # oops, we previously deleted the link, but now it's back
@@ -376,7 +411,7 @@ function gc_ref{T<:GObject}(x::T)
     end
     x
 end
-
+gc_ref(x::GObject) = pointer_from_objref(gobject_ref(x))
 
 function gc_unref_weak(x::GObject)
     # this strongly destroys and invalidates the object
@@ -394,7 +429,12 @@ function gc_unref(x::GObject)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
-        ccall((:g_object_weak_ref,libgobject),Void,(Ptr{GObject},Ptr{Void},Any),x,cfunction(gc_unref_weak,Void,(typeof(x),)),x)
+        if VERSION >= v"0.4-"
+            deref = cfunction(gc_unref_weak,Void,(Ref{typeof(x)},))
+        else
+            deref = cfunction(gc_unref_weak,Void,(typeof(x),))
+        end
+        ccall((:g_object_weak_ref,libgobject),Void,(Ptr{GObject},Ptr{Void},Any),x,deref,x)
     else
         ccall((:g_object_steal_qdata,libgobject),Any,(Ptr{GObject},Uint32),x,jlref_quark::Uint32)
         gc_unref_weak(x)
@@ -402,14 +442,14 @@ function gc_unref(x::GObject)
     nothing
 end
 gc_unref(::Ptr{GObject}, x::GObject) = gc_unref(x)
-gc_ref_closure(x::GObject) = C_NULL
+gc_ref_closure(x::GObject) = (gc_ref(x), C_NULL)
 
 function gc_force_floating(x::GObject)
     ccall((:g_object_force_floating,libgobject),Void,(Ptr{GObject},),x)
 end
-function gc_move_ref(new::GObject, old::GObject)
-    h = convert(Ptr{GObject}, new)
-    @assert h == convert(Ptr{GObject}, old) != C_NULL
+function gobject_move_ref(new::GObject, old::GObject)
+    h = unsafe_convert(Ptr{GObject}, new)
+    @assert h == unsafe_convert(Ptr{GObject}, old) != C_NULL
     gc_ref(h)
     gc_unref(old)
     gc_ref(new)

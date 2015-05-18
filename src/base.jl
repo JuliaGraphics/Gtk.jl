@@ -1,10 +1,10 @@
-convert(::Type{Ptr{GObject}},w::StringLike) = convert(Ptr{GObject},GtkLabelLeaf(w))
+unsafe_convert(::Type{Ptr{GObject}},w::StringLike) = unsafe_convert(Ptr{GObject},GtkLabelLeaf(w))
 
 destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 hasparent(w::GtkWidget) = ccall((:gtk_widget_get_parent,libgtk), Ptr{Void}, (Ptr{GObject},), w) != C_NULL
 function toplevel(w::GtkWidget)
-    p = convert(Ptr{GObject}, w)
+    p = unsafe_convert(Ptr{GObject}, w)
     pp = p
     while pp != C_NULL
         p = pp
@@ -68,4 +68,3 @@ function push!(w::GtkWidget, accel_signal::StringLike, accel_group::GtkAccelGrou
           w, bytestring(accel_signal), accel_group, accel_key, accel_mods, accel_flags)
     w
 end
-

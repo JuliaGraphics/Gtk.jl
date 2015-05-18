@@ -77,7 +77,7 @@ function GtkTextIter(text::GtkTextBuffer,mark::GtkTextMark)
 end
 show(io::IO, iter::GtkTextIter) = print("GtkTextIter(...)")
 
-immutable GtkTextRange <: Ranges
+immutable GtkTextRange <: Range
     a::MutableTypes.MutableX{GtkTextIter}
     b::MutableTypes.MutableX{GtkTextIter}
     GtkTextRange(a,b) = new(mutable(copy(a)),mutable(copy(b)))

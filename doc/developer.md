@@ -10,11 +10,11 @@ You can subclass an existing Gtk type in Julia using the following code pattern:
         other_fields
         function MyWidget(label)
             btn = @GtkButton(label)
-            Gtk.gc_move_ref(new(btn), btn)
+            Gtk.gobject_move_ref(new(btn), btn)
         end
     end
 
-This creates a `MyWidget` type which inherits its behavior from `GtkButton`. The `gc_move_ref` call transfers ownership of the `GObject` handle from `GtkButton` to `MyWidget` in a gc-safe manner. Afterwards, the `btn` object is invalid and converting from the `Ptr{GtkObject}` to `GtkObject` will return the `MyWidget` object.
+This creates a `MyWidget` type which inherits its behavior from `GtkButton`. The `gobject_move_ref` call transfers ownership of the `GObject` handle from `GtkButton` to `MyWidget` in a gc-safe manner. Afterwards, the `btn` object is invalid and converting from the `Ptr{GtkObject}` to `GtkObject` will return the `MyWidget` object.
 
 New native Gtk types can be most easily added by invoking the `Gtk.@GTypes` macro:
 
@@ -34,9 +34,9 @@ Please pay attention to existing constructors that already exist to avoid user c
 This no-copy variant of `bytestring` allows you to specify whether Julia "owns" the memory pointed to by `ptr` (similar to `Base.pointer_to_array`).
 This is useful for `GList` iteration when wishing to return strings created by a Gtk object, and other APIs that return a newly allocated string.
 
-### `GLib.gc_ref(x::ANY)` / `GLib.gc_unref(x::ANY)`
+### `GLib.gc_ref(x::ANY)` / `GLib.gc_unref(x::ANY)` / `GLib.gobject_ref(x::GObject)`
 
-As the names suggests, these functions increase / decrease the reference count of a Julia object `x`, to prevent garbage-collection of this object while it is in use by `Glib`. Note that `GLib.gc_unref(w::GObject)` should typically not be called, since it will immediately destroy the Julia reference `w`, and will be called automatically by the Julia garbage-collector once their are no remaining references to this object (in GLib or Julia)
+As the names suggests, these functions increase / decrease the reference count of a Julia object `x`, to prevent garbage-collection of this object while it is in use by `Glib`. Note that `GLib.gc_unref(w::GObject)` should typically not be called, since it will immediately destroy the Julia reference `w`, and will be called automatically by the Julia garbage-collector once their are no remaining references to this object (in GLib or Julia). The function `gc_ref` returns a pointer to the gc-protected memory (as a `*jl_value_t` / `Ptr{Void}`) for use in ccall, whereas `gobject_ref` returns `x` for use in method chaining.
 
 ### `mutable{T}(::Type{T})`
 

@@ -77,7 +77,7 @@ function GtkRadioButtonGroup(elem::Vector, active::Int=1)
     end
     grp
 end
-convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroup) = convert(Ptr{GObject},grp.handle)
+unsafe_convert(::Type{Ptr{GObject}},grp::GtkRadioButtonGroup) = unsafe_convert(Ptr{GObject},grp.handle)
 show(io::IO,::GtkRadioButtonGroup) = print(io,"GtkRadioButtonGroup()")
 function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton,active::Bool)
     push!(grp, e)

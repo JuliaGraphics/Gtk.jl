@@ -50,7 +50,7 @@ function gen_consts(body, gtk_h)
                 else
                     shortdecl = decl[lprefix:end]
                 end
-                jldecl = Expr(:const, Expr(:(=), symbol(decl), Expr(:call, :(Main.Base.int32), cindex.value(child))))
+                jldecl = Expr(:const, Expr(:(=), symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
                 if ismatch(r"^[A-Za-z]", shortdecl)
                     push!(consts.args, Expr(:const, Expr(:(=), symbol(shortdecl), jldecl)))
                 else

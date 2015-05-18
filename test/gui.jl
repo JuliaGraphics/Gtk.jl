@@ -1,6 +1,7 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Graphics
 import Gtk.deleteat!
+import Gtk.GLib.Compat: int32, int8, uint32
 
 ## Window
 w = @Window("Window", 400, 300) |> showall
@@ -239,7 +240,7 @@ function toggled(ptr,evt,widget)
     else
         setproperty!(widget,:label,"Off")
     end
-    int32(true)
+    convert(Int32,true)
 end
 on_signal_button_press(toggled, tb)
 press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
@@ -369,11 +370,11 @@ function cb_sbpush(ptr,evt,id)
     global sb_count
     push!(sb, id, string("Item ", sb_count))
     sb_count += 1
-    int32(false)
+    convert(Int32,false)
 end
 function cb_sbpop(ptr,evt,id)
     pop!(sb, id)
-    int32(false)
+    convert(Int32,false)
 end
 on_signal_button_press(cb_sbpush, bpush, false, ctxid)
 on_signal_button_press(cb_sbpop, bpop, false, ctxid)

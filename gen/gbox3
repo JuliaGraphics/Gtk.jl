@@ -1,8 +1,8 @@
 quote
-$(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote 
-    $(Expr(:import, :., :., :Gtk))
-    $(Expr(:import, :., :., :Gtk, :GObject))
-    $(Expr(:export, :mnemonic_keyval, :cell_allocation, :opacity, :buffer, :display_name, :modal, :alignment, :action_target_value, :valign_with_baseline, :digits, :increments, :pixels, :insert, :icon_tooltip_markup, :response_sensitive, :placement, :start_position, :presentation_time, :option, :preview_file, :filter, :range, :icon_from_pixbuf, :headers_clickable, :current_folder, :visibility, :background, :iter_at_position, :submenu, :reorderable, :tag_table, :object_type, :default_size, :uris, :default, :scrollable, :action_widget, :state, :icon_drag_source, :use_alpha, :destroy_with_parent, :rowstride, :preferred_width_for_height, :target, :is_locked, :iter_at_line_offset, :text_alignment, :slice, :column_spacing, :rules_hint, :margin, :icon_size, :arrow_tooltip_text, :reserve_toggle_size, :hexpand_set, :preview_text, :font, :left_margin, :invisible_char, :capture_button_press, :hscrollbar, :uri, :use_drag_window, :selected_items, :role, :mark, :widget, :ancestor, :displayed_row, :value_pos, :current_uri, :font_family, :receives_default, :line_wrap, :can_focus, :entry, :parent, :length, :allocated_baseline, :focus, :vadjustment, :focus_visible, :from_surface, :hover_selection, :page_increment, :icon_from_gicon, :activatable, :x_offset, :ellipsize_mode, :default_response, :action_area, :show_hidden, :action_name, :fixed_size, :icon_factory, :fit_model, :background_area, :section, :vscrollbar, :line_at_y, :focus_chain, :height, :tooltip_context, :headers_visible, :label_widget, :width_chars, :tab_reorderable, :default_bottom_margin, :hexpand, :n_items, :default_top_margin, :aligned_area, :vexpand, :wrap, :wmclass, :from_pixbuf, :valign, :tooltip_row, :angle, :child_visible, :start_iter, :max_width_chars, :padding, :selection_bounds, :icon_set, :window_type, :child_requisition, :position, :text_with_mnemonic, :iter_at_child_anchor, :tearoff_state, :sizing, :render_icon_surface, :enable_search, :kinetic_scrolling, :margin_top, :proxy_menu_item, :draw_value, :fixed_height_from_font, :n_pages, :sort_indicator, :width, :events, :visible_rect, :resize_toplevel, :junction_sides, :is_important, :debug_updates, :default_attributes, :font_desc, :bin_window, :select_multiple, :right_justified, :keep_above, :text_length, :use_markup, :cursor_on_cell, :margin_start, :x11_window_id, :show_preview_entry, :header_bar, :menu, :child, :text_area, :selection, :qdata, :icon_gicon, :from_file, :expander_column, :event_window, :left_gravity, :selection_mode, :search_entry, :tooltip_window, :serialize_formats, :current_item, :limit, :detailed_action_name, :qdata_full, :value_as_int, :page_size, :has_alpha, :area, :show_events, :fixed_width, :create_folders, :selected, :from_resource, :iter_location, :icon_area, :cursor_visible, :resize_mode, :enable_tree_lines, :shadow_type, :cells, :background_color, :columns, :show_arrow, :widget_for_response, :policy, :expanded, :paste_target_list, :line_count, :indices, :nth_item, :focus_on_map, :numeric, :end_iter, :clipboard, :grid_lines, :margin_right, :use_stock, :tab_label, :device_enabled, :focus_from_sibling, :hover_expand, :focus_on_click, :style_context, :default_icon, :scale, :range_rect, :n_columns, :device_events, :model, :hide_titlebar_when_maximized, :option_group, :preferred_height_for_width, :allocation, :hadjustment, :string_from_iter, :edited_cell, :text_orientation, :input_hints, :placeholder_text, :website, :alternative_button_order, :startup_id, :show_tabs, :sort_column_id, :drop_index, :depth, :homogeneous, :overwrite, :justification, :child_non_homogeneous, :sort_order, :destroy_count_func, :arrow_tooltip_markup, :lower, :pixbuf, :content_type, :sort_func, :show_text, :no_show_all, :predicted_presentation_time, :files, :menu_label, :resize_grip_area, :vexpand_set, :show_size, :uri_display, :font_name, :overwrite_mode, :inline_completion, :focus_vadjustment, :markup_column, :path_for_child, :min_slider_size, :data_type, :screen, :direction, :focus_child, :flags, :default_left_margin, :has_tooltip, :activates_default, :storage_type, :colorspace, :halign, :completion, :icon_sensitive, :window, :icon_storage_type, :gravity, :title, :preview_widget, :upper, :active_text, :scale_factor, :text_size_group, :clickable, :pixbuf_column, :inner_border, :margin_left, :size_of_row, :popup_completion, :dest_row_at_pos, :has_origin, :artists, :modified, :item_index, :layout_offsets, :siblings, :iter, :template_child, :popup_single_match, :handle_window, :drag_dest_item, :min_content_height, :titlebar, :icon_pixbuf, :orientation, :progress_pulse_step, :group_name, :char_count, :rubber_banding, :item_at_pos, :license_type, :attach_widget, :icon_stock, :always_show_image, :font_size, :settings, :justify, :image, :children, :search_position_func, :default_right_margin, :font_face, :pixels_above_lines, :skip_taskbar_hint, :image_position, :sensitive, :tab_pos, :mime_type, :path, :n_channels, :preview_filename, :applications, :cell_at_position, :drag_dest_row, :text, :column, :mapped, :accel_group, :current_folder_file, :paper_sizes, :pixels_below_lines, :value, :end_position, :focus_hadjustment, :data_with_length, :icon_name, :has_selection, :completion_prefix, :end_line, :allocated_width, :right_margin, :iter_from_string, :step_increment, :buildable_property, :focus_cell, :show_tips, :alternative_button_order_from_array, :show_fill_level, :label, :color, :response_for_widget, :translator_credits, :toolbar_style, :translation_domain, :cursor_locations, :extra_widget, :pixels_inside_wrap, :pattern, :column_drag_function, :application_info, :slider_range, :label_fill, :selection_bound, :icon_from_icon_name, :accepts_tab, :max_width, :flippable, :application, :display, :margin_bottom, :internal_child, :update_policy, :preview_uri, :layout, :tooltip_item, :draw, :monitor, :border_window_size, :current_folder_uri, :current_path_string, :visible_vertical, :has_resize_grip, :cell_rect, :section_type, :fill_level, :can_default, :iter_at_location, :selectable, :frame_time, :data, :item_padding, :icon_list, :line_wrap_mode, :bounds, :can_create_tags, :adjustment, :use_size, :track_motion, :use_preview_label, :iter_at_line, :wrap_license, :accel_path, :attached_to, :cursor, :item_width, :deletable, :reserve_indicator, :context_id, :progress_fraction, :priority, :group, :targets, :deleted, :copy_target_list, :restrict_to_fill_level, :button, :for_attach_widget, :preferred_width, :label_align, :iter_at_offset, :inline_selection, :filename, :sort_type, :pixel_size, :size, :realized, :skip_pager_hint, :icon_activatable, :request_mode, :use_underline, :expand, :added, :items, :tooltip_markup, :row_separator_func, :stock_id, :focus_siblings, :reallocate_redraws, :minimum_key_length, :private_hint, :vscroll_policy, :stock, :tooltip_text, :tab_detachable, :tooltip_cell, :from_icon_name, :mode, :auto_startup_notification, :markup_with_mnemonic, :gicon, :accept_focus, :row_drag_data, :tooltip_column, :show_style, :relief_style, :style_property, :column_type, :cell_area, :modifier_mask, :size_request, :icon_tooltip_text, :objects, :input_purpose, :default_widget, :tab_hborder, :state_flags, :level_indentation, :visited, :composite_name, :item_row, :default_icon_list, :style, :column_types, :child_secondary, :minimum_increment, :animation, :preview_widget_active, :transient_for, :urgency_hint, :nth_page, :license, :rgba, :iter_first, :property, :background_rgba, :toplevel, :menu_label_text, :wrap_mode, :age, :copyright, :show_not_found, :show_expanders, :select_function, :match_func, :frame_clock, :fixed_height_mode, :preferred_height, :target_list, :root_window, :tab_vborder, :inconsistent, :description, :iter_at_line_index, :groups, :meta_marshal, :attributes, :icon_from_stock, :line_yrange, :editable, :current_icon_drag_source, :item_orientation, :action, :filter_func, :has_window, :hscroll_policy, :version, :visual, :visible_func, :accessible, :markup, :icon, :icon_from_file, :message_area, :mnemonics_visible, :support_multidevice, :parent_window, :type_hint, :drop_highlight_item, :show_icons, :pixels_with_length, :local_only, :search_equal_func, :border, :bits_per_sample, :documenters, :draw_sensitive, :deserialize_formats, :lines, :from_animation, :content_area, :lower_stepper_sensitivity, :has_frame, :show_private, :logo, :selected_rows, :track_visited_links, :current_name, :do_overwrite_confirmation, :from_icon_set, :authors, :ppd_name, :path_at_pos, :icon_widget, :object, :text_column, :refresh_interval, :keep_below, :cursor_hadjustment, :user_data, :min_content_width, :comments, :current_page, :visible_column, :default_sort_func, :geometry, :format, :filenames, :pango_context, :marshal, :name, :preferred_size, :allocated_height, :show_border, :item_column, :spacing, :pulse_step, :relief, :icon_at_pos, :fraction, :round_digits, :iter_at_mark, :center_widget, :tab_label_text, :resizable, :geometry_hints, :child1, :start_line, :redraw_on_allocate, :requisition, :complete, :search_column, :from_gicon, :preferred_height_and_baseline_for_width, :disabled, :from_stock, :modify_func, :use_font, :sibling_index, :dest_item_at_pos, :single_line_mode, :app_paintable, :program_name, :radio, :indent, :proxy, :frame_counter, :border_width, :default_geometry, :edit_widget, :ellipsize, :margin_end, :upper_stepper_sensitivity, :pointer, :inverted, :website_label, :app_info, :activate_on_single_click, :valuesv, :byte_length, :chars, :tabs, :cell_data_func, :active, :tree_view, :action_target, :cell_data, :double_buffered, :extensions, :visible_range, :child_packing, :border_color, :row_spacing, :has_user_ref_count, :snap_to_ticks, :max_length, :type_from_name, :mnemonic_modifier, :file, :visible_horizontal, :min_width, :visible, :data_full, :logo_icon_name, :baseline_position, :slider_size_fixed, :decorated, :mnemonic_widget, :child2, :indices_with_depth, :render_icon_pixbuf, :mime_types, :short_name))
+$(Expr(:toplevel, :(module GAccessor
+    import ..Gtk
+    import ..Gtk.GObject
+    export label_align, qdata, template_child, width, buffer, pixbuf, icon_activatable, preview_widget_active, iter_at_mark, preferred_width_for_height, inner_border, markup_with_mnemonic, popup_single_match, render_icon_pixbuf, has_selection, hover_expand, double_buffered, baseline_position, focus_visible, tree_view, focus_cell, has_frame, right_margin, artists, mime_type, child_requisition, use_preview_label, option_group, style, font_desc, cursor_locations, filenames, show_tips, background_area, mode, option, max_length, show_not_found, frame_clock, requisition, use_alpha, for_attach_widget, preferred_size, data_full, children, use_stock, sort_order, private_hint, tag_table, edited_cell, use_markup, draw, can_focus, iter_location, upper, pixels_inside_wrap, scale, logo_icon_name, max_width, margin_end, action_target, icon_at_pos, select_function, website, markup_column, default_bottom_margin, response_sensitive, show_events, cursor_on_cell, popup_completion, activate_on_single_click, height, limit, allocated_baseline, visible_horizontal, object_type, match_func, cell_area, activatable, screen, tooltip_markup, destroy_with_parent, resizable, icon_from_file, byte_length, icon_tooltip_text, level_indentation, background_rgba, flippable, upper_stepper_sensitivity, left_gravity, iter, resize_mode, round_digits, keep_below, layout_offsets, left_margin, size_request, cells, row_separator_func, select_multiple, color, iter_at_line_index, tab_hborder, bounds, from_gicon, max_width_chars, editable, predicted_presentation_time, min_content_width, margin_left, font, iter_at_child_anchor, default_attributes, single_line_mode, column_drag_function, range_rect, active, from_icon_set, border_color, message_area, from_surface, has_alpha, show_text, action_area, depth, is_locked, resize_grip_area, current_icon_drag_source, is_important, minimum_key_length, fixed_height_mode, refresh_interval, font_size, preferred_height_and_baseline_for_width, sort_func, background, has_resize_grip, child, search_column, show_arrow, pixels_below_lines, ancestor, area, decorated, chars, mnemonic_widget, selection_bound, track_motion, margin_start, default_sort_func, show_hidden, accessible, slider_size_fixed, inline_selection, titlebar, show_size, show_icons, margin_bottom, font_face, pulse_step, lower_stepper_sensitivity, width_chars, tooltip_item, show_preview_entry, cell_data, enable_tree_lines, modal, tabs, arrow_tooltip_text, default_geometry, proxy, attach_widget, receives_default, lines, activates_default, preview_file, background_color, paper_sizes, icon_name, toolbar_style, policy, icon_gicon, icon_from_gicon, colorspace, image_position, visited, header_bar, preview_widget, icon_size, meta_marshal, from_animation, target_list, focus_vadjustment, icon_drag_source, range, preferred_height_for_width, display, text, version, pixel_size, clipboard, icon, alternative_button_order_from_array, visible_range, search_entry, focus_on_click, content_area, sizing, visible_column, hadjustment, end_line, create_folders, ellipsize_mode, menu, tab_detachable, resize_toplevel, animation, menu_label, copy_target_list, modify_func, halign, widget, paste_target_list, no_show_all, selection_bounds, focus_hadjustment, n_items, char_count, keep_above, step_increment, pattern, pixels_with_length, mime_types, urgency_hint, digits, local_only, sibling_index, accel_group, indices_with_depth, tooltip_row, pixels, focus_from_sibling, translation_domain, markup, events, property, documenters, type_from_name, uri, stock_id, default_top_margin, bits_per_sample, nth_page, drag_dest_row, font_family, fraction, focus, show_style, iter_at_offset, show_fill_level, icon_set, visibility, response_for_widget, cursor, line_wrap, image, fixed_size, display_name, targets, dest_row_at_pos, junction_sides, visible_vertical, file, kinetic_scrolling, border, group_name, always_show_image, text_with_mnemonic, row_drag_data, string_from_iter, from_stock, pointer, data_type, track_visited_links, end_position, description, from_icon_name, tab_label_text, headers_clickable, numeric, use_font, expanded, allocation, fixed_width, label_widget, alternative_button_order, item_index, headers_visible, position, application, child_packing, has_window, app_info, text_length, start_line, default_response, icon_list, expand, tooltip_column, action, mapped, realized, extensions, entry, inverted, text_size_group, column_type, hexpand_set, line_count, border_window_size, accepts_tab, reallocate_redraws, column, program_name, alignment, pango_context, label, text_alignment, input_purpose, path, current_folder_file, use_size, nth_item, iter_first, state, snap_to_ticks, min_width, start_position, current_uri, page_increment, columns, fill_level, default_icon_list, parent, submenu, gravity, mnemonic_keyval, ellipsize, selection, completion, reserve_indicator, target, visible_func, from_resource, preview_uri, sort_type, selected, opacity, expander_column, visual, shadow_type, child2, modified, default_size, vscrollbar, icon_area, data, valign, valign_with_baseline, interactive_debugging, stock, cursor_hadjustment, type_hint, label_fill, age, vscroll_policy, mark, line_yrange, rgba, grid_lines, preview_text, cell_rect, hscroll_policy, icon_storage_type, mnemonics_visible, show_border, copyright, increments, angle, fixed_height_from_font, group, deletable, website_label, page_size, current_page, icon_stock, bin_window, marshal, hover_selection, wmclass, current_path_string, homogeneous, menu_label_text, clip, icon_from_stock, filter_func, search_equal_func, has_user_ref_count, can_default, siblings, section, toplevel, reorderable, x_offset, rules_hint, tab_vborder, iter_at_position, draw_value, arrow_tooltip_markup, wrap_license, deserialize_formats, valuesv, deleted, icon_sensitive, user_data, monitor, model, margin_top, title, focus_chain, size_of_row, update_policy, gicon, window, render_icon_surface, default_widget, right_justified, progress_pulse_step, filter, role, column_types, text_orientation, vexpand, handle_window, slider_range, dest_item_at_pos, path_at_pos, inconsistent, drop_highlight_item, item_row, border_width, button, hide_titlebar_when_maximized, value_as_int, files, preview_filename, slice, default_right_margin, icon_tooltip_markup, radio, state_flags, action_target_value, frame_time, n_channels, margin_right, license, startup_id, focus_siblings, selection_mode, relief_style, layout, qdata_full, complete, detailed_action_name, has_origin, tooltip_window, cell_data_func, text_column, item_at_pos, action_widget, hscrollbar, debug_updates, geometry_hints, length, use_underline, value, edit_widget, rubber_banding, child_secondary, composite_name, action_name, internal_child, direction, iter_at_location, default_icon, indent, device_enabled, settings, placement, has_tooltip, accept_focus, destroy_count_func, spacing, start_iter, child_non_homogeneous, justification, reserve_toggle_size, license_type, item_width, icon_widget, insert, adjustment, value_pos, show_private, sort_indicator, data_with_length, cursor_visible, padding, aligned_area, style_property, modifier_mask, frame_counter, visible_rect, path_for_child, draw_sensitive, cell_allocation, item_column, accel_path, column_spacing, attributes, from_pixbuf, current_folder, show_tabs, child_visible, priority, row_spacing, tooltip_cell, orientation, text_area, authors, show_expanders, uris, invisible_char, short_name, end_iter, root_window, font_name, sort_column_id, preferred_width, search_position_func, tab_label, line_at_y, app_paintable, proxy_menu_item, object, icon_factory, skip_pager_hint, justify, event_window, widget_for_response, focus_child, size, rowstride, tearoff_state, margin, presentation_time, storage_type, min_content_height, do_overwrite_confirmation, default_left_margin, default, application_info, visible, disabled, translator_credits, preferred_height, flags, style_context, mnemonic_modifier, format, wrap_mode, current_name, added, active_text, vexpand_set, redraw_on_allocate, completion_prefix, parent_window, enable_search, item_orientation, ppd_name, min_slider_size, minimum_increment, inline_completion, auto_startup_notification, vadjustment, lower, attached_to, selectable, n_columns, child1, pixels_above_lines, item_padding, selected_items, allocated_width, from_file, name, capture_button_press, wrap, can_create_tags, filename, items, clickable, groups, skip_taskbar_hint, drop_index, extra_widget, support_multidevice, center_widget, relief, tooltip_context, current_item, iter_at_line, scrollable, progress_fraction, restrict_to_fill_level, request_mode, tab_pos, device_events, section_type, content_type, hexpand, logo, context_id, cell_at_position, scale_factor, tooltip_text, sensitive, allocated_height, iter_from_string, overwrite_mode, objects, fit_model, use_drag_window, serialize_formats, icon_from_icon_name, uri_display, transient_for, input_hints, line_wrap_mode, comments, selected_rows, icon_pixbuf, tab_reorderable, icon_from_pixbuf, displayed_row, buildable_property, focus_on_map, indices, current_folder_uri, n_pages, applications, pixbuf_column, iter_at_line_offset, overwrite, window_type, placeholder_text, drag_dest_item
     function marshal(closure::Gtk.GClosure,marshal_)
         ccall((:g_closure_set_marshal,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GClosure},Ptr{Void}),closure,marshal_)
         return closure
@@ -320,6 +320,15 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
     function allocation(widget::Gtk.GtkWidget,allocation_)
         ccall((:gtk_widget_set_allocation,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle}),widget,allocation_)
         return widget
+    end
+    function clip(widget::Gtk.GtkWidget,clip_)
+        ccall((:gtk_widget_set_clip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle}),widget,clip_)
+        return widget
+    end
+    function clip(widget::Gtk.GtkWidget)
+        clip_ = Gtk.mutable(Gtk.GdkRectangle)
+        ccall((:gtk_widget_get_clip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GdkRectangle}),widget,clip_)
+        return clip_[]
     end
     function requisition(widget::Gtk.GtkWidget,requisition_)
         return ccall((:gtk_widget_get_requisition,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),widget,requisition_)
@@ -902,6 +911,10 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         ccall((:gtk_window_set_titlebar,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),window,titlebar_)
         return window
     end
+    function interactive_debugging(enable::Bool)
+        ccall((:gtk_window_set_interactive_debugging,Gtk.libgtk),Void,(Cint,),enable)
+        return enable
+    end
     function response_sensitive(dialog::Gtk.GtkDialog,response_id,setting)
         ccall((:gtk_dialog_set_response_sensitive,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Cint),dialog,response_id,setting)
         return dialog
@@ -1319,18 +1332,6 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
     function minimum_increment(adjustment::Gtk.GtkAdjustment)
         return ccall((:gtk_adjustment_get_minimum_increment,Gtk.libgtk),Cdouble,(Ptr{Gtk.GObject},),adjustment)
     end
-    function padding(alignment::Gtk.GtkAlignment,padding_top,padding_bottom,padding_left,padding_right)
-        ccall((:gtk_alignment_set_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32,Uint32,Uint32,Uint32),alignment,padding_top,padding_bottom,padding_left,padding_right)
-        return alignment
-    end
-    function padding(alignment::Gtk.GtkAlignment)
-        padding_right = Gtk.mutable(Uint32)
-        padding_left = Gtk.mutable(Uint32)
-        padding_bottom = Gtk.mutable(Uint32)
-        padding_top = Gtk.mutable(Uint32)
-        ccall((:gtk_alignment_get_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint32},Ptr{Uint32},Ptr{Uint32},Ptr{Uint32}),alignment,padding_top,padding_bottom,padding_left,padding_right)
-        return (padding_top[],padding_bottom[],padding_left[],padding_right[])
-    end
     function app_info(self::Gtk.GtkAppChooser)
         return ccall((:gtk_app_chooser_get_app_info,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),self)
     end
@@ -1565,6 +1566,9 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
     end
     function current_path_string(area::Gtk.GtkCellArea)
         return ccall((:gtk_cell_area_get_current_path_string,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),area)
+    end
+    function column(area::Gtk.GtkCellArea,renderer,attribute)
+        return ccall((:gtk_cell_area_attribute_get_column,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}),area,renderer,attribute)
     end
     function property(area::Gtk.GtkCellArea,renderer,property_name,value)
         ccall((:gtk_cell_area_cell_set_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),area,renderer,property_name,value)
@@ -2627,8 +2631,8 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
     function internal_child(buildable::Gtk.GtkBuildable,builder,childname)
         return convert(Gtk.GObject,ccall((:gtk_buildable_get_internal_child,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}),buildable,builder,childname))
     end
-    function relief(button::Gtk.GtkButton,newstyle)
-        ccall((:gtk_button_set_relief,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),button,newstyle)
+    function relief(button::Gtk.GtkButton,relief_)
+        ccall((:gtk_button_set_relief,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),button,relief_)
         return button
     end
     function relief(button::Gtk.GtkButton)
@@ -4364,99 +4368,6 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
     function message_area(statusbar::Gtk.GtkStatusbar)
         return convert(Gtk.GtkWidget,ccall((:gtk_statusbar_get_message_area,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),statusbar))
     end
-    function from_pixbuf(status_icon::Gtk.GtkStatusIcon,pixbuf)
-        ccall((:gtk_status_icon_set_from_pixbuf,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),status_icon,pixbuf)
-        return status_icon
-    end
-    function from_file(status_icon::Gtk.GtkStatusIcon,filename)
-        ccall((:gtk_status_icon_set_from_file,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,filename)
-        return status_icon
-    end
-    function from_stock(status_icon::Gtk.GtkStatusIcon,stock_id)
-        ccall((:gtk_status_icon_set_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,stock_id)
-        return status_icon
-    end
-    function from_icon_name(status_icon::Gtk.GtkStatusIcon,icon_name)
-        ccall((:gtk_status_icon_set_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,icon_name)
-        return status_icon
-    end
-    function from_gicon(status_icon::Gtk.GtkStatusIcon,icon)
-        ccall((:gtk_status_icon_set_from_gicon,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),status_icon,icon)
-        return status_icon
-    end
-    function storage_type(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_storage_type,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),status_icon)
-    end
-    function pixbuf(status_icon::Gtk.GtkStatusIcon)
-        return convert(Gtk.GdkPixbuf,ccall((:gtk_status_icon_get_pixbuf,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),status_icon))
-    end
-    function stock(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_stock,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function icon_name(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function gicon(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_gicon,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function size(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_size,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),status_icon)
-    end
-    function screen(status_icon::Gtk.GtkStatusIcon,screen_)
-        ccall((:gtk_status_icon_set_screen,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),status_icon,screen_)
-        return status_icon
-    end
-    function screen(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_screen,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function has_tooltip(status_icon::Gtk.GtkStatusIcon,has_tooltip_)
-        ccall((:gtk_status_icon_set_has_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),status_icon,has_tooltip_)
-        return status_icon
-    end
-    function tooltip_text(status_icon::Gtk.GtkStatusIcon,text)
-        ccall((:gtk_status_icon_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,text)
-        return status_icon
-    end
-    function tooltip_markup(status_icon::Gtk.GtkStatusIcon,markup)
-        ccall((:gtk_status_icon_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,markup)
-        return status_icon
-    end
-    function title(status_icon::Gtk.GtkStatusIcon,title_)
-        ccall((:gtk_status_icon_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,title_)
-        return status_icon
-    end
-    function title(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function name(status_icon::Gtk.GtkStatusIcon,name_)
-        ccall((:gtk_status_icon_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,name_)
-        return status_icon
-    end
-    function visible(status_icon::Gtk.GtkStatusIcon,visible_)
-        ccall((:gtk_status_icon_set_visible,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),status_icon,visible_)
-        return status_icon
-    end
-    function visible(status_icon::Gtk.GtkStatusIcon)
-        return convert(Bool,ccall((:gtk_status_icon_get_visible,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),status_icon))
-    end
-    function geometry(status_icon::Gtk.GtkStatusIcon)
-        orientation = Gtk.mutable(Cint)
-        area = Gtk.mutable(Gtk.GdkRectangle)
-        screen = Gtk.mutable(Ptr{Void})
-        return (convert(Bool,ccall((:gtk_status_icon_get_geometry,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Ptr{Void}},Ptr{Gtk.GdkRectangle},Ptr{Cint}),status_icon,screen,area,orientation)),screen[],area[],orientation[])
-    end
-    function has_tooltip(status_icon::Gtk.GtkStatusIcon)
-        return convert(Bool,ccall((:gtk_status_icon_get_has_tooltip,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),status_icon))
-    end
-    function tooltip_text(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_tooltip_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function tooltip_markup(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_tooltip_markup,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
-    end
-    function x11_window_id(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_x11_window_id,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),status_icon)
-    end
     function visible(mark::Gtk.GtkTextMark,setting)
         ccall((:gtk_text_mark_set_visible,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),mark,setting)
         return mark
@@ -4885,6 +4796,13 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
         ccall((:gtk_widget_path_iter_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GtkWidgetPath},Cint,Ptr{Uint8}),path,pos,name_)
         return path
     end
+    function state(path::Gtk.GtkWidgetPath,pos)
+        return ccall((:gtk_widget_path_iter_get_state,Gtk.libgtk),Cint,(Ptr{Gtk.GtkWidgetPath},Cint),path,pos)
+    end
+    function state(path::Gtk.GtkWidgetPath,pos,state_)
+        ccall((:gtk_widget_path_iter_set_state,Gtk.libgtk),Void,(Ptr{Gtk.GtkWidgetPath},Cint,Cint),path,pos,state_)
+        return path
+    end
     function object_type(path::Gtk.GtkWidgetPath)
         return ccall((:gtk_widget_path_get_object_type,Gtk.libgtk),Culong,(Ptr{Gtk.GtkWidgetPath},),path)
     end
@@ -4902,5 +4820,5 @@ $(Expr(:toplevel, :($(Expr(:module, true, :GAccessor, quote
             w
         end
     end
-end)))))
+    end)))
 end

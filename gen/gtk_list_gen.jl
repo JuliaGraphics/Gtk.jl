@@ -1,5 +1,6 @@
 import Gtk
 import Gtk.GLib: g_type, g_type_from_name, g_isa, GObject, get_fn_ptr
+importall Gtk.GLib.Compat
 import Clang, Clang.cindex
 
 function gen_g_type_lists(gtk_h)
@@ -8,10 +9,10 @@ function gen_g_type_lists(gtk_h)
         :GType => :g_gtype,
         ]
     tdecls = cindex.search(gtk_h, cindex.TypedefDecl)
-    leafs = (Symbol,Expr)[]
-    ifaces = (Symbol,Expr)[]
-    boxes = (Symbol,Expr)[]
-    gpointers = (Symbol,Expr)[]
+    leafs = TupleType(Symbol,Expr)[]
+    ifaces = TupleType(Symbol,Expr)[]
+    boxes = TupleType(Symbol,Expr)[]
+    gpointers = TupleType(Symbol,Expr)[]
     for tdecl in tdecls
         ty = cindex.getTypedefDeclUnderlyingType(tdecl)
         if isa(ty,cindex.Pointer)

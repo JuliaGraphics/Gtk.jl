@@ -176,7 +176,7 @@ const reserved_names = Set{Symbol}([symbol(x) for x in split("
     type immutable module function macro ccall
     while do for if ifelse nothing quote
     start next end done top tuple convert
-    Gtk GAccessor GValue
+    Gtk GAccessor GValue unsafe_convert
     ")])
 for typsym in values(cl_to_jl)
     push!(reserved_names, typsym)
@@ -246,7 +246,7 @@ function is_gstring(ctype)
         return false
     end
     ctype = cindex.pointee_type(ctype)
-    if !bool(cindex.isConstQualifiedType(ctype))
+    if cindex.isConstQualifiedType(ctype) == 0
         return false
     end
     ctypedecl = cindex.getTypeDeclaration(ctype)

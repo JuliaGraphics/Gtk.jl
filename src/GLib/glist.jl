@@ -41,7 +41,7 @@ eltype{L<:_LList}(::LList{L}) = eltype(L)
 deref{L<:_LList}(item::Ptr{L}) = deref_to(L, unsafe_load(item).data) # extract something from the glist (automatically determine type)
 deref_to{T}(::Type{T}, x::Ptr) = unsafe_pointer_to_objref(x)::T # helper for extracting something from the glist (to type T)
 deref_to{L<:_LList}(::Type{L}, x::Ptr) = convert(eltype(L),deref_to(_listdatatype(L), x))
-ref_to{T}(::Type{T}, x) = pointer_from_objref(gc_ref(x)) # create a reference to something for putting in the glist
+ref_to{T}(::Type{T}, x) = gc_ref(x) # create a reference to something for putting in the glist
 ref_to{L<:_LList}(::Type{L}, x) = ref_to(_listdatatype(L), x)
 empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
 empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{super(L)}, li))
@@ -55,21 +55,26 @@ function glist_iter{L<:_LList}(list::Ptr{L}, transfer_full::Bool=false)
     # this function pairs every list element with the list head, to forestall garbage collection
     (GList(list, transfer_full), list)
 end
-function next{L<:_LList}(::LList,s::(LList,Ptr{L}))
-    (deref(s[2]), (s[1],unsafe_load(s[2]).next))
+if VERSION >= v"0.4-"
+    typealias LListPair{L} Tuple{LList, Ptr{L}}
+else
+    typealias LListPair{L} (LList, Ptr{L})
 end
-done{L<:_LList}(::LList,s::(LList,Ptr{L})) = done(s[1],s[2])
+function next{L<:_LList}(::LList, s::LListPair{L})
+    (deref(s[2]), (s[1], unsafe_load(s[2]).next))
+end
+done{L<:_LList}(::LList,s::LListPair{L}) = done(s[1],s[2])
 
 ## Standard Array-like declarations
 show{L,T}(io::IO, list::GList{L,T}) = print(io, "GList{$L => $T}(length=$(length(list)), transfer_full=$(list.transfer_full))")
 show{L,T}(io::IO, list::Type{GList{L,T}}) = print(io, "GList{$L => $T}")
-convert{L<:_LList}(::Type{Ptr{L}}, list::GList) = list.handle
+unsafe_convert{L<:_LList}(::Type{Ptr{L}}, list::GList) = list.handle
 endof(list::LList) = length(list)
 ndims(list::LList) = 1
 strides(list::LList) = (1,)
 stride(list::LList,k::Integer) = (k>1 ? length(list) : 1)
 size(list::LList) = (length(list),)
-isempty{L}(list::LList{L}) = (convert(Ptr{L},list) == C_NULL)
+isempty{L}(list::LList{L}) = (unsafe_convert(Ptr{L},list) == C_NULL)
 
 shift!(list::GList) = splice!(list,nth_first(list))
 pop!(list::GList) = splice!(list,nth_last(list))

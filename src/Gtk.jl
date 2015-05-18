@@ -6,25 +6,26 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-using Cairo
-
+importall .GLib.Compat
 import .GLib: setproperty!, getproperty, StringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
     signal_emit
-if VERSION < v"0.3-"
-    QuoteNode(x) = Base.qn(x)
-end
+
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!, deleteat!,
              select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end
+
 import Graphics: width, height, getgc
+
+using Cairo
 import Cairo: destroy
 
 typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
 
+export GAccessor
 include("basic_exports.jl")
 include("long_exports.jl")
 include("long_leaf_exports.jl")
@@ -53,9 +54,9 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-export GAccessor
+const ser_version = VERSION >= v"0.4-" ? Base.Serializer.ser_version : Base.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
-    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_julia_ser$(Base.ser_version)")
+    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_julia_ser$(ser_version)")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)

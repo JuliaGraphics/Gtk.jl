@@ -24,7 +24,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         on_signal_button_press(mousedown_cb, widget, false, widget.mouse)
         on_signal_button_release(mouseup_cb, widget, false, widget.mouse)
         on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse)
-        gc_ref(widget)
+        return gobject_ref(widget)
     end
 end
 const GtkCanvasLeaf = GtkCanvas
@@ -79,7 +79,7 @@ function cairo_surface_for(widget::GtkCanvas)
     w, h = width(widget), height(widget)
     CairoSurface(
         ccall((:gdk_window_create_similar_surface,libgdk), Ptr{Void},
-        (Ptr{Void}, Enum, Int32, Int32),
+        (Ptr{Void}, GEnum, Int32, Int32),
         gdk_window(widget), Cairo.CONTENT_COLOR_ALPHA, w, h),
     w, h)
 end

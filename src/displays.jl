@@ -201,10 +201,11 @@ function GdkPixbufLeaf(;stream=nothing,resource_path=nothing,filename=nothing,xp
         alpha = convert(Bool,has_alpha)
         width = size(data,1)*bstride(data,1)/(3+int(alpha))
         height = size(data,2)
+        ref_data, deref_data = GLib.gc_ref_closure(data)
         pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk_pixbuf),Ptr{GObject},
-            (Ptr{Void},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Any),
+            (Ptr{Void},Cint,Cint,Cint,Cint,Cint,Cint,Ptr{Void},Ptr{Void}),
             data,0,alpha,8,width,height,bstride(data,2),
-            gc_ref_closure(data),data)
+            deref_data,ref_data)
     else
         @assert(width!=-1 && height!=-1,"GdkPixbuf requires a width, height, and has_alpha to create an uninitialized pixbuf")
         alpha = convert(Bool,has_alpha)

@@ -93,13 +93,13 @@ function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
 end
 
 immutable GdkEventAny <: GdkEvent
-    event_type::Enum
+    event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
 end
 
 immutable GdkEventButton <: GdkEvent
-    event_type::Enum
+    event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
     time::Uint32
@@ -114,14 +114,14 @@ immutable GdkEventButton <: GdkEvent
 end
 
 immutable GdkEventScroll <: GdkEvent
-    event_type::Enum
+    event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
     time::Uint32
     x::Float64
     y::Float64
     state::Uint32
-    direction::Enum
+    direction::GEnum
     gdk_device::Ptr{Void}
     x_root::Float64
     y_root::Float64
@@ -130,7 +130,7 @@ immutable GdkEventScroll <: GdkEvent
 end
 
 immutable GdkEventKey <: GdkEvent
-    event_type::Enum
+    event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
     time::Uint32
@@ -146,7 +146,7 @@ end
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
 immutable GdkEventMotion <: GdkEvent
-  event_type::Enum
+  event_type::GEnum
   gdk_window::Ptr{Void}
   send_event::Int8
   time::Uint32
@@ -161,7 +161,7 @@ immutable GdkEventMotion <: GdkEvent
 end
 
 immutable GdkEventCrossing <: GdkEvent
-  event_type::Enum
+  event_type::GEnum
   gdk_window::Ptr{Void}
   send_event::Int8
   gdk_subwindow::Ptr{Void}
@@ -170,8 +170,8 @@ immutable GdkEventCrossing <: GdkEvent
   y::Float64
   x_root::Float64
   y_root::Float64
-  mode::Enum
-  detail::Enum
+  mode::GEnum
+  detail::GEnum
   focus::Cint
   state::Uint32
 end

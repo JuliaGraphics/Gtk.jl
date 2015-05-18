@@ -13,22 +13,40 @@ import Base: convert, copy, show, showall, showcompact, size, length, getindex, 
              sigatomic_begin, sigatomic_end
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
-export Enum, GError, GValue, gvalue, make_gvalue, g_type
-export GList, glist_iter, _GSList, _GList, gc_ref, gc_unref, gc_move_ref, gc_ref_closure
+export GEnum, GError, GValue, gvalue, make_gvalue, g_type
+export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
+
+module Compat
+if VERSION >= v"0.4-"
+    export TupleType, int, int32, uint32, uint64, dlopen, dlsym_e, unsafe_convert
+    TupleType(types...) = Tuple{types...}
+    int(v) = Int(v)
+    int32(v) = Int32(v)
+    uint32(v) = UInt32(v)
+    uint64(v) = UInt64(v)
+    const unsafe_convert = Base.unsafe_convert
+    import Base.Libdl: dlopen, dlsym_e
+else
+    export TupleType, unsafe_convert
+    const TupleType = tuple
+    const unsafe_convert = Base.cconvert
+end
+if VERSION < v"0.3-"
+    export QuoteNode
+    QuoteNode(x) = Base.qn(x)
+end
+end
+importall .Compat
 
 # local function, handles Symbol and makes UTF8-strings easier
 typealias StringLike Union(String,Symbol)
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{Uint8},),s)),own))
-
-if VERSION < v"0.3-"
-    QuoteNode(x) = Base.qn(x)
-end
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 
