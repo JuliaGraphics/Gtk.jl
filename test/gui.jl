@@ -3,7 +3,7 @@ using Gtk.ShortNames, Gtk.GConstants, Graphics
 import Gtk.deleteat!
 
 ## Window
-w = @Window("Window", 400, 300)
+w = @Window("Window", 400, 300) |> showall
 @assert width(w) == 400
 @assert height(w) == 300
 @assert size(w) == (400, 300)
@@ -13,7 +13,7 @@ pos = G_.position(w)
 @assert G_.position(w) == pos
 G_.position(w, 100, 100)
 sleep(0.1)
-if G_.position(w) != pos
+if G_.position(w) == pos
     warn("The Window Manager did not move the Gtk Window when requested")
 end
 @assert getproperty(w,"title",String) == "Window"
@@ -42,6 +42,7 @@ push!(nb, c, "B")
 w = @Window("TestDataViewer",600,600)
 push!(w,nb)
 showall(w)
+destroy(w)
 
 # Labelframe
 f = @Frame("Label")
