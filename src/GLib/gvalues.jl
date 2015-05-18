@@ -171,6 +171,8 @@ end
 
 
 function show(io::IO, w::GObject)
+    const READABLE   = 0x00000001
+    const DEPRECATED = 0x80000000
     print(io,typeof(w),'(')
     if convert(Ptr{GObject},w) == C_NULL
         print(io,"<NULL>)")
@@ -180,12 +182,18 @@ function show(io::IO, w::GObject)
     props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
         (Ptr{Void},Ptr{Cuint}),G_OBJECT_GET_CLASS(w),n)
     v = gvalue(ByteString)
+    first = true
     for i = 1:unsafe_load(n)
         param = unsafe_load(unsafe_load(props,i))
+        if !first
+            print(io,", ")
+        else
+            first = false
+        end
         print(io,bytestring(param.name))
-        const READABLE=1
-        if (param.flags&1)==READABLE &&
-                bool(ccall((:g_value_type_transformable,libgobject),Cint,
+        if (param.flags & READABLE) != 0 &&
+           (param.flags & DEPRECATED) == 0 &&
+           bool(ccall((:g_value_type_transformable,libgobject),Cint,
                 (Int,Int),param.value_type,g_type(String)))
             ccall((:g_object_get_property,libgobject), Void,
                 (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, param.name, v)
@@ -196,9 +204,6 @@ function show(io::IO, w::GObject)
             else
                 print(io,'=',value)
             end
-        end
-        if i != n
-            print(io,", ")
         end
     end
     print(io,')')
