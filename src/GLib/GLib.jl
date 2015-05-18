@@ -20,8 +20,6 @@ export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
 
-include(joinpath("..","..","deps","ext_glib.jl"))
-
 # local function, handles Symbol and makes UTF8-strings easier
 typealias StringLike Union(String,Symbol)
 bytestring(s) = Base.bytestring(s)
@@ -31,6 +29,8 @@ bytestring(s::Ptr{Uint8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:s
 if VERSION < v"0.3-"
     QuoteNode(x) = Base.qn(x)
 end
+
+include(joinpath("..","..","deps","ext_glib.jl"))
 
 ccall((:g_type_init,libgobject),Void,())
 
