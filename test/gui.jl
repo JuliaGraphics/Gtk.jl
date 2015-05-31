@@ -1,5 +1,12 @@
 ## Tests
-using Gtk.ShortNames, Gtk.GConstants, Graphics
+using Gtk.ShortNames, Gtk.GConstants
+
+if VERSION < v"0.4.0-dev+3275"
+    import Base.Graphics
+else
+    import Graphics
+end
+
 import Gtk.deleteat!
 import Gtk.GLib.Compat: int32, int8, uint32
 

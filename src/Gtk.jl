@@ -18,7 +18,11 @@ import Base: convert, show, showall, run, size, resize!, length, getindex, setin
              select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end
 
-import Graphics: width, height, getgc
+if VERSION < v"0.4.0-dev+3275"
+    import Base.Graphics: width, height, getgc
+else
+    import Graphics: width, height, getgc
+end
 
 using Cairo
 import Cairo: destroy
