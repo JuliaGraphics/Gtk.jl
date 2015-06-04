@@ -264,24 +264,25 @@ macro quark_str(q)
     :( ccall((:g_quark_from_string, libglib), Uint32, (Ptr{Uint8},), bytestring($q)) )
 end
 
+unsafe_convert{T<:GBoxed}(::Type{Ptr{T}}, box::T) = convert(Ptr{T}, box.handle)
+convert(::Type{GBoxed}, unbox::Ptr{GBoxed}) = GBoxedUnkown(unbox)
+convert{T<:GBoxed}(::Type{GBoxed}, unbox::Ptr{T}) = GBoxedUnkown(unbox)
+convert{T<:GBoxed}(::Type{T}, unbox::Ptr{GBoxed}) = convert(T, convert(Ptr{T}, unbox))
+convert{T<:GBoxed}(::Type{T}, unbox::Ptr{T}) = T(unbox)
+convert{T<:GBoxed}(::Type{T}, unbox::GBoxedUnkown) = convert(T, unbox.handle)
+
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object
-unsafe_convert(::Type{Ptr{GObject}},w::GObject) = w.handle
-convert{T<:GObject}(::Type{T},w::Ptr{T}) = convert(T,convert(Ptr{GObject},w))
-eltype{T<:GObject}(::Type{_LList{T}}) = T
-ref_to{T<:GObject}(::Type{T}, x) = gobject_ref(unsafe_convert(Ptr{GObject},x))
-deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
-empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
+# or to override this method (e.g. GtkNullContainer, AbstractString)
+unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = w.handle
 
-unsafe_convert{T<:GBoxed}(::Type{Ptr{T}},box::T) = convert(Ptr{T},box.handle)
-convert{T<:GBoxed}(::Type{T},unbox::Ptr{GBoxed}) = convert(T,convert(Ptr{T},unbox))
-convert{T<:GBoxed}(::Type{T},unbox::Ptr{T}) = T(unbox)
-convert{T<:GBoxed}(::Type{GBoxed},unbox::Ptr{T}) = GBoxedUnkown(unbox)
-convert{T<:GBoxed}(::Type{T},unbox::GBoxedUnkown) = convert(T, unbox.handle)
+# this method should be used by gtk methods returning widgets of unknown type
+# and/or that might have been wrapped by julia before,
+# instead of a direct call to the constructor
+convert{T<:GObject}(::Type{T}, w::Ptr{GObject}) = convert(T,convert(Ptr{T},w)) # this definition must be first due to a 0.2 dispatch bug
 
-# this could be used for gtk methods returing widgets of unknown type
-# and/or might have been wrapped by julia before
-function convert{T<:GObject}(::Type{T}, hnd::Ptr{GObject})
+function convert{T<:GObject}(::Type{T}, ptr::Ptr{T})
+    hnd = convert(Ptr{GObject}, ptr)
     if hnd == C_NULL
         error(UndefRefError())
     end
@@ -303,6 +304,11 @@ function wrap_gobject(hnd::Ptr{GObject})
     T = gtype_wrappers[typname]
     return T(hnd)
 end
+
+eltype{T<:GObject}(::Type{_LList{T}}) = T
+ref_to{T<:GObject}(::Type{T}, x) = gobject_ref(unsafe_convert(Ptr{GObject},x))
+deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
+empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
 ### Miscellaneous types
 baremodule GConnectFlags
