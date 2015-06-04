@@ -18,7 +18,12 @@ import Base: convert, show, showall, run, size, resize!, length, getindex, setin
              select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end
 
-import Graphics: width, height, getgc
+if isdefined(Base,:Graphics)
+    const Graphics = Base.Graphics
+else
+    import Graphics
+end
+import .Graphics: width, height, getgc
 
 using Cairo
 import Cairo: destroy

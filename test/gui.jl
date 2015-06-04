@@ -1,5 +1,5 @@
 ## Tests
-using Gtk.ShortNames, Gtk.GConstants, Graphics
+using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!
 import Gtk.GLib.Compat: int32, int8, uint32
 
