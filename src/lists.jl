@@ -106,7 +106,7 @@ function iter_from_string_index(store, index::String)
     if !isvalid(store, iter)
         error("invalid index: $index")
     end
-     iter
+     iter[]
 end
 
 ### GtkListStore
@@ -118,10 +118,10 @@ function GtkListStoreLeaf(types::Type...)
 end
 
 ## index is integer for a liststore, vector of ints for tree
-iter_from_index(store::GtkListStoreLeaf, index::Int) = iter_from_string_index(store, string(index-1))
+iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index-1))
+index_from_iter(store::GtkListStore, iter::TRI) = int(get_string_from_iter(GtkTreeModel(store), iter)) + 1
 
-
-function list_store_set_values(store::GtkListStoreLeaf, iter, values)
+function list_store_set_values(store::GtkListStore, iter, values)
     for (i,value) in enumerate(values)
         ccall((:gtk_list_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
               store,iter,i-1, Gtk.gvalue(value))
@@ -146,7 +146,7 @@ end
 ## insert before
 function insert!(listStore::GtkListStoreLeaf, iter::TRI, values)
     newiter = Gtk.mutable(GtkTreeIter)
-    ccall((:gtk_list_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), listStore, newiter, iter)
+    ccall((:gtk_list_store_insert_before,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}), listStore, newiter, mutable(iter))
     list_store_set_values(listStore, newiter, values)
     newiter[]
 end
@@ -181,19 +181,19 @@ shift!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
 
 isvalid(listStore::GtkListStore, iter::TRI) =
     ccall((:gtk_list_store_iter_is_valid,libgtk), Cint,
-	     (Ptr{GObject},Ptr{GtkTreeIter}),listStore, mutable(iter)) != 0
+         (Ptr{GObject},Ptr{GtkTreeIter}),listStore, mutable(iter)) != 0
 
 length(listStore::GtkListStore) =
     ccall((:gtk_tree_model_iter_n_children,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),listStore, C_NULL)
 
 size(listStore::GtkListStore) = (length(listStore), ncolumns(GtkTreeModel(listStore)))
 
-getindex(listStore::GtkListStore, iter::TRI, column::Integer) = getindex(GtkTreeModel(listStore), iter, column)
-getindex(listStore::GtkListStore, iter::TRI) = getindex(GtkTreeModel(listStore), iter)
-getindex(listStore::GtkListStore, row::Int, column) = getindex(listStore, iter_from_index(listStore, row), column)
-getindex(listStore::GtkListStore, row::Int) = getindex(listStore, iter_from_index(listStore, row))
+getindex(store::GtkListStore, row::Int, column) = getindex(store, iter_from_index(store, row), column)
+getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store, row))
 
-
+function setindex!(store::GtkListStore, value, index::Int, column::Integer)
+    setindex!(store, value, Gtk.iter_from_index(store, index), column)
+end
 
 ### GtkTreeStore
 
@@ -208,7 +208,7 @@ iter_from_index(store::GtkTreeStoreLeaf, index::Vector{Int}) = iter_from_string_
 function tree_store_set_values(treeStore::GtkTreeStoreLeaf, iter, values)
     for (i,value) in enumerate(values)
         ccall((:gtk_tree_store_set_value,Gtk.libgtk),Void,(Ptr{GObject},Ptr{GtkTreeIter},Cint,Ptr{Gtk.GValue}),
-              treeStore,iter,i-1,Gtk.gvalue(value))
+              treeStore,iter,i-1,gvalue(value))
     end
     iter[]
 end
@@ -286,7 +286,7 @@ empty!(treeStore::GtkTreeStore) =
 
 isvalid(treeStore::GtkTreeStore, iter::TRI) =
     ccall((:gtk_tree_store_iter_is_valid,libgtk), Cint,
-	     (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter)) != 0
+         (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter)) != 0
 
 isancestor(treeStore::GtkTreeStore, iter::TRI, descendant::TRI) =
     ccall((:gtk_tree_store_is_ancestor,libgtk), Cint,
@@ -295,6 +295,24 @@ isancestor(treeStore::GtkTreeStore, iter::TRI, descendant::TRI) =
 
 depth(treeStore::GtkTreeStore, iter::TRI) =
     ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter))
+
+## get index store[iter], store[iter, column], store[index], store[index,column]
+getindex(store::Union(GtkTreeStore,GtkListStore), iter::TRI, column::Integer) = getindex(GtkTreeModel(store), iter, column)
+getindex(store::Union(GtkTreeStore, GtkListStore), iter::TRI) = getindex(GtkTreeModel(store), iter)
+
+getindex(store::GtkTreeStore, row::Vector{Int}, column) = getindex(store, iter_from_index(store, row), column)
+getindex(store::GtkTreeStore, row::Vector{Int}) = getindex(store, iter_from_index(store, row))
+
+
+function setindex!(store::Union(GtkListStore, GtkTreeStore), value, iter::TRI, column::Integer)
+    Gtk.G_.value(store, Gtk.mutable(iter), column-1, gvalue(value))
+end
+
+function setindex!(store::GtkTreeStore, value, index::Vector{Int}, column::Integer)
+     setindex!(store, value, Gtk.iter_from_index(store, index), column)
+end
+
+
 
 ### GtkTreeModelFilter
 
@@ -342,6 +360,168 @@ end
 
 ncolumns(treeModel::GtkTreeModel) =
     ccall((:gtk_tree_model_get_n_columns,libgtk), Cint, (Ptr{GObject},),treeModel)
+
+## add in gtk_tree_model iter functions to traverse tree
+
+## Most gtk function pass in a Mutable Iter and return a bool
+## Update iter to point to first iterm
+function get_iter_first(treeModel::GtkTreeModel, iter=Mutable{GtkTreeIter})
+    ret = ccall((:gtk_tree_model_get_iter_first, libgtk), Cint,
+          (Ptr{GObject},Ptr{GtkTreeIter}),
+          treeModel, iter)
+    ret != 0
+end
+
+## return (Bool, iter)
+function get_iter_next(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter})
+    ret = ccall((:gtk_tree_model_iter_next, libgtk), Cint,
+                (Ptr{GObject}, Ptr{GtkTreeIter}),
+                treeModel, iter)
+    ret != 0
+end
+
+## update iter to point to previous.
+## return Bool
+function get_iter_previous(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter})
+    ret = ccall((:gtk_tree_model_iter_previous, libgtk), Cint,
+          (Ptr{GObject}, Ptr{GtkTreeIter}),
+          treeModel, iter)
+    ret != 0
+end
+
+## update iter to point to first child of parent iter
+## return Bool
+function iter_children(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI)
+    ret = ccall((:gtk_tree_model_iter_children, libgtk), Cint,
+                (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}),
+                treeModel, iter, mutable(piter))
+    ret != 0
+end
+
+## return boolean, checks if there is a child
+function iter_has_child(treeModel::GtkTreeModel, iter::TRI)
+    ret = ccall((:gtk_tree_model_iter_has_child, libgtk), Cint,
+          (Ptr{GObject},  Ptr{GtkTreeIter}),
+          treeModel, mutable(iter))
+    ret != 0
+end
+
+## return number of children for iter
+function iter_n_children(treeModel::GtkTreeModel, iter::TRI)
+    ret = ccall((:gtk_tree_model_iter_n_children, libgtk), Cint,
+          (Ptr{GObject},  Ptr{GtkTreeIter}),
+          treeModel, mutable(iter))
+    ret
+end
+
+
+## update iter pointing to nth child n in 1:nchildren)
+## return boolean
+function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI, n::Int)
+    ret = ccall((:gtk_tree_model_iter_nth_child, libgtk), Cint,
+          (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Cint),
+          treeModel, iter, mutable(piter), n - 1) # 0-based
+    ret != 0
+end
+
+## return Bool
+function iter_parent(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, citer::TRI)
+    ret = ccall((:gtk_tree_model_iter_parent, libgtk), Cint,
+                (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}),
+                treeModel, iter, mutable(citer))
+    ret != 0
+end
+
+## string is of type "0:1:0" (0-based)
+function get_string_from_iter(treeModel::GtkTreeModel, iter::TRI)
+    val = ccall((:gtk_tree_model_get_string_from_iter, libgtk),  Ptr{Uint8},
+          (Ptr{GObject},Ptr{GtkTreeIter}),
+          treeModel, mutable(iter))
+    val = bytestring(val)
+end
+
+## these mutate iter to point to new object.
+next(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = get_iter_next(treeModel, iter)
+prev(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = get_iter_previous(treeModel, iter)
+up(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = iter_parent(treeModel, iter, copy(iter))
+down(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}) = iter_children(treeModel, iter, copy(iter))
+
+length(treeModel::GtkTreeModel, iter::TRI) = iter_n_children(treeModel, iter)
+string(treeModel::GtkTreeModel, iter::TRI) = get_string_from_iter(treeModel, iter)
+
+## index is Int[] 1-based
+index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_from_iter(treeModel, iter), ":")) + 1
+
+## An iterator to walk a tree, e.g.,
+## for iter in Gtk.TreeIterator(store) ## or Gtk.TreeIterator(store, piter)
+##   println(store[iter, 1])
+## end
+type TreeIterator
+    store::GtkTreeStore
+    model::GtkTreeModel
+    iter::Union(Nothing, TRI)
+end
+TreeIterator(store::GtkTreeStore, iter=nothing) = TreeIterator(store, GtkTreeModel(store), iter)
+
+
+## iterator interface for depth first search
+function start(x::TreeIterator)
+    isa(x.iter, Nothing) ? nothing : mutable(copy(x.iter))
+end
+
+function done(x::TreeIterator, state)
+
+    iter = mutable(GtkTreeIter)
+
+    isa(state, Nothing) && return (!Gtk.get_iter_first(x.model, iter))   # special case root
+
+    state = copy(state)
+
+    ## we are not done if:
+    iter_has_child(x.model, state) && return(false) # state has child
+    next(x.model, copy(state))     && return(false) # state has sibling
+
+    # or a valid ancestor of piter has a sibling
+    up(x.model, state) || return(true)
+
+    while isa(x.iter, Nothing) || isancestor(x.store, x.iter, state)
+        next(x.model, copy(state)) && return(false) # has a sibling
+        up(x.model, state) || return(true)
+    end
+    return(true)
+end
+
+
+function next(x::TreeIterator, state)
+    iter = mutable(GtkTreeIter)
+
+    if isa(state, Nothing)      # special case root
+        Gtk.get_iter_first(x.model, iter)
+        return(iter, iter)
+    end
+
+    state = copy(state)
+
+    if iter_has_child(x.model, state)
+        down(x.model, state)
+        return(state, state)
+    end
+
+    cstate = copy(state)
+    next(x.model, cstate) && return(cstate, cstate)
+
+    up(x.model, state)
+
+    while isa(x.iter, Nothing) || isancestor(x.store, x.iter, state)
+        cstate = copy(state)
+        next(x.model, cstate) && return(cstate, cstate) # return the sibling of state
+        up(x.model, state)
+    end
+    error("next not found")
+end
+
+
+
 
 #TODO: Replace by accessor
 function iter(treeModel::GtkTreeModel, path::GtkTreePath)
@@ -445,11 +625,11 @@ function selected_rows(selection::GtkTreeSelection)
 
     model = mutable(Ptr{GtkTreeModel})
 
-    paths = Gtk.GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, Gtk.libgtk), 
+    paths = Gtk.GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, Gtk.libgtk),
                                 Ptr{Gtk._GList{Gtk.GtkTreePath}},
-                                (Ptr{GObject}, Ptr{GtkTreeModel}), 
+                                (Ptr{GObject}, Ptr{GtkTreeModel}),
                                 selection, model))
-    
+
     iters = GtkTreeIter[]
     for path in paths
         it = mutable(GtkTreeIter)
@@ -457,9 +637,9 @@ function selected_rows(selection::GtkTreeSelection)
                           model,it,path) != 0
         ret && push!(iters, it[])
     end
-    
+
     iters
-    
+
 end
 
 
