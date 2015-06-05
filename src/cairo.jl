@@ -1,7 +1,8 @@
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
 type GtkCanvas <: GtkDrawingArea # NOT an @GType
     handle::Ptr{GObject}
-    has_allocation::Bool
+    is_realized::Bool
+    is_sized::Bool
     mouse::MouseHandler
     resize::Union(Function,Nothing)
     draw::Union(Function,Nothing)
@@ -11,7 +12,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     function GtkCanvas(w=-1, h=-1)
         da = ccall((:gtk_drawing_area_new,libgtk),Ptr{GObject},())
         ccall((:gtk_widget_set_size_request,libgtk),Void,(Ptr{GObject},Int32,Int32), da, w, h)
-        widget = new(da, false, MouseHandler(), nothing, nothing)
+        widget = new(da, false, false, MouseHandler(), nothing, nothing)
         widget.mouse.widget = widget
         signal_connect(notify_realize,widget,"realize",Void,())
         signal_connect(notify_unrealize,widget,"unrealize",Void,())
@@ -33,30 +34,39 @@ macro GtkCanvas(args...)
 end
 
 function notify_realize(::Ptr{GObject}, widget::GtkCanvas)
-    widget.has_allocation = true
-    widget.back = cairo_surface_for(widget)
-    widget.backcc = CairoContext(widget.back)
-    draw(widget, false)
+    widget.is_realized = true
+    widget.is_sized && notify_resize(
+        convert(Ptr{GObject}, C_NULL),
+        convert(Ptr{GdkRectangle}, C_NULL),
+        widget)
     nothing
 end
 
 function notify_unrealize(::Ptr{GObject}, widget::GtkCanvas)
-    widget.has_allocation = false
+    widget.is_realized = false
+    widget.is_sized = false
     nothing
 end
 
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
-    if isa(widget.resize,Function)
-        widget.resize(widget)
+    widget.is_sized = true
+    if widget.is_realized
+        widget.back = cairo_surface_for(widget)
+        widget.backcc = CairoContext(widget.back)
+        if isa(widget.resize,Function)
+            widget.resize(widget)
+        end
+        draw(widget,false)
     end
-    draw(widget,false)
     nothing
 end
 
 function resize(config::Function, widget::GtkCanvas)
     widget.resize = config
-    widget.resize(widget)
-    draw(widget, false)
+    if widget.is_realized && widget.is_sized
+        widget.resize(widget)
+        draw(widget, false)
+    end
     nothing
 end
 
@@ -67,7 +77,7 @@ function draw(redraw::Function, widget::GtkCanvas)
 end
 
 function draw(widget::GtkCanvas, immediate::Bool=true)
-    if widget.has_allocation
+    if widget.is_realized && widget.is_sized
         if isa(widget.draw,Function)
             widget.draw(widget)
         end
