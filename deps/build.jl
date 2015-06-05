@@ -53,11 +53,11 @@ end
     provides(Homebrew.HB, "gdk-pixbuf", gdk_pixbuf, os = :Darwin)
 end
 
-@BinDeps.install Dict(
-    :glib => :libglib,
-    :gobject => :libgobject,
-    :gtk => :libgtk,
-    :gdk => :libgdk,
-    :gdk_pixbuf => :libgdk_pixbuf,
-    :gio => :libgio,
-)
+@BinDeps.install Dict([
+    (:glib, :libglib),
+    (:gobject, :libgobject),
+    (:gtk, :libgtk),
+    (:gdk, :libgdk),
+    (:gdk_pixbuf, :libgdk_pixbuf),
+    (:gio, :libgio),
+])
