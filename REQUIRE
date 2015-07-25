@@ -1,5 +1,5 @@
 Cairo 0.2.2
-julia 0.2-
+julia 0.2
 Graphics 0.1
 BinDeps
 @windows WinRPM
