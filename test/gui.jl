@@ -389,6 +389,7 @@ c.draw = function(_)
     set_source_rgb(ctx, 1.0, 0.0, 0.0)
     paint(ctx)
 end
+draw(c)
 destroy(w)
 
 ## Menus

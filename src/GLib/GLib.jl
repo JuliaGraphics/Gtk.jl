@@ -21,25 +21,39 @@ export setproperty!, getproperty
 export GConnectFlags
 
 module Compat
-if VERSION >= v"0.4-"
-    export TupleType, int, int8, int32, uint32, uint64, dlopen, dlsym_e, unsafe_convert
-    TupleType(types...) = Tuple{types...}
-    int(v) = Int(v)
-    int8(v) = Int8(v)
-    int32(v) = Int32(v)
-    uint32(v) = UInt32(v)
-    uint64(v) = UInt64(v)
-    const unsafe_convert = Base.unsafe_convert
-    import Base.Libdl: dlopen, dlsym_e
-else
-    export TupleType, unsafe_convert
-    const TupleType = tuple
-    const unsafe_convert = Base.cconvert
-end
-if VERSION < v"0.3-"
-    export QuoteNode
-    QuoteNode(x) = Base.qn(x)
-end
+    export @assign_if_unassigned
+    macro assign_if_unassigned(expr)
+        # BinDeps often fails and generates corrupt deps.jl files
+        # (https://github.com/JuliaLang/BinDeps.jl/issues/146),
+        # but most of the time, we don't care
+        @assert expr.head === :(=)
+        left = expr.args[1]
+        right = expr.args[2]
+        quote
+            if !isdefined(current_module(), $(QuoteNode(left)))
+                global const $(esc(left)) = $(esc(right))
+            end
+        end
+    end
+    if VERSION >= v"0.4-"
+        export TupleType, int, int8, int32, uint32, uint64, dlopen, dlsym_e, unsafe_convert
+        TupleType(types...) = Tuple{types...}
+        int(v) = Int(v)
+        int8(v) = Int8(v)
+        int32(v) = Int32(v)
+        uint32(v) = UInt32(v)
+        uint64(v) = UInt64(v)
+        const unsafe_convert = Base.unsafe_convert
+        import Base.Libdl: dlopen, dlsym_e
+    else
+        export TupleType, unsafe_convert
+        const TupleType = tuple
+        const unsafe_convert = Base.cconvert
+    end
+    if VERSION < v"0.3-"
+        export QuoteNode
+        QuoteNode(x) = Base.qn(x)
+    end
 end
 importall .Compat
 
