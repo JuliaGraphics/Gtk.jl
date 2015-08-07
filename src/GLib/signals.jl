@@ -167,6 +167,7 @@ function g_sigatom(f::Base.Callable)
             g_sigatom_flag = false
             sigatomic_end()
         end
+        Base.println("FATAL ERROR: Gtk state corrupted by error thrown in a callback:")
         Base.display_error(err, catch_backtrace())
         println()
         rethrow(err)
@@ -338,6 +339,7 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
     elseif @windows ? (VERSION < v"0.3-") : false # uv_backend_timeout broken on windows before Julia v0.3-rc2
         tmout_ms = 10
     else
+        ccall(:uv_update_time,Void,(Ptr{Void},),evt)
         tmout_ms = ccall(:uv_backend_timeout,Cint,(Ptr{Void},),evt)
         tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 5000
         if tmout_ms < 0 || tmout_ms > tmout_min
