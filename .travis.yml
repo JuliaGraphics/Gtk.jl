@@ -1,4 +1,5 @@
 language: julia
+sudo: false
 os:
     - osx
     - linux
@@ -7,11 +8,15 @@ julia:
     - nightly
 notifications:
     email: false
+addons:
+    apt:
+        packages:
+            - xvfb
+            - xauth
+            - libgtk-3-0
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd());
-          Pkg.build("Gtk");
-          println(readall(Pkg.dir("Gtk/deps/deps.jl")));
+    - xvfb-run julia -e 'Pkg.clone(pwd());
           println(BinDeps.debug("Gtk"));
           Pkg.test("Gtk"; coverage=true)'
     - julia -e 'cd(Pkg.dir("Gtk"));
