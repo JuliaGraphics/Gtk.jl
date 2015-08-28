@@ -129,7 +129,7 @@ function signal_emit(w::GObject, sig::StringLike, RT::Type, args...)
     signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{Uint8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
     return_value = RT===Void ? C_NULL : gvalue(RT)
     ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
-    return_value[RT]
+    RT===Void ? nothing : return_value[RT]
 end
 
 gtk_stack = nothing # need to call g_loop_run from only one stack

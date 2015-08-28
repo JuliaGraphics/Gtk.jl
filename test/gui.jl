@@ -352,6 +352,15 @@ e = @Entry()
 w = @Window(e, "Entry")|>showall
 setproperty!(e,:text,"initial")
 setproperty!(e,:sensitive,false)
+
+activated = false
+signal_connect(e, :activate) do widget
+    global activated
+    activated = true
+end
+signal_emit(e, :activate, Void)
+@assert activated
+
 destroy(w)
 
 ## Statusbar
