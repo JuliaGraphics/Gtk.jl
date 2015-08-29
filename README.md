@@ -254,7 +254,27 @@ Most signals will be _emitted_ as a consequence of user interaction: clicking on
 closing a window, or just moving the mouse. You _connect_ your signals to particular functions
 to make something happen.
 
-Let's do a simple example:
+Let's try a simple example:
+```jl
+    b = @Button("Press me")
+    win = @Window(b, "Callbacks")
+    showall(win)
+
+    function button_clicked_callback(widget)
+        println(widget, " was clicked!")
+    end
+
+    id = signal_connect(button_clicked_callback, b, "clicked")
+```
+
+Here, `button_clicked_callback` is a *callback function*, something
+designed to be called by GTK+ to implement the response to user
+action.  You use the `signal_connect` function to specify when it
+should be called: in this case, when widget `b` (your button) emits
+the `"clicked"` signal.
+
+Using Julia's `do` syntax, the exact same code could alternatively be
+written as
 ```jl
     b = @Button("Press me")
     win = @Window(b, "Callbacks")
@@ -262,9 +282,6 @@ Let's do a simple example:
         println(widget, " was clicked!")
     end
 ```
-`signal_connect` specifies that a callback function should be run when the `"clicked"`
-signal is received. In this case, we used the `do` syntax to define the function, but
-we could alternatively have passed the function as `id = signal_connect(func, b, "clicked")`.
 
 If you try this, and click on the button, you should see something like the following:
 ```
@@ -281,11 +298,11 @@ Now you get something like this:
 julia> GtkButton(action-name=NULL, action-target, related-action, use-action-appearance=TRUE, name="", parent, width-request=-1, height-request=-1, visible=TRUE, sensitive=TRUE, app-paintable=FALSE, can-focus=TRUE, has-focus=TRUE, is-focus=TRUE, can-default=FALSE, has-default=FALSE, receives-default=TRUE, composite-child=FALSE, style, events=0, no-show-all=FALSE, has-tooltip=FALSE, tooltip-markup=NULL, tooltip-text=NULL, window, double-buffered=TRUE, halign=GTK_ALIGN_FILL, valign=GTK_ALIGN_FILL, margin-left=0, margin-right=0, margin-top=0, margin-bottom=0, margin=0, hexpand=FALSE, vexpand=FALSE, hexpand-set=FALSE, vexpand-set=FALSE, expand=FALSE, border-width=0, resize-mode=GTK_RESIZE_PARENT, child, label="Press me", image, relief=GTK_RELIEF_NORMAL, use-underline=TRUE, use-stock=FALSE, focus-on-click=TRUE, xalign=0.500000, yalign=0.500000, image-position=GTK_POS_LEFT, ) was clicked!
 "Press me" was clicked!
 ```
-Notice that _both_ of the callback functions executed.
+Notice that _both_ of the callback functions executed!
 Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://developer.gnome.org/gobject/stable/gobject-Signals.html#gobject-Signals.description).
 Callbacks for some [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
 
-The `"clicked"` signal doesn't provide a return value, so other callbacks will always be run.
+The [`"clicked"` signal callback](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) should return `nothing` (`void` in C parlance), so you can't prevent other callbacks from running.
 However, we can disconnect the first signal handler:
 ```jl
     signal_handler_disconnect(b, id)
@@ -307,11 +324,13 @@ For example, instead of using the `"clicked"` signal---for which the Julia handl
 ```
 Note that this signal requires two arguments, here `widget` and `event`, and that `event` contained useful information.
 Arguments and their meaning are described along with their corresponding [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed).
-Note that you should omit the final `user_data` argument described in the Gtk documentation;
+**You should omit the final `user_data` argument described in the Gtk documentation**;
 keep in mind that you can always address other variables from inside your function block, or define the callback in terms of an anonymous function:
 ```
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
+
+Finally, in some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md).
 
 ### Usage without the REPL
 
@@ -486,4 +505,3 @@ info_dialog("Julia rocks!")
 ask_dialog('Do you like chocolate ice cream?, "I like it", "Not at all") && println("That's my favorite too.")
 warn_dialog("Oops!... I did it again", win)
 ```
-
