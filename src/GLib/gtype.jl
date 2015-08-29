@@ -284,7 +284,7 @@ convert{T<:GObject}(::Type{T}, w::Ptr{GObject}) = convert(T,convert(Ptr{T},w)) #
 function convert{T<:GObject}(::Type{T}, ptr::Ptr{T})
     hnd = convert(Ptr{GObject}, ptr)
     if hnd == C_NULL
-        error(UndefRefError())
+        throw(UndefRefError())
     end
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},Uint32), hnd, jlref_quark::Uint32)
     if x != C_NULL
