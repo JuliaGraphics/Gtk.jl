@@ -2,15 +2,15 @@
 #    stuff
 # end
 function signal_connect{CT,RT}(cb::Function,w::GObject,sig::StringLike,
-        ::Type{RT},param_types::Tuple,after::Bool=false,closure::CT=w) #TODO: assert that length(param_types) is correct
+        ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w) #TODO: assert that length(param_types) is correct
     if isgeneric(cb)
-        if !isbits(closure) || VERSION >= v"0.4-"
+        if !isbits(user_data) || VERSION >= v"0.4-"
             if VERSION >= v"0.4-"
                 callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
             else
                 callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,CT))
             end
-            ref, deref = gc_ref_closure(closure)
+            ref, deref = gc_ref_closure(user_data)
             return ccall((:g_signal_connect_data,libgobject), Culong,
                 (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
                     w,
@@ -22,7 +22,7 @@ function signal_connect{CT,RT}(cb::Function,w::GObject,sig::StringLike,
         end
     end
     # oops, Julia doesn't support this natively yet -- fake it instead
-    return _signal_connect(cb, w, sig, after, true,param_types,closure)
+    return _signal_connect(cb, w, sig, after, true,param_types,user_data)
 end
 
 # id = signal_connect(widget, :event) do obj, evt_args...
@@ -31,13 +31,13 @@ end
 function signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool=false)
     _signal_connect(cb, w, sig, after, false,nothing,nothing)
 end
-function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk_call_conv::Bool,param_types,closure)
+function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk_call_conv::Bool,param_types,user_data)
     @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object,libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+WORD_SIZE*2, w)
     closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
     unsafe_store!(closure_env, cb, 1)
     if gtk_call_conv
-        env = Any[param_types,closure]
+        env = Any[param_types,user_data]
         unsafe_store!(closure_env, env, 2)
         ref_env, deref_env = gc_ref_closure(env)
         ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
@@ -62,7 +62,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
     params = Array(Any, n_param_values)
     if gtk_calling_convention
         # compatibility mode, if we must
-        param_types,closure = unsafe_load(closure_env, 2)::Array{Any,1}
+        param_types,user_data = unsafe_load(closure_env, 2)::Array{Any,1}
         length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
         for i = 1:n_param_values
             gv = mutable(param_values,i)
@@ -81,7 +81,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 params[i] = convert(param_types[i-1], params[i])
             end
         end
-        push!(params, closure)
+        push!(params, user_data)
     else
         for i = 1:n_param_values
             params[i] = mutable(param_values,i)[Any]
