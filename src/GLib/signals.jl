@@ -95,7 +95,16 @@ function GClosureMarshal(closuref, return_value, n_param_values,
     if return_value != C_NULL && retval !== nothing
         gtyp = unsafe_load(return_value).g_type
         if gtyp != g_type(Void) && gtyp != 0
-            return_value[] = gvalue(retval)
+            try
+                return_value[] = gvalue(retval)
+            catch
+                if isgeneric(cb)
+                    warn("Executing ", cb, ":")
+                else
+                    warn("Executing ", Base.uncompressed_ast(cb.code).args[3].args[1])   # just show file/line
+                end
+                error("Error setting return value of type $(typeof(retval)); did your callback return an unintentional value?")
+            end
         end
     end
     return nothing
