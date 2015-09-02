@@ -1,7 +1,7 @@
 # Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
 
-[![Gtk on julia-release](http://pkg.julialang.org/badges/Gtk_release.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=release)
-[![Gtk on julia-nightly](http://pkg.julialang.org/badges/Gtk_nightly.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=nightly)
+[![Gtk](http://pkg.julialang.org/badges/Gtk_0.3.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=0.3)
+[![Gtk](http://pkg.julialang.org/badges/Gtk_0.4.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=0.4)
 [![Build Status](https://travis-ci.org/JuliaLang/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaLang/Gtk.jl)
 [![Coverage Status](https://coveralls.io/repos/JuliaLang/Gtk.jl/badge.svg)](https://coveralls.io/r/JuliaLang/Gtk.jl)
 
