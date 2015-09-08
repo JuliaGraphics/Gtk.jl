@@ -1,7 +1,6 @@
 language: julia
 sudo: false
 os:
-    - osx
     - linux
 julia:
     - release
