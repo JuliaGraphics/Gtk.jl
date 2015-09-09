@@ -88,17 +88,30 @@ function GClosureMarshal(closuref, return_value, n_param_values,
         end
     end
     local retval = nothing
-    g_siginterruptible() do
+    g_siginterruptible(cb) do
         # note: make sure not to leak any of the GValue objects into this task switch, since many of them were alloca'd
         retval = cb(params...) # widget, args...
     end
     if return_value != C_NULL && retval !== nothing
         gtyp = unsafe_load(return_value).g_type
         if gtyp != g_type(Void) && gtyp != 0
-            return_value[] = gvalue(retval)
+            try
+                return_value[] = gvalue(retval)
+            catch
+                blame(cb)
+                error("Error setting return value of type $(typeof(retval)); did your callback return an unintentional value?")
+            end
         end
     end
     return nothing
+end
+
+function blame(cb)
+    if isgeneric(cb)
+        warn("Executing ", cb, ":")
+    else
+        warn("Executing ", Base.uncompressed_ast(cb.code).args[3].args[1])   # just show file/line
+    end
 end
 
 # Signals API for the cb pointer
@@ -201,7 +214,7 @@ else
     _get_return() = current_task().last
 end
 
-function g_siginterruptible(f::Base.Callable)
+function g_siginterruptible(f::Base.Callable, cb)
     global g_sigatom_flag, gtk_stack, gtk_work
     prev = g_sigatom_flag
     @assert prev $ (current_task() !== gtk_stack)
@@ -271,6 +284,7 @@ function g_siginterruptible(f::Base.Callable)
             end
         end
     catch err
+        blame(cb)
         ct = current_task()
         filter!(x->x!==ct, Base.Workqueue)
         if f !== yield
@@ -378,7 +392,7 @@ function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
 end
 
 function g_yield(data)
-    g_siginterruptible(yield)
+    g_siginterruptible(yield, yield)
     return int32(true)
 end
 
