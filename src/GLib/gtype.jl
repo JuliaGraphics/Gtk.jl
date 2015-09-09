@@ -202,7 +202,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
         local kwargs, T #to prevent Julia-0.2 from name-mangling kwargs, <:T
         function $ename(args...; kwargs...)
             if isempty(kwargs)
-                throw(MethodError($ename, args))
+                error(MethodError($ename, args))
             end
             w = $ename(args...)
             for (kw,val) in kwargs
@@ -339,7 +339,7 @@ if VERSION >= v"0.4-"
         gc_preserve[x] = (ref, cnt+1)
         return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any},ref)))
     end
-    function gc_unref(x)
+    function gc_unref(x::ANY)
         global gc_preserve
         ref, cnt = gc_preserve[x]::Tuple{Ref{Any},Int}
         @assert cnt > 0
