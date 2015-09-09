@@ -120,11 +120,13 @@ type MouseHandler
     button3release::Function
     motion::Function
     button1motion::Function
+    stack::Vector{Tuple{Symbol,Function}}
     widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         default_mouse_cb, default_mouse_cb)
+                         default_mouse_cb, default_mouse_cb,
+                         Array(Tuple{Symbol,Function}, 0))
 end
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
@@ -158,4 +160,22 @@ function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
         this.button1motion(this.widget, event)
     end
     int32(false)
+end
+
+function push!(mh_evt::Tuple{MouseHandler,Symbol}, func::Function)
+    mh, evt = mh_evt
+    push!(mh.stack, (evt, getfield(mh, evt)))
+    setfield!(mh, evt, func)
+    mh
+end
+
+function pop!(mh_evt::Tuple{MouseHandler,Symbol})
+    mh, evt = mh_evt
+    idx = findlast(x->x[1]==evt, mh.stack)
+    if idx != 0
+        _, func = mh.stack[idx]
+        setfield!(mh, evt, func)
+        deleteat!(mh.stack, idx)
+    end
+    mh
 end
