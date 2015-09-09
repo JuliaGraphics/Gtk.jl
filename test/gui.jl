@@ -534,6 +534,7 @@ destroy(w)
 # Canvas mouse callback stack operations
 c = @Canvas()
 w = @Window(c)
+showall(w)
 io = IOBuffer()
 c.mouse.button1press = (widget,evt) -> println(io, "cb1_1")
 c.mouse.button2press = (widget,evt) -> println(io, "cb2_1")
@@ -552,4 +553,11 @@ signal_emit(c, "button-press-event", Bool, press1)
 signal_emit(c, "button-press-event", Bool, press2)
 str = takebuf_string(io)
 @assert str == "cb1_1\ncb2_1\ncb1_2\ncb2_1\ncb1_2\ncb2_2\ncb1_1\ncb2_2\n"
+
+c.mouse.scroll = (widget,event) -> println(io, "scrolling")
+scroll = Gtk.GdkEventScroll(Gtk.GdkEventType.SCROLL, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, UInt32(0), Gtk.GdkScrollDirection.UP, convert(Ptr{Float64},C_NULL), 0.0, 0.0, 0.0, 0.0)
+signal_emit(c, "scroll-event", Bool, scroll)
+str = takebuf_string(io)
+@assert str == "scrolling\n"
+
 destroy(w)

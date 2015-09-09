@@ -25,6 +25,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         on_signal_button_press(mousedown_cb, widget, false, widget.mouse)
         on_signal_button_release(mouseup_cb, widget, false, widget.mouse)
         on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse)
+        on_signal_scroll(mousescroll_cb, widget, false, widget.mouse)
         return gobject_ref(widget)
     end
 end
@@ -112,4 +113,3 @@ end
 
 getgc(c::GtkCanvas) = c.backcc
 cairo_surface(c::GtkCanvas) = c.back
-

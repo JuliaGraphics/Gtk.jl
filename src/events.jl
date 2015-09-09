@@ -99,6 +99,12 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
     signal_connect(notify_motion, widget, "motion-notify-event", Cint, (Ptr{GdkEventMotion},), after, closure)
 end
 
+function on_signal_scroll(scroll_cb::Function, widget::GtkWidget, vargs...)
+    add_events(widget, GdkEventMask.SCROLL)
+    signal_connect(scroll_cb, widget, "scroll-event", Cint, (Ptr{GdkEventScroll},), vargs...)
+end
+
+
 function reveal(c::GtkWidget, immediate::Bool=true)
     #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&allocation(c))
     #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
@@ -120,12 +126,13 @@ type MouseHandler
     button3release::Function
     motion::Function
     button1motion::Function
+    scroll::Function
     stack::Vector{Tuple{Symbol,Function}}
     widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         default_mouse_cb, default_mouse_cb,
+                         default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          Array(Tuple{Symbol,Function}, 0))
 end
 
@@ -161,6 +168,13 @@ function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     end
     int32(false)
 end
+
+function mousescroll_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
+    event = unsafe_load(eventp)
+    this.scroll(this.widget, event)
+    int32(false)
+end
+
 
 function push!(mh_evt::Tuple{MouseHandler,Symbol}, func::Function)
     mh, evt = mh_evt
