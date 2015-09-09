@@ -117,6 +117,12 @@ end
 
 const default_mouse_cb = (w, event)->nothing
 
+if VERSION < v"0.4.0-dev"
+typealias MHStack Vector{(Symbol,Function)}
+else
+typealias MHStack Vector{Tuple{Symbol,Function}}
+end
+
 type MouseHandler
     button1press::Function
     button1release::Function
@@ -127,13 +133,26 @@ type MouseHandler
     motion::Function
     button1motion::Function
     scroll::Function
-    stack::Vector{Tuple{Symbol,Function}}
+    stack::MHStack
     widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          Array(Tuple{Symbol,Function}, 0))
+end
+
+if VERSION < v"0.4.0-dev"
+typealias MHPair  (MouseHandler,Symbol)
+function findlast(testf::Function, A)
+    for i = length(A):-1:1
+        testf(A[i]) && return i
+    end
+    0
+end
+
+else
+typealias MHPair  Tuple{MouseHandler,Symbol}
 end
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
@@ -176,14 +195,14 @@ function mousescroll_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
 end
 
 
-function push!(mh_evt::Tuple{MouseHandler,Symbol}, func::Function)
+function push!(mh_evt::MHPair, func::Function)
     mh, evt = mh_evt
     push!(mh.stack, (evt, getfield(mh, evt)))
     setfield!(mh, evt, func)
     mh
 end
 
-function pop!(mh_evt::Tuple{MouseHandler,Symbol})
+function pop!(mh_evt::MHPair)
     mh, evt = mh_evt
     idx = findlast(x->x[1]==evt, mh.stack)
     if idx != 0
