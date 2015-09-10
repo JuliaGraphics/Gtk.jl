@@ -330,8 +330,8 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
-Finally, in some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md).
-One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
+In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative. See also https://github.com/JuliaLang/Gtk.jl/issues/161, which documents a bug currently affecting the "simple" approach shown here.
+
 
 ### Usage without the REPL
 
@@ -378,7 +378,7 @@ Generic drawing is done on a `Canvas`. You control what appears on this canvas b
     using Gtk.ShortNames, Graphics
     c = @Canvas()
     win = @Window(c, "Canvas")
-    draw(c) do widget
+    @guarded draw(c) do widget
         ctx = getgc(c)
         h = height(c)
         w = width(c)
@@ -398,6 +398,32 @@ This `draw` function will get called each time the window gets resized or otherw
 ![canvas](doc/figures/canvas.png)
 
 See Julia's standard-library documentation for more information on graphics.
+
+Errors in the `draw` function can corrupt Gtk's internal state; if
+this happens, you have to quit julia and start a fresh session. To
+avoid this problem, the `@guarded` macro wraps your code in a
+`try/catch` block and prevents the corruption. It is especially useful
+when initially writing and debugging code. See [further
+discussion](doc/more_signals.md) about when `@guarded` is relevant.
+
+Finally, `Canvas`es have a field called `mouse` that allows you to
+easily write callbacks for mouse events:
+
+```jl
+   c.mouse.button1press = @guarded (widget, event) -> begin
+       ctx = getgc(widget)
+       set_source_rgb(ctx, 0, 1, 0)
+       arc(ctx, event.x, event.y, 5, 0, 2pi)
+       stroke(ctx)
+       reveal(widget)
+   end
+```
+
+This will draw a green circle on the canvas at every mouse click.
+Resizing the window will make them go away; they were drawn on the
+canvas, but they weren't added to the `draw` function.
+
+Note the use of the `@guarded` macro here, too.
 
 #### Menus
 
