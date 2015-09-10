@@ -65,12 +65,24 @@ macro guarded(ex...)
         length(ex) == 1 || error("@guarded requires 1 or 2 arguments")
         ex = ex[1]
     end
+    # do-block syntax
+    if ex.head == :call && length(ex.args) >= 2 && ex.args[2].head == :->
+        newbody = _guarded(ex.args[2], retval)
+        ret = deepcopy(ex)
+        ret.args[2] = Expr(ret.args[2].head, ret.args[2].args[1], newbody)
+        return esc(ret)
+    end
+    newbody = _guarded(ex, retval)
+    esc(Expr(ex.head, ex.args[1], newbody))
+end
+
+function _guarded(ex, retval)
     isa(ex, Expr) && (
         ex.head == :-> ||
         (ex.head == :(=) && isa(ex.args[1],Expr) && ex.args[1].head == :call) ||
         ex.head == :function
     ) || error("@guarded requires an expression defining a function")
-    newbody = quote
+    quote
         begin
             try
                 $(ex.args[2])
@@ -81,8 +93,8 @@ macro guarded(ex...)
             end
         end
     end
-    esc(Expr(ex.head, ex.args[1], newbody))
 end
+
 
 @deprecate getindex(w::GtkContainer, child::GtkWidget, name::StringLike, T::Type) getproperty(w,name,child,T)
 @deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike, T::Type) setproperty!(w,name,child,T,value)

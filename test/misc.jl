@@ -21,7 +21,6 @@ end
 print_with_color(:green, """
 The following messages:
    WARNING: Error in @guarded callback
-   ERROR: UndefVarError: k not defined
 are expected and a sign of normal operation.
 """)
 
@@ -32,5 +31,14 @@ are expected and a sign of normal operation.
 @assert foo3(3,5) == 8
 @assert bar3(3,5) == nothing
 @assert bar4(3,5) == unhandled
+
+# Do-block syntax
+c = @GtkCanvas()
+win = @GtkWindow(c)
+showall(win)
+@guarded draw(c) do widget
+    error("oops")
+end
+destroy(win)
 
 end

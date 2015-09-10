@@ -4,7 +4,7 @@ In addition to the ["simple"
 interface](../README.md#callbacks-and-signals), `signal_connect`
 supports an approach that allows your callback function to be directly
 compiled to machine code.  Not only is this more efficient, but it can
-occasionally be useful in avoiding problems from callback interrupts.
+occasionally be useful in avoiding problems (see issue #161).
 
 This alternative syntax is as follows:
 ```
@@ -12,7 +12,7 @@ signal_connect(cb, widget, signalname, return_type, parameter_type_tuple, after,
 ```
 where:
 
-- `cb` is your callback function. You should use a generic function
+- `cb` is your callback function. This will be compiled with `cfunction`, and you need to follow its rules. In particular, you should use a generic function
   (i.e., one defined as `function foo(x,y,z) ... end`), and the
   arguments and return type should match the GTK+ documentation for
   the widget and signal ([see
@@ -37,10 +37,9 @@ where:
   to operate.  For example, you can pass other widgets, tuples of
   values, etc.  If omitted, it defaults to `widget`.
 
-The callback's argument need to match the GTK documentation, with the
+The callback's arguments need to match the GTK documentation, with the
 exception of the `user_data` argument. (Rather than being a pointer,
 `user_data` will automatically be converted back to an object.)
-you.)
 
 For example, consider a GUI in which pressing a button updates
 a counter:
@@ -72,3 +71,36 @@ signal_connect(button_cb, button, "clicked", Void, (), false, (label, counter))
 
 You should note that the value of `counter[]` matches the display in
 the GUI.
+
+#### Specifying the event type
+
+If your callback function takes an `event` argument, it is important
+to declare its type correctly. An easy way to do that is to first
+write a callback using the "simple" interface, e.g.,
+
+```jl
+    signal_connect(win, "delete-event") do widget, event
+        @show typeof(event)
+        @show event
+    end
+```
+
+and then use the reported type in `parameter_type_tuple`.
+
+#### `@guarded`
+
+The "simple" callback interface includes protections against
+corrupting Gtk state from errors, but this `cfunction`-based approach
+does not. Consequently, you may wish to use `@guarded` when writing
+these functions. ([Canvas](../README.md#canvases) draw functions and
+mouse event-handling are called through this interface, which is why
+you should use `@guarded` there.) For functions that should return a
+value, you can specify the value to be returned on error as the first
+argument. For example:
+
+```jl
+    const unhandled = convert(Int32, false)
+    @guarded unhandled function my_callback(widgetptr, ...)
+        ...
+    end
+```
