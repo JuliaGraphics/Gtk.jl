@@ -42,7 +42,7 @@ end
     provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
         """
         function __init__bindeps__()
-            if "XDG_DATA_DIRS" in ENV
+            if "XDG_DATA_DIRS" in keys(ENV)
                 ENV["XDG_DATA_DIRS"] *= ":" * joinpath("$(Homebrew.brew_prefix)", "share")
             else
                 ENV["XDG_DATA_DIRS"] = joinpath("$(Homebrew.brew_prefix)", "share")
