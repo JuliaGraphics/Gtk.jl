@@ -10,7 +10,7 @@ export new, width, height, #minsize, maxsize
     #raise, focus, destroy, enabled
 
 export open_dialog, save_dialog
-export info_dialog, ask_dialog, warn_dialog, error_dialog
+export info_dialog, ask_dialog, warn_dialog, error_dialog, input_dialog
 
 # GLib-imported event handling
 export signal_connect, signal_handler_disconnect,

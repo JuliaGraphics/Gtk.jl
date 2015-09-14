@@ -87,4 +87,22 @@ for (func, flag) in (
     end
 end
 
+function input_dialog(message::String, entry_default::String, buttons=(("Cancel",0), ("Accept",1)), parent = GtkNullContainer())
+    widget = @GtkMessageDialog(message, buttons, GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.INFO, parent)
+    box = content_area(widget)
+    entry = @GtkEntry(;text=entry_default)
+    push!(box, entry)
+    showall(widget)
+    resp = run(widget)
+    entry_text = getproperty(entry, :text, ByteString)
+    destroy(widget)
+    return resp, entry_text
+end
+
+function content_area(widget::GtkDialog)
+    boxp = ccall((:gtk_dialog_get_content_area,libgtk), Ptr{GObject},
+                 (Ptr{GObject},), widget)
+    convert(GtkBoxLeaf, boxp)
+end
+
 #TODO: GtkSeparator — A separator widget
