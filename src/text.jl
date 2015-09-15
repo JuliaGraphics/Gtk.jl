@@ -83,10 +83,22 @@ immutable GtkTextRange <: Range
     GtkTextRange(a,b) = new(mutable(copy(a)),mutable(copy(b)))
 end
 
-#type GtkClipboard
-#TODO
-#end
+#####  GtkClipboard #####
 
+GtkClipboardLeaf(selection::UInt16) =  GtkClipboardLeaf(ccall((:gtk_clipboard_get,libgtk), Ptr{GObject},
+    (UInt16,), selection))
+GtkClipboardLeaf() = GtkClipboardLeaf(Gtk.GdkAtoms.CLIPBOARD)
+clipboard_set_text(clip::GtkClipboard,text::String) = ccall((:gtk_clipboard_set_text,libgtk), Void,
+    (Ptr{GObject}, Ptr{Uint8},Cint), clip, text, length(text))
+clipboard_store(clip::Gtk.GtkClipboard) = ccall((:gtk_clipboard_store ,libgtk), Void,
+    (Ptr{GObject},), clip)
+
+#note: this needs main_loops to run
+function clipboard_wait_for_text(clip::Gtk.GtkClipboard)
+    ptr = ccall((:gtk_clipboard_wait_for_text,libgtk), Ptr{Uint8},
+        (Ptr{GObject},), clip)
+    return ptr == Ptr{Uint8}(0) ? "" : bytestring(ptr)
+end
 
 #####  GtkTextIter  #####
 #TODO: search
