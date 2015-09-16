@@ -97,7 +97,7 @@ clipboard_store(clip::Gtk.GtkClipboard) = ccall((:gtk_clipboard_store ,libgtk), 
 function clipboard_wait_for_text(clip::Gtk.GtkClipboard)
     ptr = ccall((:gtk_clipboard_wait_for_text,libgtk), Ptr{Uint8},
         (Ptr{GObject},), clip)
-    return ptr == Ptr{Uint8}(0) ? "" : bytestring(ptr)
+    return ptr == C_NULL ? "" : bytestring(ptr)
 end
 
 #####  GtkTextIter  #####
