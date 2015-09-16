@@ -561,3 +561,12 @@ str = takebuf_string(io)
 @assert str == "scrolling\n"
 
 destroy(w)
+
+using Gtk.@GtkClipboard
+# Clipboard
+w = @Window("Window", 400, 300) |> showall
+clip = @GtkClipboard()
+Gtk.clipboard_set_text(clip,"testing clipboard")
+Gtk.clipboard_store(clip)
+@assert Gtk.clipboard_wait_for_text(clip) == "testing clipboard"
+destroy(w)

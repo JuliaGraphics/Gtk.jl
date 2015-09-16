@@ -68,6 +68,21 @@ baremodule GdkKeySyms
   const Hyper_R = 0xffee
 end
 
+baremodule GdkAtoms
+    const NONE = 0x0000
+    const SELECTION_PRIMARY = 0x0001
+    const SELECTION_SECONDARY = 0x0002
+    const SELECTION_TYPE_ATOM = 0x0004
+    const SELECTION_TYPE_BITMAP = 0x0005
+    const SELECTION_TYPE_COLORMAP = 0x0007
+    const SELECTION_TYPE_DRAWABLE = 0x0011
+    const SELECTION_TYPE_INTEGER = 0x0013
+    const SELECTION_TYPE_PIXMAP = 0x0014
+    const SELECTION_TYPE_STRING = 0x001f
+    const SELECTION_TYPE_WINDOW = 0x0021
+    const SELECTION_CLIPBOARD = 0x0045
+end
+
 abstract GdkEvent <: GBoxed
 make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event,:libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
@@ -178,4 +193,3 @@ end
 
 keyval(name::String) =
   ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{Uint8},),bytestring(name))
-

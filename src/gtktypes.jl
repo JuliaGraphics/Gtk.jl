@@ -89,6 +89,7 @@ end
 @gtktype GtkTextView
 @gtktype GtkTextMark
 @gtktype GtkTextTag
+@gtktype GtkClipboard
 @gtktype GtkToolbar
 @gtktype GtkToolItem
 @gtktype GtkToolButton
@@ -153,4 +154,3 @@ else
         :( GtkStyleContextLeaf($(args...)) )
     end
 end
-
