@@ -85,11 +85,11 @@ end
 
 #####  GtkClipboard #####
 
-GtkClipboardLeaf(selection::UInt16) =  GtkClipboardLeaf(ccall((:gtk_clipboard_get,libgtk), Ptr{GObject},
-    (UInt16,), selection))
-GtkClipboardLeaf() = GtkClipboardLeaf(Gtk.GdkAtoms.CLIPBOARD)
+GtkClipboardLeaf(selection::Uint16) =  GtkClipboardLeaf(ccall((:gtk_clipboard_get,libgtk), Ptr{GObject},
+    (Uint16,), selection))
+GtkClipboardLeaf() = GtkClipboardLeaf(Gtk.GdkAtoms.SELECTION_CLIPBOARD)
 clipboard_set_text(clip::GtkClipboard,text::String) = ccall((:gtk_clipboard_set_text,libgtk), Void,
-    (Ptr{GObject}, Ptr{Uint8},Cint), clip, text, length(text))
+    (Ptr{GObject}, Ptr{Uint8},Cint), clip, text, sizeof(text))
 clipboard_store(clip::Gtk.GtkClipboard) = ccall((:gtk_clipboard_store ,libgtk), Void,
     (Ptr{GObject},), clip)
 
