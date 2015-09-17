@@ -7,7 +7,7 @@ include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
 importall .GLib.Compat
-import .GLib: setproperty!, getproperty, StringLike, bytestring
+import .GLib: setproperty!, getproperty, AbstractStringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,

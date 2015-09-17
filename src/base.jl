@@ -1,4 +1,4 @@
-unsafe_convert(::Type{Ptr{GObject}},w::StringLike) = unsafe_convert(Ptr{GObject},GtkLabelLeaf(w))
+unsafe_convert(::Type{Ptr{GObject}},w::AbstractStringLike) = unsafe_convert(Ptr{GObject},GtkLabelLeaf(w))
 
 destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
@@ -37,20 +37,20 @@ showall(w::GtkWidget) = (ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},
 modifyfont(w::GtkWidget, font_desc::Ptr{Void}) =
    ccall((:gtk_widget_modify_font,libgtk),Void,(Ptr{GObject},Ptr{Void}),w,font_desc)
 
-function getproperty{T}(w::GtkContainer, name::StringLike, child::GtkWidget, ::Type{T})
+function getproperty{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), v)
+        (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), v)
     val = v[T]
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
     return val
 end
 
 #property(w::GtkContainer, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
-setproperty!{T}(w::GtkContainer, name::StringLike, child::GtkWidget, ::Type{T}, value) = setproperty!(w, name, child, convert(T,value))
-function setproperty!(w::GtkContainer, name::StringLike, child::GtkWidget, value)
+setproperty!{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}, value) = setproperty!(w, name, child, convert(T,value))
+function setproperty!(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, value)
     ccall((:gtk_container_child_set_property,libgtk), Void,
-        (Ptr{GObject}, Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
+        (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
     w
 end
 
@@ -96,17 +96,17 @@ function _guarded(ex, retval)
 end
 
 
-@deprecate getindex(w::GtkContainer, child::GtkWidget, name::StringLike, T::Type) getproperty(w,name,child,T)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike, T::Type) setproperty!(w,name,child,T,value)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::StringLike) setproperty!(w,name,child,value)
+@deprecate getindex(w::GtkContainer, child::GtkWidget, name::AbstractStringLike, T::Type) getproperty(w,name,child,T)
+@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike, T::Type) setproperty!(w,name,child,T,value)
+@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike) setproperty!(w,name,child,value)
 
 GtkAccelGroupLeaf() = GtkAccelGroupLeaf(
     ccall((:gtk_accel_group_new,libgtk),Ptr{GObject},()))
 
-function push!(w::GtkWidget, accel_signal::StringLike, accel_group::GtkAccelGroup,
+function push!(w::GtkWidget, accel_signal::AbstractStringLike, accel_group::GtkAccelGroup,
                accel_key::Integer, accel_mods::Integer, accel_flags::Integer)
     ccall((:gtk_widget_add_accelerator,libgtk), Void,
-         (Ptr{GObject}, Ptr{Uint8}, Ptr{GObject}, Cuint, Cint, Cint),
+         (Ptr{GObject}, Ptr{UInt8}, Ptr{GObject}, Cuint, Cint, Cint),
           w, bytestring(accel_signal), accel_group, accel_key, accel_mods, accel_flags)
     w
 end

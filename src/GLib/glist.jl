@@ -215,12 +215,12 @@ empty!{N<:Number}(li::Ptr{_GSList{Ptr{N}}}) = c_free(unsafe_load(li).data)
 empty!{N<:Number}(li::Ptr{_GList{Ptr{N}}}) = c_free(unsafe_load(li).data)
 
 ### Store (byte)strings as pointers
-deref_to{S<:ByteString}(::Type{S}, p::Ptr) = bytestring(convert(Ptr{Uint8},p))
+deref_to{S<:ByteString}(::Type{S}, p::Ptr) = bytestring(convert(Ptr{UInt8},p))
 function ref_to{S<:ByteString}(::Type{S}, x)
     s = bytestring(x)
     l = sizeof(s)
-    p = convert(Ptr{Uint8},c_malloc(l+1))
-    unsafe_copy!(p,convert(Ptr{Uint8},pointer(s)),l)
+    p = convert(Ptr{UInt8},c_malloc(l+1))
+    unsafe_copy!(p,convert(Ptr{UInt8},pointer(s)),l)
     unsafe_store!(p,'\0',l+1)
     return p
 end

@@ -34,20 +34,20 @@ GtkComboBoxTextLeaf(with_entry::Bool=false) = GtkComboBoxTextLeaf(
         else
             ccall((:gtk_combo_box_text_new,libgtk),Ptr{GObject},())
         end)
-push!(cb::GtkComboBoxText,text::String) =
-    (ccall((:gtk_combo_box_text_append_text,libgtk),Void,(Ptr{GObject},Ptr{Uint8}),cb,bytestring(text)); cb)
-unshift!(cb::GtkComboBoxText,text::String) =
-    (ccall((:gtk_combo_box_text_prepend_text,libgtk),Void,(Ptr{GObject},Ptr{Uint8}),cb,bytestring(text)); cb)
-insert!(cb::GtkComboBoxText,i::Integer,text::String) =
-    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{Uint8}),cb,i-1,bytestring(text)); cb)
+push!(cb::GtkComboBoxText,text::AbstractString) =
+    (ccall((:gtk_combo_box_text_append_text,libgtk),Void,(Ptr{GObject},Ptr{UInt8}),cb,bytestring(text)); cb)
+unshift!(cb::GtkComboBoxText,text::AbstractString) =
+    (ccall((:gtk_combo_box_text_prepend_text,libgtk),Void,(Ptr{GObject},Ptr{UInt8}),cb,bytestring(text)); cb)
+insert!(cb::GtkComboBoxText,i::Integer,text::AbstractString) =
+    (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{UInt8}),cb,i-1,bytestring(text)); cb)
 
 if gtk_version == 3
-    push!(cb::GtkComboBoxText,id::TupleType(String,Symbol),text::String) =
-        (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
-    unshift!(cb::GtkComboBoxText,id::TupleType(String,Symbol),text::String) =
-        (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GObject},Ptr{Uint8},Ptr{Uint8}),cb,id,bytestring(text)); cb)
-    insert!(cb::GtkComboBoxText,i::Integer,id::TupleType(String,Symbol),text::String) =
-        (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{Uint8}),cb,i-1,id,bytestring(text)); cb)
+    push!(cb::GtkComboBoxText,id::TupleType(AbstractString,Symbol),text::AbstractString) =
+        (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GObject},Ptr{UInt8},Ptr{UInt8}),cb,id,bytestring(text)); cb)
+    unshift!(cb::GtkComboBoxText,id::TupleType(AbstractString,Symbol),text::AbstractString) =
+        (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GObject},Ptr{UInt8},Ptr{UInt8}),cb,id,bytestring(text)); cb)
+    insert!(cb::GtkComboBoxText,i::Integer,id::TupleType(AbstractString,Symbol),text::AbstractString) =
+        (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{UInt8}),cb,i-1,id,bytestring(text)); cb)
 end
 
 delete!(cb::GtkComboBoxText,i::Integer) =
@@ -94,13 +94,13 @@ next(path::GtkTreePath) = ccall((:gtk_tree_path_next,libgtk), Void, (Ptr{GtkTree
 prev(path::GtkTreePath) = ccall((:gtk_tree_path_prev,libgtk),Cint, (Ptr{GtkTreePath},),path) != 0
 up(path::GtkTreePath) = ccall((:gtk_tree_path_up,libgtk),Cint, (Ptr{GtkTreePath},),path) != 0
 down(path::GtkTreePath) = ccall((:gtk_tree_path_down,libgtk), Void, (Ptr{GtkTreePath},),path)
-string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{Uint8},
+string(path::GtkTreePath) = bytestring( ccall((:gtk_tree_path_to_string,libgtk),Ptr{UInt8},
                                             (Ptr{GtkTreePath},),path))
 
 ### add indices for a store 1-based
 
 ## Get an iter corresponding to an index specified as a string
-function iter_from_string_index(store, index::String)
+function iter_from_string_index(store, index::AbstractString)
     iter = Gtk.mutable(GtkTreeIter)
     Gtk.G_.iter_from_string(GtkTreeModel(store), iter, index)
     if !isvalid(store, iter)
@@ -434,7 +434,7 @@ end
 
 ## string is of type "0:1:0" (0-based)
 function get_string_from_iter(treeModel::GtkTreeModel, iter::TRI)
-    val = ccall((:gtk_tree_model_get_string_from_iter, libgtk),  Ptr{Uint8},
+    val = ccall((:gtk_tree_model_get_string_from_iter, libgtk),  Ptr{UInt8},
           (Ptr{GObject},Ptr{GtkTreeIter}),
           treeModel, mutable(iter))
     val = bytestring(val)
@@ -459,21 +459,21 @@ index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_
 type TreeIterator
     store::GtkTreeStore
     model::GtkTreeModel
-    iter::Union(Nothing, TRI)
+    iter::Union(Void, TRI)
 end
 TreeIterator(store::GtkTreeStore, iter=nothing) = TreeIterator(store, GtkTreeModel(store), iter)
 
 
 ## iterator interface for depth first search
 function start(x::TreeIterator)
-    isa(x.iter, Nothing) ? nothing : mutable(copy(x.iter))
+    isa(x.iter, Void) ? nothing : mutable(copy(x.iter))
 end
 
 function done(x::TreeIterator, state)
 
     iter = mutable(GtkTreeIter)
 
-    isa(state, Nothing) && return (!Gtk.get_iter_first(x.model, iter))   # special case root
+    isa(state, Void) && return (!Gtk.get_iter_first(x.model, iter))   # special case root
 
     state = copy(state)
 
@@ -484,7 +484,7 @@ function done(x::TreeIterator, state)
     # or a valid ancestor of piter has a sibling
     up(x.model, state) || return(true)
 
-    while isa(x.iter, Nothing) || isancestor(x.store, x.iter, state)
+    while isa(x.iter, Void) || isancestor(x.store, x.iter, state)
         next(x.model, copy(state)) && return(false) # has a sibling
         up(x.model, state) || return(true)
     end
@@ -495,7 +495,7 @@ end
 function next(x::TreeIterator, state)
     iter = mutable(GtkTreeIter)
 
-    if isa(state, Nothing)      # special case root
+    if isa(state, Void)      # special case root
         Gtk.get_iter_first(x.model, iter)
         return(iter, iter)
     end
@@ -512,7 +512,7 @@ function next(x::TreeIterator, state)
 
     up(x.model, state)
 
-    while isa(x.iter, Nothing) || isancestor(x.store, x.iter, state)
+    while isa(x.iter, Void) || isancestor(x.store, x.iter, state)
         cstate = copy(state)
         next(x.model, cstate) && return(cstate, cstate) # return the sibling of state
         up(x.model, state)
@@ -581,7 +581,7 @@ function GtkTreeViewColumnLeaf(renderer::GtkCellRenderer, mapping)
     treeColumn
 end
 
-function GtkTreeViewColumnLeaf(title::String, renderer::GtkCellRenderer, mapping)
+function GtkTreeViewColumnLeaf(title::AbstractString, renderer::GtkCellRenderer, mapping)
     setproperty!(GtkTreeViewColumnLeaf(renderer,mapping), :title, title)
 end
 
@@ -601,9 +601,9 @@ function push!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand:
 end
 
 add_attribute(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer,
-              attribute::String, column::Integer) =
+              attribute::AbstractString, column::Integer) =
     ccall((:gtk_tree_view_column_add_attribute,libgtk),Void,
-          (Ptr{GObject},Ptr{GObject},Ptr{Uint8},Cint),treeColumn,renderer,bytestring(attribute),column)
+          (Ptr{GObject},Ptr{GObject},Ptr{UInt8},Cint),treeColumn,renderer,bytestring(attribute),column)
 
 ### GtkTreeSelection
 function selected(selection::GtkTreeSelection)

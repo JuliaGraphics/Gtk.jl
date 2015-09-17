@@ -102,12 +102,12 @@ immutable GdkEventButton <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
-    time::Uint32
+    time::UInt32
     x::Float64
     y::Float64
     axes::Ptr{Float64}
-    state::Uint32
-    button::Uint32
+    state::UInt32
+    button::UInt32
     gdk_device::Ptr{Void}
     x_root::Float64
     y_root::Float64
@@ -117,10 +117,10 @@ immutable GdkEventScroll <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
-    time::Uint32
+    time::UInt32
     x::Float64
     y::Float64
-    state::Uint32
+    state::UInt32
     direction::GEnum
     gdk_device::Ptr{Void}
     x_root::Float64
@@ -133,14 +133,14 @@ immutable GdkEventKey <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
-    time::Uint32
-    state::Uint32
-    keyval::Uint32
+    time::UInt32
+    state::UInt32
+    keyval::UInt32
     length::Int32
-    string::Ptr{Uint8}
-    hardware_keycode::Uint16
-    group::Uint8
-    flags::Uint32
+    string::Ptr{UInt8}
+    hardware_keycode::UInt16
+    group::UInt8
+    flags::UInt32
 end
 
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
@@ -149,11 +149,11 @@ immutable GdkEventMotion <: GdkEvent
   event_type::GEnum
   gdk_window::Ptr{Void}
   send_event::Int8
-  time::Uint32
+  time::UInt32
   x::Float64
   y::Float64
   axes::Ptr{Float64}
-  state::Uint32
+  state::UInt32
   is_hint::Int16
   gdk_device::Ptr{Void}
   x_root::Float64
@@ -165,7 +165,7 @@ immutable GdkEventCrossing <: GdkEvent
   gdk_window::Ptr{Void}
   send_event::Int8
   gdk_subwindow::Ptr{Void}
-  time::Uint32
+  time::UInt32
   x::Float64
   y::Float64
   x_root::Float64
@@ -173,9 +173,9 @@ immutable GdkEventCrossing <: GdkEvent
   mode::GEnum
   detail::GEnum
   focus::Cint
-  state::Uint32
+  state::UInt32
 end
 
-keyval(name::String) =
-  ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{Uint8},),bytestring(name))
+keyval(name::AbstractString) =
+  ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{UInt8},),bytestring(name))
 

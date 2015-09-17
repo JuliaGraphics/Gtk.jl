@@ -17,9 +17,9 @@ sleep(0.1)
 if G_.position(w) == pos
     warn("The Window Manager did not move the Gtk Window when requested")
 end
-@assert getproperty(w,"title",String) == "Window"
+@assert getproperty(w,"title",AbstractString) == "Window"
 setproperty!(w,:title,"Window 2")
-@assert getproperty(w,:title,String) == "Window 2"
+@assert getproperty(w,:title,AbstractString) == "Window 2"
 destroy(w)
 @assert !getproperty(w,:visible,Bool)
 w=WeakRef(w)
@@ -49,7 +49,7 @@ destroy(w)
 f = @Frame("Label")
 w = @Window(f, "Labelframe", 400, 400)
 setproperty!(f,:label,"new label")
-@assert getproperty(f,:label,String) == "new label"
+@assert getproperty(f,:label,AbstractString) == "new label"
 showall(w)
 destroy(w)
 
@@ -102,7 +102,7 @@ push!(g2, b22)
 strs = ["first", "second"]
 i = 1
 for child in g1
-    @assert getproperty(child,:label,String) == strs[i]
+    @assert getproperty(child,:label,AbstractString) == strs[i]
     @assert toplevel(child) == w
     i += 1
 end
@@ -149,9 +149,9 @@ l = @Label("label"); push!(f,l)
 b = @Button("button"); push!(f,b)
 
 setproperty!(l,:label,"new label")
-@assert getproperty(l,:label,String) == "new label"
+@assert getproperty(l,:label,AbstractString) == "new label"
 setproperty!(b,:label,"new label")
-@assert getproperty(b,:label,String) == "new label"
+@assert getproperty(b,:label,AbstractString) == "new label"
 
 counter = 0
 id = signal_connect(b, "clicked") do widget
@@ -189,9 +189,9 @@ destroy(w)
 w = @Window("Checkbutton")
 check = @CheckButton("check me"); push!(w,check)
 setproperty!(check,:active,true)
-@assert getproperty(check,:active,String) == "TRUE"
+@assert getproperty(check,:active,AbstractString) == "TRUE"
 setproperty!(check,:label,"new label")
-@assert getproperty(check,:label,String) == "new label"
+@assert getproperty(check,:label,AbstractString) == "new label"
 #ctr = 0
 #tk_bind(check, "command", cb)
 #tcl(check, "invoke")
@@ -219,14 +219,14 @@ r = @RadioButtonGroup(choices,2)
 itms = Array(Any,length(r))
 for (i,e) in enumerate(r)
     itms[i] = try
-            getproperty(e,:label,String)
+            getproperty(e,:label,AbstractString)
         catch
             e[1]
         end
 end
 @assert setdiff(choices, itms) == [choices[4],]
 @assert setdiff(itms, choices) == ["choice four",]
-@assert getproperty(getproperty(r,:active),:label,String) == choices[2]
+@assert getproperty(getproperty(r,:active),:label,AbstractString) == choices[2]
 w = @Window(r,"RadioGroup")|>showall
 destroy(w)
 
@@ -234,7 +234,7 @@ destroy(w)
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 function toggled(ptr,evt,widget)
-    state = getproperty(widget,:label,String)
+    state = getproperty(widget,:label,AbstractString)
     if state == "Off"
         setproperty!(widget,:label,"On")
     else
@@ -254,7 +254,7 @@ destroy(w)
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 on_signal_button_press(tb) do ptr, evt, widget
-    state = getproperty(widget,:label,String)
+    state = getproperty(widget,:label,AbstractString)
     if state == "Off"
         setproperty!(widget,:label,"On")
     else
@@ -273,7 +273,7 @@ destroy(w)
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 signal_connect(tb, :button_press_event) do widget, evt
-    state = getproperty(widget,:label,String)
+    state = getproperty(widget,:label,AbstractString)
     if state == "Off"
         setproperty!(widget,:label,"On")
     else
@@ -499,7 +499,7 @@ destroy(w)
 
 
 ## Tree view
-ts=@TreeStore(String)
+ts=@TreeStore(AbstractString)
 iter1 = push!(ts,("one",))
 iter2 = push!(ts,("two",),iter1)
 iter3 = push!(ts,("three",),iter2)

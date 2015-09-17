@@ -1,8 +1,8 @@
-function GtkWindowLeaf(title::Union(Nothing,StringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
+function GtkWindowLeaf(title::Union(Void,AbstractStringLike)=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
     hnd = ccall((:gtk_window_new,libgtk),Ptr{GObject},(GEnum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
-        ccall((:gtk_window_set_title,libgtk),Void,(Ptr{GObject},Ptr{Uint8}),hnd,title)
+        ccall((:gtk_window_set_title,libgtk),Void,(Ptr{GObject},Ptr{UInt8}),hnd,title)
     end
     if resizable
         ccall((:gtk_window_set_default_size,libgtk),Void,(Ptr{GObject},Int32,Int32),hnd,w,h)
@@ -34,12 +34,12 @@ GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
                 C_NULL,C_NULL))
 
 #if VERSION >= v"0.4-"
-#GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons::=>...; kwargs...) =
+#GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons::=>...; kwargs...) =
 #    GtkDialogLeaf(title, parent, flags, buttons; kwargs...)
 #end
-function GtkDialogLeaf(title::StringLike, parent::GtkContainer, flags::Integer, buttons; kwargs...)
+function GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons; kwargs...)
     w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons,libgtk), Ptr{GObject},
-                (Ptr{Uint8},Ptr{GObject},Cint,Ptr{Void}),
+                (Ptr{UInt8},Ptr{GObject},Cint,Ptr{Void}),
                 title, parent, flags, C_NULL); kwargs...)
     for (k,v) in buttons
         push!(w, k, v)
@@ -50,9 +50,9 @@ end
 GtkAboutDialogLeaf() = GtkAboutDialogLeaf(
     ccall((:gtk_about_dialog_new,libgtk),Ptr{GObject},()))
 
-function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ::Integer, parent = GtkNullContainer(); kwargs...)
+function GtkMessageDialogLeaf(message::AbstractStringLike, buttons, flags::Integer, typ::Integer, parent = GtkNullContainer(); kwargs...)
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
-        (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
+        (Ptr{GObject},Cint,Cint,Cint,Ptr{UInt8}),
         parent, flags, typ, GtkButtonsType.NONE, C_NULL); kwargs...)
     setproperty!(w, :text, message)
     for (k,v) in buttons
@@ -61,10 +61,10 @@ function GtkMessageDialogLeaf(message::StringLike, buttons, flags::Integer, typ:
     w
 end
 
-ask_dialog(message::String, parent = GtkNullContainer()) =
+ask_dialog(message::AbstractString, parent = GtkNullContainer()) =
         ask_dialog(message, "No", "Yes", parent)
 
-function ask_dialog(message::String, no_text, yes_text, parent = GtkNullContainer())
+function ask_dialog(message::AbstractString, no_text, yes_text, parent = GtkNullContainer())
     dlg = @GtkMessageDialog(message, ((no_text,0), (yes_text,1)),
             GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.QUESTION, parent)
     response = run(dlg)
@@ -76,9 +76,9 @@ for (func, flag) in (
         (:info_dialog, :(GtkMessageType.INFO)),
         (:warn_dialog, :(GtkMessageType.WARNING)),
         (:error_dialog, :(GtkMessageType.ERROR)))
-    @eval function $func(message::String, parent = GtkNullContainer())
+    @eval function $func(message::AbstractString, parent = GtkNullContainer())
         w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new,libgtk), Ptr{GObject},
-            (Ptr{GObject},Cint,Cint,Cint,Ptr{Uint8}),
+            (Ptr{GObject},Cint,Cint,Cint,Ptr{UInt8}),
             parent, GtkDialogFlags.DESTROY_WITH_PARENT,
             $flag, GtkButtonsType.CLOSE, C_NULL))
         setproperty!(w, :text, message)
@@ -87,7 +87,7 @@ for (func, flag) in (
     end
 end
 
-function input_dialog(message::String, entry_default::String, buttons=(("Cancel",0), ("Accept",1)), parent = GtkNullContainer())
+function input_dialog(message::AbstractString, entry_default::AbstractString, buttons=(("Cancel",0), ("Accept",1)), parent = GtkNullContainer())
     widget = @GtkMessageDialog(message, buttons, GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.INFO, parent)
     box = content_area(widget)
     entry = @GtkEntry(;text=entry_default)

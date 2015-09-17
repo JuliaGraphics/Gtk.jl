@@ -29,15 +29,15 @@ else
         end)
 end
 GtkScaleLeaf(vertical::Bool,scale::Range) = GtkScaleLeaf(vertical,minimum(scale),maximum(scale),step(scale))
-function push!(scale::GtkScale, value, position::Symbol, markup::String)
+function push!(scale::GtkScale, value, position::Symbol, markup::AbstractString)
     ccall((:gtk_scale_add_mark,libgtk),Void,
-        (Ptr{GObject},Cdouble,GEnum,Ptr{Uint8}),
+        (Ptr{GObject},Cdouble,GEnum,Ptr{UInt8}),
         scale,value,GtkPositionType.(position),bytestring(markup))
     scale
 end
 function push!(scale::GtkScale, value, position::Symbol)
     ccall((:gtk_scale_add_mark,libgtk),Void,
-        (Ptr{GObject},Cdouble,GEnum,Ptr{Uint8}),
+        (Ptr{GObject},Cdouble,GEnum,Ptr{UInt8}),
         scale,value,GtkPositionType.(position),C_NULL)
     scale
 end

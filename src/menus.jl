@@ -20,9 +20,9 @@
 #GtkRadioToolButton — A toolbar item that contains a radio button
 
 GtkMenuItemLeaf() = GtkMenuItemLeaf(ccall((:gtk_menu_item_new,libgtk),Ptr{GObject},()))
-GtkMenuItemLeaf(label::String) =
+GtkMenuItemLeaf(label::AbstractString) =
     GtkMenuItemLeaf(ccall((:gtk_menu_item_new_with_mnemonic,libgtk),Ptr{GObject},
-                (Ptr{Uint8},), bytestring(label)))
+                (Ptr{UInt8},), bytestring(label)))
 
 GtkSeparatorMenuItemLeaf() = GtkSeparatorMenuItemLeaf(ccall((:gtk_separator_menu_item_new,libgtk),Ptr{GObject},()))
 
@@ -39,5 +39,5 @@ GtkMenuBarLeaf() = GtkMenuBarLeaf(ccall((:gtk_menu_bar_new,libgtk),Ptr{GObject},
 
 popup(menu::GtkMenuShell, event::GdkEventButton) =
     ccall((:gtk_menu_popup,libgtk), Void,
-          (Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{Void},Cuint,Uint32),
+          (Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{Void},Cuint,UInt32),
           menu, GtkNullContainerLeaf(), GtkNullContainerLeaf(), GtkNullContainerLeaf(), C_NULL, event.button, event.time)
