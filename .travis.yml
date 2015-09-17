@@ -3,8 +3,7 @@ sudo: false
 os:
     - linux
 julia:
-    - release
-    - nightly
+    - 0.4
 notifications:
     email: false
 addons:
@@ -19,9 +18,7 @@ script:
           println(BinDeps.debug("Gtk"));
           Pkg.test("Gtk"; coverage=true)'
 after_success:
-    - if [ $TRAVIS_JULIA_VERSION = "nightly" ]; then
-          julia -e 'cd(Pkg.dir("Gtk"));
-              Pkg.add("Coverage");
-              using Coverage;
-              Coveralls.submit(Coveralls.process_folder())';
-      fi
+    - julia -e 'cd(Pkg.dir("Gtk"));
+                Pkg.add("Coverage");
+                using Coverage;
+                Coveralls.submit(Coveralls.process_folder())'
