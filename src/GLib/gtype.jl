@@ -23,14 +23,14 @@ const fundamental_types = (
     (:gchar,      Int8,             Int8,           :schar),
     (:guchar,     UInt8,            UInt8,          :uchar),
     (:gboolean,   Cint,             Bool,           :boolean),
-    (:gint,       Cint,             Union(),           :int),
-    (:guint,      Cuint,            Union(),           :uint),
-    (:glong,      Clong,            Union(),           :long),
-    (:gulong,     Culong,           Union(),           :ulong),
+    (:gint,       Cint,             Union{},           :int),
+    (:guint,      Cuint,            Union{},           :uint),
+    (:glong,      Clong,            Union{},           :long),
+    (:gulong,     Culong,           Union{},           :ulong),
     (:gint64,     Int64,            Signed,         :int64),
     (:guint64,    UInt64,           Unsigned,       :uint64),
-    (:GEnum,      GEnum,            Union(),           :enum),
-    (:GFlags,     GEnum,            Union(),           :flags),
+    (:GEnum,      GEnum,            Union{},           :enum),
+    (:GFlags,     GEnum,            Union{},           :flags),
     (:gfloat,     Float32,          Float32,        :float),
     (:gdouble,    Float64,          AbstractFloat,  :double),
     (:gchararray, Ptr{UInt8},       AbstractString,         :string),
@@ -48,7 +48,7 @@ g_type(gtyp::GType) = gtyp
 let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-        if juliatype !== Union()
+        if juliatype !== Union{}
             push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
         end
     end

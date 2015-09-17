@@ -54,7 +54,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         with_id = with_id::TupleType(Symbol,Any)
         with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
-    if pass_x !== Union()
+    if pass_x !== Union{}
         eval(current_module(),quote
             function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
                 ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},Csize_t), v, $with_id)
@@ -79,7 +79,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     if to_gtype == :static_string
         to_gtype = :string
     end
-    if pass_x !== Union()
+    if pass_x !== Union{}
         eval(current_module(),quote
             function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
                 x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
@@ -97,7 +97,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             function(v::GLib.GV)
                 x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
                 $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
-                $(if pass_x !== Union()
+                $(if pass_x !== Union{}
                     :(return Base.convert($pass_x,x))
                 else
                     :(return x)
