@@ -12,21 +12,21 @@ function push!(builder::GtkBuilder;buffer=nothing,filename=nothing,resource=noth
     if buffer !== nothing
         GError() do error_check
           ret = ccall((:gtk_builder_add_from_string ,libgtk), Cuint,
-            (Ptr{GObject}, Ptr{Uint8}, Culong, Ptr{Ptr{GError}}),
+            (Ptr{GObject}, Ptr{UInt8}, Culong, Ptr{Ptr{GError}}),
             builder, bytestring(buffer), -1, error_check)
           return ret != 0
         end
     elseif filename !== nothing
         GError() do error_check
           ret = ccall((:gtk_builder_add_from_file ,libgtk), Cuint,
-            (Ptr{GObject}, Ptr{Uint8}, Ptr{Ptr{GError}}),
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{Ptr{GError}}),
             builder, bytestring(filename), error_check)
           return ret != 0
         end
     elseif resource !== nothing
         GError() do error_check
           ret = ccall((:gtk_builder_add_from_resource ,libgtk), Cuint,
-            (Ptr{GObject}, Ptr{Uint8}, Ptr{Ptr{GError}}),
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{Ptr{GError}}),
             builder, bytestring(resource), error_check)
           return ret != 0
         end

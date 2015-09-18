@@ -9,7 +9,7 @@ end
 function __init__()
     GError() do error_check
         ccall((:gtk_init_with_args,libgtk), Bool,
-            (Ptr{Void}, Ptr{Void}, Ptr{Uint8}, Ptr{Void}, Ptr{Uint8}, Ptr{GError}),
+            (Ptr{Void}, Ptr{Void}, Ptr{UInt8}, Ptr{Void}, Ptr{UInt8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 
@@ -26,7 +26,7 @@ add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,lib
 # widget[:event] = function(ptr, obj)
 #    stuff
 # end
-#function setindex!(w::GObject,cb::Function,sig::StringLike,vargs...)
+#function setindex!(w::GObject,cb::Function,sig::AbstractStringLike,vargs...)
 #    signal_connect(cb,w,sig,vargs...)
 #end
 
@@ -51,8 +51,8 @@ end
 type Gtk_signal_motion{T}
     closure::T
     callback::Ptr{Void}
-    include::Uint32
-    exclude::Uint32
+    include::UInt32
+    exclude::UInt32
 end
 function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion{T})
     event = unsafe_load(eventp)

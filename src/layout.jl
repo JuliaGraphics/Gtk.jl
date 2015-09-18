@@ -83,18 +83,18 @@ GtkAlignmentLeaf(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<
         (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale))
 
 ### GtkFrame — A bin with a decorative frame and optional label
-GtkFrameLeaf(label::StringLike) = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8},), bytestring(label)))
+GtkFrameLeaf(label::AbstractStringLike) = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
+        (Ptr{UInt8},), bytestring(label)))
 GtkFrameLeaf() = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8},), C_NULL))
+        (Ptr{UInt8},), C_NULL))
 
 ### GtkAspectFrame
 GtkAspectFrameLeaf(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
     GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
+        (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
 GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
     GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
+        (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
 if gtk_version == 3
@@ -199,25 +199,25 @@ width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]
 
 ### GtkExpander
-GtkExpanderLeaf(title::StringLike) =
+GtkExpanderLeaf(title::AbstractStringLike) =
     GtkExpanderLeaf(ccall((:gtk_expander_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8},), bytestring(title)))
+        (Ptr{UInt8},), bytestring(title)))
 
 ### GtkNotebook
 GtkNotebookLeaf() = GtkNotebookLeaf(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
-function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,StringLike), label::Union(GtkWidget,StringLike))
+function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
         w, x, label, position-1)+1
     w
 end
-function unshift!(w::GtkNotebook, x::Union(GtkWidget,StringLike), label::Union(GtkWidget,StringLike))
+function unshift!(w::GtkNotebook, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
     ccall((:gtk_notebook_prepend_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
     w
 end
-function push!(w::GtkNotebook, x::Union(GtkWidget,StringLike), label::Union(GtkWidget,StringLike))
+function push!(w::GtkNotebook, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
     ccall((:gtk_notebook_append_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
@@ -235,7 +235,7 @@ pagenumber(w::GtkNotebook, child::GtkWidget) =
 ### GtkOverlay
 if gtk_version == 3
     GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
-        (Ptr{Uint8},), bytestring(title)))
+        (Ptr{UInt8},), bytestring(title)))
     GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
     function push!(w::GtkOverlay, x::GtkWidget)
         ccall((:gtk_overlay_add_overlay,libgtk), Cint,

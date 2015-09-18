@@ -1,7 +1,7 @@
 immutable GError
-    domain::Uint32
+    domain::UInt32
     code::Cint
-    message::Ptr{Uint8}
+    message::Ptr{UInt8}
 end
 make_gvalue(GError, Ptr{GError}, :boxed, (:g_error,:libgobject))
 convert(::Type{GError}, err::Ptr{GError}) = GError(err)

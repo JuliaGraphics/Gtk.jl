@@ -1,6 +1,6 @@
 if gtk_version == 3
-GtkApplicationLeaf(id::String, flags) = GtkApplicationLeaf(
-    ccall((:gtk_application_new, libgtk), Ptr{GObject}, (Ptr{Uint8}, Cuint), bytestring(id), flags) )
+GtkApplicationLeaf(id::AbstractString, flags) = GtkApplicationLeaf(
+    ccall((:gtk_application_new, libgtk), Ptr{GObject}, (Ptr{UInt8}, Cuint), bytestring(id), flags) )
 
 function push!(app::GtkApplication, win::GtkWindow)
     ccall((:gtk_application_add_window, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), app, win)

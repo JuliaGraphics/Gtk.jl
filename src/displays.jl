@@ -8,14 +8,14 @@
 #GtkSpinner — Show a spinner animation
 
 immutable RGB
-    r::Uint8; g::Uint8; b::Uint8
+    r::UInt8; g::UInt8; b::UInt8
     RGB(r,g,b) = new(r,g,b)
 end
 convert(::Type{RGB},x::Unsigned) = RGB(uint8(x),uint8(x>>8),uint8(x>>16))
 convert{U<:Unsigned}(::Type{U},x::RGB) = convert(U,(x.r)|(x.g>>8)|(x.b>>16))
 
 immutable RGBA
-    r::Uint8; g::Uint8; b::Uint8; a::Uint8
+    r::UInt8; g::UInt8; b::UInt8; a::UInt8
     RGBA(r,g,b) = new(r,g,b)
 end
 convert(::Type{RGBA},x::Unsigned) = RGBA(uint8(x),uint8(x>>8),uint8(x>>16),uint8(x>>24))
@@ -167,20 +167,20 @@ function GdkPixbufLeaf(;stream=nothing,resource_path=nothing,filename=nothing,xp
     elseif resource_path !== nothing
         GError() do error_check
             if width == -1 && height == -1
-                pixbuf = ccall((:gdk_pixbuf_new_from_resource,libgdk_pixbuf),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(resource_path),error_check)
+                pixbuf = ccall((:gdk_pixbuf_new_from_resource,libgdk_pixbuf),Ptr{GObject},(Ptr{UInt8},Ptr{Ptr{GError}}),bytestring(resource_path),error_check)
             else
                 pixbuf = ccall((:gdk_pixbuf_new_from_resource_at_scale,libgdk_pixbuf),Ptr{GObject},
-                    (Ptr{Uint8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(resource_path),width,height,preserve_aspect_ratio,error_check)
+                    (Ptr{UInt8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(resource_path),width,height,preserve_aspect_ratio,error_check)
             end
             return pixbuf !== C_NULL
         end
     elseif filename !== nothing
         GError() do error_check
             if width == -1 && height == -1
-                pixbuf = ccall((:gdk_pixbuf_new_from_file,libgdk_pixbuf),Ptr{GObject},(Ptr{Uint8},Ptr{Ptr{GError}}),bytestring(filename),error_check)
+                pixbuf = ccall((:gdk_pixbuf_new_from_file,libgdk_pixbuf),Ptr{GObject},(Ptr{UInt8},Ptr{Ptr{GError}}),bytestring(filename),error_check)
             else
                 pixbuf = ccall((:gdk_pixbuf_new_from_file_at_scale,libgdk_pixbuf),Ptr{GObject},
-                    (Ptr{Uint8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(filename),width,height,preserve_aspect_ratio,error_check)
+                    (Ptr{UInt8},Cint,Cint,Cint,Ptr{Ptr{GError}}),bytestring(filename),width,height,preserve_aspect_ratio,error_check)
             end
             return pixbuf !== C_NULL
         end
@@ -261,7 +261,7 @@ Base.fill!(img::GdkPixbuf,pix) = fill!(convert(MatrixStrided,img),pix)
 #TODO: image transformations, rotations, compositing
 
 GtkImageLeaf(pixbuf::GdkPixbuf) = GtkImageLeaf(ccall((:gtk_image_new_from_pixbuf,libgtk),Ptr{GObject},(Ptr{GObject},),pixbuf))
-GtkImageLeaf(filename::String) = GtkImageLeaf(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename)))
+GtkImageLeaf(filename::AbstractString) = GtkImageLeaf(ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(filename)))
 
 function GtkImageLeaf(;resource_path=nothing,filename=nothing,icon_name=nothing,stock_id=nothing,size::Symbol=:INVALID)
     source_count = (resource_path!==nothing) + (filename!==nothing) + (icon_name!==nothing) + (stock_id!==nothing)
@@ -269,13 +269,13 @@ function GtkImageLeaf(;resource_path=nothing,filename=nothing,icon_name=nothing,
         "GdkPixbuf must have at most one resource_path, filename, stock_id, or icon_name argument")
     local img::Ptr{GObject}
     if resource_path !== nothing
-        img = ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(resource_path))
+        img = ccall((:gtk_image_new_from_resource,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(resource_path))
     elseif filename !== nothing
-        img = ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(filename))
+        img = ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(filename))
     elseif icon_name !== nothing
-        img = ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(icon_name),GtkIconSize.(size))
+        img = ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(icon_name),GtkIconSize.(size))
     elseif stock_id !== nothing
-        img = ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),bytestring(stock_id),GtkIconSize.(size))
+        img = ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(stock_id),GtkIconSize.(size))
     else
         img = ccall((:gtk_image_new,libgtk),Ptr{GObject},())
     end
@@ -294,11 +294,11 @@ stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop,libgtk),Void,(Ptr{GObject},
 
 GtkStatusbarLeaf() = GtkStatusbarLeaf(ccall((:gtk_statusbar_new,libgtk),Ptr{GObject},()))
 context_id(status::GtkStatusbar,source) =
-    ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{Uint8}),
+    ccall((:gtk_statusbar_get_context_id,libgtk),Cuint,(Ptr{GObject},Ptr{UInt8}),
         status,bytestring(source))
 context_id(status::GtkStatusbar,source::Integer) = source
 push!(status::GtkStatusbar,context,text) =
-    (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GObject},Cuint,Ptr{Uint8}),
+    (ccall((:gtk_statusbar_push,libgtk),Cuint,(Ptr{GObject},Cuint,Ptr{UInt8}),
         status,context_id(status,context),bytestring(text)); status)
 pop!(status::GtkStatusbar,context) =
     ccall((:gtk_statusbar_pop,libgtk),Ptr{GObject},(Ptr{GObject},Cuint),

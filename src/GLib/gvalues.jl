@@ -2,8 +2,8 @@
 
 immutable GValue
     g_type::GType
-    field2::Uint64
-    field3::Uint64
+    field2::UInt64
+    field3::UInt64
     GValue() = new(0,0,0)
 end
 typealias GV Union(Mutable{GValue}, Ptr{GValue})
@@ -54,7 +54,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
         with_id = with_id::TupleType(Symbol,Any)
         with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
-    if pass_x !== None
+    if pass_x !== Union{}
         eval(current_module(),quote
             function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
                 ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},Csize_t), v, $with_id)
@@ -79,7 +79,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     if to_gtype == :static_string
         to_gtype = :string
     end
-    if pass_x !== None
+    if pass_x !== Union{}
         eval(current_module(),quote
             function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
                 x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
@@ -97,7 +97,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
             function(v::GLib.GV)
                 x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
                 $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
-                $(if pass_x !== None
+                $(if pass_x !== Union{}
                     :(return Base.convert($pass_x,x))
                 else
                     :(return x)
@@ -114,7 +114,7 @@ const fundamental_fns = tuple(Function[begin
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
     end for i in 1:length(fundamental_types)]...)
-make_gvalue(Symbol, Ptr{Uint8}, :static_string, :(g_type(String)), false)
+make_gvalue(Symbol, Ptr{UInt8}, :static_string, :(g_type(AbstractString)), false)
 make_gvalue(Type, GType, :gtype, (:g_gtype,:libgobject))
 make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
 
@@ -149,25 +149,25 @@ function getindex(gv::GV, ::Type{Any})
 end
 #end
 
-function getproperty{T}(w::GObject, name::StringLike, ::Type{T})
+function getproperty{T}(w::GObject, name::AbstractStringLike, ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), v)
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, bytestring(name), v)
     val = v[T]
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
     return val
 end
 
-setproperty!{T}(w::GObject, name::StringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
-function setproperty!(w::GObject, name::StringLike, value)
+setproperty!{T}(w::GObject, name::AbstractStringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
+function setproperty!(w::GObject, name::AbstractStringLike, value)
     ccall((:g_object_set_property, libgobject), Void,
-        (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
     w
 end
 
-@deprecate getindex(w::GObject, name::StringLike, T::Type) getproperty(w,name,T)
-@deprecate setindex!(w::GObject, value, name::StringLike, T::Type) setproperty!(w,name,T,value)
-@deprecate setindex!(w::GObject, value, name::StringLike) setproperty!(w,name,value)
+@deprecate getindex(w::GObject, name::AbstractStringLike, T::Type) getproperty(w,name,T)
+@deprecate setindex!(w::GObject, value, name::AbstractStringLike, T::Type) setproperty!(w,name,T,value)
+@deprecate setindex!(w::GObject, value, name::AbstractStringLike) setproperty!(w,name,value)
 
 
 function show(io::IO, w::GObject)
@@ -194,12 +194,12 @@ function show(io::IO, w::GObject)
         if (param.flags & READABLE) != 0 &&
            (param.flags & DEPRECATED) == 0 &&
            (ccall((:g_value_type_transformable,libgobject),Cint,
-                (Int,Int),param.value_type,g_type(String)) != 0)
+                (Int,Int),param.value_type,g_type(AbstractString)) != 0)
             ccall((:g_object_get_property,libgobject), Void,
-                (Ptr{GObject}, Ptr{Uint8}, Ptr{GValue}), w, param.name, v)
-            str = ccall((:g_value_get_string,libgobject),Ptr{Uint8},(Ptr{GValue},), v)
+                (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, param.name, v)
+            str = ccall((:g_value_get_string,libgobject),Ptr{UInt8},(Ptr{GValue},), v)
             value = (str == C_NULL ? "NULL" : bytestring(str))
-            if param.value_type == g_type(String) && str != C_NULL
+            if param.value_type == g_type(AbstractString) && str != C_NULL
                 print(io,"=\"",value,'"')
             else
                 print(io,'=',value)
@@ -212,7 +212,7 @@ end
 
 #immutable GTypeQuery
 #  g_type::Int
-#  type_name::Ptr{Uint8}
+#  type_name::Ptr{UInt8}
 #  class_size::Cuint
 #  instance_size::Cuint
 #  GTypeQuery() = new(0,0,0,0)

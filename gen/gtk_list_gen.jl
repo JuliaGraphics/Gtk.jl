@@ -98,7 +98,7 @@ function gen_g_type_lists(gtk_h)
                         name = gensym()
                     end
                     jtyp = g_type_to_jl(cindex.getCursorType(cu))
-                    if jtyp === :Nothing
+                    if jtyp === :Void
                         jtyp = " < $(cindex.getCursorType(cu)) >"
                         valid = false
                     end

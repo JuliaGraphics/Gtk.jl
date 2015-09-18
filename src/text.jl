@@ -14,7 +14,7 @@
 #TODO: GtkAccel manager objects
 
 GtkLabelLeaf(title) = GtkLabelLeaf(
-    ccall((:gtk_label_new,libgtk),Ptr{GObject},(Ptr{Uint8},), bytestring(title)))
+    ccall((:gtk_label_new,libgtk),Ptr{GObject},(Ptr{UInt8},), bytestring(title)))
 
 GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
@@ -23,12 +23,12 @@ GtkTextViewLeaf(buffer::GtkTextBuffer=@GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 
 GtkTextMarkLeaf(left_gravity::Bool=false) = GtkTextMarkLeaf(
-    ccall((:gtk_text_mark_new,libgtk),Ptr{GObject},(Ptr{Uint8},Cint),C_NULL,left_gravity))
+    ccall((:gtk_text_mark_new,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),C_NULL,left_gravity))
 
 GtkTextTagLeaf() = GtkTextTagLeaf(
-    ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{Uint8},),C_NULL))
-GtkTextTagLeaf(name::String) = GtkTextTagLeaf(
-    ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{Uint8},),bytestring(name)))
+    ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{UInt8},),C_NULL))
+GtkTextTagLeaf(name::AbstractString) = GtkTextTagLeaf(
+    ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(name)))
 
 immutable GtkTextIter
   dummy1::Ptr{Void}
@@ -90,7 +90,7 @@ end
 
 #####  GtkTextIter  #####
 #TODO: search
-getproperty(text::TI, key::String, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+getproperty(text::TI, key::AbstractString, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
 function getproperty(text::TI, key::Symbol, outtype::Type=Any)
     text = mutable(text)
     return convert(outtype,
@@ -150,7 +150,7 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
     elseif key === :is_start
         bool(ccall((:gtk_text_iter_is_start,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :char
-        convert(Char,ccall((:gtk_text_iter_get_char,libgtk),Uint32,(Ptr{GtkTextIter},),text))
+        convert(Char,ccall((:gtk_text_iter_get_char,libgtk),UInt32,(Ptr{GtkTextIter},),text))
     elseif key === :pixbuf
         convert(GdkPixbuf,ccall((:gtk_text_iter_get_char,libgtk),Ptr{GdkPixbuf},(Ptr{GtkTextIter},),text))
     else
@@ -158,7 +158,7 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
         false
     end)::outtype
 end
-setproperty!(text::Mutable{GtkTextIter},key::String,value) = setproperty!(text,symbol(key),value)
+setproperty!(text::Mutable{GtkTextIter},key::AbstractString,value) = setproperty!(text,symbol(key),value)
 function setproperty!(text::Mutable{GtkTextIter},key::Symbol,value)
     if     key === :offset
         ccall((:gtk_text_iter_set_offset,libgtk),Cint,(Ptr{GtkTextIter},Cint),text,value)
@@ -278,22 +278,22 @@ last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(first(r))
 next(r::GtkTextRange,i) = next(i,i)
 done(r::GtkTextRange,i) = (i==last(r) || done(i,i))
-getproperty(text::GtkTextRange, key::String, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+getproperty(text::GtkTextRange, key::AbstractString, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
 function getproperty(text::GtkTextRange, key::Symbol, outtype::Type=Any)
     starttext = first(text)
     endtext = last(text)
     return convert(outtype,
     if     key === :slice
-        bytestring(ccall((:gtk_text_iter_get_slice,libgtk),Ptr{Uint8},
+        bytestring(ccall((:gtk_text_iter_get_slice,libgtk),Ptr{UInt8},
             (Ptr{GtkTextIter},Ptr{GtkTextIter}),starttext,endtext),true)
     elseif key === :visible_slice
-        bytestring(ccall((:gtk_text_iter_get_visible_slice,libgtk),Ptr{Uint8},
+        bytestring(ccall((:gtk_text_iter_get_visible_slice,libgtk),Ptr{UInt8},
             (Ptr{GtkTextIter},Ptr{GtkTextIter}),starttext,endtext),true)
     elseif key === :text
-        bytestring(ccall((:gtk_text_iter_get_text,libgtk),Ptr{Uint8},
+        bytestring(ccall((:gtk_text_iter_get_text,libgtk),Ptr{UInt8},
             (Ptr{GtkTextIter},Ptr{GtkTextIter}),starttext,endtext),true)
     elseif key === :visible_text
-        bytestring(ccall((:gtk_text_iter_get_visible_text,libgtk),Ptr{Uint8},
+        bytestring(ccall((:gtk_text_iter_get_visible_text,libgtk),Ptr{UInt8},
             (Ptr{GtkTextIter},Ptr{GtkTextIter}),starttext,endtext),true)
     end)::outtype
 end
@@ -316,14 +316,14 @@ done(text::GtkTextBuffer, iter) = done(iter,iter)
 length(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_char_count,libgtk),Cint,
     (Ptr{GObject},),text)
 #get_line_count(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_line_count,libgtk),Cint,(Ptr{GObject},),text)
-function insert!(text::GtkTextBuffer,index::TI,str::String)
+function insert!(text::GtkTextBuffer,index::TI,str::AbstractString)
     ccall((:gtk_text_buffer_insert,libgtk),Void,
-        (Ptr{GObject},Ptr{GtkTextIter},Ptr{Uint8},Cint),text,mutable(index),bytestring(str),sizeof(str))
+        (Ptr{GObject},Ptr{GtkTextIter},Ptr{UInt8},Cint),text,mutable(index),bytestring(str),sizeof(str))
     text
 end
-function insert!(text::GtkTextBuffer,str::String)
+function insert!(text::GtkTextBuffer,str::AbstractString)
     ccall((:gtk_text_buffer_insert_at_cursor,libgtk),Void,
-        (Ptr{GObject},Ptr{Uint8},Cint),text,bytestring(str),sizeof(str))
+        (Ptr{GObject},Ptr{UInt8},Cint),text,bytestring(str),sizeof(str))
     text
 end
 function splice!(text::GtkTextBuffer,index::TI)
@@ -352,9 +352,9 @@ function user_action(f::Function, buffer::GtkTextBuffer)
     end
 end
 
-function create_tag(buffer::GtkTextBuffer, tag_name::String; properties...)
+function create_tag(buffer::GtkTextBuffer, tag_name::AbstractString; properties...)
     tag = @GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
-                (Ptr{GObject},Ptr{Uint8},Ptr{Void}),
+                (Ptr{GObject},Ptr{UInt8},Ptr{Void}),
                 buffer, bytestring(tag_name), C_NULL))
     for (k,v) in properties
         setproperty!(tag, k, v)
@@ -362,15 +362,15 @@ function create_tag(buffer::GtkTextBuffer, tag_name::String; properties...)
     tag
 end
 
-function apply_tag(buffer::GtkTextBuffer, name::String, itstart::TI, itend::TI)
+function apply_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
     ccall((:gtk_text_buffer_apply_tag_by_name,libgtk), Void,
-         (Ptr{GObject}, Ptr{Uint8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+         (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
          buffer, bytestring(name), mutable(itstart), mutable(itend))
 end
 
-function remove_tag(buffer::GtkTextBuffer, name::String, itstart::TI, itend::TI)
+function remove_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
     ccall((:gtk_text_buffer_remove_tag_by_name,libgtk), Void,
-         (Ptr{GObject}, Ptr{Uint8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+         (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
          buffer, bytestring(name), mutable(itstart), mutable(itend))
 end
 
@@ -400,15 +400,15 @@ function insert!(text::GtkTextView,index::TI,child::GtkWidget)
     text
 end
 
-function insert!(text::GtkTextView,index::TI,str::String)
+function insert!(text::GtkTextView,index::TI,str::AbstractString)
     bool(ccall((:gtk_text_buffer_insert_interactive,libgtk),Cint,
-        (Ptr{GObject},Ptr{GtkTextIter},Ptr{Uint8},Cint,Cint),
+        (Ptr{GObject},Ptr{GtkTextIter},Ptr{UInt8},Cint,Cint),
         gtk_text_view_get_buffer(text),mutable(index),bytestring(str),sizeof(str),gtk_text_view_get_editable(text)))
     text
 end
-function insert!(text::GtkTextView,str::String)
+function insert!(text::GtkTextView,str::AbstractString)
     bool(ccall((:gtk_text_buffer_insert_interactive_at_cursor,libgtk),Cint,
-        (Ptr{GObject},Ptr{Uint8},Cint,Cint),
+        (Ptr{GObject},Ptr{UInt8},Cint,Cint),
         gtk_text_view_get_buffer(text),bytestring(str),sizeof(str),gtk_text_view_get_editable(text)))
     text
 end

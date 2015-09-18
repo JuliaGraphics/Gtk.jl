@@ -14,19 +14,19 @@
 #GtkLockButton — A widget to unlock or lock privileged operations
 
 GtkButtonLeaf() = GtkButtonLeaf(ccall((:gtk_button_new,libgtk),Ptr{GObject},()))
-GtkButtonLeaf(title::String) =
+GtkButtonLeaf(title::AbstractString) =
     GtkButtonLeaf(ccall((:gtk_button_new_with_mnemonic,libgtk),Ptr{GObject},
-        (Ptr{Uint8},), bytestring(title)))
+        (Ptr{UInt8},), bytestring(title)))
 
 GtkCheckButtonLeaf() = GtkCheckButtonLeaf(ccall((:gtk_check_button_new,libgtk),Ptr{GObject},()))
-GtkCheckButtonLeaf(title::String) =
+GtkCheckButtonLeaf(title::AbstractString) =
     GtkCheckButtonLeaf(ccall((:gtk_check_button_new_with_mnemonic,libgtk),Ptr{GObject},
-        (Ptr{Uint8},), bytestring(title)))
+        (Ptr{UInt8},), bytestring(title)))
 
 GtkToggleButtonLeaf() = GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new,libgtk),Ptr{GObject},()))
-GtkToggleButtonLeaf(title::String) =
+GtkToggleButtonLeaf(title::AbstractString) =
     GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
-        (Ptr{Uint8},), bytestring(title)))
+        (Ptr{UInt8},), bytestring(title)))
 
 if gtk_version >= 3
     GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
@@ -40,18 +40,18 @@ end
 GtkRadioButtonLeaf(group::Ptr{Void}=C_NULL) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new,libgtk),Ptr{GObject},
         (Ptr{Void},),group))
-GtkRadioButtonLeaf(group::Ptr{Void},label::String) =
+GtkRadioButtonLeaf(group::Ptr{Void},label::AbstractString) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
-        (Ptr{Void},Ptr{Uint8}),group,bytestring(label)))
-GtkRadioButtonLeaf(label::String) =
+        (Ptr{Void},Ptr{UInt8}),group,bytestring(label)))
+GtkRadioButtonLeaf(label::AbstractString) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic,libgtk),Ptr{GObject},
-        (Ptr{Void},Ptr{Uint8}),C_NULL,bytestring(label)))
+        (Ptr{Void},Ptr{UInt8}),C_NULL,bytestring(label)))
 GtkRadioButtonLeaf(group::GtkRadioButton) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_from_widget,libgtk),Ptr{GObject},
         (Ptr{GObject},),group))
-GtkRadioButtonLeaf(group::GtkRadioButton,label::String) =
+GtkRadioButtonLeaf(group::GtkRadioButton,label::AbstractString) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic_from_widget,libgtk),Ptr{GObject},
-        (Ptr{GObject},Ptr{Uint8}),group,bytestring(label)))
+        (Ptr{GObject},Ptr{UInt8}),group,bytestring(label)))
 GtkRadioButtonLeaf(group::GtkRadioButton,child::GtkWidget,vargs...) =
     push!(GtkRadioButtonLeaf(group,vargs...), child)
 
@@ -93,7 +93,7 @@ function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Nothing)=nothing)
+function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Void)=nothing)
     if isdefined(grp,:anchor)
         e = GtkRadioButtonLeaf(grp.anchor, label)
     else
@@ -119,7 +119,7 @@ done(w::GtkRadioButtonGroup,s) = done(s,s)
 length(w::GtkRadioButtonGroup) = length(start(w))
 getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
-function getproperty(grp::GtkRadioButtonGroup,name::StringLike)
+function getproperty(grp::GtkRadioButtonGroup,name::AbstractStringLike)
     k = symbol(name)
     if k == :active
         for b in grp
@@ -138,18 +138,18 @@ function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
     b
 end
 
-GtkLinkButtonLeaf(uri::String) =
+GtkLinkButtonLeaf(uri::AbstractString) =
     GtkLinkButtonLeaf(ccall((:gtk_link_button_new,libgtk),Ptr{GObject},
-        (Ptr{Uint8},),bytestring(uri)))
-GtkLinkButtonLeaf(uri::String,label::String) =
+        (Ptr{UInt8},),bytestring(uri)))
+GtkLinkButtonLeaf(uri::AbstractString,label::AbstractString) =
     GtkLinkButtonLeaf(ccall((:gtk_link_button_new_with_label,libgtk),Ptr{GObject},
-        (Ptr{Uint8},Ptr{Uint8}),bytestring(uri),bytestring(label)))
-function GtkLinkButtonLeaf(uri::String,label::String,visited::Bool)
+        (Ptr{UInt8},Ptr{UInt8}),bytestring(uri),bytestring(label)))
+function GtkLinkButtonLeaf(uri::AbstractString,label::AbstractString,visited::Bool)
     b = GtkLinkButtonLeaf(uri,label)
     ccall((:gtk_link_button_set_visited,libgtk),Void,(Ptr{GObject},Cint),b,visited)
     b
 end
-function GtkLinkButtonLeaf(uri::String,visited::Bool)
+function GtkLinkButtonLeaf(uri::AbstractString,visited::Bool)
     b = GtkLinkButtonLeaf(uri)
     ccall((:gtk_link_button_set_visited,libgtk),Void,(Ptr{GObject},Cint),b,visited)
     b

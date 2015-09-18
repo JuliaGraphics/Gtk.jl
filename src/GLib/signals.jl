@@ -1,7 +1,7 @@
 # id = VERSION >= v"0.4-"get, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect{CT,RT}(cb::Function,w::GObject,sig::StringLike,
+function signal_connect{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
         ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w) #TODO: assert that length(param_types) is correct
     if isgeneric(cb)
         if !isbits(user_data) || VERSION >= v"0.4-"
@@ -12,7 +12,7 @@ function signal_connect{CT,RT}(cb::Function,w::GObject,sig::StringLike,
             end
             ref, deref = gc_ref_closure(user_data)
             return ccall((:g_signal_connect_data,libgobject), Culong,
-                (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
+                (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
                     w,
                     bytestring(sig),
                     callback,
@@ -28,10 +28,10 @@ end
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool=false)
+function signal_connect(cb::Function,w::GObject,sig::AbstractStringLike,after::Bool=false)
     _signal_connect(cb, w, sig, after, false,nothing,nothing)
 end
-function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk_call_conv::Bool,param_types,user_data)
+function _signal_connect(cb::Function,w::GObject,sig::AbstractStringLike,after::Bool,gtk_call_conv::Bool,param_types,user_data)
     @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object,libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+WORD_SIZE*2, w)
     closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
@@ -51,7 +51,7 @@ function _signal_connect(cb::Function,w::GObject,sig::StringLike,after::Bool,gtk
     ccall((:g_closure_set_marshal,libgobject), Void,
         (Ptr{Void}, Ptr{Void}), closuref, JuliaClosureMarshal::Ptr{Void})
     return ccall((:g_signal_connect_closure,libgobject), Culong,
-        (Ptr{GObject}, Ptr{Uint8}, Ptr{Void}, Cint), w, bytestring(sig), closuref, after)
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Cint), w, bytestring(sig), closuref, after)
 end
 function GClosureMarshal(closuref, return_value, n_param_values,
                          param_values, invocation_hint, marshal_data)
@@ -72,7 +72,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
             elseif g_isa(gtyp,g_type(GBoxed))
                 params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-            elseif g_isa(gtyp,g_type(String))
+            elseif g_isa(gtyp,g_type(AbstractString))
                 params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
             else
                 params[i] = gv[Any]
@@ -131,17 +131,17 @@ signal_handler_block(w::GObject, handler_id::Culong) =
 signal_handler_unblock(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_unblock,libgobject), Void, (Ptr{GObject}, Culong), w, handler_id)
 
-function signal_emit(w::GObject, sig::StringLike, RT::Type, args...)
-    i = isa(sig, String) ? search(sig, "::") : (0:-1)
+function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
+    i = isa(sig, AbstractString) ? search(sig, "::") : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i)+1:end]
         sig = sig[1:first(i)-1]
     else
         detail = uint32(0)
     end
-    signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{Uint8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
+    signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{UInt8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
     return_value = RT===Void ? C_NULL : gvalue(RT)
-    ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,Uint32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
+    ccall((:g_signal_emitv,libgobject),Void,(Ptr{GValue},Cuint,UInt32,Ptr{GValue}),gvalues(w, args...),signal_id,detail,return_value)
     RT===Void ? nothing : return_value[RT]
 end
 
@@ -362,10 +362,10 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
     end
     timeout != C_NULL && unsafe_store!(timeout, tmout_ms)
     if tmout_ms < 0
-        expiration = typemax(Uint64)
+        expiration = typemax(UInt64)
     elseif tmout_ms > 0
-        now = ccall((:g_source_get_time,GLib.libglib),Uint64,(Ptr{Void},),src)
-        expiration = convert(Uint64,now + tmout_ms*1000)
+        now = ccall((:g_source_get_time,GLib.libglib),UInt64,(Ptr{Void},),src)
+        expiration = convert(UInt64,now + tmout_ms*1000)
     else #tmout_ms == 0
         expiration = uint64(0)
     end
@@ -373,7 +373,7 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
 end
 function uv_check(src::Ptr{Void})
     global expiration
-    ex = expiration::Uint64
+    ex = expiration::UInt64
     if !_isempty_workqueue()
         return int32(1)
     elseif !uv_loop_alive(Base.eventloop())
@@ -383,7 +383,7 @@ function uv_check(src::Ptr{Void})
     elseif uv_pollfd.revents != 0
         return int32(1)
     else
-        now = ccall((:g_source_get_time,GLib.libglib),Uint64,(Ptr{Void},),src)
+        now = ccall((:g_source_get_time,GLib.libglib),UInt64,(Ptr{Void},),src)
         return int32(ex <= now)
     end
 end
@@ -417,9 +417,9 @@ function __init__gmainloop__()
         C_NULL, C_NULL, C_NULL)
     src = new_gsource(uv_sourcefuncs)
     ccall((:g_source_set_can_recurse,GLib.libglib),Void,(Ptr{Void},Cint),src,true)
-    ccall((:g_source_set_name,GLib.libglib),Void,(Ptr{Void},Ptr{Uint8}),src,"uv loop")
-    ccall((:g_source_set_callback,GLib.libglib),Void,(Ptr{Void},Ptr{Void},Uint,Ptr{Void}),
-        src,cfunction(g_yield,Cint,(Uint,)),1,C_NULL)
+    ccall((:g_source_set_name,GLib.libglib),Void,(Ptr{Void},Ptr{UInt8}),src,"uv loop")
+    ccall((:g_source_set_callback,GLib.libglib),Void,(Ptr{Void},Ptr{Void},UInt,Ptr{Void}),
+        src,cfunction(g_yield,Cint,(UInt,)),1,C_NULL)
 
     uv_fd = @windows ? -1 : ccall(:uv_backend_fd,Cint,(Ptr{Void},),Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, typemax(Cushort))
