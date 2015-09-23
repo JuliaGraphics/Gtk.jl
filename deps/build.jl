@@ -47,6 +47,8 @@ end
             else
                 ENV["XDG_DATA_DIRS"] = joinpath("$(Homebrew.brew_prefix)", "share")
             end
+	    ENV["GDK_PIXBUF_MODULEDIR"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders")
+	    ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
         end
         """)
     provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
