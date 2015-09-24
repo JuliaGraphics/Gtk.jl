@@ -4,8 +4,8 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     is_realized::Bool
     is_sized::Bool
     mouse::MouseHandler
-    resize::Union(Function,Void)
-    draw::Union(Function,Void)
+    resize::Union{Function,Void}
+    draw::Union{Function,Void}
     back::CairoSurface   # backing store
     backcc::CairoContext
 

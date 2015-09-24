@@ -106,7 +106,7 @@ Example:
 
 In addition to listening for events, you can trigger your own:
 
-    #syntax: signal_emit(w::GObject, sig::Union(String,Symbol), RT::Type, args...)
+    #syntax: signal_emit(w::GObject, sig::Union{String,Symbol}, RT::Type, args...)
     signal_emit(widget, :event, Void, 42)
 
 Note: the return type and argument types do not need to match the spec. However, the length of the args list MUST exactly match the length of the ArgType's list.

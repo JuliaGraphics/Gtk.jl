@@ -61,7 +61,7 @@ immutable GtkTreeIter
     GtkTreeIter() = new(0,C_NULL,C_NULL,C_NULL)
 end
 
-typealias TRI Union(Mutable{GtkTreeIter},GtkTreeIter)
+typealias TRI Union{Mutable{GtkTreeIter},GtkTreeIter}
 zero(::Type{GtkTreeIter}) = GtkTreeIter()
 copy(ti::GtkTreeIter) = ti
 copy(ti::Mutable{GtkTreeIter}) = mutable(ti[])
@@ -297,14 +297,14 @@ depth(treeStore::GtkTreeStore, iter::TRI) =
     ccall((:gtk_tree_store_iter_depth,libgtk), Cint, (Ptr{GObject},Ptr{GtkTreeIter}),treeStore, mutable(iter))
 
 ## get index store[iter], store[iter, column], store[index], store[index,column]
-getindex(store::Union(GtkTreeStore,GtkListStore), iter::TRI, column::Integer) = getindex(GtkTreeModel(store), iter, column)
-getindex(store::Union(GtkTreeStore, GtkListStore), iter::TRI) = getindex(GtkTreeModel(store), iter)
+getindex(store::Union{GtkTreeStore,GtkListStore}, iter::TRI, column::Integer) = getindex(GtkTreeModel(store), iter, column)
+getindex(store::Union{GtkTreeStore, GtkListStore}, iter::TRI) = getindex(GtkTreeModel(store), iter)
 
 getindex(store::GtkTreeStore, row::Vector{Int}, column) = getindex(store, iter_from_index(store, row), column)
 getindex(store::GtkTreeStore, row::Vector{Int}) = getindex(store, iter_from_index(store, row))
 
 
-function setindex!(store::Union(GtkListStore, GtkTreeStore), value, iter::TRI, column::Integer)
+function setindex!(store::Union{GtkListStore, GtkTreeStore}, value, iter::TRI, column::Integer)
     Gtk.G_.value(store, Gtk.mutable(iter), column-1, gvalue(value))
 end
 
@@ -459,7 +459,7 @@ index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_
 type TreeIterator
     store::GtkTreeStore
     model::GtkTreeModel
-    iter::Union(Void, TRI)
+    iter::Union{Void, TRI}
 end
 TreeIterator(store::GtkTreeStore, iter=nothing) = TreeIterator(store, GtkTreeModel(store), iter)
 

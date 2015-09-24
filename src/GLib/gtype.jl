@@ -378,7 +378,7 @@ _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
 
-const gc_preserve_gtk = Dict{Union(WeakRef,GObject),Bool}() # gtk objects
+const gc_preserve_gtk = Dict{Union{WeakRef,GObject},Bool}() # gtk objects
 function gobject_ref{T<:GObject}(x::T)
     global gc_preserve_gtk
     addref = function()

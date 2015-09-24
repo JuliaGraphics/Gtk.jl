@@ -6,7 +6,7 @@ immutable GValue
     field3::UInt64
     GValue() = new(0,0,0)
 end
-typealias GV Union(Mutable{GValue}, Ptr{GValue})
+typealias GV Union{Mutable{GValue}, Ptr{GValue}}
 Base.zero(::Type{GValue}) = GValue()
 function gvalue{T}(::Type{T})
     v = mutable(GValue())

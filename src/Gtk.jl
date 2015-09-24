@@ -28,7 +28,7 @@ import .Graphics: width, height, getgc
 using Cairo
 import Cairo: destroy
 
-typealias Index Union(Integer,AbstractVector{TypeVar(:I,Integer)})
+typealias Index Union{Integer,AbstractVector{TypeVar(:I,Integer)}}
 
 export GAccessor
 include("basic_exports.jl")

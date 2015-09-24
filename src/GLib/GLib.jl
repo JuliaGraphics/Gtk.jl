@@ -58,7 +58,7 @@ end
 importall .Compat
 
 # local function, handles Symbol and makes UTF8-strings easier
-typealias AbstractStringLike Union(AbstractString,Symbol)
+typealias AbstractStringLike Union{AbstractString,Symbol}
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
