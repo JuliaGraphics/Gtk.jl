@@ -31,13 +31,13 @@ if gtk_version == 3
         return convert(GtkWidget, x)
     end
 
-    function setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, i::Union(T,Range{T}), j::Union(R,Range{R}))
+    function setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child, i::Union{T,Range{T}}, j::Union{R,Range{R}})
         (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
         ccall((:gtk_grid_attach, libgtk), Void,
             (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
     end
     #TODO:
-    # function setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child::Array, j::Union(T,Range{T}), i::Union(R,Range1{R}))
+    # function setindex!{T<:Integer,R<:Integer}(grid::GtkGrid, child::Array, j::Union{T,Range{T}}, i::Union{R,Range1{R}})
     #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     #    ccall((:gtk_grid_attach, libgtk), Void,
     #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
@@ -65,13 +65,13 @@ end
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
 GtkTableLeaf(homogeneous::Bool=false) = GtkTableLeaf(0,0,homogeneous)
-function setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union(T,Range{T}), j::Union(R,Range{R}))
+function setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child, i::Union{T,Range{T}}, j::Union{R,Range{R}})
     (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     ccall((:gtk_table_attach_defaults, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 end
 #TODO:
-# function setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child::Array, i::Union(T,Range{T}), j::Union(R,Range{R}))
+# function setindex!{T<:Integer,R<:Integer}(grid::GtkTable, child::Array, i::Union{T,Range{T}}, j::Union{R,Range{R}})
 #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
 #    ccall((:gtk_table_attach_defaults, libgtk), Void,
 #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
@@ -205,19 +205,19 @@ GtkExpanderLeaf(title::AbstractStringLike) =
 
 ### GtkNotebook
 GtkNotebookLeaf() = GtkNotebookLeaf(ccall((:gtk_notebook_new, libgtk), Ptr{GObject},()))
-function insert!(w::GtkNotebook, position::Integer, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
+function insert!(w::GtkNotebook, position::Integer, x::Union{GtkWidget,AbstractStringLike}, label::Union{GtkWidget,AbstractStringLike})
     ccall((:gtk_notebook_insert_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
         w, x, label, position-1)+1
     w
 end
-function unshift!(w::GtkNotebook, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
+function unshift!(w::GtkNotebook, x::Union{GtkWidget,AbstractStringLike}, label::Union{GtkWidget,AbstractStringLike})
     ccall((:gtk_notebook_prepend_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
     w
 end
-function push!(w::GtkNotebook, x::Union(GtkWidget,AbstractStringLike), label::Union(GtkWidget,AbstractStringLike))
+function push!(w::GtkNotebook, x::Union{GtkWidget,AbstractStringLike}, label::Union{GtkWidget,AbstractStringLike})
     ccall((:gtk_notebook_append_page,libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label)+1
@@ -242,4 +242,3 @@ if gtk_version == 3
             (Ptr{GObject}, Ptr{GObject}), w, x)
     end
 end
-

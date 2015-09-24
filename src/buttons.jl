@@ -93,7 +93,7 @@ function push!(grp::GtkRadioButtonGroup,e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup,label,active::Union(Bool,Void)=nothing)
+function push!(grp::GtkRadioButtonGroup,label,active::Union{Bool,Void}=nothing)
     if isdefined(grp,:anchor)
         e = GtkRadioButtonLeaf(grp.anchor, label)
     else

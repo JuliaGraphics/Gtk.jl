@@ -35,7 +35,7 @@ end
 GList{T}(list::Type{T}) = GList(convert(Ptr{_GList{T}}, C_NULL), true)
 GList{L<:_LList}(list::Ptr{L},transfer_full::Bool=false) = GList{L, eltype(L)}(list, transfer_full)
 
-typealias LList{L<:_LList} Union(Ptr{L}, GList{L})
+typealias LList{L<:_LList} Union{Ptr{L}, GList{L}}
 eltype{L<:_LList}(::LList{L}) = eltype(L)
 
 deref{L<:_LList}(item::Ptr{L}) = deref_to(L, unsafe_load(item).data) # extract something from the glist (automatically determine type)
