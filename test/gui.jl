@@ -10,8 +10,11 @@ w = @Window("Window", 400, 300) |> showall
 @assert size(w) == (400, 300)
 G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
+## Check Window positions
 pos = G_.position(w)
-@assert G_.position(w) == pos
+if G_.position(w) != pos
+    warn("The Window Manager did move the Gtk Window in show")
+end
 G_.position(w, 100, 100)
 sleep(0.1)
 if G_.position(w) == pos
