@@ -56,7 +56,7 @@ function GtkFileFilterLeaf(; name::Union{ByteString,Void} = nothing, pattern::By
     else
         ccall((:gtk_file_filter_add_pixbuf_formats,libgtk), Void, (Ptr{GObject},), filt)
     end
-    ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, isempty(name) || name==nothing ? C_NULL : name)
+    ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
     filt
 end
 GtkFileFilterLeaf(pattern::ByteString; name::Union{ByteString,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)

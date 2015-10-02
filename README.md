@@ -493,8 +493,8 @@ It also provides two functions, `open_dialog` and `save_dialog`, making this fun
 The syntax of these two functions are as follows:
 
 ```jl
-open_dialog(title; parent = nothing, filters = ASCIIString[], multiple = false)
-save_dialog(title; parent = nothing, filters = ASCIIString[])
+open_dialog(title, GtkNullContainer(), ASCIIString[])
+save_dialog(title, GtkNullContainer(), ASCIIString[])
 ```
 
 If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
@@ -512,14 +512,14 @@ The generic specification of a filter is
 Here are some examples:
 ```jl
 open_dialog("Pick a file")
-open_dialog("Pick some files", multiple=true)
-open_dialog("Pick a file", filters=("*.jl",))
-open_dialog("Pick some text files", filters=("*.txt,*.csv",), multiple=true)
-open_dialog("Pick a file", filters=(@FileFilter(mimetype="text/csv"),))
-open_dialog("Pick an image file", filters=("*.png", "*.jpg", @FileFilter("*.png,*.jpg", name="All supported formats")))
-open_dialog("Pick an image file", filters=(@FileFilter(name="Supported image formats"),))
+open_dialog("Pick some files", select_multiple=true)
+open_dialog("Pick a file", Null(), ("*.jl",))
+open_dialog("Pick some text files", GtkNullContainer(), ("*.txt,*.csv",), select_multiple=true)
+open_dialog("Pick a file", Null(), (@FileFilter(mimetype="text/csv"),))
+open_dialog("Pick an image file", GtkNullContainer(), ("*.png", "*.jpg", @FileFilter("*.png,*.jpg", name="All supported formats")))
+open_dialog("Pick an image file", GtkNullContainer(), (@FileFilter(name="Supported image formats"),))
 
-save_dialog("Save as...", filters=(@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
+save_dialog("Save as...", Null(), (@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
 ```
 
 #### Message dialogs
@@ -529,6 +529,6 @@ Gtk.jl also supports `GtkMessageDialog` and provides several convenience functio
 
 ```jl
 info_dialog("Julia rocks!")
-ask_dialog('Do you like chocolate ice cream?, "I like it", "Not at all") && println("That's my favorite too.")
-warn_dialog("Oops!... I did it again", win)
+ask_dialog("Do you like chocolate ice cream?", "I like it", "Not at all") && println("That's my favorite too.")
+warn_dialog("Oops!... I did it again", window)
 ```
