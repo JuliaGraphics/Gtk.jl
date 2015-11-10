@@ -19,13 +19,21 @@ function without_linenums!(ex::Expr)
     ex
 end
 
-gtk_libdir = "/opt/local/lib"
+gtk_libpaths = ("/opt/local", "/usr/lib")
 
-toplevels = {}
+toplevels = Any[]
 cppargs = []
 let gtk_version = Gtk.gtk_version
-    header = joinpath(gtk_libdir,"..","include","gtk-$gtk_version.0","gtk","gtk.h")
-    args = ASCIIString[split(readall(`$(joinpath(gtk_libdir,"..","bin","pkg-config")) --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
+    header = gtk_libdir = ""
+    for pth in gtk_libpaths
+         header = joinpath(pth,"..","include","gtk-$gtk_version.0","gtk","gtk.h")
+        if isfile(header)
+            gtk_libdir = pth
+            break
+        end
+    end
+    isfile(header) || error("gtk.h not found, please specify path")
+    args = ASCIIString[split(readall(`pkg-config --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
     global gtk_h, gtk_macro_h
     cd(JULIA_HOME) do
         gtk_h = cindex.parse_header(header, diagnostics=true, args=args, flags=0x41)
@@ -76,4 +84,3 @@ let gtk_version = Gtk.gtk_version
     push!(toplevels,(gbox,gconsts,g_types,gtk_h))
 end
 toplevels
-

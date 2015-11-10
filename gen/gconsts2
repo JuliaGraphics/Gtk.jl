@@ -1,22 +1,6 @@
 quote
 $(Expr(:toplevel, :(module GConstants
-    export GUserDirectory, GFormatSizeFlags, GThreadError, GOnceStatus, GBookmarkFileError, GChecksumType, GConvertError, GDateDMY, GDateWeekday, GDateMonth, GTimeType, GFileError, GFileTest, GTraverseFlags, GTraverseType, GHookFlagMask, GIOCondition, GUnicodeType, GUnicodeBreakType, GUnicodeScript, GNormalizeMode, GIOError, GIOChannelError, GIOStatus, GSeekType, GIOFlags, GKeyFileError, GKeyFileFlags, GMarkupError, GMarkupParseFlags, GMarkupCollectType, GLogLevelFlags, GOptionFlags, GOptionArg, GOptionError, GRegexError, GRegexCompileFlags, GRegexMatchFlags, GErrorType, GTokenType, GShellError, GSliceConfig, GSpawnError, GSpawnFlags, GAsciiType, GTestTrapFlags, GTestSubprocessFlags, GTestLogType, GTestFileType, GVariantClass, GVariantParseError, GThreadPriority, GTypeDebugFlags, GTypeFundamentalFlags, GTypeFlags, GParamFlags, GSignalFlags, GConnectFlags, GSignalMatchType, GBindingFlags, GAppInfoCreateFlags, GConverterFlags, GConverterResult, GDataStreamByteOrder, GDataStreamNewlineType, GFileAttributeType, GFileAttributeInfoFlags, GFileAttributeStatus, GFileQueryInfoFlags, GFileCreateFlags, GFileMeasureFlags, GMountMountFlags, GMountUnmountFlags, GDriveStartFlags, GDriveStartStopType, GFileCopyFlags, GFileMonitorFlags, GFileType, GFilesystemPreviewType, GFileMonitorEvent, GIOErrorEnum, GAskPasswordFlags, GPasswordSave, GMountOperationResult, GOutputStreamSpliceFlags, GIOStreamSpliceFlags, GEmblemOrigin, GResolverError, GResolverRecordType, GResourceError, GResourceFlags, GResourceLookupFlags, GSocketFamily, GSocketType, GSocketMsgFlags, GSocketProtocol, GZlibCompressorFormat, GUnixSocketAddressType, GBusType, GBusNameOwnerFlags, GBusNameWatcherFlags, GDBusProxyFlags, GDBusError, GDBusConnectionFlags, GDBusCapabilityFlags, GDBusCallFlags, GDBusMessageType, GDBusMessageFlags, GDBusMessageHeaderField, GDBusPropertyInfoFlags, GDBusSubtreeFlags, GDBusServerFlags, GDBusSignalFlags, GDBusSendMessageFlags, GCredentialsType, GDBusMessageByteOrder, GApplicationFlags, GTlsError, GTlsCertificateFlags, GTlsAuthenticationMode, GTlsRehandshakeMode, GTlsPasswordFlags, GTlsInteractionResult, GDBusInterfaceSkeletonFlags, GDBusObjectManagerClientFlags, GTlsDatabaseVerifyFlags, GTlsDatabaseLookupFlags, GTlsCertificateRequestFlags, GIOModuleScopeFlags, GSocketClientEvent, GTestDBusFlags, GSubprocessFlags, GNotificationPriority, GNetworkConnectivity, GModuleFlags, GSettingsBindFlags, GdkByteOrder, GdkModifierType, GdkInputCondition, GdkStatus, GdkGrabStatus, GdkDragAction, GdkDragProtocol, GdkExtensionMode, GdkInputSource, GdkInputMode, GdkAxisUse, GdkFilterReturn, GdkEventType, GdkEventMask, GdkVisibilityState, GdkScrollDirection, GdkNotifyType, GdkCrossingMode, GdkPropertyState, GdkWindowState, GdkSettingAction, GdkOwnerChange, GdkRgbDither, GdkPixbufAlphaMode, GdkColorspace, GdkPixbufError, GdkInterpType, GdkPixbufRotation, GdkCursorType, GdkCapStyle, GdkFill, GdkFunction, GdkJoinStyle, GdkLineStyle, GdkSubwindowMode, GdkGCValuesMask, GdkFontType, GdkImageType, GdkPropMode, GdkFillRule, GdkOverlapType, GdkWindowClass, GdkWindowType, GdkWindowAttributesType, GdkWindowHints, GdkWindowTypeHint, GdkWMDecoration, GdkWMFunction, GdkGravity, GdkWindowEdge, GdkVisualType, GtkAnchorType, GtkArrowPlacement, GtkArrowType, GtkAttachOptions, GtkButtonBoxStyle, GtkCurveType, GtkDeleteType, GtkDirectionType, GtkExpanderStyle, GtkIconSize, GtkSensitivityType, GtkSideType, GtkTextDirection, GtkJustification, GtkMatchType, GtkMenuDirectionType, GtkMessageType, GtkMetricType, GtkMovementStep, GtkScrollStep, GtkOrientation, GtkCornerType, GtkPackType, GtkPathPriorityType, GtkPathType, GtkPolicyType, GtkPositionType, GtkPreviewType, GtkReliefStyle, GtkResizeMode, GtkSignalRunType, GtkScrollType, GtkSelectionMode, GtkShadowType, GtkStateType, GtkSubmenuDirection, GtkSubmenuPlacement, GtkToolbarStyle, GtkUpdateType, GtkVisibility, GtkWindowPosition, GtkWindowType, GtkWrapMode, GtkSortType, GtkIMPreeditStyle, GtkIMStatusStyle, GtkPackDirection, GtkPrintPages, GtkPageSet, GtkNumberUpLayout, GtkPageOrientation, GtkPrintQuality, GtkPrintDuplex, GtkUnit, GtkTreeViewGridLines, GtkDragResult, GtkAccelFlags, GtkDebugFlag, GtkObjectFlags, GtkArgFlags, GtkRcFlags, GtkRcTokenType, GtkWidgetFlags, GtkWidgetHelpType, GtkDialogFlags, GtkResponseType, GtkAssistantPageType, GtkBuilderError, GtkImageType, GtkCalendarDisplayOptions, GtkCellRendererState, GtkCellRendererMode, GtkTreeModelFlags, GtkTreeViewColumnSizing, GtkCellRendererAccelMode, GtkTextSearchFlags, GtkDestDefaults, GtkTargetFlags, GtkEntryIconPosition, GtkTreeViewDropPosition, GtkFileFilterFlags, GtkFileChooserAction, GtkFileChooserConfirmation, GtkFileChooserError, GtkIconLookupFlags, GtkIconThemeError, GtkIconViewDropPosition, GtkSizeGroupMode, GtkButtonsType, GtkNotebookTab, GtkPrintStatus, GtkPrintOperationResult, GtkPrintOperationAction, GtkPrintError, GtkProgressBarStyle, GtkProgressBarOrientation, GtkRecentManagerError, GtkRecentFilterFlags, GtkRecentSortType, GtkRecentChooserError, GtkSpinButtonUpdatePolicy, GtkSpinType, GtkTextBufferTargetInfo, GtkTextWindowType, GtkToolbarChildType, GtkToolbarSpaceStyle, GtkToolPaletteDragTargets, GtkUIManagerItemType, GtkCellType, GtkCListDragPos, GtkButtonAction, GtkCTreePos, GtkCTreeLineStyle, GtkCTreeExpanderStyle, GtkCTreeExpansionType
-    $(Expr(:toplevel, :(baremodule GUserDirectory
-    const DIRECTORY_DESKTOP = const G_USER_DIRECTORY_DESKTOP = Main.Base.convert(Main.Base.Int32,0)
-    const DIRECTORY_DOCUMENTS = const G_USER_DIRECTORY_DOCUMENTS = Main.Base.convert(Main.Base.Int32,1)
-    const DIRECTORY_DOWNLOAD = const G_USER_DIRECTORY_DOWNLOAD = Main.Base.convert(Main.Base.Int32,2)
-    const DIRECTORY_MUSIC = const G_USER_DIRECTORY_MUSIC = Main.Base.convert(Main.Base.Int32,3)
-    const DIRECTORY_PICTURES = const G_USER_DIRECTORY_PICTURES = Main.Base.convert(Main.Base.Int32,4)
-    const DIRECTORY_PUBLIC_SHARE = const G_USER_DIRECTORY_PUBLIC_SHARE = Main.Base.convert(Main.Base.Int32,5)
-    const DIRECTORY_TEMPLATES = const G_USER_DIRECTORY_TEMPLATES = Main.Base.convert(Main.Base.Int32,6)
-    const DIRECTORY_VIDEOS = const G_USER_DIRECTORY_VIDEOS = Main.Base.convert(Main.Base.Int32,7)
-    const N_DIRECTORIES = const G_USER_N_DIRECTORIES = Main.Base.convert(Main.Base.Int32,8)
-    end)))
-    $(Expr(:toplevel, :(baremodule GFormatSizeFlags
-    const DEFAULT = const G_FORMAT_SIZE_DEFAULT = Main.Base.convert(Main.Base.Int32,0)
-    const LONG_FORMAT = const G_FORMAT_SIZE_LONG_FORMAT = Main.Base.convert(Main.Base.Int32,1)
-    const IEC_UNITS = const G_FORMAT_SIZE_IEC_UNITS = Main.Base.convert(Main.Base.Int32,2)
-    end)))
+    export GThreadError, GOnceStatus, GBookmarkFileError, GChecksumType, GConvertError, GDateDMY, GDateWeekday, GDateMonth, GTimeType, GFileError, GFileTest, GTraverseFlags, GTraverseType, GHookFlagMask, GIOCondition, GUnicodeType, GUnicodeBreakType, GUnicodeScript, GNormalizeMode, GUserDirectory, GFormatSizeFlags, GIOError, GIOChannelError, GIOStatus, GSeekType, GIOFlags, GKeyFileError, GKeyFileFlags, GMarkupError, GMarkupParseFlags, GMarkupCollectType, GLogLevelFlags, GOptionFlags, GOptionArg, GOptionError, GRegexError, GRegexCompileFlags, GRegexMatchFlags, GErrorType, GTokenType, GShellError, GSliceConfig, GSpawnError, GSpawnFlags, GAsciiType, GTestTrapFlags, GTestSubprocessFlags, GTestLogType, GTestFileType, GVariantClass, GVariantParseError, GThreadPriority, GTypeDebugFlags, GTypeFundamentalFlags, GTypeFlags, GParamFlags, GSignalFlags, GConnectFlags, GSignalMatchType, GBindingFlags, GAppInfoCreateFlags, GConverterFlags, GConverterResult, GDataStreamByteOrder, GDataStreamNewlineType, GFileAttributeType, GFileAttributeInfoFlags, GFileAttributeStatus, GFileQueryInfoFlags, GFileCreateFlags, GFileMeasureFlags, GMountMountFlags, GMountUnmountFlags, GDriveStartFlags, GDriveStartStopType, GFileCopyFlags, GFileMonitorFlags, GFileType, GFilesystemPreviewType, GFileMonitorEvent, GIOErrorEnum, GAskPasswordFlags, GPasswordSave, GMountOperationResult, GOutputStreamSpliceFlags, GIOStreamSpliceFlags, GEmblemOrigin, GResolverError, GResolverRecordType, GResourceError, GResourceFlags, GResourceLookupFlags, GSocketFamily, GSocketType, GSocketMsgFlags, GSocketProtocol, GZlibCompressorFormat, GUnixSocketAddressType, GBusType, GBusNameOwnerFlags, GBusNameWatcherFlags, GDBusProxyFlags, GDBusError, GDBusConnectionFlags, GDBusCapabilityFlags, GDBusCallFlags, GDBusMessageType, GDBusMessageFlags, GDBusMessageHeaderField, GDBusPropertyInfoFlags, GDBusSubtreeFlags, GDBusServerFlags, GDBusSignalFlags, GDBusSendMessageFlags, GCredentialsType, GDBusMessageByteOrder, GApplicationFlags, GTlsError, GTlsCertificateFlags, GTlsAuthenticationMode, GTlsRehandshakeMode, GTlsPasswordFlags, GTlsInteractionResult, GDBusInterfaceSkeletonFlags, GDBusObjectManagerClientFlags, GTlsDatabaseVerifyFlags, GTlsDatabaseLookupFlags, GTlsCertificateRequestFlags, GIOModuleScopeFlags, GSocketClientEvent, GTestDBusFlags, GSubprocessFlags, GModuleFlags, GSettingsBindFlags, GdkByteOrder, GdkModifierType, GdkInputCondition, GdkStatus, GdkGrabStatus, GdkDragAction, GdkDragProtocol, GdkExtensionMode, GdkInputSource, GdkInputMode, GdkAxisUse, GdkFilterReturn, GdkEventType, GdkEventMask, GdkVisibilityState, GdkScrollDirection, GdkNotifyType, GdkCrossingMode, GdkPropertyState, GdkWindowState, GdkSettingAction, GdkOwnerChange, GdkRgbDither, GdkPixbufAlphaMode, GdkColorspace, GdkPixbufError, GdkInterpType, GdkPixbufRotation, GdkCursorType, GdkCapStyle, GdkFill, GdkFunction, GdkJoinStyle, GdkLineStyle, GdkSubwindowMode, GdkGCValuesMask, GdkFontType, GdkImageType, GdkPropMode, GdkFillRule, GdkOverlapType, GdkWindowClass, GdkWindowType, GdkWindowAttributesType, GdkWindowHints, GdkWindowTypeHint, GdkWMDecoration, GdkWMFunction, GdkGravity, GdkWindowEdge, GdkVisualType, GtkAnchorType, GtkArrowPlacement, GtkArrowType, GtkAttachOptions, GtkButtonBoxStyle, GtkCurveType, GtkDeleteType, GtkDirectionType, GtkExpanderStyle, GtkIconSize, GtkSensitivityType, GtkSideType, GtkTextDirection, GtkJustification, GtkMatchType, GtkMenuDirectionType, GtkMessageType, GtkMetricType, GtkMovementStep, GtkScrollStep, GtkOrientation, GtkCornerType, GtkPackType, GtkPathPriorityType, GtkPathType, GtkPolicyType, GtkPositionType, GtkPreviewType, GtkReliefStyle, GtkResizeMode, GtkSignalRunType, GtkScrollType, GtkSelectionMode, GtkShadowType, GtkStateType, GtkSubmenuDirection, GtkSubmenuPlacement, GtkToolbarStyle, GtkUpdateType, GtkVisibility, GtkWindowPosition, GtkWindowType, GtkWrapMode, GtkSortType, GtkIMPreeditStyle, GtkIMStatusStyle, GtkPackDirection, GtkPrintPages, GtkPageSet, GtkNumberUpLayout, GtkPageOrientation, GtkPrintQuality, GtkPrintDuplex, GtkUnit, GtkTreeViewGridLines, GtkDragResult, GtkAccelFlags, GtkDebugFlag, GtkObjectFlags, GtkArgFlags, GtkRcFlags, GtkRcTokenType, GtkWidgetFlags, GtkWidgetHelpType, GtkDialogFlags, GtkResponseType, GtkAssistantPageType, GtkBuilderError, GtkImageType, GtkCalendarDisplayOptions, GtkCellRendererState, GtkCellRendererMode, GtkTreeModelFlags, GtkTreeViewColumnSizing, GtkCellRendererAccelMode, GtkTextSearchFlags, GtkDestDefaults, GtkTargetFlags, GtkEntryIconPosition, GtkTreeViewDropPosition, GtkFileFilterFlags, GtkFileChooserAction, GtkFileChooserConfirmation, GtkFileChooserError, GtkIconLookupFlags, GtkIconThemeError, GtkIconViewDropPosition, GtkSizeGroupMode, GtkButtonsType, GtkNotebookTab, GtkPrintStatus, GtkPrintOperationResult, GtkPrintOperationAction, GtkPrintError, GtkProgressBarStyle, GtkProgressBarOrientation, GtkRecentManagerError, GtkRecentFilterFlags, GtkRecentSortType, GtkRecentChooserError, GtkSpinButtonUpdatePolicy, GtkSpinType, GtkTextBufferTargetInfo, GtkTextWindowType, GtkToolbarChildType, GtkToolbarSpaceStyle, GtkToolPaletteDragTargets, GtkUIManagerItemType, GtkCellType, GtkCListDragPos, GtkButtonAction, GtkCTreePos, GtkCTreeLineStyle, GtkCTreeExpanderStyle, GtkCTreeExpansionType
     $(Expr(:toplevel, :(baremodule GThreadError
     const AGAIN = const G_THREAD_ERROR_AGAIN = Main.Base.convert(Main.Base.Int32,0)
     end)))
@@ -325,29 +309,6 @@ $(Expr(:toplevel, :(module GConstants
     const SHARADA = const G_UNICODE_SCRIPT_SHARADA = Main.Base.convert(Main.Base.Int32,100)
     const SORA_SOMPENG = const G_UNICODE_SCRIPT_SORA_SOMPENG = Main.Base.convert(Main.Base.Int32,101)
     const TAKRI = const G_UNICODE_SCRIPT_TAKRI = Main.Base.convert(Main.Base.Int32,102)
-    const BASSA_VAH = const G_UNICODE_SCRIPT_BASSA_VAH = Main.Base.convert(Main.Base.Int32,103)
-    const CAUCASIAN_ALBANIAN = const G_UNICODE_SCRIPT_CAUCASIAN_ALBANIAN = Main.Base.convert(Main.Base.Int32,104)
-    const DUPLOYAN = const G_UNICODE_SCRIPT_DUPLOYAN = Main.Base.convert(Main.Base.Int32,105)
-    const ELBASAN = const G_UNICODE_SCRIPT_ELBASAN = Main.Base.convert(Main.Base.Int32,106)
-    const GRANTHA = const G_UNICODE_SCRIPT_GRANTHA = Main.Base.convert(Main.Base.Int32,107)
-    const KHOJKI = const G_UNICODE_SCRIPT_KHOJKI = Main.Base.convert(Main.Base.Int32,108)
-    const KHUDAWADI = const G_UNICODE_SCRIPT_KHUDAWADI = Main.Base.convert(Main.Base.Int32,109)
-    const LINEAR_A = const G_UNICODE_SCRIPT_LINEAR_A = Main.Base.convert(Main.Base.Int32,110)
-    const MAHAJANI = const G_UNICODE_SCRIPT_MAHAJANI = Main.Base.convert(Main.Base.Int32,111)
-    const MANICHAEAN = const G_UNICODE_SCRIPT_MANICHAEAN = Main.Base.convert(Main.Base.Int32,112)
-    const MENDE_KIKAKUI = const G_UNICODE_SCRIPT_MENDE_KIKAKUI = Main.Base.convert(Main.Base.Int32,113)
-    const MODI = const G_UNICODE_SCRIPT_MODI = Main.Base.convert(Main.Base.Int32,114)
-    const MRO = const G_UNICODE_SCRIPT_MRO = Main.Base.convert(Main.Base.Int32,115)
-    const NABATAEAN = const G_UNICODE_SCRIPT_NABATAEAN = Main.Base.convert(Main.Base.Int32,116)
-    const OLD_NORTH_ARABIAN = const G_UNICODE_SCRIPT_OLD_NORTH_ARABIAN = Main.Base.convert(Main.Base.Int32,117)
-    const OLD_PERMIC = const G_UNICODE_SCRIPT_OLD_PERMIC = Main.Base.convert(Main.Base.Int32,118)
-    const PAHAWH_HMONG = const G_UNICODE_SCRIPT_PAHAWH_HMONG = Main.Base.convert(Main.Base.Int32,119)
-    const PALMYRENE = const G_UNICODE_SCRIPT_PALMYRENE = Main.Base.convert(Main.Base.Int32,120)
-    const PAU_CIN_HAU = const G_UNICODE_SCRIPT_PAU_CIN_HAU = Main.Base.convert(Main.Base.Int32,121)
-    const PSALTER_PAHLAVI = const G_UNICODE_SCRIPT_PSALTER_PAHLAVI = Main.Base.convert(Main.Base.Int32,122)
-    const SIDDHAM = const G_UNICODE_SCRIPT_SIDDHAM = Main.Base.convert(Main.Base.Int32,123)
-    const TIRHUTA = const G_UNICODE_SCRIPT_TIRHUTA = Main.Base.convert(Main.Base.Int32,124)
-    const WARANG_CITI = const G_UNICODE_SCRIPT_WARANG_CITI = Main.Base.convert(Main.Base.Int32,125)
     end)))
     $(Expr(:toplevel, :(baremodule GNormalizeMode
     const DEFAULT = const G_NORMALIZE_DEFAULT = Main.Base.convert(Main.Base.Int32,0)
@@ -358,6 +319,22 @@ $(Expr(:toplevel, :(module GConstants
     const NFKD = const G_NORMALIZE_NFKD = Main.Base.convert(Main.Base.Int32,2)
     const ALL_COMPOSE = const G_NORMALIZE_ALL_COMPOSE = Main.Base.convert(Main.Base.Int32,3)
     const NFKC = const G_NORMALIZE_NFKC = Main.Base.convert(Main.Base.Int32,3)
+    end)))
+    $(Expr(:toplevel, :(baremodule GUserDirectory
+    const DIRECTORY_DESKTOP = const G_USER_DIRECTORY_DESKTOP = Main.Base.convert(Main.Base.Int32,0)
+    const DIRECTORY_DOCUMENTS = const G_USER_DIRECTORY_DOCUMENTS = Main.Base.convert(Main.Base.Int32,1)
+    const DIRECTORY_DOWNLOAD = const G_USER_DIRECTORY_DOWNLOAD = Main.Base.convert(Main.Base.Int32,2)
+    const DIRECTORY_MUSIC = const G_USER_DIRECTORY_MUSIC = Main.Base.convert(Main.Base.Int32,3)
+    const DIRECTORY_PICTURES = const G_USER_DIRECTORY_PICTURES = Main.Base.convert(Main.Base.Int32,4)
+    const DIRECTORY_PUBLIC_SHARE = const G_USER_DIRECTORY_PUBLIC_SHARE = Main.Base.convert(Main.Base.Int32,5)
+    const DIRECTORY_TEMPLATES = const G_USER_DIRECTORY_TEMPLATES = Main.Base.convert(Main.Base.Int32,6)
+    const DIRECTORY_VIDEOS = const G_USER_DIRECTORY_VIDEOS = Main.Base.convert(Main.Base.Int32,7)
+    const N_DIRECTORIES = const G_USER_N_DIRECTORIES = Main.Base.convert(Main.Base.Int32,8)
+    end)))
+    $(Expr(:toplevel, :(baremodule GFormatSizeFlags
+    const DEFAULT = const G_FORMAT_SIZE_DEFAULT = Main.Base.convert(Main.Base.Int32,0)
+    const LONG_FORMAT = const G_FORMAT_SIZE_LONG_FORMAT = Main.Base.convert(Main.Base.Int32,1)
+    const IEC_UNITS = const G_FORMAT_SIZE_IEC_UNITS = Main.Base.convert(Main.Base.Int32,2)
     end)))
     $(Expr(:toplevel, :(baremodule GIOError
     const NONE = const G_IO_ERROR_NONE = Main.Base.convert(Main.Base.Int32,0)
@@ -446,7 +423,6 @@ $(Expr(:toplevel, :(module GConstants
     const LEVEL_MASK = const G_LOG_LEVEL_MASK = Main.Base.convert(Main.Base.Int32,-4)
     end)))
     $(Expr(:toplevel, :(baremodule GOptionFlags
-    const NONE = const G_OPTION_FLAG_NONE = Main.Base.convert(Main.Base.Int32,0)
     const HIDDEN = const G_OPTION_FLAG_HIDDEN = Main.Base.convert(Main.Base.Int32,1)
     const IN_MAIN = const G_OPTION_FLAG_IN_MAIN = Main.Base.convert(Main.Base.Int32,2)
     const REVERSE = const G_OPTION_FLAG_REVERSE = Main.Base.convert(Main.Base.Int32,4)
@@ -742,8 +718,7 @@ $(Expr(:toplevel, :(module GConstants
     const NONE = const G_TYPE_DEBUG_NONE = Main.Base.convert(Main.Base.Int32,0)
     const OBJECTS = const G_TYPE_DEBUG_OBJECTS = Main.Base.convert(Main.Base.Int32,1)
     const SIGNALS = const G_TYPE_DEBUG_SIGNALS = Main.Base.convert(Main.Base.Int32,2)
-    const INSTANCE_COUNT = const G_TYPE_DEBUG_INSTANCE_COUNT = Main.Base.convert(Main.Base.Int32,4)
-    const MASK = const G_TYPE_DEBUG_MASK = Main.Base.convert(Main.Base.Int32,7)
+    const MASK = const G_TYPE_DEBUG_MASK = Main.Base.convert(Main.Base.Int32,3)
     end)))
     $(Expr(:toplevel, :(baremodule GTypeFundamentalFlags
     const CLASSED = const G_TYPE_FLAG_CLASSED = Main.Base.convert(Main.Base.Int32,1)
@@ -758,7 +733,6 @@ $(Expr(:toplevel, :(module GConstants
     $(Expr(:toplevel, :(baremodule GParamFlags
     const READABLE = const G_PARAM_READABLE = Main.Base.convert(Main.Base.Int32,1)
     const WRITABLE = const G_PARAM_WRITABLE = Main.Base.convert(Main.Base.Int32,2)
-    const READWRITE = const G_PARAM_READWRITE = Main.Base.convert(Main.Base.Int32,3)
     const CONSTRUCT = const G_PARAM_CONSTRUCT = Main.Base.convert(Main.Base.Int32,4)
     const CONSTRUCT_ONLY = const G_PARAM_CONSTRUCT_ONLY = Main.Base.convert(Main.Base.Int32,8)
     const LAX_VALIDATION = const G_PARAM_LAX_VALIDATION = Main.Base.convert(Main.Base.Int32,16)
@@ -766,7 +740,6 @@ $(Expr(:toplevel, :(module GConstants
     const PRIVATE = const G_PARAM_PRIVATE = Main.Base.convert(Main.Base.Int32,32)
     const STATIC_NICK = const G_PARAM_STATIC_NICK = Main.Base.convert(Main.Base.Int32,64)
     const STATIC_BLURB = const G_PARAM_STATIC_BLURB = Main.Base.convert(Main.Base.Int32,128)
-    const EXPLICIT_NOTIFY = const G_PARAM_EXPLICIT_NOTIFY = Main.Base.convert(Main.Base.Int32,1073741824)
     const DEPRECATED = const G_PARAM_DEPRECATED = Main.Base.convert(Main.Base.Int32,-2147483648)
     end)))
     $(Expr(:toplevel, :(baremodule GSignalFlags
@@ -965,8 +938,6 @@ $(Expr(:toplevel, :(module GConstants
     const PROXY_NEED_AUTH = const G_IO_ERROR_PROXY_NEED_AUTH = Main.Base.convert(Main.Base.Int32,42)
     const PROXY_NOT_ALLOWED = const G_IO_ERROR_PROXY_NOT_ALLOWED = Main.Base.convert(Main.Base.Int32,43)
     const BROKEN_PIPE = const G_IO_ERROR_BROKEN_PIPE = Main.Base.convert(Main.Base.Int32,44)
-    const CONNECTION_CLOSED = const G_IO_ERROR_CONNECTION_CLOSED = Main.Base.convert(Main.Base.Int32,44)
-    const NOT_CONNECTED = const G_IO_ERROR_NOT_CONNECTED = Main.Base.convert(Main.Base.Int32,45)
     end)))
     $(Expr(:toplevel, :(baremodule GAskPasswordFlags
     const NEED_PASSWORD = const G_ASK_PASSWORD_NEED_PASSWORD = Main.Base.convert(Main.Base.Int32,1)
@@ -1029,7 +1000,7 @@ $(Expr(:toplevel, :(module GConstants
     const INVALID = const G_SOCKET_FAMILY_INVALID = Main.Base.convert(Main.Base.Int32,0)
     const UNIX = const G_SOCKET_FAMILY_UNIX = Main.Base.convert(Main.Base.Int32,1)
     const IPV4 = const G_SOCKET_FAMILY_IPV4 = Main.Base.convert(Main.Base.Int32,2)
-    const IPV6 = const G_SOCKET_FAMILY_IPV6 = Main.Base.convert(Main.Base.Int32,30)
+    const IPV6 = const G_SOCKET_FAMILY_IPV6 = Main.Base.convert(Main.Base.Int32,10)
     end)))
     $(Expr(:toplevel, :(baremodule GSocketType
     const INVALID = const G_SOCKET_TYPE_INVALID = Main.Base.convert(Main.Base.Int32,0)
@@ -1127,10 +1098,6 @@ $(Expr(:toplevel, :(module GConstants
     const SELINUX_SECURITY_CONTEXT_UNKNOWN = const G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN = Main.Base.convert(Main.Base.Int32,38)
     const ADT_AUDIT_DATA_UNKNOWN = const G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN = Main.Base.convert(Main.Base.Int32,39)
     const OBJECT_PATH_IN_USE = const G_DBUS_ERROR_OBJECT_PATH_IN_USE = Main.Base.convert(Main.Base.Int32,40)
-    const UNKNOWN_OBJECT = const G_DBUS_ERROR_UNKNOWN_OBJECT = Main.Base.convert(Main.Base.Int32,41)
-    const UNKNOWN_INTERFACE = const G_DBUS_ERROR_UNKNOWN_INTERFACE = Main.Base.convert(Main.Base.Int32,42)
-    const UNKNOWN_PROPERTY = const G_DBUS_ERROR_UNKNOWN_PROPERTY = Main.Base.convert(Main.Base.Int32,43)
-    const PROPERTY_READ_ONLY = const G_DBUS_ERROR_PROPERTY_READ_ONLY = Main.Base.convert(Main.Base.Int32,44)
     end)))
     $(Expr(:toplevel, :(baremodule GDBusConnectionFlags
     const NONE = const G_DBUS_CONNECTION_FLAGS_NONE = Main.Base.convert(Main.Base.Int32,0)
@@ -1202,7 +1169,6 @@ $(Expr(:toplevel, :(module GConstants
     const FREEBSD_CMSGCRED = const G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED = Main.Base.convert(Main.Base.Int32,2)
     const OPENBSD_SOCKPEERCRED = const G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED = Main.Base.convert(Main.Base.Int32,3)
     const SOLARIS_UCRED = const G_CREDENTIALS_TYPE_SOLARIS_UCRED = Main.Base.convert(Main.Base.Int32,4)
-    const NETBSD_UNPCBID = const G_CREDENTIALS_TYPE_NETBSD_UNPCBID = Main.Base.convert(Main.Base.Int32,5)
     end)))
     $(Expr(:toplevel, :(baremodule GDBusMessageByteOrder
     const BIG_ENDIAN = const G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN = Main.Base.convert(Main.Base.Int32,66)
@@ -1303,18 +1269,6 @@ $(Expr(:toplevel, :(module GConstants
     const STDERR_SILENCE = const G_SUBPROCESS_FLAGS_STDERR_SILENCE = Main.Base.convert(Main.Base.Int32,32)
     const STDERR_MERGE = const G_SUBPROCESS_FLAGS_STDERR_MERGE = Main.Base.convert(Main.Base.Int32,64)
     const INHERIT_FDS = const G_SUBPROCESS_FLAGS_INHERIT_FDS = Main.Base.convert(Main.Base.Int32,128)
-    end)))
-    $(Expr(:toplevel, :(baremodule GNotificationPriority
-    const NORMAL = const G_NOTIFICATION_PRIORITY_NORMAL = Main.Base.convert(Main.Base.Int32,0)
-    const LOW = const G_NOTIFICATION_PRIORITY_LOW = Main.Base.convert(Main.Base.Int32,1)
-    const HIGH = const G_NOTIFICATION_PRIORITY_HIGH = Main.Base.convert(Main.Base.Int32,2)
-    const URGENT = const G_NOTIFICATION_PRIORITY_URGENT = Main.Base.convert(Main.Base.Int32,3)
-    end)))
-    $(Expr(:toplevel, :(baremodule GNetworkConnectivity
-    const LOCAL = const G_NETWORK_CONNECTIVITY_LOCAL = Main.Base.convert(Main.Base.Int32,1)
-    const LIMITED = const G_NETWORK_CONNECTIVITY_LIMITED = Main.Base.convert(Main.Base.Int32,2)
-    const PORTAL = const G_NETWORK_CONNECTIVITY_PORTAL = Main.Base.convert(Main.Base.Int32,3)
-    const FULL = const G_NETWORK_CONNECTIVITY_FULL = Main.Base.convert(Main.Base.Int32,4)
     end)))
     $(Expr(:toplevel, :(baremodule GModuleFlags
     const LAZY = const G_MODULE_BIND_LAZY = Main.Base.convert(Main.Base.Int32,1)
@@ -2642,7 +2596,6 @@ $(Expr(:toplevel, :(module GConstants
     const G_GNUC_FUNCTION = ""
     const G_GNUC_PRETTY_FUNCTION = ""
     const G_ANALYZER_ANALYZING = 1
-    const GID_MAX = 2147483647
     const G_GINT16_MODIFIER = "h"
     const G_GINT16_FORMAT = "hi"
     const G_GUINT16_FORMAT = "hu"
@@ -2664,8 +2617,8 @@ $(Expr(:toplevel, :(module GConstants
     const G_GINTPTR_FORMAT = "li"
     const G_GUINTPTR_FORMAT = "lu"
     const GLIB_MAJOR_VERSION = 2
-    const GLIB_MINOR_VERSION = 44
-    const GLIB_MICRO_VERSION = 0
+    const GLIB_MINOR_VERSION = 40
+    const GLIB_MICRO_VERSION = 2
     const G_VA_COPY_AS_ARRAY = 1
     const G_HAVE_INLINE = 1
     const G_HAVE___INLINE = 1
@@ -2673,6 +2626,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_HAVE_ISO_VARARGS = 1
     const G_HAVE_GNUC_VARARGS = 1
     const G_HAVE_GROWING_STACK = 0
+    const G_HAVE_GNUC_VISIBILITY = 1
     const G_MODULE_SUFFIX = "so"
     const GLIB_SYSDEF_AF_UNIX = 1
     const GLIB_SYSDEF_AF_INET = 2
@@ -2720,6 +2674,9 @@ $(Expr(:toplevel, :(module GConstants
     const G_KEY_FILE_DESKTOP_KEY_URL = "URL"
     const G_KEY_FILE_DESKTOP_KEY_DBUS_ACTIVATABLE = "DBusActivatable"
     const G_KEY_FILE_DESKTOP_KEY_ACTIONS = "Actions"
+    const G_KEY_FILE_DESKTOP_KEY_GETTEXT_DOMAIN = "X-GNOME-Gettext-Domain"
+    const G_KEY_FILE_DESKTOP_KEY_FULLNAME = "X-GNOME-FullName"
+    const G_KEY_FILE_DESKTOP_KEY_KEYWORDS = "Keywords"
     const G_KEY_FILE_DESKTOP_TYPE_APPLICATION = "Application"
     const G_KEY_FILE_DESKTOP_TYPE_LINK = "Link"
     const G_KEY_FILE_DESKTOP_TYPE_DIRECTORY = "Directory"
@@ -2840,12 +2797,11 @@ $(Expr(:toplevel, :(module GConstants
     const G_MENU_LINK_SECTION = "section"
     const GDK_HAVE_WCHAR_H = 1
     const GDK_HAVE_WCTYPE_H = 1
-    const GDK_HAVE_BROKEN_WCTYPE = 1
     const GDK_CURRENT_TIME = 0
     const GDK_PARENT_RELATIVE = 1
     const GDK_MAX_TIMECOORD_AXES = 128
     const GDK_PIXBUF_FEATURES_H = 1
-    const GDK_PIXBUF_VERSION = "2.31.1"
+    const GDK_PIXBUF_VERSION = "2.30.7"
     const GTK_PATH_PRIO_MASK = 0x00
     const GTK_MAX_COMPOSE_LEN = 7
     const GTK_PAPER_NAME_LETTER = "na_letter"

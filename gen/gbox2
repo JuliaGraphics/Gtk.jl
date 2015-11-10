@@ -2,7 +2,7 @@ quote
 $(Expr(:toplevel, :(module GAccessor
     import ..Gtk
     import ..Gtk.GObject
-    export label_align, qdata, icon_activatable, width, buffer, pixbuf, preview_widget_active, iter_at_mark, arrow_tooltip, inner_border, markup_with_mnemonic, popup_single_match, has_selection, hover_expand, double_buffered, tooltips, extension_events, has_frame, tree_view, right_margin, artists, mime_type, child_requisition, use_preview_label, option_group, style, filenames, show_tips, background_area, mode, option, max_length, show_not_found, requisition, for_attach_widget, data_full, children, use_stock, sort_order, private_hint, tag_table, draw, use_markup, pixels_inside_wrap, can_focus, iter_location, upper, from_drawable, info_from_tip_window, logo_icon_name, max_width, icon_at_pos, select_function, website, add_source, markup_column, default_bottom_margin, response_sensitive, show_events, cursor_on_cell, popup_completion, limit, height, visible_horizontal, match_func, activatable, cell_area, screen, tooltip_markup, destroy_with_parent, resizable, icon_from_file, byte_length, icon_tooltip_text, level_indentation, flippable, upper_stepper_sensitivity, left_gravity, iter, resize_mode, round_digits, keep_below, from_pixmap, layout_offsets, left_margin, size_request, cells, row_separator_func, select_multiple, iter_at_line_index, tab_hborder, bounds, from_gicon, max_width_chars, editable, default_attributes, iter_at_child_anchor, single_line_mode, column_drag_function, range_rect, active, from_icon_set, message_area, has_alpha, action_area, depth, verbose, is_locked, current_icon_drag_source, is_important, tab_border, minimum_key_length, fixed_height_mode, sort_func, has_resize_grip, child, search_column, discrete_blocks, pixels_below_lines, ancestor, show_arrow, decorated, chars, mnemonic_widget, selection_bound, track_motion, default_sort_func, show_hidden, slider_size_fixed, accessible, show_numbers, inline_selection, show_icons, show_size, blinking, pulse_step, lower_stepper_sensitivity, width_chars, tooltip_item, arrow_tooltip_text, cell_data, enable_tree_lines, modal, tabs, proxy, attach_widget, receives_default, activates_default, preview_file, paper_sizes, background_color, icon_name, policy, toolbar_style, icon_from_gicon, icon_gicon, colorspace, image_position, visited, preview_widget, activity_blocks, icon_size, meta_marshal, from_animation, target_list, focus_vadjustment, size_wildcarded, icon_drag_source, range, text, display, version, pixel_size, clipboard, icon, alternative_button_order_from_array, focus_on_click, visible_range, search_entry, content_area, sizing, visible_column, hadjustment, create_folders, ellipsize_mode, menu, tab_detachable, animation, menu_label, copy_target_list, modify_func, widget, paste_target_list, no_show_all, selection_bounds, focus_hadjustment, unref, n_items, char_count, keep_above, step_increment, pattern, pixels_with_length, mime_types, urgency_hint, text_window, digits, local_only, accel_group, translation_domain, indices_with_depth, pixels, tooltip_row, uri, markup, events, property, documenters, type_from_name, stock_id, default_top_margin, bits_per_sample, render_icon, drag_dest_row, nth_page, fraction, focus, show_style, iter_at_offset, show_fill_level, icon_set, image, response_for_widget, visibility, line_wrap, cursor, fixed_size, icon_window, display_name, targets, dest_row_at_pos, visible_vertical, file, group_name, text_with_mnemonic, row_drag_data, from_stock, string_from_iter, pointer, data_type, track_visited_links, use_xshm, description, from_icon_name, tab_label_text, headers_clickable, numeric, use_font, expanded, allocation, label_widget, fixed_width, alternative_button_order, item_index, headers_visible, position, child_packing, has_window, text_length, geometry, default_response, icon_list, expand, tooltip_column, action, mapped, realized, extensions, entry, inverted, text_size_group, column_type, line_count, border_window_size, accepts_tab, reallocate_redraws, column, program_name, alignment, scroll_adjustments, pango_context, label, text_alignment, path, current_folder_file, use_size, nth_item, iter_first, state, snap_to_ticks, min_width, page_increment, current_uri, columns, fill_level, default_icon_list, parent, submenu, gravity, mnemonic_keyval, frame_dimensions, ellipsize, selection, completion, target, visible_func, activity_step, preview_uri, sort_type, selected, opacity, shadow_type, visual, expander_column, child2, modified, default_size, vscrollbar, data, stock, cursor_hadjustment, mark, label_fill, type_hint, line_yrange, age, modifier_style, child_size, uposition, grid_lines, col_spacing, icon_storage_type, mnemonics_visible, show_border, copyright, increments, angle, fixed_height_from_font, group, deletable, website_label, page_size, current_page, x11_window_id, icon_stock, bin_window, marshal, hover_selection, wmclass, menu_label_text, homogeneous, icon_from_stock, search_equal_func, group_id, can_default, toplevel, reorderable, rules_hint, tab_vborder, iter_at_position, direction_wildcarded, draw_value, arrow_tooltip_markup, wrap_license, deserialize_formats, valuesv, deleted, icon_sensitive, user_data, monitor, model, title, focus_chain, size_of_row, update_policy, gicon, window, default_widget, right_justified, progress_pulse_step, filter, role, column_types, handle_window, slider_range, text_orientation, dest_item_at_pos, child_ipadding, path_at_pos, inconsistent, drop_highlight_item, item_row, border_width, value_as_int, files, preview_filename, slice, default_right_margin, icon_tooltip_markup, radio, sizes, n_channels, license, startup_id, relief_style, selection_mode, layout, qdata_full, from_image, tooltip_window, cell_data_func, text_column, state_wildcarded, item_at_pos, action_widget, debug_updates, geometry_hints, hscrollbar, length, value, use_underline, rubber_banding, child_secondary, indent, composite_name, internal_child, direction, iter_at_location, default_icon, settings, placement, has_tooltip, colormap, accept_focus, destroy_count_func, spacing, start_iter, justification, reserve_toggle_size, item_width, icon_widget, insert, adjustment, value_pos, usize, show_private, sort_indicator, cursor_visible, padding, bar_style, modifier_mask, visible_rect, item_column, ref, accel_path, column_spacing, attributes, from_pixbuf, current_folder, show_tabs, child_visible, priority, row_spacing, tooltip_cell, orientation, authors, show_expanders, homogeneous_tabs, uris, invisible_char, short_name, end_iter, root_window, font_name, sort_column_id, search_position_func, tab_label, line_at_y, app_paintable, proxy_menu_item, object, skip_pager_hint, justify, event_window, snapshot, widget_for_response, focus_child, size, rowstride, tearoff_state, margin, row_spacings, default_col_spacing, storage_type, do_overwrite_confirmation, default_left_margin, default, cell_renderers, visible, disabled, translator_credits, tab_label_packing, application_info, flags, mnemonic_modifier, format, tooltip, current_name, added, active_text, wrap_mode, redraw_on_allocate, completion_prefix, parent_window, enable_search, min_slider_size, item_orientation, ppd_name, inline_completion, auto_startup_notification, vadjustment, lower, n_columns, selectable, child1, pixels_above_lines, item_padding, selected_items, wrap, from_file, name, can_create_tags, filename, items, clickable, groups, skip_taskbar_hint, drop_index, extra_widget, current_item, relief, iter_at_line, tooltip_context, scrollable, progress_fraction, restrict_to_fill_level, tab_pos, copy, logo, context_id, objects, tooltip_text, sensitive, pixmap, iter_from_string, overwrite_mode, use_drag_window, default_row_spacing, serialize_formats, icon_from_icon_name, uri_display, transient_for, line_wrap_mode, comments, selected_rows, icon_pixbuf, tab_reorderable, icon_from_pixbuf, col_spacings, displayed_row, has_separator, buildable_property, install, focus_on_map, indices, current_folder_uri, new_from_pixbuf, n_pages, applications, pixbuf_column, iter_at_line_offset, overwrite, window_type, drag_dest_item
+    export label_align, qdata, icon_activatable, width, buffer, pixbuf, preview_widget_active, iter_at_mark, arrow_tooltip, inner_border, markup_with_mnemonic, popup_single_match, has_selection, hover_expand, double_buffered, tooltips, extension_events, has_frame, tree_view, right_margin, artists, mime_type, child_requisition, use_preview_label, option_group, style, filenames, show_tips, background_area, mode, option, max_length, show_not_found, requisition, for_attach_widget, data_full, children, use_stock, sort_order, private_hint, tag_table, draw, use_markup, pixels_inside_wrap, can_focus, iter_location, upper, from_drawable, info_from_tip_window, logo_icon_name, max_width, icon_at_pos, select_function, website, add_source, markup_column, default_bottom_margin, response_sensitive, show_events, cursor_on_cell, popup_completion, limit, height, visible_horizontal, match_func, activatable, cell_area, screen, tooltip_markup, destroy_with_parent, resizable, icon_from_file, byte_length, icon_tooltip_text, level_indentation, flippable, upper_stepper_sensitivity, left_gravity, iter, resize_mode, round_digits, keep_below, from_pixmap, layout_offsets, left_margin, size_request, cells, row_separator_func, select_multiple, iter_at_line_index, tab_hborder, bounds, from_gicon, max_width_chars, editable, default_attributes, iter_at_child_anchor, single_line_mode, column_drag_function, range_rect, active, from_icon_set, message_area, has_alpha, action_area, depth, verbose, is_locked, current_icon_drag_source, is_important, tab_border, minimum_key_length, fixed_height_mode, sort_func, has_resize_grip, child, search_column, discrete_blocks, pixels_below_lines, ancestor, show_arrow, decorated, chars, mnemonic_widget, selection_bound, track_motion, default_sort_func, show_hidden, slider_size_fixed, accessible, show_numbers, inline_selection, show_icons, show_size, blinking, pulse_step, lower_stepper_sensitivity, width_chars, tooltip_item, arrow_tooltip_text, cell_data, enable_tree_lines, modal, tabs, proxy, attach_widget, receives_default, activates_default, preview_file, paper_sizes, background_color, icon_name, policy, toolbar_style, icon_from_gicon, icon_gicon, colorspace, image_position, visited, preview_widget, activity_blocks, icon_size, meta_marshal, from_animation, target_list, focus_vadjustment, size_wildcarded, icon_drag_source, range, text, display, version, pixel_size, clipboard, icon, alternative_button_order_from_array, focus_on_click, visible_range, search_entry, content_area, sizing, visible_column, hadjustment, create_folders, ellipsize_mode, menu, tab_detachable, animation, menu_label, copy_target_list, modify_func, widget, paste_target_list, no_show_all, selection_bounds, focus_hadjustment, unref, n_items, char_count, keep_above, step_increment, pattern, pixels_with_length, mime_types, urgency_hint, text_window, digits, local_only, accel_group, translation_domain, indices_with_depth, pixels, tooltip_row, uri, markup, events, property, documenters, type_from_name, stock_id, default_top_margin, bits_per_sample, render_icon, drag_dest_row, nth_page, fraction, focus, show_style, iter_at_offset, show_fill_level, icon_set, image, response_for_widget, visibility, line_wrap, cursor, fixed_size, icon_window, display_name, targets, dest_row_at_pos, visible_vertical, file, group_name, text_with_mnemonic, row_drag_data, from_stock, string_from_iter, pointer, data_type, track_visited_links, use_xshm, description, from_icon_name, tab_label_text, headers_clickable, numeric, use_font, expanded, allocation, label_widget, fixed_width, alternative_button_order, item_index, has_grab, position, headers_visible, child_packing, has_window, text_length, geometry, default_response, icon_list, expand, tooltip_column, action, mapped, realized, extensions, entry, inverted, text_size_group, column_type, line_count, border_window_size, accepts_tab, reallocate_redraws, column, program_name, alignment, scroll_adjustments, pango_context, label, text_alignment, path, current_folder_file, use_size, nth_item, iter_first, state, snap_to_ticks, min_width, page_increment, current_uri, columns, fill_level, default_icon_list, parent, submenu, gravity, mnemonic_keyval, frame_dimensions, ellipsize, selection, completion, target, visible_func, activity_step, preview_uri, sort_type, selected, opacity, shadow_type, visual, expander_column, child2, modified, default_size, vscrollbar, data, stock, cursor_hadjustment, mark, label_fill, type_hint, line_yrange, age, modifier_style, child_size, uposition, grid_lines, col_spacing, icon_storage_type, mnemonics_visible, show_border, copyright, increments, angle, fixed_height_from_font, group, deletable, website_label, page_size, current_page, x11_window_id, icon_stock, bin_window, marshal, hover_selection, wmclass, menu_label_text, homogeneous, icon_from_stock, search_equal_func, group_id, can_default, toplevel, reorderable, rules_hint, tab_vborder, iter_at_position, direction_wildcarded, draw_value, arrow_tooltip_markup, wrap_license, deserialize_formats, valuesv, deleted, icon_sensitive, user_data, monitor, model, title, focus_chain, size_of_row, update_policy, gicon, window, default_widget, right_justified, progress_pulse_step, filter, role, column_types, handle_window, slider_range, text_orientation, dest_item_at_pos, child_ipadding, path_at_pos, inconsistent, drop_highlight_item, item_row, border_width, value_as_int, files, preview_filename, slice, default_right_margin, icon_tooltip_markup, radio, sizes, n_channels, license, startup_id, relief_style, selection_mode, layout, qdata_full, from_image, tooltip_window, cell_data_func, text_column, state_wildcarded, item_at_pos, action_widget, debug_updates, geometry_hints, hscrollbar, length, value, use_underline, rubber_banding, child_secondary, indent, composite_name, internal_child, direction, iter_at_location, default_icon, settings, placement, has_tooltip, colormap, accept_focus, destroy_count_func, spacing, start_iter, justification, reserve_toggle_size, item_width, icon_widget, insert, adjustment, value_pos, usize, show_private, sort_indicator, cursor_visible, padding, bar_style, modifier_mask, visible_rect, item_column, ref, accel_path, column_spacing, attributes, from_pixbuf, current_folder, show_tabs, child_visible, priority, row_spacing, tooltip_cell, orientation, authors, show_expanders, homogeneous_tabs, uris, invisible_char, short_name, end_iter, root_window, font_name, sort_column_id, search_position_func, tab_label, line_at_y, app_paintable, proxy_menu_item, object, skip_pager_hint, justify, event_window, snapshot, widget_for_response, focus_child, size, rowstride, tearoff_state, margin, row_spacings, default_col_spacing, storage_type, do_overwrite_confirmation, default_left_margin, default, cell_renderers, visible, disabled, translator_credits, tab_label_packing, application_info, flags, mnemonic_modifier, format, tooltip, current_name, added, active_text, wrap_mode, redraw_on_allocate, completion_prefix, parent_window, enable_search, min_slider_size, item_orientation, ppd_name, inline_completion, auto_startup_notification, vadjustment, lower, n_columns, selectable, child1, pixels_above_lines, item_padding, selected_items, wrap, from_file, name, can_create_tags, filename, items, clickable, groups, skip_taskbar_hint, drop_index, extra_widget, current_item, relief, iter_at_line, tooltip_context, scrollable, progress_fraction, restrict_to_fill_level, tab_pos, copy, logo, context_id, objects, tooltip_text, sensitive, pixmap, iter_from_string, overwrite_mode, use_drag_window, default_row_spacing, serialize_formats, icon_from_icon_name, uri_display, transient_for, line_wrap_mode, comments, selected_rows, icon_pixbuf, tab_reorderable, icon_from_pixbuf, col_spacings, displayed_row, has_separator, buildable_property, install, focus_on_map, indices, current_folder_uri, new_from_pixbuf, n_pages, applications, pixbuf_column, iter_at_line_offset, overwrite, window_type, drag_dest_item
     function marshal(closure::Gtk.GClosure,marshal_)
         ccall((:g_closure_set_marshal,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GClosure},Ptr{Void}),closure,marshal_)
         return closure
@@ -12,32 +12,32 @@ $(Expr(:toplevel, :(module GAccessor
         return closure
     end
     function property(object::Gtk.GObject,property_name,value)
-        ccall((:g_object_set_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),object,property_name,value)
+        ccall((:g_object_set_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),object,property_name,value)
         return object
     end
     function property(object::Gtk.GObject,property_name,value)
-        return ccall((:g_object_get_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),object,property_name,value)
+        return ccall((:g_object_get_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),object,property_name,value)
     end
     function qdata(object::Gtk.GObject,quark)
-        return ccall((:g_object_get_qdata,Gtk.GLib.libgobject),Ptr{Void},(Ptr{Gtk.GObject},Uint32),object,quark)
+        return ccall((:g_object_get_qdata,Gtk.GLib.libgobject),Ptr{Void},(Ptr{Gtk.GObject},UInt32),object,quark)
     end
     function qdata(object::Gtk.GObject,quark,data)
-        ccall((:g_object_set_qdata,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Uint32,Ptr{Void}),object,quark,data)
+        ccall((:g_object_set_qdata,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},UInt32,Ptr{Void}),object,quark,data)
         return object
     end
     function qdata_full(object::Gtk.GObject,quark,data,destroy)
-        ccall((:g_object_set_qdata_full,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Uint32,Ptr{Void},Ptr{Void}),object,quark,data,destroy)
+        ccall((:g_object_set_qdata_full,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},UInt32,Ptr{Void},Ptr{Void}),object,quark,data,destroy)
         return object
     end
     function data(object::Gtk.GObject,key)
-        return ccall((:g_object_get_data,Gtk.GLib.libgobject),Ptr{Void},(Ptr{Gtk.GObject},Ptr{Uint8}),object,key)
+        return ccall((:g_object_get_data,Gtk.GLib.libgobject),Ptr{Void},(Ptr{Gtk.GObject},Ptr{UInt8}),object,key)
     end
     function data(object::Gtk.GObject,key,data_)
-        ccall((:g_object_set_data,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),object,key,data_)
+        ccall((:g_object_set_data,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),object,key,data_)
         return object
     end
     function data_full(object::Gtk.GObject,key,data,destroy)
-        ccall((:g_object_set_data_full,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void},Ptr{Void}),object,key,data,destroy)
+        ccall((:g_object_set_data_full,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void},Ptr{Void}),object,key,data,destroy)
         return object
     end
     function show_events(show_events_::Bool)
@@ -80,30 +80,30 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gdk_pixbuf_get_byte_length,Gtk.libgdk_pixbuf),Culong,(Ptr{Gtk.GObject},),pixbuf)
     end
     function pixels_with_length(pixbuf::Gtk.GdkPixbuf)
-        length = Gtk.mutable(Uint32)
-        return (ccall((:gdk_pixbuf_get_pixels_with_length,Gtk.libgdk_pixbuf),Ptr{Cuchar},(Ptr{Gtk.GObject},Ptr{Uint32}),pixbuf,length),length[])
+        length = Gtk.mutable(UInt32)
+        return (ccall((:gdk_pixbuf_get_pixels_with_length,Gtk.libgdk_pixbuf),Ptr{Cuchar},(Ptr{Gtk.GObject},Ptr{UInt32}),pixbuf,length),length[])
     end
     function option(pixbuf::Gtk.GdkPixbuf,key)
-        return ccall((:gdk_pixbuf_get_option,Gtk.libgdk_pixbuf),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Uint8}),pixbuf,key)
+        return ccall((:gdk_pixbuf_get_option,Gtk.libgdk_pixbuf),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{UInt8}),pixbuf,key)
     end
     function name(format::Gtk.GdkPixbufFormat)
-        return ccall((:gdk_pixbuf_format_get_name,Gtk.libgdk_pixbuf),Ptr{Uint8},(Ptr{Gtk.GdkPixbufFormat},),format)
+        return ccall((:gdk_pixbuf_format_get_name,Gtk.libgdk_pixbuf),Ptr{UInt8},(Ptr{Gtk.GdkPixbufFormat},),format)
     end
     function description(format::Gtk.GdkPixbufFormat)
-        return ccall((:gdk_pixbuf_format_get_description,Gtk.libgdk_pixbuf),Ptr{Uint8},(Ptr{Gtk.GdkPixbufFormat},),format)
+        return ccall((:gdk_pixbuf_format_get_description,Gtk.libgdk_pixbuf),Ptr{UInt8},(Ptr{Gtk.GdkPixbufFormat},),format)
     end
     function mime_types(format::Gtk.GdkPixbufFormat)
-        return ccall((:gdk_pixbuf_format_get_mime_types,Gtk.libgdk_pixbuf),Ptr{Ptr{Uint8}},(Ptr{Gtk.GdkPixbufFormat},),format)
+        return ccall((:gdk_pixbuf_format_get_mime_types,Gtk.libgdk_pixbuf),Ptr{Ptr{UInt8}},(Ptr{Gtk.GdkPixbufFormat},),format)
     end
     function extensions(format::Gtk.GdkPixbufFormat)
-        return ccall((:gdk_pixbuf_format_get_extensions,Gtk.libgdk_pixbuf),Ptr{Ptr{Uint8}},(Ptr{Gtk.GdkPixbufFormat},),format)
+        return ccall((:gdk_pixbuf_format_get_extensions,Gtk.libgdk_pixbuf),Ptr{Ptr{UInt8}},(Ptr{Gtk.GdkPixbufFormat},),format)
     end
     function disabled(format::Gtk.GdkPixbufFormat,disabled_)
         ccall((:gdk_pixbuf_format_set_disabled,Gtk.libgdk_pixbuf),Void,(Ptr{Gtk.GdkPixbufFormat},Cint),format,disabled_)
         return format
     end
     function license(format::Gtk.GdkPixbufFormat)
-        return ccall((:gdk_pixbuf_format_get_license,Gtk.libgdk_pixbuf),Ptr{Uint8},(Ptr{Gtk.GdkPixbufFormat},),format)
+        return ccall((:gdk_pixbuf_format_get_license,Gtk.libgdk_pixbuf),Ptr{UInt8},(Ptr{Gtk.GdkPixbufFormat},),format)
     end
     function from_drawable(dest::Gtk.GdkPixbuf,src,cmap,src_x,src_y,dest_x,dest_y,width,height)
         return convert(Gtk.GdkPixbuf,ccall((:gdk_pixbuf_get_from_drawable,Gtk.libgdk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Cint,Cint,Cint,Cint,Cint,Cint),dest,src,cmap,src_x,src_y,dest_x,dest_y,width,height))
@@ -181,7 +181,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_widget_get_child_requisition,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),widget,requisition)
     end
     function accel_path(widget::Gtk.GtkWidget,accel_path_,accel_group)
-        ccall((:gtk_widget_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Gtk.GObject}),widget,accel_path_,accel_group)
+        ccall((:gtk_widget_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Gtk.GObject}),widget,accel_path_,accel_group)
         return widget
     end
     function scroll_adjustments(widget::Gtk.GtkWidget,hadjustment,vadjustment)
@@ -210,11 +210,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_widget_get_receives_default,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),widget))
     end
     function name(widget::Gtk.GtkWidget,name_)
-        ccall((:gtk_widget_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,name_)
+        ccall((:gtk_widget_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,name_)
         return widget
     end
     function name(widget::Gtk.GtkWidget)
-        return ccall((:gtk_widget_get_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),widget)
+        return ccall((:gtk_widget_get_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),widget)
     end
     function state(widget::Gtk.GtkWidget,state_)
         ccall((:gtk_widget_set_state,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),widget,state_)
@@ -406,14 +406,14 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_widget_get_pango_context,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),widget)
     end
     function composite_name(widget::Gtk.GtkWidget,name)
-        ccall((:gtk_widget_set_composite_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,name)
+        ccall((:gtk_widget_set_composite_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,name)
         return widget
     end
     function composite_name(widget::Gtk.GtkWidget)
-        return ccall((:gtk_widget_get_composite_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),widget)
+        return ccall((:gtk_widget_get_composite_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),widget)
     end
     function property(widget::Gtk.GtkWidget,property_name,value)
-        return ccall((:gtk_widget_style_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),widget,property_name,value)
+        return ccall((:gtk_widget_style_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),widget,property_name,value)
     end
     function direction(widget::Gtk.GtkWidget,dir)
         ccall((:gtk_widget_set_direction,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),widget,dir)
@@ -430,18 +430,18 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkWindow,ccall((:gtk_widget_get_tooltip_window,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),widget))
     end
     function tooltip_text(widget::Gtk.GtkWidget,text)
-        ccall((:gtk_widget_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,text)
+        ccall((:gtk_widget_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,text)
         return widget
     end
     function tooltip_text(widget::Gtk.GtkWidget)
-        return ccall((:gtk_widget_get_tooltip_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),widget)
+        return ccall((:gtk_widget_get_tooltip_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),widget)
     end
     function tooltip_markup(widget::Gtk.GtkWidget,markup)
-        ccall((:gtk_widget_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,markup)
+        ccall((:gtk_widget_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,markup)
         return widget
     end
     function tooltip_markup(widget::Gtk.GtkWidget)
-        return ccall((:gtk_widget_get_tooltip_markup,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),widget)
+        return ccall((:gtk_widget_get_tooltip_markup,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),widget)
     end
     function has_tooltip(widget::Gtk.GtkWidget,has_tooltip_)
         ccall((:gtk_widget_set_has_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),widget,has_tooltip_)
@@ -450,12 +450,16 @@ $(Expr(:toplevel, :(module GAccessor
     function has_tooltip(widget::Gtk.GtkWidget)
         return convert(Bool,ccall((:gtk_widget_get_has_tooltip,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),widget))
     end
+    function has_grab(widget::Gtk.GtkWidget,has_grab_)
+        ccall((:ubuntu_gtk_widget_set_has_grab,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),widget,has_grab_)
+        return widget
+    end
     function border_width(container::Gtk.GtkContainer,border_width_)
-        ccall((:gtk_container_set_border_width,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),container,border_width_)
+        ccall((:gtk_container_set_border_width,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),container,border_width_)
         return container
     end
     function border_width(container::Gtk.GtkContainer)
-        return ccall((:gtk_container_get_border_width,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),container)
+        return ccall((:gtk_container_get_border_width,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),container)
     end
     function resize_mode(container::Gtk.GtkContainer,resize_mode_)
         ccall((:gtk_container_set_resize_mode,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),container,resize_mode_)
@@ -501,36 +505,36 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkAdjustment,ccall((:gtk_container_get_focus_hadjustment,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),container))
     end
     function property(container::Gtk.GtkContainer,child,property_name,value)
-        ccall((:gtk_container_child_set_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),container,child,property_name,value)
+        ccall((:gtk_container_child_set_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),container,child,property_name,value)
         return container
     end
     function property(container::Gtk.GtkContainer,child,property_name,value)
-        return ccall((:gtk_container_child_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),container,child,property_name,value)
+        return ccall((:gtk_container_child_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),container,child,property_name,value)
     end
     function child(bin::Gtk.GtkBin)
         return convert(Gtk.GtkWidget,ccall((:gtk_bin_get_child,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),bin))
     end
     function title(window::Gtk.GtkWindow,title_)
-        ccall((:gtk_window_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),window,title_)
+        ccall((:gtk_window_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),window,title_)
         return window
     end
     function title(window::Gtk.GtkWindow)
-        return ccall((:gtk_window_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),window)
+        return ccall((:gtk_window_get_title,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),window)
     end
     function wmclass(window::Gtk.GtkWindow,wmclass_name,wmclass_class)
-        ccall((:gtk_window_set_wmclass,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Uint8}),window,wmclass_name,wmclass_class)
+        ccall((:gtk_window_set_wmclass,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{UInt8}),window,wmclass_name,wmclass_class)
         return window
     end
     function role(window::Gtk.GtkWindow,role_)
-        ccall((:gtk_window_set_role,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),window,role_)
+        ccall((:gtk_window_set_role,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),window,role_)
         return window
     end
     function startup_id(window::Gtk.GtkWindow,startup_id_)
-        ccall((:gtk_window_set_startup_id,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),window,startup_id_)
+        ccall((:gtk_window_set_startup_id,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),window,startup_id_)
         return window
     end
     function role(window::Gtk.GtkWindow)
-        return ccall((:gtk_window_get_role,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),window)
+        return ccall((:gtk_window_get_role,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),window)
     end
     function position(window::Gtk.GtkWindow,position_)
         ccall((:gtk_window_set_position,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),window,position_)
@@ -690,18 +694,18 @@ $(Expr(:toplevel, :(module GAccessor
         return window
     end
     function icon_name(window::Gtk.GtkWindow,name)
-        ccall((:gtk_window_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),window,name)
+        ccall((:gtk_window_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),window,name)
         return window
     end
     function icon_from_file(window::Gtk.GtkWindow,filename,err)
-        ccall((:gtk_window_set_icon_from_file,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Ptr{Gtk.GError}}),window,filename,err)
+        ccall((:gtk_window_set_icon_from_file,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Ptr{Gtk.GError}}),window,filename,err)
         return window
     end
     function icon(window::Gtk.GtkWindow)
         return convert(Gtk.GdkPixbuf,ccall((:gtk_window_get_icon,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),window))
     end
     function icon_name(window::Gtk.GtkWindow)
-        return ccall((:gtk_window_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),window)
+        return ccall((:gtk_window_get_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),window)
     end
     function default_icon(icon::Gtk.GdkPixbuf)
         ccall((:gtk_window_set_default_icon,Gtk.libgtk),Void,(Ptr{Gtk.GObject},),icon)
@@ -801,45 +805,45 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkWidget,ccall((:gtk_dialog_get_content_area,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),dialog))
     end
     function name(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function name(about::Gtk.GtkAboutDialog,name_)
-        ccall((:gtk_about_dialog_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,name_)
+        ccall((:gtk_about_dialog_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,name_)
         return about
     end
     function program_name(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_program_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_program_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function program_name(about::Gtk.GtkAboutDialog,name)
-        ccall((:gtk_about_dialog_set_program_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,name)
+        ccall((:gtk_about_dialog_set_program_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,name)
         return about
     end
     function version(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_version,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_version,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function version(about::Gtk.GtkAboutDialog,version_)
-        ccall((:gtk_about_dialog_set_version,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,version_)
+        ccall((:gtk_about_dialog_set_version,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,version_)
         return about
     end
     function copyright(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_copyright,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_copyright,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function copyright(about::Gtk.GtkAboutDialog,copyright_)
-        ccall((:gtk_about_dialog_set_copyright,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,copyright_)
+        ccall((:gtk_about_dialog_set_copyright,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,copyright_)
         return about
     end
     function comments(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_comments,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_comments,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function comments(about::Gtk.GtkAboutDialog,comments_)
-        ccall((:gtk_about_dialog_set_comments,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,comments_)
+        ccall((:gtk_about_dialog_set_comments,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,comments_)
         return about
     end
     function license(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_license,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_license,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function license(about::Gtk.GtkAboutDialog,license_)
-        ccall((:gtk_about_dialog_set_license,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,license_)
+        ccall((:gtk_about_dialog_set_license,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,license_)
         return about
     end
     function wrap_license(about::Gtk.GtkAboutDialog)
@@ -850,45 +854,45 @@ $(Expr(:toplevel, :(module GAccessor
         return about
     end
     function website(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_website,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_website,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function website(about::Gtk.GtkAboutDialog,website_)
-        ccall((:gtk_about_dialog_set_website,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,website_)
+        ccall((:gtk_about_dialog_set_website,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,website_)
         return about
     end
     function website_label(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_website_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_website_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function website_label(about::Gtk.GtkAboutDialog,website_label_)
-        ccall((:gtk_about_dialog_set_website_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,website_label_)
+        ccall((:gtk_about_dialog_set_website_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,website_label_)
         return about
     end
     function authors(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_authors,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_authors,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GObject},),about)
     end
     function authors(about::Gtk.GtkAboutDialog,authors_)
-        ccall((:gtk_about_dialog_set_authors,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}),about,authors_)
+        ccall((:gtk_about_dialog_set_authors,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{UInt8}}),about,authors_)
         return about
     end
     function documenters(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_documenters,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_documenters,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GObject},),about)
     end
     function documenters(about::Gtk.GtkAboutDialog,documenters_)
-        ccall((:gtk_about_dialog_set_documenters,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}),about,documenters_)
+        ccall((:gtk_about_dialog_set_documenters,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{UInt8}}),about,documenters_)
         return about
     end
     function artists(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_artists,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_artists,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GObject},),about)
     end
     function artists(about::Gtk.GtkAboutDialog,artists_)
-        ccall((:gtk_about_dialog_set_artists,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}}),about,artists_)
+        ccall((:gtk_about_dialog_set_artists,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{UInt8}}),about,artists_)
         return about
     end
     function translator_credits(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_translator_credits,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_translator_credits,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function translator_credits(about::Gtk.GtkAboutDialog,translator_credits_)
-        ccall((:gtk_about_dialog_set_translator_credits,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,translator_credits_)
+        ccall((:gtk_about_dialog_set_translator_credits,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,translator_credits_)
         return about
     end
     function logo(about::Gtk.GtkAboutDialog)
@@ -899,17 +903,17 @@ $(Expr(:toplevel, :(module GAccessor
         return about
     end
     function logo_icon_name(about::Gtk.GtkAboutDialog)
-        return ccall((:gtk_about_dialog_get_logo_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),about)
+        return ccall((:gtk_about_dialog_get_logo_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),about)
     end
     function logo_icon_name(about::Gtk.GtkAboutDialog,icon_name)
-        ccall((:gtk_about_dialog_set_logo_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),about,icon_name)
+        ccall((:gtk_about_dialog_set_logo_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),about,icon_name)
         return about
     end
     function active(menu::Gtk.GtkMenu)
         return convert(Gtk.GtkWidget,ccall((:gtk_menu_get_active,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),menu))
     end
     function active(menu::Gtk.GtkMenu,index_)
-        ccall((:gtk_menu_set_active,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),menu,index_)
+        ccall((:gtk_menu_set_active,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),menu,index_)
         return menu
     end
     function accel_group(menu::Gtk.GtkMenu,accel_group_)
@@ -920,11 +924,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkAccelGroup,ccall((:gtk_menu_get_accel_group,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),menu))
     end
     function accel_path(menu::Gtk.GtkMenu,accel_path_)
-        ccall((:gtk_menu_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),menu,accel_path_)
+        ccall((:gtk_menu_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),menu,accel_path_)
         return menu
     end
     function accel_path(menu::Gtk.GtkMenu)
-        return ccall((:gtk_menu_get_accel_path,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),menu)
+        return ccall((:gtk_menu_get_accel_path,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),menu)
     end
     function attach_widget(menu::Gtk.GtkMenu)
         return convert(Gtk.GtkWidget,ccall((:gtk_menu_get_attach_widget,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),menu))
@@ -937,11 +941,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_menu_get_tearoff_state,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),menu))
     end
     function title(menu::Gtk.GtkMenu,title_)
-        ccall((:gtk_menu_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),menu,title_)
+        ccall((:gtk_menu_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),menu,title_)
         return menu
     end
     function title(menu::Gtk.GtkMenu)
-        return ccall((:gtk_menu_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),menu)
+        return ccall((:gtk_menu_get_title,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),menu)
     end
     function screen(menu::Gtk.GtkMenu,screen_)
         ccall((:gtk_menu_set_screen,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),menu,screen_)
@@ -965,11 +969,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_menu_get_reserve_toggle_size,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),menu))
     end
     function text(label::Gtk.GtkLabel,str)
-        ccall((:gtk_label_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label,str)
+        ccall((:gtk_label_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label,str)
         return label
     end
     function text(label::Gtk.GtkLabel)
-        return ccall((:gtk_label_get_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),label)
+        return ccall((:gtk_label_get_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),label)
     end
     function attributes(label::Gtk.GtkLabel,attrs)
         ccall((:gtk_label_set_attributes,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),label,attrs)
@@ -979,14 +983,14 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_label_get_attributes,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),label)
     end
     function label(label_::Gtk.GtkLabel,str)
-        ccall((:gtk_label_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label_,str)
+        ccall((:gtk_label_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label_,str)
         return label_
     end
     function label(label_::Gtk.GtkLabel)
-        return ccall((:gtk_label_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),label_)
+        return ccall((:gtk_label_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),label_)
     end
     function markup(label::Gtk.GtkLabel,str)
-        ccall((:gtk_label_set_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label,str)
+        ccall((:gtk_label_set_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label,str)
         return label
     end
     function use_markup(label::Gtk.GtkLabel,setting)
@@ -1004,11 +1008,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_label_get_use_underline,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),label))
     end
     function markup_with_mnemonic(label::Gtk.GtkLabel,str)
-        ccall((:gtk_label_set_markup_with_mnemonic,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label,str)
+        ccall((:gtk_label_set_markup_with_mnemonic,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label,str)
         return label
     end
     function mnemonic_keyval(label::Gtk.GtkLabel)
-        return ccall((:gtk_label_get_mnemonic_keyval,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),label)
+        return ccall((:gtk_label_get_mnemonic_keyval,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),label)
     end
     function mnemonic_widget(label::Gtk.GtkLabel,widget)
         ccall((:gtk_label_set_mnemonic_widget,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),label,widget)
@@ -1018,7 +1022,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkWidget,ccall((:gtk_label_get_mnemonic_widget,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),label))
     end
     function text_with_mnemonic(label::Gtk.GtkLabel,str)
-        ccall((:gtk_label_set_text_with_mnemonic,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label,str)
+        ccall((:gtk_label_set_text_with_mnemonic,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label,str)
         return label
     end
     function justify(label::Gtk.GtkLabel,jtype)
@@ -1050,7 +1054,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_label_get_max_width_chars,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),label)
     end
     function pattern(label::Gtk.GtkLabel,pattern_)
-        ccall((:gtk_label_set_pattern,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),label,pattern_)
+        ccall((:gtk_label_set_pattern,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),label,pattern_)
         return label
     end
     function line_wrap(label::Gtk.GtkLabel,wrap)
@@ -1103,7 +1107,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_label_get_single_line_mode,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),label))
     end
     function current_uri(label::Gtk.GtkLabel)
-        return ccall((:gtk_label_get_current_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),label)
+        return ccall((:gtk_label_get_current_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),label)
     end
     function track_visited_links(label::Gtk.GtkLabel,track_links)
         ccall((:gtk_label_set_track_visited_links,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),label,track_links)
@@ -1116,23 +1120,23 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_widget_get_action,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),widget)
     end
     function padding(alignment::Gtk.GtkAlignment,padding_top,padding_bottom,padding_left,padding_right)
-        ccall((:gtk_alignment_set_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32,Uint32,Uint32,Uint32),alignment,padding_top,padding_bottom,padding_left,padding_right)
+        ccall((:gtk_alignment_set_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32,UInt32,UInt32,UInt32),alignment,padding_top,padding_bottom,padding_left,padding_right)
         return alignment
     end
     function padding(alignment::Gtk.GtkAlignment)
-        padding_right = Gtk.mutable(Uint32)
-        padding_left = Gtk.mutable(Uint32)
-        padding_bottom = Gtk.mutable(Uint32)
-        padding_top = Gtk.mutable(Uint32)
-        ccall((:gtk_alignment_get_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint32},Ptr{Uint32},Ptr{Uint32},Ptr{Uint32}),alignment,padding_top,padding_bottom,padding_left,padding_right)
+        padding_right = Gtk.mutable(UInt32)
+        padding_left = Gtk.mutable(UInt32)
+        padding_bottom = Gtk.mutable(UInt32)
+        padding_top = Gtk.mutable(UInt32)
+        ccall((:gtk_alignment_get_padding,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt32},Ptr{UInt32},Ptr{UInt32},Ptr{UInt32}),alignment,padding_top,padding_bottom,padding_left,padding_right)
         return (padding_top[],padding_bottom[],padding_left[],padding_right[])
     end
     function label(frame::Gtk.GtkFrame,label_)
-        ccall((:gtk_frame_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),frame,label_)
+        ccall((:gtk_frame_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),frame,label_)
         return frame
     end
     function label(frame::Gtk.GtkFrame)
-        return ccall((:gtk_frame_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),frame)
+        return ccall((:gtk_frame_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),frame)
     end
     function label_widget(frame::Gtk.GtkFrame,label_widget_)
         ccall((:gtk_frame_set_label_widget,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),frame,label_widget_)
@@ -1173,7 +1177,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_box_get_spacing,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),box)
     end
     function child_packing(box::Gtk.GtkBox,child,expand,fill,padding,pack_type)
-        ccall((:gtk_box_set_child_packing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint,Cint,Uint32,Cint),box,child,expand,fill,padding,pack_type)
+        ccall((:gtk_box_set_child_packing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint,Cint,UInt32,Cint),box,child,expand,fill,padding,pack_type)
         return box
     end
     function layout(widget::Gtk.GtkButtonBox)
@@ -1211,35 +1215,35 @@ $(Expr(:toplevel, :(module GAccessor
         return (ipad_x[],ipad_y[])
     end
     function object(builder::Gtk.GtkBuilder,name)
-        return convert(Gtk.GObject,ccall((:gtk_builder_get_object,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Uint8}),builder,name))
+        return convert(Gtk.GObject,ccall((:gtk_builder_get_object,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{UInt8}),builder,name))
     end
     function objects(builder::Gtk.GtkBuilder)
         return ccall((:gtk_builder_get_objects,Gtk.libgtk),Ptr{Gtk._GSList{Void}},(Ptr{Gtk.GObject},),builder)
     end
     function translation_domain(builder::Gtk.GtkBuilder,domain)
-        ccall((:gtk_builder_set_translation_domain,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),builder,domain)
+        ccall((:gtk_builder_set_translation_domain,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),builder,domain)
         return builder
     end
     function translation_domain(builder::Gtk.GtkBuilder)
-        return ccall((:gtk_builder_get_translation_domain,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),builder)
+        return ccall((:gtk_builder_get_translation_domain,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),builder)
     end
     function type_from_name(builder::Gtk.GtkBuilder)
-        type_name = Gtk.mutable(Uint8)
-        return (ccall((:gtk_builder_get_type_from_name,Gtk.libgtk),Culong,(Ptr{Gtk.GObject},Ptr{Uint8}),builder,type_name),type_name[])
+        type_name = Gtk.mutable(UInt8)
+        return (ccall((:gtk_builder_get_type_from_name,Gtk.libgtk),Culong,(Ptr{Gtk.GObject},Ptr{UInt8}),builder,type_name),type_name[])
     end
     function name(buildable::Gtk.GtkBuildable,name_)
-        ccall((:gtk_buildable_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),buildable,name_)
+        ccall((:gtk_buildable_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),buildable,name_)
         return buildable
     end
     function name(buildable::Gtk.GtkBuildable)
-        return ccall((:gtk_buildable_get_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),buildable)
+        return ccall((:gtk_buildable_get_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),buildable)
     end
     function buildable_property(buildable::Gtk.GtkBuildable,builder,name,value)
-        ccall((:gtk_buildable_set_buildable_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Void}),buildable,builder,name,value)
+        ccall((:gtk_buildable_set_buildable_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),buildable,builder,name,value)
         return buildable
     end
     function internal_child(buildable::Gtk.GtkBuildable,builder,childname)
-        return convert(Gtk.GObject,ccall((:gtk_buildable_get_internal_child,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}),buildable,builder,childname))
+        return convert(Gtk.GObject,ccall((:gtk_buildable_get_internal_child,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8}),buildable,builder,childname))
     end
     function from_pixmap(image::Gtk.GtkImage,pixmap,mask)
         ccall((:gtk_image_set_from_pixmap,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void}),image,pixmap,mask)
@@ -1250,7 +1254,7 @@ $(Expr(:toplevel, :(module GAccessor
         return image
     end
     function from_file(image::Gtk.GtkImage,filename)
-        ccall((:gtk_image_set_from_file,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),image,filename)
+        ccall((:gtk_image_set_from_file,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),image,filename)
         return image
     end
     function from_pixbuf(image::Gtk.GtkImage,pixbuf)
@@ -1258,7 +1262,7 @@ $(Expr(:toplevel, :(module GAccessor
         return image
     end
     function from_stock(image::Gtk.GtkImage,stock_id,size)
-        ccall((:gtk_image_set_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Cint),image,stock_id,size)
+        ccall((:gtk_image_set_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Cint),image,stock_id,size)
         return image
     end
     function from_icon_set(image::Gtk.GtkImage,icon_set,size)
@@ -1270,7 +1274,7 @@ $(Expr(:toplevel, :(module GAccessor
         return image
     end
     function from_icon_name(image::Gtk.GtkImage,icon_name,size)
-        ccall((:gtk_image_set_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Cint),image,icon_name,size)
+        ccall((:gtk_image_set_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Cint),image,icon_name,size)
         return image
     end
     function from_gicon(image::Gtk.GtkImage,icon,size)
@@ -1301,8 +1305,8 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function stock(image::Gtk.GtkImage)
         size = Gtk.mutable(Cint)
-        stock_id = Gtk.mutable(Ptr{Uint8})
-        ccall((:gtk_image_get_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}},Ptr{Cint}),image,stock_id,size)
+        stock_id = Gtk.mutable(Ptr{UInt8})
+        ccall((:gtk_image_get_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{UInt8}},Ptr{Cint}),image,stock_id,size)
         return (stock_id[],size[])
     end
     function icon_set(image::Gtk.GtkImage)
@@ -1316,8 +1320,8 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function icon_name(image::Gtk.GtkImage)
         size = Gtk.mutable(Cint)
-        icon_name_ = Gtk.mutable(Ptr{Uint8})
-        ccall((:gtk_image_get_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{Uint8}},Ptr{Cint}),image,icon_name_,size)
+        icon_name_ = Gtk.mutable(Ptr{UInt8})
+        ccall((:gtk_image_get_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Ptr{UInt8}},Ptr{Cint}),image,icon_name_,size)
         return (icon_name_[],size[])
     end
     function gicon(image::Gtk.GtkImage)
@@ -1337,11 +1341,11 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_button_get_relief,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),button)
     end
     function label(button::Gtk.GtkButton,label_)
-        ccall((:gtk_button_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,label_)
+        ccall((:gtk_button_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,label_)
         return button
     end
     function label(button::Gtk.GtkButton)
-        return ccall((:gtk_button_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),button)
+        return ccall((:gtk_button_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),button)
     end
     function use_underline(button::Gtk.GtkButton,use_underline_)
         ccall((:gtk_button_set_use_underline,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),button,use_underline_)
@@ -1475,11 +1479,11 @@ $(Expr(:toplevel, :(module GAccessor
         return (convert(Bool,ccall((:gtk_tree_model_get_iter,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Gtk.GtkTreePath}),tree_model,iter_,path)),iter_[],path[])
     end
     function iter_from_string(tree_model::Gtk.GtkTreeModel,iter,path_string)
-        return convert(Bool,ccall((:gtk_tree_model_get_iter_from_string,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{Uint8}),tree_model,iter,path_string))
+        return convert(Bool,ccall((:gtk_tree_model_get_iter_from_string,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter},Ptr{UInt8}),tree_model,iter,path_string))
     end
     function string_from_iter(tree_model::Gtk.GtkTreeModel)
         iter = Gtk.mutable(Gtk.GtkTreeIter)
-        return (ccall((:gtk_tree_model_get_string_from_iter,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter}),tree_model,iter),iter[])
+        return (ccall((:gtk_tree_model_get_string_from_iter,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTreeIter}),tree_model,iter),iter[])
     end
     function iter_first(tree_model::Gtk.GtkTreeModel)
         iter = Gtk.mutable(Gtk.GtkTreeIter)
@@ -1573,11 +1577,11 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_tree_view_column_get_max_width,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),tree_column)
     end
     function title(tree_column::Gtk.GtkTreeViewColumn,title_)
-        ccall((:gtk_tree_view_column_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),tree_column,title_)
+        ccall((:gtk_tree_view_column_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),tree_column,title_)
         return tree_column
     end
     function title(tree_column::Gtk.GtkTreeViewColumn)
-        return ccall((:gtk_tree_view_column_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),tree_column)
+        return ccall((:gtk_tree_view_column_get_title,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),tree_column)
     end
     function expand(tree_column::Gtk.GtkTreeViewColumn,expand_)
         ccall((:gtk_tree_view_column_set_expand,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),tree_column,expand_)
@@ -1753,18 +1757,18 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_menu_item_get_right_justified,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),menu_item))
     end
     function accel_path(menu_item::Gtk.GtkMenuItem,accel_path_)
-        ccall((:gtk_menu_item_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),menu_item,accel_path_)
+        ccall((:gtk_menu_item_set_accel_path,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),menu_item,accel_path_)
         return menu_item
     end
     function accel_path(menu_item::Gtk.GtkMenuItem)
-        return ccall((:gtk_menu_item_get_accel_path,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),menu_item)
+        return ccall((:gtk_menu_item_get_accel_path,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),menu_item)
     end
     function label(menu_item::Gtk.GtkMenuItem,label_)
-        ccall((:gtk_menu_item_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),menu_item,label_)
+        ccall((:gtk_menu_item_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),menu_item,label_)
         return menu_item
     end
     function label(menu_item::Gtk.GtkMenuItem)
-        return ccall((:gtk_menu_item_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),menu_item)
+        return ccall((:gtk_menu_item_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),menu_item)
     end
     function use_underline(menu_item::Gtk.GtkMenuItem,setting)
         ccall((:gtk_menu_item_set_use_underline,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),menu_item,setting)
@@ -1802,7 +1806,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_selection_data_get_display,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GtkSelectionData},),selection_data)
     end
     function text(selection_data::Gtk.GtkSelectionData,str,len)
-        ccall((:gtk_selection_data_set_text,Gtk.libgtk),Cint,(Ptr{Gtk.GtkSelectionData},Ptr{Uint8},Cint),selection_data,str,len)
+        ccall((:gtk_selection_data_set_text,Gtk.libgtk),Cint,(Ptr{Gtk.GtkSelectionData},Ptr{UInt8},Cint),selection_data,str,len)
         return selection_data
     end
     function text(selection_data::Gtk.GtkSelectionData)
@@ -1816,11 +1820,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GdkPixbuf,ccall((:gtk_selection_data_get_pixbuf,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GtkSelectionData},),selection_data))
     end
     function uris(selection_data::Gtk.GtkSelectionData,uris_)
-        ccall((:gtk_selection_data_set_uris,Gtk.libgtk),Cint,(Ptr{Gtk.GtkSelectionData},Ptr{Ptr{Uint8}}),selection_data,uris_)
+        ccall((:gtk_selection_data_set_uris,Gtk.libgtk),Cint,(Ptr{Gtk.GtkSelectionData},Ptr{Ptr{UInt8}}),selection_data,uris_)
         return selection_data
     end
     function uris(selection_data::Gtk.GtkSelectionData)
-        return ccall((:gtk_selection_data_get_uris,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GtkSelectionData},),selection_data)
+        return ccall((:gtk_selection_data_get_uris,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GtkSelectionData},),selection_data)
     end
     function targets(selection_data::Gtk.GtkSelectionData)
         n_atoms = Gtk.mutable(Cint)
@@ -1828,7 +1832,7 @@ $(Expr(:toplevel, :(module GAccessor
         return (convert(Bool,ccall((:gtk_selection_data_get_targets,Gtk.libgtk),Cint,(Ptr{Gtk.GtkSelectionData},Ptr{Ptr{Ptr{Void}}},Ptr{Cint}),selection_data,targets_,n_atoms)),targets_[],n_atoms[])
     end
     function data(widget::Gtk.GtkWidget,context,target,time_)
-        return ccall((:gtk_drag_get_data,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},Uint32),widget,context,target,time_)
+        return ccall((:gtk_drag_get_data,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{Void},UInt32),widget,context,target,time_)
     end
     function proxy(widget::Gtk.GtkWidget,proxy_window,protocol,use_coordinates)
         ccall((:gtk_drag_dest_set_proxy,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Cint,Cint),widget,proxy_window,protocol,use_coordinates)
@@ -1864,11 +1868,11 @@ $(Expr(:toplevel, :(module GAccessor
         return widget
     end
     function icon_stock(widget::Gtk.GtkWidget,stock_id)
-        ccall((:gtk_drag_source_set_icon_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,stock_id)
+        ccall((:gtk_drag_source_set_icon_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,stock_id)
         return widget
     end
     function icon_name(widget::Gtk.GtkWidget,icon_name_)
-        ccall((:gtk_drag_source_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),widget,icon_name_)
+        ccall((:gtk_drag_source_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),widget,icon_name_)
         return widget
     end
     function selection_bounds(editable::Gtk.GtkEditable)
@@ -1877,7 +1881,7 @@ $(Expr(:toplevel, :(module GAccessor
         return (convert(Bool,ccall((:gtk_editable_get_selection_bounds,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Cint},Ptr{Cint}),editable,start_pos,end_pos)),start_pos[],end_pos[])
     end
     function chars(editable::Gtk.GtkEditable,start_pos,end_pos)
-        return ccall((:gtk_editable_get_chars,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Cint,Cint),editable,start_pos,end_pos)
+        return ccall((:gtk_editable_get_chars,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Cint,Cint),editable,start_pos,end_pos)
     end
     function position(editable::Gtk.GtkEditable,position_)
         ccall((:gtk_editable_set_position,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),editable,position_)
@@ -1978,7 +1982,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_entry_completion_get_popup_single_match,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),completion))
     end
     function completion_prefix(completion::Gtk.GtkEntryCompletion)
-        return ccall((:gtk_entry_completion_get_completion_prefix,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),completion)
+        return ccall((:gtk_entry_completion_get_completion_prefix,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),completion)
     end
     function text_column(completion::Gtk.GtkEntryCompletion,column)
         ccall((:gtk_entry_completion_set_text_column,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),completion,column)
@@ -2005,11 +2009,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_entry_get_visibility,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),entry))
     end
     function invisible_char(entry::Gtk.GtkEntry,ch)
-        ccall((:gtk_entry_set_invisible_char,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),entry,ch)
+        ccall((:gtk_entry_set_invisible_char,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),entry,ch)
         return entry
     end
     function invisible_char(entry::Gtk.GtkEntry)
-        return ccall((:gtk_entry_get_invisible_char,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),entry)
+        return ccall((:gtk_entry_get_invisible_char,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),entry)
     end
     function has_frame(entry::Gtk.GtkEntry,setting)
         ccall((:gtk_entry_set_has_frame,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),entry,setting)
@@ -2040,7 +2044,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_entry_get_max_length,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),entry)
     end
     function text_length(entry::Gtk.GtkEntry)
-        return ccall((:gtk_entry_get_text_length,Gtk.libgtk),Uint16,(Ptr{Gtk.GObject},),entry)
+        return ccall((:gtk_entry_get_text_length,Gtk.libgtk),UInt16,(Ptr{Gtk.GObject},),entry)
     end
     function activates_default(entry::Gtk.GtkEntry,setting)
         ccall((:gtk_entry_set_activates_default,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),entry,setting)
@@ -2057,11 +2061,11 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_entry_get_width_chars,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),entry)
     end
     function text(entry::Gtk.GtkEntry,text_)
-        ccall((:gtk_entry_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),entry,text_)
+        ccall((:gtk_entry_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),entry,text_)
         return entry
     end
     function text(entry::Gtk.GtkEntry)
-        return ccall((:gtk_entry_get_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),entry)
+        return ccall((:gtk_entry_get_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),entry)
     end
     function layout(entry::Gtk.GtkEntry)
         return ccall((:gtk_entry_get_layout,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),entry)
@@ -2112,11 +2116,11 @@ $(Expr(:toplevel, :(module GAccessor
         return entry
     end
     function icon_from_stock(entry::Gtk.GtkEntry,icon_pos,stock_id)
-        ccall((:gtk_entry_set_icon_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{Uint8}),entry,icon_pos,stock_id)
+        ccall((:gtk_entry_set_icon_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{UInt8}),entry,icon_pos,stock_id)
         return entry
     end
     function icon_from_icon_name(entry::Gtk.GtkEntry,icon_pos,icon_name)
-        ccall((:gtk_entry_set_icon_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{Uint8}),entry,icon_pos,icon_name)
+        ccall((:gtk_entry_set_icon_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{UInt8}),entry,icon_pos,icon_name)
         return entry
     end
     function icon_from_gicon(entry::Gtk.GtkEntry,icon_pos,icon)
@@ -2130,10 +2134,10 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GdkPixbuf,ccall((:gtk_entry_get_icon_pixbuf,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Cint),entry,icon_pos))
     end
     function icon_stock(entry::Gtk.GtkEntry,icon_pos)
-        return ccall((:gtk_entry_get_icon_stock,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
+        return ccall((:gtk_entry_get_icon_stock,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
     end
     function icon_name(entry::Gtk.GtkEntry,icon_pos)
-        return ccall((:gtk_entry_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
+        return ccall((:gtk_entry_get_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
     end
     function icon_gicon(entry::Gtk.GtkEntry,icon_pos)
         return ccall((:gtk_entry_get_icon_gicon,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
@@ -2156,18 +2160,18 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_entry_get_icon_at_pos,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Cint,Cint),entry,x,y)
     end
     function icon_tooltip_text(entry::Gtk.GtkEntry,icon_pos,tooltip)
-        ccall((:gtk_entry_set_icon_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{Uint8}),entry,icon_pos,tooltip)
+        ccall((:gtk_entry_set_icon_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{UInt8}),entry,icon_pos,tooltip)
         return entry
     end
     function icon_tooltip_text(entry::Gtk.GtkEntry,icon_pos)
-        return ccall((:gtk_entry_get_icon_tooltip_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
+        return ccall((:gtk_entry_get_icon_tooltip_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
     end
     function icon_tooltip_markup(entry::Gtk.GtkEntry,icon_pos,tooltip)
-        ccall((:gtk_entry_set_icon_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{Uint8}),entry,icon_pos,tooltip)
+        ccall((:gtk_entry_set_icon_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{UInt8}),entry,icon_pos,tooltip)
         return entry
     end
     function icon_tooltip_markup(entry::Gtk.GtkEntry,icon_pos)
-        return ccall((:gtk_entry_get_icon_tooltip_markup,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
+        return ccall((:gtk_entry_get_icon_tooltip_markup,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Cint),entry,icon_pos)
     end
     function icon_drag_source(entry::Gtk.GtkEntry,icon_pos,target_list,actions)
         ccall((:gtk_entry_set_icon_drag_source,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Ptr{Gtk.GtkTargetList},Cint),entry,icon_pos,target_list,actions)
@@ -2441,7 +2445,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_tree_view_get_tooltip_column,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),tree_view)
     end
     function active_text(combo_box::Gtk.GtkComboBoxText)
-        return ccall((:gtk_combo_box_text_get_active_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),combo_box)
+        return ccall((:gtk_combo_box_text_get_active_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),combo_box)
     end
     function expanded(expander::Gtk.GtkExpander,expanded_)
         ccall((:gtk_expander_set_expanded,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),expander,expanded_)
@@ -2458,11 +2462,11 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_expander_get_spacing,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),expander)
     end
     function label(expander::Gtk.GtkExpander,label_)
-        ccall((:gtk_expander_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),expander,label_)
+        ccall((:gtk_expander_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),expander,label_)
         return expander
     end
     function label(expander::Gtk.GtkExpander)
-        return ccall((:gtk_expander_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),expander)
+        return ccall((:gtk_expander_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),expander)
     end
     function use_underline(expander::Gtk.GtkExpander,use_underline_)
         ccall((:gtk_expander_set_use_underline,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),expander,use_underline_)
@@ -2535,42 +2539,42 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_file_chooser_get_create_folders,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),chooser))
     end
     function current_name(chooser::Gtk.GtkFileChooser,name)
-        ccall((:gtk_file_chooser_set_current_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),chooser,name)
+        ccall((:gtk_file_chooser_set_current_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),chooser,name)
         return chooser
     end
     function filename(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_filename,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_filename,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function filename(chooser::Gtk.GtkFileChooser,filename_)
-        ccall((:gtk_file_chooser_set_filename,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8}),chooser,filename_)
+        ccall((:gtk_file_chooser_set_filename,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8}),chooser,filename_)
         return chooser
     end
     function filenames(chooser::Gtk.GtkFileChooser)
         return ccall((:gtk_file_chooser_get_filenames,Gtk.libgtk),Ptr{Gtk._GSList{Void}},(Ptr{Gtk.GObject},),chooser)
     end
     function current_folder(chooser::Gtk.GtkFileChooser,filename)
-        ccall((:gtk_file_chooser_set_current_folder,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8}),chooser,filename)
+        ccall((:gtk_file_chooser_set_current_folder,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8}),chooser,filename)
         return chooser
     end
     function current_folder(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_current_folder,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_current_folder,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function uri(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function uri(chooser::Gtk.GtkFileChooser,uri_)
-        ccall((:gtk_file_chooser_set_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8}),chooser,uri_)
+        ccall((:gtk_file_chooser_set_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8}),chooser,uri_)
         return chooser
     end
     function uris(chooser::Gtk.GtkFileChooser)
         return ccall((:gtk_file_chooser_get_uris,Gtk.libgtk),Ptr{Gtk._GSList{Void}},(Ptr{Gtk.GObject},),chooser)
     end
     function current_folder_uri(chooser::Gtk.GtkFileChooser,uri)
-        ccall((:gtk_file_chooser_set_current_folder_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8}),chooser,uri)
+        ccall((:gtk_file_chooser_set_current_folder_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8}),chooser,uri)
         return chooser
     end
     function current_folder_uri(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_current_folder_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_current_folder_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function file(chooser::Gtk.GtkFileChooser)
         return ccall((:gtk_file_chooser_get_file,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),chooser)
@@ -2611,10 +2615,10 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_file_chooser_get_use_preview_label,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),chooser))
     end
     function preview_filename(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_preview_filename,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_preview_filename,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function preview_uri(chooser::Gtk.GtkFileChooser)
-        return ccall((:gtk_file_chooser_get_preview_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_file_chooser_get_preview_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function preview_file(chooser::Gtk.GtkFileChooser)
         return ccall((:gtk_file_chooser_get_preview_file,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),chooser)
@@ -2634,10 +2638,10 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_file_chooser_get_filter,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),chooser)
     end
     function title(font_button::Gtk.GtkFontButton)
-        return ccall((:gtk_font_button_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),font_button)
+        return ccall((:gtk_font_button_get_title,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),font_button)
     end
     function title(font_button::Gtk.GtkFontButton,title_)
-        ccall((:gtk_font_button_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),font_button,title_)
+        ccall((:gtk_font_button_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),font_button,title_)
         return font_button
     end
     function use_font(font_button::Gtk.GtkFontButton)
@@ -2655,10 +2659,10 @@ $(Expr(:toplevel, :(module GAccessor
         return font_button
     end
     function font_name(font_button::Gtk.GtkFontButton)
-        return ccall((:gtk_font_button_get_font_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),font_button)
+        return ccall((:gtk_font_button_get_font_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),font_button)
     end
     function font_name(font_button::Gtk.GtkFontButton,fontname)
-        ccall((:gtk_font_button_set_font_name,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8}),font_button,fontname)
+        ccall((:gtk_font_button_set_font_name,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8}),font_button,fontname)
         return font_button
     end
     function show_style(font_button::Gtk.GtkFontButton)
@@ -2848,7 +2852,7 @@ $(Expr(:toplevel, :(module GAccessor
         return icon_set
     end
     function render_icon(icon_set::Gtk.GtkIconSet,style,direction,state,size,widget,detail)
-        ccall((:gtk_icon_set_render_icon,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GtkIconSet},Ptr{Void},Cint,Cint,Cint,Ptr{Gtk.GObject},Ptr{Uint8}),icon_set,style,direction,state,size,widget,detail)
+        ccall((:gtk_icon_set_render_icon,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GtkIconSet},Ptr{Void},Cint,Cint,Cint,Ptr{Gtk.GObject},Ptr{UInt8}),icon_set,style,direction,state,size,widget,detail)
         return icon_set
     end
     function add_source(icon_set::Gtk.GtkIconSet,source)
@@ -2862,11 +2866,11 @@ $(Expr(:toplevel, :(module GAccessor
         return (sizes_[],n_sizes[])
     end
     function filename(source::Gtk.GtkIconSource,filename_)
-        ccall((:gtk_icon_source_set_filename,Gtk.libgtk),Void,(Ptr{Gtk.GtkIconSource},Ptr{Uint8}),source,filename_)
+        ccall((:gtk_icon_source_set_filename,Gtk.libgtk),Void,(Ptr{Gtk.GtkIconSource},Ptr{UInt8}),source,filename_)
         return source
     end
     function icon_name(source::Gtk.GtkIconSource,icon_name_)
-        ccall((:gtk_icon_source_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GtkIconSource},Ptr{Uint8}),source,icon_name_)
+        ccall((:gtk_icon_source_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GtkIconSource},Ptr{UInt8}),source,icon_name_)
         return source
     end
     function pixbuf(source::Gtk.GtkIconSource,pixbuf_)
@@ -2874,10 +2878,10 @@ $(Expr(:toplevel, :(module GAccessor
         return source
     end
     function filename(source::Gtk.GtkIconSource)
-        return ccall((:gtk_icon_source_get_filename,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkIconSource},),source)
+        return ccall((:gtk_icon_source_get_filename,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkIconSource},),source)
     end
     function icon_name(source::Gtk.GtkIconSource)
-        return ccall((:gtk_icon_source_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkIconSource},),source)
+        return ccall((:gtk_icon_source_get_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkIconSource},),source)
     end
     function pixbuf(source::Gtk.GtkIconSource)
         return convert(Gtk.GdkPixbuf,ccall((:gtk_icon_source_get_pixbuf,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GtkIconSource},),source))
@@ -3102,13 +3106,13 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_layout_get_bin_window,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),layout)
     end
     function size(layout::Gtk.GtkLayout,width,height)
-        ccall((:gtk_layout_set_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32,Uint32),layout,width,height)
+        ccall((:gtk_layout_set_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32,UInt32),layout,width,height)
         return layout
     end
     function size(layout::Gtk.GtkLayout)
-        height = Gtk.mutable(Uint32)
-        width = Gtk.mutable(Uint32)
-        ccall((:gtk_layout_get_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint32},Ptr{Uint32}),layout,width,height)
+        height = Gtk.mutable(UInt32)
+        width = Gtk.mutable(UInt32)
+        ccall((:gtk_layout_get_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt32},Ptr{UInt32}),layout,width,height)
         return (width[],height[])
     end
     function hadjustment(layout::Gtk.GtkLayout)
@@ -3126,10 +3130,10 @@ $(Expr(:toplevel, :(module GAccessor
         return layout
     end
     function uri(link_button::Gtk.GtkLinkButton)
-        return ccall((:gtk_link_button_get_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),link_button)
+        return ccall((:gtk_link_button_get_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),link_button)
     end
     function uri(link_button::Gtk.GtkLinkButton,uri_)
-        ccall((:gtk_link_button_set_uri,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),link_button,uri_)
+        ccall((:gtk_link_button_set_uri,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),link_button,uri_)
         return link_button
     end
     function visited(link_button::Gtk.GtkLinkButton)
@@ -3162,15 +3166,15 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_tool_item_get_expand,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),tool_item))
     end
     function tooltip(tool_item::Gtk.GtkToolItem,tooltips,tip_text,tip_private)
-        ccall((:gtk_tool_item_set_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{Uint8},Ptr{Uint8}),tool_item,tooltips,tip_text,tip_private)
+        ccall((:gtk_tool_item_set_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{UInt8},Ptr{UInt8}),tool_item,tooltips,tip_text,tip_private)
         return tool_item
     end
     function tooltip_text(tool_item::Gtk.GtkToolItem,text)
-        ccall((:gtk_tool_item_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),tool_item,text)
+        ccall((:gtk_tool_item_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),tool_item,text)
         return tool_item
     end
     function tooltip_markup(tool_item::Gtk.GtkToolItem,markup)
-        ccall((:gtk_tool_item_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),tool_item,markup)
+        ccall((:gtk_tool_item_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),tool_item,markup)
         return tool_item
     end
     function use_drag_window(tool_item::Gtk.GtkToolItem,use_drag_window_)
@@ -3226,18 +3230,18 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_tool_item_get_text_size_group,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),tool_item)
     end
     function proxy_menu_item(tool_item::Gtk.GtkToolItem,menu_item_id)
-        return convert(Gtk.GtkWidget,ccall((:gtk_tool_item_get_proxy_menu_item,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Uint8}),tool_item,menu_item_id))
+        return convert(Gtk.GtkWidget,ccall((:gtk_tool_item_get_proxy_menu_item,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{UInt8}),tool_item,menu_item_id))
     end
     function proxy_menu_item(tool_item::Gtk.GtkToolItem,menu_item_id,menu_item)
-        ccall((:gtk_tool_item_set_proxy_menu_item,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Gtk.GObject}),tool_item,menu_item_id,menu_item)
+        ccall((:gtk_tool_item_set_proxy_menu_item,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Gtk.GObject}),tool_item,menu_item_id,menu_item)
         return tool_item
     end
     function label(button::Gtk.GtkToolButton,label_)
-        ccall((:gtk_tool_button_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,label_)
+        ccall((:gtk_tool_button_set_label,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,label_)
         return button
     end
     function label(button::Gtk.GtkToolButton)
-        return ccall((:gtk_tool_button_get_label,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),button)
+        return ccall((:gtk_tool_button_get_label,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),button)
     end
     function use_underline(button::Gtk.GtkToolButton,use_underline_)
         ccall((:gtk_tool_button_set_use_underline,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),button,use_underline_)
@@ -3247,18 +3251,18 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_tool_button_get_use_underline,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),button))
     end
     function stock_id(button::Gtk.GtkToolButton,stock_id_)
-        ccall((:gtk_tool_button_set_stock_id,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,stock_id_)
+        ccall((:gtk_tool_button_set_stock_id,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,stock_id_)
         return button
     end
     function stock_id(button::Gtk.GtkToolButton)
-        return ccall((:gtk_tool_button_get_stock_id,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),button)
+        return ccall((:gtk_tool_button_get_stock_id,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),button)
     end
     function icon_name(button::Gtk.GtkToolButton,icon_name_)
-        ccall((:gtk_tool_button_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,icon_name_)
+        ccall((:gtk_tool_button_set_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,icon_name_)
         return button
     end
     function icon_name(button::Gtk.GtkToolButton)
-        return ccall((:gtk_tool_button_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),button)
+        return ccall((:gtk_tool_button_get_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),button)
     end
     function icon_widget(button::Gtk.GtkToolButton,icon_widget_)
         ccall((:gtk_tool_button_set_icon_widget,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),button,icon_widget_)
@@ -3282,15 +3286,15 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkWidget,ccall((:gtk_menu_tool_button_get_menu,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),button))
     end
     function arrow_tooltip(button::Gtk.GtkMenuToolButton,tooltips,tip_text,tip_private)
-        ccall((:gtk_menu_tool_button_set_arrow_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{Uint8},Ptr{Uint8}),button,tooltips,tip_text,tip_private)
+        ccall((:gtk_menu_tool_button_set_arrow_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void},Ptr{UInt8},Ptr{UInt8}),button,tooltips,tip_text,tip_private)
         return button
     end
     function arrow_tooltip_text(button::Gtk.GtkMenuToolButton,text)
-        ccall((:gtk_menu_tool_button_set_arrow_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,text)
+        ccall((:gtk_menu_tool_button_set_arrow_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,text)
         return button
     end
     function arrow_tooltip_markup(button::Gtk.GtkMenuToolButton,markup)
-        ccall((:gtk_menu_tool_button_set_arrow_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),button,markup)
+        ccall((:gtk_menu_tool_button_set_arrow_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),button,markup)
         return button
     end
     function image(dialog::Gtk.GtkMessageDialog,image_)
@@ -3301,7 +3305,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkWidget,ccall((:gtk_message_dialog_get_image,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),dialog))
     end
     function markup(message_dialog::Gtk.GtkMessageDialog,str)
-        ccall((:gtk_message_dialog_set_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),message_dialog,str)
+        ccall((:gtk_message_dialog_set_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),message_dialog,str)
         return message_dialog
     end
     function message_area(message_dialog::Gtk.GtkMessageDialog)
@@ -3322,11 +3326,11 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_notebook_get_group,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),notebook)
     end
     function group_name(notebook::Gtk.GtkNotebook,group_name_)
-        ccall((:gtk_notebook_set_group_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),notebook,group_name_)
+        ccall((:gtk_notebook_set_group_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),notebook,group_name_)
         return notebook
     end
     function group_name(notebook::Gtk.GtkNotebook)
-        return ccall((:gtk_notebook_get_group_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),notebook)
+        return ccall((:gtk_notebook_get_group_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),notebook)
     end
     function current_page(notebook::Gtk.GtkNotebook)
         return ccall((:gtk_notebook_get_current_page,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),notebook)
@@ -3367,15 +3371,15 @@ $(Expr(:toplevel, :(module GAccessor
         return notebook
     end
     function tab_border(notebook::Gtk.GtkNotebook,border_width)
-        ccall((:gtk_notebook_set_tab_border,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),notebook,border_width)
+        ccall((:gtk_notebook_set_tab_border,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),notebook,border_width)
         return notebook
     end
     function tab_hborder(notebook::Gtk.GtkNotebook,tab_hborder_)
-        ccall((:gtk_notebook_set_tab_hborder,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),notebook,tab_hborder_)
+        ccall((:gtk_notebook_set_tab_hborder,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),notebook,tab_hborder_)
         return notebook
     end
     function tab_vborder(notebook::Gtk.GtkNotebook,tab_vborder_)
-        ccall((:gtk_notebook_set_tab_vborder,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),notebook,tab_vborder_)
+        ccall((:gtk_notebook_set_tab_vborder,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),notebook,tab_vborder_)
         return notebook
     end
     function scrollable(notebook::Gtk.GtkNotebook,scrollable_)
@@ -3386,10 +3390,10 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_notebook_get_scrollable,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),notebook))
     end
     function tab_hborder(notebook::Gtk.GtkNotebook)
-        return ccall((:gtk_notebook_get_tab_hborder,Gtk.libgtk),Uint16,(Ptr{Gtk.GObject},),notebook)
+        return ccall((:gtk_notebook_get_tab_hborder,Gtk.libgtk),UInt16,(Ptr{Gtk.GObject},),notebook)
     end
     function tab_vborder(notebook::Gtk.GtkNotebook)
-        return ccall((:gtk_notebook_get_tab_vborder,Gtk.libgtk),Uint16,(Ptr{Gtk.GObject},),notebook)
+        return ccall((:gtk_notebook_get_tab_vborder,Gtk.libgtk),UInt16,(Ptr{Gtk.GObject},),notebook)
     end
     function tab_label(notebook::Gtk.GtkNotebook,child)
         return convert(Gtk.GtkWidget,ccall((:gtk_notebook_get_tab_label,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child))
@@ -3399,11 +3403,11 @@ $(Expr(:toplevel, :(module GAccessor
         return notebook
     end
     function tab_label_text(notebook::Gtk.GtkNotebook,child,tab_text)
-        ccall((:gtk_notebook_set_tab_label_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}),notebook,child,tab_text)
+        ccall((:gtk_notebook_set_tab_label_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8}),notebook,child,tab_text)
         return notebook
     end
     function tab_label_text(notebook::Gtk.GtkNotebook,child)
-        return ccall((:gtk_notebook_get_tab_label_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child)
+        return ccall((:gtk_notebook_get_tab_label_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child)
     end
     function menu_label(notebook::Gtk.GtkNotebook,child)
         return convert(Gtk.GtkWidget,ccall((:gtk_notebook_get_menu_label,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child))
@@ -3413,11 +3417,11 @@ $(Expr(:toplevel, :(module GAccessor
         return notebook
     end
     function menu_label_text(notebook::Gtk.GtkNotebook,child,menu_text)
-        ccall((:gtk_notebook_set_menu_label_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{Uint8}),notebook,child,menu_text)
+        ccall((:gtk_notebook_set_menu_label_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8}),notebook,child,menu_text)
         return notebook
     end
     function menu_label_text(notebook::Gtk.GtkNotebook,child)
-        return ccall((:gtk_notebook_get_menu_label_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child)
+        return ccall((:gtk_notebook_get_menu_label_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),notebook,child)
     end
     function tab_label_packing(notebook::Gtk.GtkNotebook,child,expand,fill,pack_type)
         ccall((:gtk_notebook_set_tab_label_packing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Cint,Cint,Cint),notebook,child,expand,fill,pack_type)
@@ -3455,13 +3459,13 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_paper_size_get_paper_sizes,Gtk.libgtk),Ptr{Gtk._GList{Void}},(Cint,),include_custom)
     end
     function name(size::Gtk.GtkPaperSize)
-        return ccall((:gtk_paper_size_get_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkPaperSize},),size)
+        return ccall((:gtk_paper_size_get_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkPaperSize},),size)
     end
     function display_name(size::Gtk.GtkPaperSize)
-        return ccall((:gtk_paper_size_get_display_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkPaperSize},),size)
+        return ccall((:gtk_paper_size_get_display_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkPaperSize},),size)
     end
     function ppd_name(size::Gtk.GtkPaperSize)
-        return ccall((:gtk_paper_size_get_ppd_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkPaperSize},),size)
+        return ccall((:gtk_paper_size_get_ppd_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkPaperSize},),size)
     end
     function width(size::Gtk.GtkPaperSize,unit)
         return ccall((:gtk_paper_size_get_width,Gtk.libgtk),Cdouble,(Ptr{Gtk.GtkPaperSize},Cint),size,unit)
@@ -3486,7 +3490,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_paper_size_get_default_right_margin,Gtk.libgtk),Cdouble,(Ptr{Gtk.GtkPaperSize},Cint),size,unit)
     end
     function text(pbar::Gtk.GtkProgressBar,text_)
-        ccall((:gtk_progress_bar_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),pbar,text_)
+        ccall((:gtk_progress_bar_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),pbar,text_)
         return pbar
     end
     function fraction(pbar::Gtk.GtkProgressBar,fraction_)
@@ -3502,7 +3506,7 @@ $(Expr(:toplevel, :(module GAccessor
         return pbar
     end
     function text(pbar::Gtk.GtkProgressBar)
-        return ccall((:gtk_progress_bar_get_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),pbar)
+        return ccall((:gtk_progress_bar_get_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),pbar)
     end
     function fraction(pbar::Gtk.GtkProgressBar)
         return ccall((:gtk_progress_bar_get_fraction,Gtk.libgtk),Cdouble,(Ptr{Gtk.GObject},),pbar)
@@ -3525,15 +3529,15 @@ $(Expr(:toplevel, :(module GAccessor
         return pbar
     end
     function discrete_blocks(pbar::Gtk.GtkProgressBar,blocks)
-        ccall((:gtk_progress_bar_set_discrete_blocks,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),pbar,blocks)
+        ccall((:gtk_progress_bar_set_discrete_blocks,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),pbar,blocks)
         return pbar
     end
     function activity_step(pbar::Gtk.GtkProgressBar,step)
-        ccall((:gtk_progress_bar_set_activity_step,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),pbar,step)
+        ccall((:gtk_progress_bar_set_activity_step,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),pbar,step)
         return pbar
     end
     function activity_blocks(pbar::Gtk.GtkProgressBar,blocks)
-        ccall((:gtk_progress_bar_set_activity_blocks,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),pbar,blocks)
+        ccall((:gtk_progress_bar_set_activity_blocks,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),pbar,blocks)
         return pbar
     end
     function group(radio_button::Gtk.GtkRadioButton)
@@ -3551,16 +3555,16 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_toggle_tool_button_get_active,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),button))
     end
     function uri(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function display_name(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_display_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_display_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function description(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_description,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_description,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function mime_type(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_mime_type,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_mime_type,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function added(info::Gtk.GtkRecentInfo)
         return ccall((:gtk_recent_info_get_added,Gtk.libgtk),Clong,(Ptr{Gtk.GtkRecentInfo},),info)
@@ -3576,26 +3580,26 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function application_info(info::Gtk.GtkRecentInfo,app_name)
         time_ = Gtk.mutable(Clong)
-        count = Gtk.mutable(Uint32)
-        app_exec = Gtk.mutable(Ptr{Uint8})
-        return (convert(Bool,ccall((:gtk_recent_info_get_application_info,Gtk.libgtk),Cint,(Ptr{Gtk.GtkRecentInfo},Ptr{Uint8},Ptr{Ptr{Uint8}},Ptr{Uint32},Ptr{Clong}),info,app_name,app_exec,count,time_)),app_exec[],count[],time_[])
+        count = Gtk.mutable(UInt32)
+        app_exec = Gtk.mutable(Ptr{UInt8})
+        return (convert(Bool,ccall((:gtk_recent_info_get_application_info,Gtk.libgtk),Cint,(Ptr{Gtk.GtkRecentInfo},Ptr{UInt8},Ptr{Ptr{UInt8}},Ptr{UInt32},Ptr{Clong}),info,app_name,app_exec,count,time_)),app_exec[],count[],time_[])
     end
     function applications(info::Gtk.GtkRecentInfo)
         length = Gtk.mutable(Culong)
-        return (ccall((:gtk_recent_info_get_applications,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GtkRecentInfo},Ptr{Culong}),info,length),length[])
+        return (ccall((:gtk_recent_info_get_applications,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GtkRecentInfo},Ptr{Culong}),info,length),length[])
     end
     function groups(info::Gtk.GtkRecentInfo)
         length = Gtk.mutable(Culong)
-        return (ccall((:gtk_recent_info_get_groups,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GtkRecentInfo},Ptr{Culong}),info,length),length[])
+        return (ccall((:gtk_recent_info_get_groups,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GtkRecentInfo},Ptr{Culong}),info,length),length[])
     end
     function icon(info::Gtk.GtkRecentInfo,size)
         return convert(Gtk.GdkPixbuf,ccall((:gtk_recent_info_get_icon,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GtkRecentInfo},Cint),info,size))
     end
     function short_name(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_short_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_short_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function uri_display(info::Gtk.GtkRecentInfo)
-        return ccall((:gtk_recent_info_get_uri_display,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GtkRecentInfo},),info)
+        return ccall((:gtk_recent_info_get_uri_display,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GtkRecentInfo},),info)
     end
     function age(info::Gtk.GtkRecentInfo)
         return ccall((:gtk_recent_info_get_age,Gtk.libgtk),Cint,(Ptr{Gtk.GtkRecentInfo},),info)
@@ -3668,11 +3672,11 @@ $(Expr(:toplevel, :(module GAccessor
         return chooser
     end
     function current_uri(chooser::Gtk.GtkRecentChooser,uri,error)
-        ccall((:gtk_recent_chooser_set_current_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{Uint8},Ptr{Ptr{Gtk.GError}}),chooser,uri,error)
+        ccall((:gtk_recent_chooser_set_current_uri,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Ptr{Gtk.GError}}),chooser,uri,error)
         return chooser
     end
     function current_uri(chooser::Gtk.GtkRecentChooser)
-        return ccall((:gtk_recent_chooser_get_current_uri,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),chooser)
+        return ccall((:gtk_recent_chooser_get_current_uri,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),chooser)
     end
     function current_item(chooser::Gtk.GtkRecentChooser)
         return convert(Gtk.GtkRecentInfo,ccall((:gtk_recent_chooser_get_current_item,Gtk.libgtk),Ptr{Gtk.GtkRecentInfo},(Ptr{Gtk.GObject},),chooser))
@@ -3682,7 +3686,7 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function uris(chooser::Gtk.GtkRecentChooser)
         length = Gtk.mutable(Culong)
-        return (ccall((:gtk_recent_chooser_get_uris,Gtk.libgtk),Ptr{Ptr{Uint8}},(Ptr{Gtk.GObject},Ptr{Culong}),chooser,length),length[])
+        return (ccall((:gtk_recent_chooser_get_uris,Gtk.libgtk),Ptr{Ptr{UInt8}},(Ptr{Gtk.GObject},Ptr{Culong}),chooser,length),length[])
     end
     function filter(chooser::Gtk.GtkRecentChooser,filter_)
         ccall((:gtk_recent_chooser_set_filter,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),chooser,filter_)
@@ -3750,11 +3754,11 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GtkAdjustment,ccall((:gtk_spin_button_get_adjustment,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),spin_button))
     end
     function digits(spin_button::Gtk.GtkSpinButton,digits_)
-        ccall((:gtk_spin_button_set_digits,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),spin_button,digits_)
+        ccall((:gtk_spin_button_set_digits,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),spin_button,digits_)
         return spin_button
     end
     function digits(spin_button::Gtk.GtkSpinButton)
-        return ccall((:gtk_spin_button_get_digits,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),spin_button)
+        return ccall((:gtk_spin_button_get_digits,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),spin_button)
     end
     function increments(spin_button::Gtk.GtkSpinButton,step,page)
         ccall((:gtk_spin_button_set_increments,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cdouble,Cdouble),spin_button,step,page)
@@ -3815,7 +3819,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_spin_button_get_snap_to_ticks,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),spin_button))
     end
     function context_id(statusbar::Gtk.GtkStatusbar,context_description)
-        return ccall((:gtk_statusbar_get_context_id,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},Ptr{Uint8}),statusbar,context_description)
+        return ccall((:gtk_statusbar_get_context_id,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},Ptr{UInt8}),statusbar,context_description)
     end
     function has_resize_grip(statusbar::Gtk.GtkStatusbar,setting)
         ccall((:gtk_statusbar_set_has_resize_grip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),statusbar,setting)
@@ -3832,15 +3836,15 @@ $(Expr(:toplevel, :(module GAccessor
         return status_icon
     end
     function from_file(status_icon::Gtk.GtkStatusIcon,filename)
-        ccall((:gtk_status_icon_set_from_file,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,filename)
+        ccall((:gtk_status_icon_set_from_file,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,filename)
         return status_icon
     end
     function from_stock(status_icon::Gtk.GtkStatusIcon,stock_id)
-        ccall((:gtk_status_icon_set_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,stock_id)
+        ccall((:gtk_status_icon_set_from_stock,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,stock_id)
         return status_icon
     end
     function from_icon_name(status_icon::Gtk.GtkStatusIcon,icon_name)
-        ccall((:gtk_status_icon_set_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,icon_name)
+        ccall((:gtk_status_icon_set_from_icon_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,icon_name)
         return status_icon
     end
     function from_gicon(status_icon::Gtk.GtkStatusIcon,icon)
@@ -3854,10 +3858,10 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Gtk.GdkPixbuf,ccall((:gtk_status_icon_get_pixbuf,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),status_icon))
     end
     function stock(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_stock,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_stock,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),status_icon)
     end
     function icon_name(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_icon_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_icon_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),status_icon)
     end
     function gicon(status_icon::Gtk.GtkStatusIcon)
         return ccall((:gtk_status_icon_get_gicon,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),status_icon)
@@ -3873,7 +3877,7 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_status_icon_get_screen,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),status_icon)
     end
     function tooltip(status_icon::Gtk.GtkStatusIcon,tooltip_text)
-        ccall((:gtk_status_icon_set_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,tooltip_text)
+        ccall((:gtk_status_icon_set_tooltip,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,tooltip_text)
         return status_icon
     end
     function has_tooltip(status_icon::Gtk.GtkStatusIcon,has_tooltip_)
@@ -3881,22 +3885,22 @@ $(Expr(:toplevel, :(module GAccessor
         return status_icon
     end
     function tooltip_text(status_icon::Gtk.GtkStatusIcon,text)
-        ccall((:gtk_status_icon_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,text)
+        ccall((:gtk_status_icon_set_tooltip_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,text)
         return status_icon
     end
     function tooltip_markup(status_icon::Gtk.GtkStatusIcon,markup)
-        ccall((:gtk_status_icon_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,markup)
+        ccall((:gtk_status_icon_set_tooltip_markup,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,markup)
         return status_icon
     end
     function title(status_icon::Gtk.GtkStatusIcon,title_)
-        ccall((:gtk_status_icon_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,title_)
+        ccall((:gtk_status_icon_set_title,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,title_)
         return status_icon
     end
     function title(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_title,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_title,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),status_icon)
     end
     function name(status_icon::Gtk.GtkStatusIcon,name_)
-        ccall((:gtk_status_icon_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8}),status_icon,name_)
+        ccall((:gtk_status_icon_set_name,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8}),status_icon,name_)
         return status_icon
     end
     function visible(status_icon::Gtk.GtkStatusIcon,visible_)
@@ -3923,41 +3927,41 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_status_icon_get_has_tooltip,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),status_icon))
     end
     function tooltip_text(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_tooltip_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_tooltip_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),status_icon)
     end
     function tooltip_markup(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_tooltip_markup,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_tooltip_markup,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),status_icon)
     end
     function x11_window_id(status_icon::Gtk.GtkStatusIcon)
-        return ccall((:gtk_status_icon_get_x11_window_id,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),status_icon)
+        return ccall((:gtk_status_icon_get_x11_window_id,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),status_icon)
     end
     function row_spacing(table::Gtk.GtkTable,row,spacing)
-        ccall((:gtk_table_set_row_spacing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32,Uint32),table,row,spacing)
+        ccall((:gtk_table_set_row_spacing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32,UInt32),table,row,spacing)
         return table
     end
     function row_spacing(table::Gtk.GtkTable,row)
-        return ccall((:gtk_table_get_row_spacing,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},Uint32),table,row)
+        return ccall((:gtk_table_get_row_spacing,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},UInt32),table,row)
     end
     function col_spacing(table::Gtk.GtkTable,column,spacing)
-        ccall((:gtk_table_set_col_spacing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32,Uint32),table,column,spacing)
+        ccall((:gtk_table_set_col_spacing,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32,UInt32),table,column,spacing)
         return table
     end
     function col_spacing(table::Gtk.GtkTable,column)
-        return ccall((:gtk_table_get_col_spacing,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},Uint32),table,column)
+        return ccall((:gtk_table_get_col_spacing,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},UInt32),table,column)
     end
     function row_spacings(table::Gtk.GtkTable,spacing)
-        ccall((:gtk_table_set_row_spacings,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),table,spacing)
+        ccall((:gtk_table_set_row_spacings,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),table,spacing)
         return table
     end
     function default_row_spacing(table::Gtk.GtkTable)
-        return ccall((:gtk_table_get_default_row_spacing,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),table)
+        return ccall((:gtk_table_get_default_row_spacing,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),table)
     end
     function col_spacings(table::Gtk.GtkTable,spacing)
-        ccall((:gtk_table_set_col_spacings,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Uint32),table,spacing)
+        ccall((:gtk_table_set_col_spacings,Gtk.libgtk),Void,(Ptr{Gtk.GObject},UInt32),table,spacing)
         return table
     end
     function default_col_spacing(table::Gtk.GtkTable)
-        return ccall((:gtk_table_get_default_col_spacing,Gtk.libgtk),Uint32,(Ptr{Gtk.GObject},),table)
+        return ccall((:gtk_table_get_default_col_spacing,Gtk.libgtk),UInt32,(Ptr{Gtk.GObject},),table)
     end
     function homogeneous(table::Gtk.GtkTable,homogeneous_)
         ccall((:gtk_table_set_homogeneous,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint),table,homogeneous_)
@@ -3967,9 +3971,9 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_table_get_homogeneous,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),table))
     end
     function size(table::Gtk.GtkTable)
-        columns = Gtk.mutable(Uint32)
-        rows = Gtk.mutable(Uint32)
-        ccall((:gtk_table_get_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint32},Ptr{Uint32}),table,rows,columns)
+        columns = Gtk.mutable(UInt32)
+        rows = Gtk.mutable(UInt32)
+        ccall((:gtk_table_get_size,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt32},Ptr{UInt32}),table,rows,columns)
         return (rows[],columns[])
     end
     function visible(mark::Gtk.GtkTextMark,setting)
@@ -3980,7 +3984,7 @@ $(Expr(:toplevel, :(module GAccessor
         return convert(Bool,ccall((:gtk_text_mark_get_visible,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),mark))
     end
     function name(mark::Gtk.GtkTextMark)
-        return ccall((:gtk_text_mark_get_name,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},),mark)
+        return ccall((:gtk_text_mark_get_name,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},),mark)
     end
     function deleted(mark::Gtk.GtkTextMark)
         return convert(Bool,ccall((:gtk_text_mark_get_deleted,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),mark))
@@ -4001,17 +4005,17 @@ $(Expr(:toplevel, :(module GAccessor
         return ccall((:gtk_text_buffer_get_tag_table,Gtk.libgtk),Ptr{Void},(Ptr{Gtk.GObject},),buffer)
     end
     function text(buffer::Gtk.GtkTextBuffer,text_,len)
-        ccall((:gtk_text_buffer_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Uint8},Cint),buffer,text_,len)
+        ccall((:gtk_text_buffer_set_text,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Cint),buffer,text_,len)
         return buffer
     end
     function text(buffer::Gtk.GtkTextBuffer,start_,end_,include_hidden_chars)
-        return ccall((:gtk_text_buffer_get_text,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint),buffer,start_,end_,include_hidden_chars)
+        return ccall((:gtk_text_buffer_get_text,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint),buffer,start_,end_,include_hidden_chars)
     end
     function slice(buffer::Gtk.GtkTextBuffer,start_,end_,include_hidden_chars)
-        return ccall((:gtk_text_buffer_get_slice,Gtk.libgtk),Ptr{Uint8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint),buffer,start_,end_,include_hidden_chars)
+        return ccall((:gtk_text_buffer_get_slice,Gtk.libgtk),Ptr{UInt8},(Ptr{Gtk.GObject},Ptr{Gtk.GtkTextIter},Ptr{Gtk.GtkTextIter},Cint),buffer,start_,end_,include_hidden_chars)
     end
     function mark(buffer::Gtk.GtkTextBuffer,name)
-        return convert(Gtk.GtkTextMark,ccall((:gtk_text_buffer_get_mark,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{Uint8}),buffer,name))
+        return convert(Gtk.GtkTextMark,ccall((:gtk_text_buffer_get_mark,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},Ptr{UInt8}),buffer,name))
     end
     function insert(buffer::Gtk.GtkTextBuffer)
         return convert(Gtk.GtkTextMark,ccall((:gtk_text_buffer_get_insert,Gtk.libgtk),Ptr{Gtk.GObject},(Ptr{Gtk.GObject},),buffer))
