@@ -27,7 +27,7 @@ function gen_consts(body, gtk_h)
                     mask = false
                 end
                 if c1 != c2
-                    for (i,pre) in enumerate(split(c2,'_',prefix))
+                    for (i,pre) in enumerate(split(c2,'_';limit=prefix))
                         if i == prefix
                             break
                         end

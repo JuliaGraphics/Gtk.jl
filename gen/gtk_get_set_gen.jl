@@ -80,7 +80,7 @@ const GtkTypeMap = Set{Symbol}([
     :GtkVolumeButton,
     :GtkWidget,
     :GtkWindow,
-    
+
     #interfaces
     :GTypePlugin,
     :GtkActionable,
@@ -121,7 +121,7 @@ const GtkBoxedMap = Set{Symbol}([
     :GtkTreeRowReference,
     :GtkWidgetPath,
     ])
-cl_to_jl = [
+cl_to_jl = Dict(
     cindex.VoidType         => :Void,
     cindex.BoolType         => :Bool,
     cindex.Char_U           => :UInt8,
@@ -145,8 +145,8 @@ cl_to_jl = [
     cindex.Enum             => :Cint,
     cindex.UInt128          => :UInt128,
     cindex.FirstBuiltin     => :Void,
-    ]
-c_typdef_to_jl = (ASCIIString=>Any)[
+    )
+c_typdef_to_jl = Dict{ASCIIString,Any}(
     "va_list"               => :Void,
     "size_t"                => :Csize_t,
     "ptrdiff_t"             => :Cptrdiff_t,
@@ -163,7 +163,7 @@ c_typdef_to_jl = (ASCIIString=>Any)[
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
     "GList"                 => :(Gtk._GList{Void}),
     "GSList"                => :(Gtk._GSList{Void}),
-    ]
+    )
 for gtktype in GtkTypeMap
     c_typdef_to_jl[string(gtktype)] = :(Gtk.GObject)
 end
@@ -186,14 +186,14 @@ for typsym in values(c_typdef_to_jl)
         push!(reserved_names, typsym)
     end
 end
-const gtklibname = (ASCIIString=>Any)[
+const gtklibname = Dict{ASCIIString,Any}(
     "gtk" => :(Gtk.libgtk),
     "gdk" => :(Gtk.libgdk),
     "gobject" => :(Gtk.GLib.libgobject),
     "glib" => :(Gtk.GLib.libglib),
     "gdk-pixbuf" => :(Gtk.libgdk_pixbuf),
     "deprecated" => nothing,
-    ]
+    )
 
 g_type_to_jl(ctype::cindex.Invalid) = :Void
 g_type_to_jl(ctype::cindex.Unexposed) = :Void
@@ -280,7 +280,7 @@ function gen_get_set(body, gtk_h)
             continue
         end
         spell = cindex.spelling(fdecl)
-        if beginswith(spell,"gtk_test_") || beginswith(spell,"_")
+        if startswith(spell,"gtk_test_") || startswith(spell,"_")
             continue
         end
         m = match(r"g.+_(get|set)_(.+)", spell)

@@ -21,7 +21,7 @@ end
 
 gtk_libpaths = ("/opt/local", "/usr/lib")
 
-toplevels = {}
+toplevels = Any[]
 cppargs = []
 let gtk_version = Gtk.gtk_version
     header = gtk_libdir = ""

@@ -4,10 +4,10 @@ importall Gtk.GLib.Compat
 import Clang, Clang.cindex
 
 function gen_g_type_lists(gtk_h)
-    replacelist = (Symbol=>Symbol)[
+    replacelist = Dict{Symbol,Symbol}(
         :GVariant => :nothing,
         :GType => :g_gtype,
-        ]
+        )
     tdecls = cindex.search(gtk_h, cindex.TypedefDecl)
     leafs = TupleType(Symbol,Expr)[]
     ifaces = TupleType(Symbol,Expr)[]
