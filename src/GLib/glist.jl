@@ -67,7 +67,7 @@ done{L<:_LList}(::LList,s::LListPair{L}) = done(s[1],s[2])
 
 ## Standard Array-like declarations
 show{L,T}(io::IO, list::GList{L,T}) = print(io, "GList{$L => $T}(length=$(length(list)), transfer_full=$(list.transfer_full))")
-show{L,T}(io::IO, list::Type{GList{L,T}}) = print(io, "GList{$L => $T}")
+# show{L,T}(io::IO, list::Type{GList{L,T}}) = print(io, "GList{$L => $T}")
 unsafe_convert{L<:_LList}(::Type{Ptr{L}}, list::GList) = list.handle
 endof(list::LList) = length(list)
 ndims(list::LList) = 1
