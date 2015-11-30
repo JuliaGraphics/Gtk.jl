@@ -15,7 +15,7 @@ function GtkCssProviderLeaf(;data=nothing,filename=nothing)
     elseif filename !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_path,libgtk), Bool,
-            (Ptr{GObject}, Ptr{UInt8}, Clong, Ptr{Ptr{GError}}),
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{Ptr{GError}}),
             provider, bytestring(filename), error_check)
         end
     end
