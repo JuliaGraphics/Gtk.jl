@@ -88,6 +88,7 @@ const _ = GAccessor
 using .GConstants
 
 include("windows.jl")
+include("gl_area.jl")
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames

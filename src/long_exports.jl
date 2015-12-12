@@ -90,7 +90,7 @@ export GTypePlugin,
     GtkTreeSortable
 
 # Gtk3 objects
-export GtkGrid
+export GtkGrid, GtkGLArea
 # Gtk3 interfaces
 export
     GtkActionable,

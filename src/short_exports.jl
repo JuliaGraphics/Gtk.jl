@@ -183,7 +183,8 @@ export
 if Gtk.gtk_version >= 3
     #objects
     const Grid = GtkGrid
-    export Grid
+    const GLArea = GtkGLArea
+    export Grid, GLArea
     #interfaces
     const Actionable = GtkActionable
     const AppChooser = GtkAppChooser
