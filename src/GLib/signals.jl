@@ -66,35 +66,35 @@ function GClosureMarshal(closuref, return_value, n_param_values,
     cb = unsafe_load(closure_env, 1)
     gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
     params = Array(Any, n_param_values)
-    if gtk_calling_convention
-        # compatibility mode, if we must
-        param_types,user_data = unsafe_load(closure_env, 2)::Array{Any,1}
-        length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
-        for i = 1:n_param_values
-            gv = mutable(param_values,i)
-            gtyp = unsafe_load(gv).g_type
-            # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
-            if g_isa(gtyp,g_type(GObject))
-                params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
-            elseif g_isa(gtyp,g_type(GBoxed))
-                params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-            elseif g_isa(gtyp,g_type(AbstractString))
-                params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
-            else
-                params[i] = gv[Any]
-            end
-            if i > 1
-                params[i] = convert(param_types[i-1], params[i])
-            end
-        end
-        push!(params, user_data)
-    else
-        for i = 1:n_param_values
-            params[i] = mutable(param_values,i)[Any]
-        end
-    end
     local retval = nothing
     g_siginterruptible(cb) do
+        if gtk_calling_convention
+            # compatibility mode, if we must
+            param_types,user_data = unsafe_load(closure_env, 2)::Array{Any,1}
+            length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
+            for i = 1:n_param_values
+                gv = mutable(param_values,i)
+                gtyp = unsafe_load(gv).g_type
+                # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
+                if g_isa(gtyp,g_type(GObject))
+                    params[i] = ccall((:g_value_get_object,libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
+                elseif g_isa(gtyp,g_type(GBoxed))
+                    params[i] = ccall((:g_value_get_boxed,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+                elseif g_isa(gtyp,g_type(AbstractString))
+                    params[i] = ccall((:g_value_get_string,libgobject), Ptr{Void}, (Ptr{GValue},), gv)
+                else
+                    params[i] = gv[Any]
+                end
+                if i > 1
+                    params[i] = convert(param_types[i-1], params[i])
+                end
+            end
+            push!(params, user_data)
+        else
+            for i = 1:n_param_values
+                params[i] = mutable(param_values,i)[Any]
+            end
+        end
         # note: make sure not to leak any of the GValue objects into this task switch, since many of them were alloca'd
         retval = cb(params...) # widget, args...
     end
@@ -105,7 +105,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
                 return_value[] = gvalue(retval)
             catch
                 blame(cb)
-                error("Error setting return value of type $(typeof(retval)); did your callback return an unintentional value?")
+                println("ERROR: failed to set return value of type $(typeof(retval)); did your callback return an unintentional value?")
             end
         end
     end
@@ -151,163 +151,104 @@ function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
     RT===Void ? nothing : return_value[RT]
 end
 
-gtk_stack = nothing # need to call g_loop_run from only one stack
-gtk_work = nothing
-g_sigatom_flag = false
-function g_sigatom(f::Base.Callable)
-    # don't yield() from f inside g_sigatom, use g_siginterruptible(yield) if unsure
-    global g_sigatom_flag, gtk_stack, gtk_work
-    prev = g_sigatom_flag
-    stk = gtk_stack
+g_stack = nothing # need to call g_loop_run from only one stack
+const g_yielded = Ref(false) # when true, use the `g_doatomic` queue to run sigatom functions
+const g_doatomic = [] # (work, notification) scheduler queue
+const g_sigatom_flag = Ref(false) # keep track of Base sigatomic state
+function g_sigatom(f::Base.Callable) # calls f, where f never throws (but this function may throw)
+    global g_sigatom_flag, g_stack, g_doatomic
+    prev = g_sigatom_flag[]
+    stk = g_stack
+    ct = current_task()
+    if g_yielded[]
+        @assert g_stack !== nothing && g_stack != ct && !prev
+        push!(g_doatomic, (f, ct))
+        return wait()
+    end
+
     if !prev
         sigatomic_begin()
-        g_sigatom_flag = true
+        g_sigatom_flag[] = true
     end
-    local ret
+    ret = nothing
     try
-        ct = current_task()
-        if gtk_stack === nothing
-            @assert !prev
-            gtk_stack = ct
-            ret = f()
-        elseif gtk_stack === ct
+        if g_stack === ct
             ret = f()
         else
-            @assert !prev # assert that we are going to end up in g_wait, otherwise PANIC!
-            @assert gtk_work === nothing
-            gtk_work = f
-            _set_return()
-            ret = yieldto(gtk_stack)
+            @assert g_stack === nothing && !prev
+            g_stack = ct
+            ret = f()
         end
     catch err
-        gtk_stack = stk
-        @assert g_sigatom_flag
+        g_stack = stk
+        @assert g_sigatom_flag[]
         if !prev
-            g_sigatom_flag = false
-            sigatomic_end()
+            g_sigatom_flag[] = false
+            sigatomic_end() # may throw SIGINT
         end
         Base.println("FATAL ERROR: Gtk state corrupted by error thrown in a callback:")
         Base.display_error(err, catch_backtrace())
         println()
         rethrow(err)
     end
-    gtk_stack = stk
-    @assert g_sigatom_flag
+    g_stack = stk
+    @assert g_sigatom_flag[]
     if !prev
-        g_sigatom_flag = false
-        sigatomic_end()
+        g_sigatom_flag[] = false
+        sigatomic_end() # may throw SIGINT
     end
     return ret
 end
 
-## when the user calls g_sigatom on a stack, it becomes the gtk_stack (until return).
-## it is not possible to be on that stack without g_sigatom_flag set,
-## nor to be off that stack with g_sigatom_flag set
-## the only condition necessary to ensure this invariant is that the user never calls
-## yield() (or wait(), or I/O) from the gtk_stack. this means that any callbacks must
-## ensure they are not on the gtk_stack if they might throw errors or block, by calling
-## g_siginterruptible(f)
-
-if VERSION < v"0.3-"
-    _set_waiting(t::Task) = t.runnable = false
-    _set_runnable(t::Task) = t.runnable = true
-    _set_return() = global gtk_return = current_task()
-    _get_return() = gtk_return::Task
-else
-    _set_waiting(t::Task) = t.state = :waiting
-    _set_runnable(t::Task) = t.state = :runnable
-    _set_return() = nothing
-    _get_return() = current_task().last
-end
-
-function g_siginterruptible(f::Base.Callable, cb)
-    global g_sigatom_flag, gtk_stack, gtk_work
-    prev = g_sigatom_flag
-    @assert prev $ (current_task() !== gtk_stack)
-    local c
+function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), but this function never throws
+    global g_sigatom_flag, g_stack
+    prev = g_sigatom_flag[]
+    @assert prev $ (current_task() !== g_stack)
     try
-        if !prev
-            # also know that current_task() !== gtk_stack
-            # so nothing fancy, just call and return (with try/catch protection)
-            f()
-            return
-        else
-            # also know that current_task() === gtk_stack
-            # so we want call this on an alternative stack
-            g_sigatom_flag = false
-            sigatomic_end()
-            if f === yield
-                yield()
-            else
-                c = Condition()
-                t = Task(f)
-                t.donenotify = c
-                ct = current_task()
-                _set_waiting(ct)
-                push!(c.waitq, ct)
-                schedule(t)
-                wait()
-            end
-            while gtk_work !== nothing # came from g_sigatom, not scheduler -- run thunk, don't return yet
-                @assert g_sigatom_flag # verify that we got here from g_sigatom, otherwise PANIC!
-                last = _get_return()
-                try
-                    gtk_f = gtk_work
-                    gtk_work = nothing
-                    ct = current_task()
-                    if f === yield || istaskdone(t)
-                        filter!(x->x!==ct, Base.Workqueue)
-                    else
-                        filter!(x->x!==ct, c.waitq)
-                        _set_runnable(ct)
-                    end
-                    res = gtk_f()
-                    if f === yield || istaskdone(t)
-                        schedule(current_task())
-                    else
-                        _set_waiting(ct)
-                        push!(c.waitq, ct)
-                    end
-                    yieldto(last, res)
-                catch e
-                    if f === yield || istaskdone(t)
-                        schedule(current_task())
-                    else
-                        push!(c.waitq, ct)
-                        _set_waiting(ct)
-                    end
-                    Base.throwto(last, e)
-                end
-            end
-            if f !== yield
-                ct = current_task()
-                _set_runnable(ct)
-                filter!(x->x!==ct, c.waitq)
-                @assert istaskdone(t)
-                if t.state == :failed
-                    Base.display_error(t.exception, backtrace())
-                end
-            end
+        if prev
+            # also know that current_task() === g_stack
+            g_sigatom_flag[] = false
+            sigatomic_end() # may throw SIGINT
         end
+        f()
     catch err
-        blame(cb)
-        ct = current_task()
-        filter!(x->x!==ct, Base.Workqueue)
-        if f !== yield
-            _set_runnable(ct)
-            filter!(x->x!==ct, c.waitq)
-        end
         try
+            blame(cb)
             Base.display_error(err, catch_backtrace())
             println()
         end
     end
-    @assert !g_sigatom_flag
+    @assert !g_sigatom_flag[]
     if prev
         sigatomic_begin()
-        g_sigatom_flag = true
+        g_sigatom_flag[] = true
     end
     nothing
+end
+
+function g_yield(data)
+    global g_yielded, g_doatomic
+    while true
+        g_yielded[] = true
+        g_siginterruptible(yield, yield)
+        g_yielded[] = false
+        run_delayed_finalizers()
+
+        if isempty(g_doatomic)
+            return Int32(true)
+        else
+            f, t = pop!(g_doatomic)
+            ret = nothing
+            iserror = false
+            try
+                ret = f()
+            catch err
+                iserror = true
+                ret = err
+            end
+            schedule(t, ret, error = iserror)
+        end
+    end
 end
 
 type _GPollFD
@@ -397,11 +338,6 @@ function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
     return ccall(callback,Cint,(T,),data)
 end
 
-function g_yield(data)
-    g_siginterruptible(yield, yield)
-    return Int32(true)
-end
-
 sizeof_gclosure = 0
 function __init__gtype__()
     ccall((:g_type_init,libgobject),Void,())
@@ -438,14 +374,15 @@ function __init__gmainloop__()
     nothing
 end
 
+const exiting = Ref(false)
 function __init__()
     if isdefined(GLib,:__init__bindeps__)
         GLib.__init__bindeps__()
     end
     global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
         (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
-    global exiting = false
-    atexit(()->global exiting = true)
+    exiting[] = false
+    atexit(()->exiting[] = true)
     __init__gtype__()
     __init__gmainloop__()
     nothing

@@ -382,29 +382,52 @@ end
 _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
-gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref,libgobject),Void,(Ptr{GObject},),x)
-gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref,libgobject),Void,(Ptr{GObject},),x)
+gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Void, (Ptr{GObject},), x)
+gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Void, (Ptr{GObject},), x)
 
-const gc_preserve_gtk = Dict{Union{WeakRef,GObject},Bool}() # gtk objects
-function gobject_ref{T<:GObject}(x::T)
-    global gc_preserve_gtk
-    addref = function()
-        ccall((:g_object_ref_sink,libgobject),Ptr{GObject},(Ptr{GObject},),x)
-        finalizer(x,function(x)
-                global gc_preserve_gtk, exiting
-                if exiting
-                    return # unnecessary to cleanup if we are about to die anyways
-                end
-                delete!(gc_preserve_gtk,x)
-                if x.handle != C_NULL
-                    gc_preserve_gtk[x] = true # convert to a strong-reference
-                    gc_unref(unsafe_convert(Ptr{GObject},x)) # may clear the strong reference
-                end
-            end)
-        delete!(gc_preserve_gtk,x)
-        gc_preserve_gtk[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
+const gc_preserve_glib = Dict{Union{WeakRef,GObject},Bool}() # glib objects
+const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
+const topfinalizer = Ref(true) # keep recursion to a minimum by only iterating from the top
+const await_finalize = Any[]
+
+function finalize_gc_unref(x::ANY)
+    # this records that the are no user references left to the object from Julia
+    # and notifies GLib that it can free the object (if no reference exist from C)
+    # it is intended to be called by GC, not in user code function
+    istop = topfinalizer[]
+    topfinalizer[] = false
+    gc_preserve_glib_lock[] = true
+    delete!(gc_preserve_glib, x)
+    if x.handle != C_NULL
+        gc_preserve_glib[x] = true # convert to a strong-reference
+        gc_preserve_glib_lock[] = false
+        gc_unref(unsafe_convert(Ptr{GObject}, x)) # may clear the strong reference
+    else
+        gc_preserve_glib_lock[] = false
     end
-    strong = get(gc_preserve_gtk, x, nothing)
+    topfinalizer[] = istop
+    istop && run_delayed_finalizers()
+    nothing
+end
+
+function gobject_ref{T<:GObject}(x::T)
+    addref = function()
+        ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
+        finalizer(x, function(x::ANY)
+                exiting[] && return # unnecessary to cleanup if we are about to die anyways
+                if gc_preserve_glib_lock[] || g_yielded[]
+                    push!(await_finalize, x)
+                    return # avoid running finalizers at random times
+                end
+                finalize_gc_unref(x)
+                nothing
+            end)
+        delete!(gc_preserve_glib,x) # in v0.2, the WeakRef assignment below wouldn't update the key
+        gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
+        nothing
+    end
+    gc_preserve_glib_lock[] = true
+    strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
         if VERSION >= v"0.4-"
@@ -422,23 +445,38 @@ function gobject_ref{T<:GObject}(x::T)
     else
         # already gc-protected, nothing to do
     end
-    x
+    gc_preserve_glib_lock[] = false
+    run_delayed_finalizers()
+    return x
 end
 gc_ref(x::GObject) = pointer_from_objref(gobject_ref(x))
+
+function run_delayed_finalizers()
+    exiting[] && return # unnecessary to cleanup if we are about to die anyways
+    g_yielded[] && return # can't run them right now
+    topfinalizer[] = false
+    while !isempty(await_finalize)
+        x = pop!(await_finalize)
+        finalize_gc_unref(x)
+    end
+    topfinalizer[] = true
+end
 
 function gc_unref_weak(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
     # note: this may be called multiple times by GLib
     x.handle = C_NULL
-    global gc_preserve_gtk
-    delete!(gc_preserve_gtk, x)
+    gc_preserve_glib_lock[] = true
+    delete!(gc_preserve_glib, x)
+    gc_preserve_glib_lock[] = false
     nothing
 end
+
 function gc_unref(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
-    ref = ccall((:g_object_get_qdata,libgobject),Ptr{Void},(Ptr{GObject},UInt32),x,jlref_quark::UInt32)
+    ref = ccall((:g_object_get_qdata, libgobject), Ptr{Void}, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
@@ -447,18 +485,19 @@ function gc_unref(x::GObject)
         else
             deref = cfunction(gc_unref_weak,Void,(typeof(x),))
         end
-        ccall((:g_object_weak_ref,libgobject),Void,(Ptr{GObject},Ptr{Void},Any),x,deref,x)
+        ccall((:g_object_weak_ref, libgobject), Void, (Ptr{GObject}, Ptr{Void}, Any), x, deref, x)
     else
-        ccall((:g_object_steal_qdata,libgobject),Any,(Ptr{GObject},UInt32),x,jlref_quark::UInt32)
+        ccall((:g_object_steal_qdata, libgobject), Any, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)
         gc_unref_weak(x)
     end
     nothing
 end
+
 gc_unref(::Ptr{GObject}, x::GObject) = gc_unref(x)
 gc_ref_closure(x::GObject) = (gc_ref(x), C_NULL)
 
 function gc_force_floating(x::GObject)
-    ccall((:g_object_force_floating,libgobject),Void,(Ptr{GObject},),x)
+    ccall((:g_object_force_floating, libgobject), Void, (Ptr{GObject},), x)
 end
 function gobject_move_ref(new::GObject, old::GObject)
     h = unsafe_convert(Ptr{GObject}, new)

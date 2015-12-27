@@ -330,8 +330,11 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
-In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative. See also https://github.com/JuliaGraphics/Gtk.jl/issues/161, which documents a bug currently affecting the "simple" approach shown here.
+In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
 
+Warning: it is essential to avoid task switching inside Gtk callbacks,
+as this corrupts the Gtk C-stack.
+This should be fixed once https://github.com/JuliaLang/julia/pull/13099 is merged.
 
 ### Usage without the REPL
 
