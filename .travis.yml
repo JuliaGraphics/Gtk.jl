@@ -1,9 +1,13 @@
 language: julia
 sudo: false
-os:
-    - linux
-julia:
-    - 0.4
+matrix:
+  include:
+    - os: linux
+      julia: 0.4
+      env: TESTCMD="xvfb-run julia"
+    - os: osx
+      julia: 0.4
+      env: TESTCMD="julia"
 notifications:
     email: false
 addons:
@@ -14,7 +18,7 @@ addons:
             - libgtk-3-0
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - xvfb-run julia -e 'Pkg.clone(pwd()); using BinDeps;
+    - $TESTCMD -e 'Pkg.clone(pwd()); using BinDeps;
           println(BinDeps.debug("Gtk"));
           Pkg.test("Gtk"; coverage=true)'
 after_success:
