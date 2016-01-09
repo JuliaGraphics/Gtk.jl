@@ -20,6 +20,7 @@ script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
     - $TESTCMD -e 'Pkg.clone(pwd()); using BinDeps;
           println(BinDeps.debug("Gtk"));
+          Pkg.build("Gtk");
           Pkg.test("Gtk"; coverage=true)'
 after_success:
     - julia -e 'cd(Pkg.dir("Gtk"));
