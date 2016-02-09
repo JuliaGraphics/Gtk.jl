@@ -3,7 +3,7 @@
 # end
 function signal_connect{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
         ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w) #TODO: assert that length(param_types) is correct
-    if isgeneric(cb)
+    if isa(cb, Function)
         if !isbits(user_data) || VERSION >= v"0.4-"
             if VERSION >= v"0.4-"
                 callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
@@ -107,7 +107,7 @@ function GClosureMarshal(closuref, return_value, n_param_values,
 end
 
 function blame(cb)
-    if isgeneric(cb)
+    if isa(cb, Function)
         warn("Executing ", cb, ":")
     else
         warn("Executing ", Base.uncompressed_ast(cb.code).args[3].args[1])   # just show file/line
