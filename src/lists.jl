@@ -677,18 +677,18 @@ end
 
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
-    pathPtr = mutable(Ptr{GtkTreePath})
-    path = GtkTreePath()
+    pathPtr = Ref{Ptr{GtkTreePath}}(0)
 
     ret = ccall((:gtk_tree_view_get_path_at_pos,libgtk),Cint,
-                      (Ptr{GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
+                      (Ptr{GObject},Cint,Cint,Ref{Ptr{GtkTreePath}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
                        treeView,x,y,pathPtr,C_NULL,C_NULL,C_NULL) != 0
     if ret
-      path = convert(GtkTreePath, pathPtr[])
+        path = GtkTreePath(pathPtr[],true)
+    else
+      path = GtkTreePath()
     end
     ret, path
 end
-
 ### To be done
 #
 #if gtk_version == 3
