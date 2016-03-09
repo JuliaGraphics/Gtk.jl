@@ -84,7 +84,7 @@ type GtkTreePath <: GBoxed
         finalizer(path, x::GtkTreePath->begin
                 ccall((:gtk_tree_path_free,libgtk),Void,(Ptr{GtkTreePath},),x.handle)
             end)
-        path
+        x
     end
 end
 GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{GtkTreePath},()),true)
