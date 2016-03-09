@@ -81,7 +81,7 @@ type GtkTreePath <: GBoxed
     function GtkTreePath(pathIn::Ptr{GtkTreePath},own::Bool=false)
         x = new( own ? pathIn :
             ccall((:gtk_tree_path_copy,Gtk.libgtk),Void,(Ptr{GtkTreePath},),pathIn))
-        finalizer(path, x::GtkTreePath->begin
+        finalizer(x, x::GtkTreePath->begin
                 ccall((:gtk_tree_path_free,libgtk),Void,(Ptr{GtkTreePath},),x.handle)
             end)
         x
