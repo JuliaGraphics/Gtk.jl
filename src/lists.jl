@@ -81,10 +81,10 @@ type GtkTreePath <: GBoxed
     function GtkTreePath(pathIn::Ptr{GtkTreePath},own::Bool=false)
         x = new( own ? pathIn :
             ccall((:gtk_tree_path_copy,Gtk.libgtk),Void,(Ptr{GtkTreePath},),pathIn))
-        finalizer(path, x::GtkTreePath->begin
+        finalizer(x, x::GtkTreePath->begin
                 ccall((:gtk_tree_path_free,libgtk),Void,(Ptr{GtkTreePath},),x.handle)
             end)
-        path
+        x
     end
 end
 GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new,libgtk),Ptr{GtkTreePath},()),true)
@@ -677,18 +677,18 @@ end
 
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
-    pathPtr = mutable(Ptr{GtkTreePath})
-    path = GtkTreePath()
+    pathPtr = Ref{Ptr{GtkTreePath}}(0)
 
     ret = ccall((:gtk_tree_view_get_path_at_pos,libgtk),Cint,
-                      (Ptr{GObject},Cint,Cint,Ptr{Ptr{Void}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
+                      (Ptr{GObject},Cint,Cint,Ref{Ptr{GtkTreePath}},Ptr{Ptr{Void}},Ptr{Cint},Ptr{Cint} ),
                        treeView,x,y,pathPtr,C_NULL,C_NULL,C_NULL) != 0
     if ret
-      path = convert(GtkTreePath, pathPtr[])
+        path = GtkTreePath(pathPtr[],true)
+    else
+      path = GtkTreePath()
     end
     ret, path
 end
-
 ### To be done
 #
 #if gtk_version == 3
