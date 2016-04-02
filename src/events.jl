@@ -143,7 +143,7 @@ type MouseHandler
 end
 
 if VERSION < v"0.4.0-dev"
-typealias MHPair  (MouseHandler,Symbol)
+typealias MHPair  tuple(MouseHandler,Symbol)
 function findlast(testf::Function, A)
     for i = length(A):-1:1
         testf(A[i]) && return i
