@@ -120,7 +120,7 @@ length(w::GtkRadioButtonGroup) = length(start(w))
 getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton,start(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp,:anchor)
 function getproperty(grp::GtkRadioButtonGroup,name::AbstractStringLike)
-    k = symbol(name)
+    k = Symbol(name)
     if k == :active
         for b in grp
             if getproperty(b,:active,Bool)

@@ -52,7 +52,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     with_id === :error && return
     if isa(with_id,Tuple)
         with_id = with_id::TupleType(Symbol,Any)
-        with_id = :(ccall($(Expr(:tuple, Meta.quot(symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
+        with_id = :(ccall($(Expr(:tuple, Meta.quot(Symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
     if pass_x !== Union{}
         eval(current_module(),quote
@@ -86,7 +86,7 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))
                     elseif pass_x == Symbol
-                        :(x = symbol(x))
+                        :(x = Symbol(x))
                     end)
                 return Base.convert(T,x)
             end

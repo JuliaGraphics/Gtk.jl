@@ -80,10 +80,10 @@ macro g_type_delegate(eq)
     @assert isa(eq,Expr) && eq.head == :(=) && length(eq.args) == 2
     new = eq.args[1]
     real = eq.args[2]
-    newleaf = esc(symbol(string(new,current_module().suffix)))
-    realleaf = esc(symbol(string(real,current_module().suffix)))
+    newleaf = esc(Symbol(string(new,current_module().suffix)))
+    realleaf = esc(Symbol(string(real,current_module().suffix)))
     new = esc(new)
-    macroreal = QuoteNode(symbol(string('@',real)))
+    macroreal = QuoteNode(Symbol(string('@',real)))
     quote
         const $newleaf = $realleaf
         macro $new(args...)
