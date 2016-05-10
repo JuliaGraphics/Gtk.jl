@@ -1,6 +1,6 @@
 module GLib
 
-if VERSION < v"0.5.0-dev"
+if VERSION < v"0.5.0-dev+3876"
     include("../compat_string.jl")
 end
 
