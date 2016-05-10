@@ -1,7 +1,7 @@
 function _gtksubtype_constructors(name::Symbol)
     cm = current_module()
-    ename = Symbol(string(name,cm.(:suffix)))
-    typ = cm.(ename)
+    ename = Symbol(string(name, getfield(cm, :suffix)))
+    typ = getfield(cm, ename)
     if GLib.g_isa(typ, GtkOrientable)
         @eval $ename(orientation::Symbol,vargs...) = $ename(
             (orientation==:v ? true :
