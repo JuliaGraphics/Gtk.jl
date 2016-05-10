@@ -17,23 +17,23 @@ end
 
 const fundamental_types = (
     #(:name,      Ctype,            JuliaType,      g_value_fn)
-    (:invalid,    Void,             Void,           :error),
-    (:void,       Void,          Void,        :error),
+    (:invalid,    Void,             Union{},        :error),
+    (:void,       Void,             Void,           :error),
     (:GInterface, Ptr{Void},        GInterface,     :error),
     (:gchar,      Int8,             Int8,           :schar),
     (:guchar,     UInt8,            UInt8,          :uchar),
     (:gboolean,   Cint,             Bool,           :boolean),
-    (:gint,       Cint,             Union{},           :int),
-    (:guint,      Cuint,            Union{},           :uint),
-    (:glong,      Clong,            Union{},           :long),
-    (:gulong,     Culong,           Union{},           :ulong),
+    (:gint,       Cint,             Union{},        :int),
+    (:guint,      Cuint,            Union{},        :uint),
+    (:glong,      Clong,            Union{},        :long),
+    (:gulong,     Culong,           Union{},        :ulong),
     (:gint64,     Int64,            Signed,         :int64),
     (:guint64,    UInt64,           Unsigned,       :uint64),
-    (:GEnum,      GEnum,            Union{},           :enum),
-    (:GFlags,     GEnum,            Union{},           :flags),
+    (:GEnum,      GEnum,            Union{},        :enum),
+    (:GFlags,     GEnum,            Union{},        :flags),
     (:gfloat,     Float32,          Float32,        :float),
     (:gdouble,    Float64,          AbstractFloat,  :double),
-    (:gchararray, Ptr{UInt8},       AbstractString,         :string),
+    (:gchararray, Ptr{UInt8},       AbstractString, :string),
     (:gpointer,   Ptr{Void},        Ptr,            :pointer),
     (:GBoxed,     Ptr{GBoxed},      GBoxed,         :boxed),
     (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
@@ -45,12 +45,11 @@ g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
-let handled=Set(), jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
+let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-        if juliatype !== Union{} && !(juliatype in handled)
+        if juliatype != Union{}
             push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
-            push!(handled, juliatype)
         end
     end
     eval(jtypes)
