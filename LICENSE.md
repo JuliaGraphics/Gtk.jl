@@ -2,7 +2,7 @@ The Julia-Gtk bindings are licensed under the MIT License:
 
 > Copyright (c) 2013-2014: Jameson Nash and other contributors:
 >
-> https://github.com/JuliaLang/Gtk.jl/contributors
+> https://github.com/JuliaGraphics/Gtk.jl/contributors
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the

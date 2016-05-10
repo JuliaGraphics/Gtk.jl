@@ -2,8 +2,8 @@
 
 [![Gtk](http://pkg.julialang.org/badges/Gtk_0.3.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=0.3)
 [![Gtk](http://pkg.julialang.org/badges/Gtk_0.4.svg)](http://pkg.julialang.org/?pkg=Gtk&ver=0.4)
-[![Build Status](https://travis-ci.org/JuliaLang/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaLang/Gtk.jl)
-[![Coverage Status](https://coveralls.io/repos/JuliaLang/Gtk.jl/badge.svg)](https://coveralls.io/r/JuliaLang/Gtk.jl)
+[![Build Status](https://travis-ci.org/JuliaGraphics/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaGraphics/Gtk.jl)
+[![Coverage Status](https://coveralls.io/repos/JuliaGraphics/Gtk.jl/badge.svg)](https://coveralls.io/r/JuliaGraphics/Gtk.jl)
 
 GUI building, using the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
 
@@ -330,7 +330,7 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
-In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative. See also https://github.com/JuliaLang/Gtk.jl/issues/161, which documents a bug currently affecting the "simple" approach shown here.
+In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative. See also https://github.com/JuliaGraphics/Gtk.jl/issues/161, which documents a bug currently affecting the "simple" approach shown here.
 
 
 ### Usage without the REPL
