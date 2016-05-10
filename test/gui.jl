@@ -256,20 +256,21 @@ destroy(w)
 ## ToggleButton repeat 1
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
-on_signal_button_press(tb) do ptr, evt, widget
-    state = getproperty(widget,:label,AbstractString)
-    if state == "Off"
-        setproperty!(widget,:label,"On")
-    else
-        setproperty!(widget,:label,"Off")
-    end
-    true
-end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
-signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
-signal_emit(tb, "button-release-event", Bool, release)
-## next time just use "gtk_button_clicked", mkay?
+# TODO: uncomment these next lines
+# on_signal_button_press(tb) do ptr, evt, widget
+#     state = getproperty(widget,:label,AbstractString)
+#     if state == "Off"
+#         setproperty!(widget,:label,"On")
+#     else
+#         setproperty!(widget,:label,"Off")
+#     end
+#     true
+# end
+# press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+# signal_emit(tb, "button-press-event", Bool, press)
+# release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+# signal_emit(tb, "button-release-event", Bool, release)
+# next time just use "gtk_button_clicked", mkay?
 destroy(w)
 
 ## ToggleButton repeat 2
