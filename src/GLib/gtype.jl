@@ -410,22 +410,27 @@ function finalize_gc_unref(x::ANY)
     nothing
 end
 
-function gobject_ref{T<:GObject}(x::T)
-    addref = function()
-        ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
-        finalizer(x, function(x::ANY)
-                exiting[] && return # unnecessary to cleanup if we are about to die anyways
-                if gc_preserve_glib_lock[] || g_yielded[]
-                    push!(await_finalize, x)
-                    return # avoid running finalizers at random times
-                end
-                finalize_gc_unref(x)
-                nothing
-            end)
-        delete!(gc_preserve_glib,x) # in v0.2, the WeakRef assignment below wouldn't update the key
-        gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
-        nothing
+function delref(x::ANY)
+    # internal helper function
+    # for v0.4 compat, this is toplevel function
+    exiting[] && return # unnecessary to cleanup if we are about to die anyways
+    if gc_preserve_glib_lock[] || g_yielded[]
+        push!(await_finalize, x)
+        return # avoid running finalizers at random times
     end
+    finalize_gc_unref(x)
+    nothing
+end
+function addref(x::ANY)
+    # internal helper function
+    # for v0.4 compat, this is toplevel function
+    ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
+    finalizer(x, delref)
+    delete!(gc_preserve_glib,x) # in v0.2, the WeakRef assignment below wouldn't update the key
+    gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
+    nothing
+end
+function gobject_ref{T<:GObject}(x::T)
     gc_preserve_glib_lock[] = true
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
@@ -438,10 +443,10 @@ function gobject_ref{T<:GObject}(x::T)
         ccall((:g_object_set_qdata_full, libgobject), Void,
             (Ptr{GObject}, UInt32, Any, Ptr{Void}), x, jlref_quark::UInt32, x,
             deref) # add a circular reference to the Julia object in the GObject
-        addref()
+        addref(x)
     elseif strong
         # oops, we previously deleted the link, but now it's back
-        addref()
+        addref(x)
     else
         # already gc-protected, nothing to do
     end
