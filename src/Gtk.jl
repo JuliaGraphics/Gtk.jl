@@ -6,7 +6,7 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-importall .GLib.Compat
+importall .GLib.CompatGLib
 import .GLib: setproperty!, getproperty, AbstractStringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,
@@ -27,6 +27,10 @@ import .Graphics: width, height, getgc
 
 using Cairo
 import Cairo: destroy
+
+if VERSION < v"0.5.0-dev+3876"
+    include("compat_string.jl")
+end
 
 typealias Index Union{Integer,AbstractVector{TypeVar(:I,Integer)}}
 

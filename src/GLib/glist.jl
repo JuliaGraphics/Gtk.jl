@@ -86,8 +86,8 @@ setindex!(list::GList,x,i::Real) = setindex!(list,x,nth(list,i))
 ## More Array-like declarations, this time involving ccall
 
 ### Non-modifying functions
-length{L<:_GSList}(list::LList{L}) = int(ccall((:g_slist_length,libglib),Cuint,(Ptr{L},),list))
-length{L<:_GList}(list::LList{L}) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
+length{L<:_GSList}(list::LList{L}) = Int(ccall((:g_slist_length,libglib),Cuint,(Ptr{L},),list))
+length{L<:_GList}(list::LList{L}) = Int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
 copy{L<:_GSList}(list::GList{L}) = typeof(list)(ccall((:g_slist_copy,libglib),Ptr{L},(Ptr{L},),list), false)
 copy{L<:_GList}(list::GList{L}) = typeof(list)(ccall((:g_list_copy,libglib),Ptr{L},(Ptr{L},),list), false)
 check_undefref(p::Ptr) = (p==C_NULL ? error(UndefRefError()) : p)
@@ -215,8 +215,8 @@ empty!{N<:Number}(li::Ptr{_GSList{Ptr{N}}}) = c_free(unsafe_load(li).data)
 empty!{N<:Number}(li::Ptr{_GList{Ptr{N}}}) = c_free(unsafe_load(li).data)
 
 ### Store (byte)strings as pointers
-deref_to{S<:ByteString}(::Type{S}, p::Ptr) = bytestring(convert(Ptr{UInt8},p))
-function ref_to{S<:ByteString}(::Type{S}, x)
+deref_to{S<:String}(::Type{S}, p::Ptr) = bytestring(convert(Ptr{UInt8},p))
+function ref_to{S<:String}(::Type{S}, x)
     s = bytestring(x)
     l = sizeof(s)
     p = convert(Ptr{UInt8},c_malloc(l+1))
@@ -224,5 +224,5 @@ function ref_to{S<:ByteString}(::Type{S}, x)
     unsafe_store!(p,'\0',l+1)
     return p
 end
-empty!{S<:ByteString}(li::Ptr{_GSList{S}}) = c_free(unsafe_load(li).data)
-empty!{S<:ByteString}(li::Ptr{_GList{S}}) = c_free(unsafe_load(li).data)
+empty!{S<:String}(li::Ptr{_GSList{S}}) = c_free(unsafe_load(li).data)
+empty!{S<:String}(li::Ptr{_GList{S}}) = c_free(unsafe_load(li).data)

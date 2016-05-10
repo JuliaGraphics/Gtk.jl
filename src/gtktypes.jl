@@ -1,6 +1,6 @@
 function _gtksubtype_constructors(name::Symbol)
     cm = current_module()
-    ename = symbol(string(name,cm.(:suffix)))
+    ename = Symbol(string(name,cm.(:suffix)))
     typ = cm.(ename)
     if GLib.g_isa(typ, GtkOrientable)
         @eval $ename(orientation::Symbol,vargs...) = $ename(
@@ -15,7 +15,7 @@ end
 
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
-    symname = symbol(join([lowercase(s) for s in groups],"_"))
+    symname = Symbol(join([lowercase(s) for s in groups],"_"))
     quote
         @Gtype $(esc(name)) libgtk $(esc(symname))
         _gtksubtype_constructors($(QuoteNode(name)))

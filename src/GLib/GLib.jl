@@ -1,5 +1,9 @@
 module GLib
 
+if VERSION < v"0.5.0-dev+3876"
+    include("../compat_string.jl")
+end
+
 if false
 function include(x)
     println("including $x")
@@ -20,7 +24,7 @@ export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
 
-module Compat
+module CompatGLib
     export @assign_if_unassigned
     macro assign_if_unassigned(expr)
         # BinDeps often fails and generates corrupt deps.jl files
@@ -35,33 +39,18 @@ module Compat
             end
         end
     end
-    if VERSION >= v"0.4-"
-        export TupleType, int, int8, int32, uint32, uint64, dlopen, dlsym_e, unsafe_convert
-        TupleType(types...) = Tuple{types...}
-        int(v) = Int(v)
-        int8(v) = Int8(v)
-        int32(v) = Int32(v)
-        uint32(v) = UInt32(v)
-        uint64(v) = UInt64(v)
-        const unsafe_convert = Base.unsafe_convert
-        import Base.Libdl: dlopen, dlsym_e
-    else
-        export TupleType, unsafe_convert
-        const TupleType = tuple
-        const unsafe_convert = Base.cconvert
-    end
-    if VERSION < v"0.3-"
-        export QuoteNode
-        QuoteNode(x) = Base.qn(x)
-    end
+    export TupleType, dlopen, dlsym_e, unsafe_convert
+    TupleType(types...) = Tuple{types...}
+    const unsafe_convert = Base.unsafe_convert
+    import Base.Libdl: dlopen, dlsym_e
 end
-importall .Compat
+importall .CompatGLib
 
 # local function, handles Symbol and makes UTF8-strings easier
 typealias AbstractStringLike Union{AbstractString,Symbol}
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 
@@ -80,10 +69,10 @@ macro g_type_delegate(eq)
     @assert isa(eq,Expr) && eq.head == :(=) && length(eq.args) == 2
     new = eq.args[1]
     real = eq.args[2]
-    newleaf = esc(symbol(string(new,current_module().suffix)))
-    realleaf = esc(symbol(string(real,current_module().suffix)))
+    newleaf = esc(Symbol(string(new,current_module().suffix)))
+    realleaf = esc(Symbol(string(real,current_module().suffix)))
     new = esc(new)
-    macroreal = QuoteNode(symbol(string('@',real)))
+    macroreal = QuoteNode(Symbol(string('@',real)))
     quote
         const $newleaf = $realleaf
         macro $new(args...)

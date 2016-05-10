@@ -94,7 +94,7 @@ function input_dialog(message::AbstractString, entry_default::AbstractString, bu
     push!(box, entry)
     showall(widget)
     resp = run(widget)
-    entry_text = getproperty(entry, :text, ByteString)
+    entry_text = getproperty(entry, :text, String)
     destroy(widget)
     return resp, entry_text
 end

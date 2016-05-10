@@ -45,11 +45,12 @@ g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
-let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
+let handled=Set(), jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-        if juliatype !== Union{}
+        if juliatype !== Union{} && !(juliatype in handled)
             push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
+            push!(handled, juliatype)
         end
     end
     eval(jtypes)
@@ -63,7 +64,7 @@ G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type) != 0
 g_isa(gtyp, is_a_type) = g_isa(g_type(gtyp), g_type(is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
-g_type_name(g_type::GType) = symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{UInt8},(GType,),g_type),false))
+g_type_name(g_type::GType) = Symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{UInt8},(GType,),g_type),false))
 
 g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType, GEnum), g_type, flag)
 const G_TYPE_FLAG_CLASSED           = 1 << 0
@@ -177,9 +178,16 @@ end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
     :( GLib.g_type{T<:$(esc(name))}(::Type{T}) = $(esc(symname)) )
-get_gtype_decl(name::Symbol, lib, symname::Symbol) =
-    :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
-        ccall(($(QuoteNode(symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+let handled=Set()
+function get_gtype_decl(name::Symbol, lib, symname::Symbol)
+    if !(name in handled)
+        push!(handled, name)
+        return :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
+                  ccall(($(QuoteNode(Symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+    end
+    nothing
+end
+end #let
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
     ename = esc(name)
@@ -220,7 +228,7 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
 end
 
 macro Gtype_decl(name,gtyp,gtype_decl)
-    get_type_decl(name,symbol(string(name,current_module().suffix)),gtyp,gtype_decl)
+    get_type_decl(name,Symbol(string(name,current_module().suffix)),gtyp,gtype_decl)
 end
 
 macro Gtype(iname,lib,symname)
@@ -234,7 +242,7 @@ macro Gtype(iname,lib,symname)
         error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
     gtype_decl = get_gtype_decl(iname, lib, symname)
-    name = symbol(string(iname,current_module().suffix))
+    name = Symbol(string(iname,current_module().suffix))
     get_type_decl(name, iname, gtyp, gtype_decl)
 end
 

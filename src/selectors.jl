@@ -39,7 +39,7 @@ run(widget::GtkDialog) = GLib.g_sigatom() do
 end
 
 const SingleComma = r"(?<!,),(?!,)"
-function GtkFileFilterLeaf(; name::Union{ByteString,Void} = nothing, pattern::ByteString = "", mimetype::ByteString = "")
+function GtkFileFilterLeaf(; name::Union{String,Void} = nothing, pattern::String = "", mimetype::String = "")
     filt = GtkFileFilterLeaf(ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ()))
     if !isempty(pattern)
         name == nothing && (name = pattern)
@@ -59,7 +59,7 @@ function GtkFileFilterLeaf(; name::Union{ByteString,Void} = nothing, pattern::By
     ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
     filt
 end
-GtkFileFilterLeaf(pattern::ByteString; name::Union{ByteString,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
+GtkFileFilterLeaf(pattern::String; name::Union{String,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
 
 GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 
@@ -69,7 +69,7 @@ function makefilters!(dlgp::GtkFileChooser, filters::Union{AbstractVector,Tuple}
     end
 end
 
-function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = ASCIIString[]; kwargs...)
+function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = String[]; kwargs...)
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
                                 (("_Cancel", GConstants.GtkResponseType.CANCEL),
                                  ("_Open",   GConstants.GtkResponseType.ACCEPT)); kwargs...)
@@ -82,7 +82,7 @@ function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters
     local selection
     if response == GConstants.GtkResponseType.ACCEPT
         if multiple
-            selection = UTF8String[]
+            selection = String[]
             for f in GLib.GList(ccall((:gtk_file_chooser_get_filenames,libgtk), Ptr{_GSList{UInt8}}, (Ptr{GObject},), dlgp))
                 push!(selection, GLib.bytestring(f, true))
             end
@@ -91,7 +91,7 @@ function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters
         end
     else
         if multiple
-            selection = UTF8String[]
+            selection = String[]
         else
             selection = utf8("")
         end
@@ -100,7 +100,7 @@ function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters
     selection
 end
 
-function save_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = ASCIIString[]; kwargs...)
+function save_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = String[]; kwargs...)
     dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
                                 (("_Cancel", GConstants.GtkResponseType.CANCEL),
                                  ("_Save",   GConstants.GtkResponseType.ACCEPT)), kwargs...)

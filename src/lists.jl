@@ -119,7 +119,7 @@ end
 
 ## index is integer for a liststore, vector of ints for tree
 iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index-1))
-index_from_iter(store::GtkListStore, iter::TRI) = int(get_string_from_iter(GtkTreeModel(store), iter)) + 1
+index_from_iter(store::GtkListStore, iter::TRI) = Int(get_string_from_iter(GtkTreeModel(store), iter)) + 1
 
 function list_store_set_values(store::GtkListStore, iter, values)
     for (i,value) in enumerate(values)
@@ -463,6 +463,15 @@ type TreeIterator
 end
 TreeIterator(store::GtkTreeStore, iter=nothing) = TreeIterator(store, GtkTreeModel(store), iter)
 
+if VERSION >= v"0.5.0-dev"
+    function Base.length(iter::TreeIterator)
+        count = 0
+        for x in iter
+            count += 1
+        end
+        return count
+    end
+end
 
 ## iterator interface for depth first search
 function start(x::TreeIterator)

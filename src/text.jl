@@ -90,7 +90,7 @@ end
 
 #####  GtkTextIter  #####
 #TODO: search
-getproperty(text::TI, key::AbstractString, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+getproperty(text::TI, key::AbstractString, outtype::Type=Any) = getproperty(text, Symbol(key), outtype)
 function getproperty(text::TI, key::Symbol, outtype::Type=Any)
     text = mutable(text)
     return convert(outtype,
@@ -158,7 +158,7 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
         false
     end)::outtype
 end
-setproperty!(text::Mutable{GtkTextIter},key::AbstractString,value) = setproperty!(text,symbol(key),value)
+setproperty!(text::Mutable{GtkTextIter},key::AbstractString,value) = setproperty!(text,Symbol(key),value)
 function setproperty!(text::Mutable{GtkTextIter},key::Symbol,value)
     if     key === :offset
         ccall((:gtk_text_iter_set_offset,libgtk),Cint,(Ptr{GtkTextIter},Cint),text,value)
@@ -278,7 +278,7 @@ last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(first(r))
 next(r::GtkTextRange,i) = next(i,i)
 done(r::GtkTextRange,i) = (i==last(r) || done(i,i))
-getproperty(text::GtkTextRange, key::AbstractString, outtype::Type=Any) = getproperty(text, symbol(key), outtype)
+getproperty(text::GtkTextRange, key::AbstractString, outtype::Type=Any) = getproperty(text, Symbol(key), outtype)
 function getproperty(text::GtkTextRange, key::Symbol, outtype::Type=Any)
     starttext = first(text)
     endtext = last(text)

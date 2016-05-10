@@ -11,14 +11,14 @@ immutable RGB
     r::UInt8; g::UInt8; b::UInt8
     RGB(r,g,b) = new(r,g,b)
 end
-convert(::Type{RGB},x::Unsigned) = RGB(uint8(x),uint8(x>>8),uint8(x>>16))
+convert(::Type{RGB},x::Unsigned) = RGB(UInt8(x),UInt8(x>>8),UInt8(x>>16))
 convert{U<:Unsigned}(::Type{U},x::RGB) = convert(U,(x.r)|(x.g>>8)|(x.b>>16))
 
 immutable RGBA
     r::UInt8; g::UInt8; b::UInt8; a::UInt8
     RGBA(r,g,b) = new(r,g,b)
 end
-convert(::Type{RGBA},x::Unsigned) = RGBA(uint8(x),uint8(x>>8),uint8(x>>16),uint8(x>>24))
+convert(::Type{RGBA},x::Unsigned) = RGBA(UInt8(x),UInt8(x>>8),UInt8(x>>16),UInt8(x>>24))
 convert{U<:Unsigned}(::Type{U},x::RGBA) = convert(U,(x.r)|(x.g>>8)|(x.b>>16)|(x.a>>24))
 
 # Example constructors:
@@ -199,7 +199,7 @@ function GdkPixbufLeaf(;stream=nothing,resource_path=nothing,filename=nothing,xp
     elseif data !== nothing # RGB or RGBA array, packed however you wish
         @assert(width==-1 && height==-1,"GdkPixbuf cannot set the width/height of a image from data")
         alpha = convert(Bool,has_alpha)
-        width = size(data,1)*bstride(data,1)/(3+int(alpha))
+        width = size(data,1)*bstride(data,1)/(3+Int(alpha))
         height = size(data,2)
         ref_data, deref_data = GLib.gc_ref_closure(data)
         pixbuf = ccall((:gdk_pixbuf_new_from_data,libgdk_pixbuf),Ptr{GObject},
@@ -235,7 +235,6 @@ function bstride(img::GdkPixbuf,i)
         convert(Cint,0)
     end
 end
-size(img::GdkPixbuf) = (width(img),height(img))
 function eltype(img::GdkPixbuf)
     #nbytes = stride(img,1)
     nbytes = convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk_pixbuf),Cint,(Ptr{GObject},),img) *

@@ -99,7 +99,7 @@ function canvas_on_draw_event(::Ptr{GObject},cc::Ptr{Void},widget::GtkCanvas) # 
     ccall((:cairo_set_source_surface,Cairo._jl_libcairo), Void,
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
-    int32(false) # propagate the event further
+    Int32(false) # propagate the event further
 end
 
 function canvas_on_expose_event(::Ptr{GObject},e::Ptr{Void},widget::GtkCanvas) # e is a GdkEventExpose
@@ -108,7 +108,7 @@ function canvas_on_expose_event(::Ptr{GObject},e::Ptr{Void},widget::GtkCanvas) #
         (Ptr{Void},Ptr{Void},Float64,Float64), cc, widget.back.ptr, 0, 0)
     ccall((:cairo_paint,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
     ccall((:cairo_destroy,Cairo._jl_libcairo),Void, (Ptr{Void},), cc)
-    int32(false) # propagate the event further
+    Int32(false) # propagate the event further
 end
 
 getgc(c::GtkCanvas) = c.backcc
