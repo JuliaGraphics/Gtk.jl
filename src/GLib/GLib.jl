@@ -39,25 +39,10 @@ module CompatGLib
             end
         end
     end
-    if VERSION >= v"0.4-"
-        export TupleType, int, int8, int32, uint32, uint64, dlopen, dlsym_e, unsafe_convert
-        TupleType(types...) = Tuple{types...}
-        int(v) = Int(v)
-        int8(v) = Int8(v)
-        int32(v) = Int32(v)
-        uint32(v) = UInt32(v)
-        uint64(v) = UInt64(v)
-        const unsafe_convert = Base.unsafe_convert
-        import Base.Libdl: dlopen, dlsym_e
-    else
-        export TupleType, unsafe_convert
-        const TupleType = tuple
-        const unsafe_convert = Base.cconvert
-    end
-    if VERSION < v"0.3-"
-        export QuoteNode
-        QuoteNode(x) = Base.qn(x)
-    end
+    export TupleType, dlopen, dlsym_e, unsafe_convert
+    TupleType(types...) = Tuple{types...}
+    const unsafe_convert = Base.unsafe_convert
+    import Base.Libdl: dlopen, dlsym_e
 end
 importall .CompatGLib
 
@@ -65,7 +50,7 @@ importall .CompatGLib
 typealias AbstractStringLike Union{AbstractString,Symbol}
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 

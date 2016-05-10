@@ -64,7 +64,7 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
             ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
         end
     else
-        ret = int32(false)
+        ret = Int32(false)
     end
     ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
@@ -93,8 +93,8 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
     end
     closure = Gtk_signal_motion{T}(
         closure, cb,
-        uint32(include),
-        uint32(exclude)
+        UInt32(include),
+        UInt32(exclude)
         )
     signal_connect(notify_motion, widget, "motion-notify-event", Cint, (Ptr{GdkEventMotion},), after, closure)
 end
@@ -164,7 +164,7 @@ function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     elseif event.button == 3
         this.button3press(this.widget, event)
     end
-    int32(false)
+    Int32(false)
 end
 
 function mouseup_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
@@ -176,7 +176,7 @@ function mouseup_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     elseif event.button == 3
         this.button3release(this.widget, event)
     end
-    int32(false)
+    Int32(false)
 end
 
 function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
@@ -185,13 +185,13 @@ function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     if event.state & GdkModifierType.BUTTON1 != 0
         this.button1motion(this.widget, event)
     end
-    int32(false)
+    Int32(false)
 end
 
 function mousescroll_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
     this.scroll(this.widget, event)
-    int32(false)
+    Int32(false)
 end
 
 

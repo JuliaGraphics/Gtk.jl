@@ -1,7 +1,6 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!
-import Gtk.GLib.CompatGLib: int32, int8, uint32
 
 ## Window
 w = @Window("Window", 400, 300) |> showall
@@ -246,9 +245,9 @@ function toggled(ptr,evt,widget)
     convert(Int32,true)
 end
 on_signal_button_press(toggled, tb)
-press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -266,9 +265,9 @@ w = @Window(tb, "ToggleButton")|>showall
 #     end
 #     true
 # end
-# press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+# press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 # signal_emit(tb, "button-press-event", Bool, press)
-# release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+# release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 # signal_emit(tb, "button-release-event", Bool, release)
 # next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -285,9 +284,9 @@ signal_connect(tb, :button_press_event) do widget, evt
     end
     true
 end
-press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+press=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 signal_emit(tb, "button-press-event", Bool, press)
-release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
+release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
@@ -542,8 +541,8 @@ showall(w)
 io = IOBuffer()
 c.mouse.button1press = (widget,evt) -> println(io, "cb1_1")
 c.mouse.button2press = (widget,evt) -> println(io, "cb2_1")
-press1=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(c), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(1), C_NULL, 0.0, 0.0)
-press2=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(c), int8(0), uint32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), uint32(0), uint32(2), C_NULL, 0.0, 0.0)
+press1=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(1), C_NULL, 0.0, 0.0)
+press2=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_PRESS, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, convert(Ptr{Float64},C_NULL), UInt32(0), UInt32(2), C_NULL, 0.0, 0.0)
 signal_emit(c, "button-press-event", Bool, press1)
 signal_emit(c, "button-press-event", Bool, press2)
 push!((c.mouse,:button1press), (widget,evt) -> println(io, "cb1_2"))
@@ -559,7 +558,7 @@ str = takebuf_string(io)
 @assert str == "cb1_1\ncb2_1\ncb1_2\ncb2_1\ncb1_2\ncb2_2\ncb1_1\ncb2_2\n"
 
 c.mouse.scroll = (widget,event) -> println(io, "scrolling")
-scroll = Gtk.GdkEventScroll(Gtk.GdkEventType.SCROLL, Gtk.gdk_window(c), int8(0), uint32(0), 0.0, 0.0, uint32(0), Gtk.GdkScrollDirection.UP, convert(Ptr{Float64},C_NULL), 0.0, 0.0, 0.0, 0.0)
+scroll = Gtk.GdkEventScroll(Gtk.GdkEventType.SCROLL, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, UInt32(0), Gtk.GdkScrollDirection.UP, convert(Ptr{Float64},C_NULL), 0.0, 0.0, 0.0, 0.0)
 signal_emit(c, "scroll-event", Bool, scroll)
 str = takebuf_string(io)
 @assert str == "scrolling\n"

@@ -86,8 +86,8 @@ setindex!(list::GList,x,i::Real) = setindex!(list,x,nth(list,i))
 ## More Array-like declarations, this time involving ccall
 
 ### Non-modifying functions
-length{L<:_GSList}(list::LList{L}) = int(ccall((:g_slist_length,libglib),Cuint,(Ptr{L},),list))
-length{L<:_GList}(list::LList{L}) = int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
+length{L<:_GSList}(list::LList{L}) = Int(ccall((:g_slist_length,libglib),Cuint,(Ptr{L},),list))
+length{L<:_GList}(list::LList{L}) = Int(ccall((:g_list_length,libglib),Cuint,(Ptr{L},),list))
 copy{L<:_GSList}(list::GList{L}) = typeof(list)(ccall((:g_slist_copy,libglib),Ptr{L},(Ptr{L},),list), false)
 copy{L<:_GList}(list::GList{L}) = typeof(list)(ccall((:g_list_copy,libglib),Ptr{L},(Ptr{L},),list), false)
 check_undefref(p::Ptr) = (p==C_NULL ? error(UndefRefError()) : p)

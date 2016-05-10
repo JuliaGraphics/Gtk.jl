@@ -137,7 +137,7 @@ function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
         detail = @quark_str sig[last(i)+1:end]
         sig = sig[1:first(i)-1]
     else
-        detail = uint32(0)
+        detail = UInt32(0)
     end
     signal_id = ccall((:g_signal_lookup,libgobject),Cuint,(Ptr{UInt8},Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
     return_value = RT===Void ? C_NULL : gvalue(RT)
@@ -329,7 +329,7 @@ function new_gsource(source_funcs::_GSourceFuncs)
     gsource
 end
 
-expiration = uint64(0)
+expiration = UInt64(0)
 if VERSION < v"0.3-"
     _isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] === Base.Scheduler)
     function uv_loop_alive(evt)
@@ -367,24 +367,24 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
         now = ccall((:g_source_get_time,GLib.libglib),UInt64,(Ptr{Void},),src)
         expiration = convert(UInt64,now + tmout_ms*1000)
     else #tmout_ms == 0
-        expiration = uint64(0)
+        expiration = UInt64(0)
     end
-    int32(tmout_ms == 0)
+    Int32(tmout_ms == 0)
 end
 function uv_check(src::Ptr{Void})
     global expiration
     ex = expiration::UInt64
     if !_isempty_workqueue()
-        return int32(1)
+        return Int32(1)
     elseif !uv_loop_alive(Base.eventloop())
-        return int32(0)
+        return Int32(0)
     elseif ex == 0
-        return int32(1)
+        return Int32(1)
     elseif uv_pollfd.revents != 0
-        return int32(1)
+        return Int32(1)
     else
         now = ccall((:g_source_get_time,GLib.libglib),UInt64,(Ptr{Void},),src)
-        return int32(ex <= now)
+        return Int32(ex <= now)
     end
 end
 function uv_dispatch{T}(src::Ptr{Void},callback::Ptr{Void},data::T)
@@ -393,7 +393,7 @@ end
 
 function g_yield(data)
     g_siginterruptible(yield, yield)
-    return int32(true)
+    return Int32(true)
 end
 
 sizeof_gclosure = 0
