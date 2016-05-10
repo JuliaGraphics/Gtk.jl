@@ -235,7 +235,6 @@ function bstride(img::GdkPixbuf,i)
         convert(Cint,0)
     end
 end
-size(img::GdkPixbuf) = (width(img),height(img))
 function eltype(img::GdkPixbuf)
     #nbytes = stride(img,1)
     nbytes = convert(Cint, div(ccall((:gdk_pixbuf_get_bits_per_sample,libgdk_pixbuf),Cint,(Ptr{GObject},),img) *

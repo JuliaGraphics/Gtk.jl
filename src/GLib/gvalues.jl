@@ -46,15 +46,15 @@ getindex{T}(gv::GV, i::Int, ::Type{T}) = getindex(mutable(gv,i), T)
 getindex(gv::GV, i::Int) = getindex(mutable(gv,i))
 getindex(v::GV,i::Int, ::Type{Void}) = nothing
 
-#let
-#global make_gvalue, getindex
+let handled=Set()
+global make_gvalue, getindex
 function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,fundamental::Bool=false)
     with_id === :error && return
     if isa(with_id,Tuple)
         with_id = with_id::TupleType(Symbol,Any)
         with_id = :(ccall($(Expr(:tuple, Meta.quot(Symbol(string(with_id[1],"_get_type"))), with_id[2])),GType,()))
     end
-    if pass_x !== Union{}
+    if pass_x !== Union{} && !(pass_x in handled)
         eval(current_module(),quote
             function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
                 ccall((:g_value_init,GLib.libgobject),Void,(Ptr{GLib.GValue},Csize_t), v, $with_id)
@@ -79,7 +79,8 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     if to_gtype == :static_string
         to_gtype = :string
     end
-    if pass_x !== Union{}
+    if pass_x !== Union{} && !(pass_x in handled)
+        push!(handled, pass_x)
         eval(current_module(),quote
             function Base.getindex{T<:$pass_x}(v::GLib.GV,::Type{T})
                 x = ccall(($(string("g_value_get_",to_gtype)),GLib.libgobject),$as_ctype,(Ptr{GLib.GValue},), v)
@@ -109,6 +110,8 @@ function make_gvalue(pass_x,as_ctype,to_gtype,with_id,allow_reverse::Bool=true,f
     end
     return nothing
 end
+end #let
+
 const gvalue_types = Any[]
 const fundamental_fns = tuple(Function[begin
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]

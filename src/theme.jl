@@ -1,5 +1,4 @@
 if gtk_version == 3
-GtkCssProviderLeaf() = GtkCssProviderLeaf(ccall((:gtk_css_provider_get_default,libgtk),Ptr{GObject},()))
 
 function GtkCssProviderLeaf(;data=nothing,filename=nothing)
     source_count = (data!==nothing) + (filename!==nothing)

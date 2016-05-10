@@ -45,11 +45,12 @@ g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
-let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
+let handled=Set(), jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-        if juliatype !== Union{}
+        if juliatype !== Union{} && !(juliatype in handled)
             push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
+            push!(handled, juliatype)
         end
     end
     eval(jtypes)
@@ -177,9 +178,16 @@ end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
     :( GLib.g_type{T<:$(esc(name))}(::Type{T}) = $(esc(symname)) )
-get_gtype_decl(name::Symbol, lib, symname::Symbol) =
-    :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
-        ccall(($(QuoteNode(Symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+let handled=Set()
+function get_gtype_decl(name::Symbol, lib, symname::Symbol)
+    if !(name in handled)
+        push!(handled, name)
+        return :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
+                  ccall(($(QuoteNode(Symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+    end
+    nothing
+end
+end #let
 
 function get_type_decl(name,iname,gtyp,gtype_decl)
     ename = esc(name)
