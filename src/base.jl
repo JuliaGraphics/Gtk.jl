@@ -1,6 +1,6 @@
 unsafe_convert(::Type{Ptr{GObject}},w::AbstractStringLike) = unsafe_convert(Ptr{GObject},GtkLabelLeaf(w))
 
-destroy(w::GtkWidget) = ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
+destroy(w::GtkWidget) = @sigatom ccall((:gtk_widget_destroy,libgtk), Void, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent,libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 hasparent(w::GtkWidget) = ccall((:gtk_widget_get_parent,libgtk), Ptr{Void}, (Ptr{GObject},), w) != C_NULL
 function toplevel(w::GtkWidget)
@@ -29,9 +29,9 @@ end
 
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
-visible(w::GtkWidget, state::Bool) = ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
-show(w::GtkWidget) = (ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
-showall(w::GtkWidget) = (ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)
+visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
+show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
+showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)
 
 # TODO Use Pango type PangoFontDescription once it is wrapped
 modifyfont(w::GtkWidget, font_desc::Ptr{Void}) =

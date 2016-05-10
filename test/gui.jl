@@ -19,14 +19,14 @@ sleep(0.1)
 if G_.position(w) == pos
     warn("The Window Manager did not move the Gtk Window when requested")
 end
-@assert getproperty(w,"title",AbstractString) == "Window"
-setproperty!(w,:title,"Window 2")
-@assert getproperty(w,:title,AbstractString) == "Window 2"
-destroy(w)
-@assert !getproperty(w,:visible,Bool)
+@assert getproperty(w, "title", AbstractString) == "Window"
+setproperty!(w, :title, "Window 2")
+@assert getproperty(w, :title, AbstractString) == "Window 2"
+destroy(w); yield()
+@assert !getproperty(w, :visible, Bool)
 w=WeakRef(w)
-gc(); gc(); sleep(.1); gc(); gc()
-@assert w.value === nothing || w.value.handle == C_NULL
+gc(); yield(); gc()
+@assert w.value === nothing
 
 ## Frame
 w = @Window(

@@ -155,7 +155,7 @@ g_stack = nothing # need to call g_loop_run from only one stack
 const g_yielded = Ref(false) # when true, use the `g_doatomic` queue to run sigatom functions
 const g_doatomic = [] # (work, notification) scheduler queue
 const g_sigatom_flag = Ref(false) # keep track of Base sigatomic state
-function g_sigatom(f::Base.Callable) # calls f, where f never throws (but this function may throw)
+function g_sigatom(f::ANY) # calls f, where f never throws (but this function may throw)
     global g_sigatom_flag, g_stack, g_doatomic
     prev = g_sigatom_flag[]
     stk = g_stack
@@ -198,6 +198,13 @@ function g_sigatom(f::Base.Callable) # calls f, where f never throws (but this f
         sigatomic_end() # may throw SIGINT
     end
     return ret
+end
+macro sigatom(f)
+    return quote
+        g_sigatom() do
+            $(esc(f))
+        end
+    end
 end
 
 function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), but this function never throws

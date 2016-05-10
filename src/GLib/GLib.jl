@@ -23,6 +23,7 @@ export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
+export @sigatom
 
 module CompatGLib
     export @assign_if_unassigned

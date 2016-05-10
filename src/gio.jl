@@ -1,7 +1,7 @@
 if gtk_version == 3
-run(app::GApplication) = GLib.g_sigatom() do
-    ccall((:g_application_run,libgio),Cint, (Ptr{GObject},Cint, Ptr{Ptr{UInt8}}), app, 0, C_NULL)
-end
+run(app::GApplication) =
+    (@sigatom ccall((:g_application_run,libgio), Cint,
+        (Ptr{GObject},Cint, Ptr{Ptr{UInt8}}), app, 0, C_NULL))::Cint
 
 function register(app::GApplication)
    GError() do error_check
