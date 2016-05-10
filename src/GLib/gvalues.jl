@@ -181,7 +181,7 @@ function show(io::IO, w::GObject)
     n = mutable(Cuint)
     props = ccall((:g_object_class_list_properties,libgobject),Ptr{Ptr{GParamSpec}},
         (Ptr{Void},Ptr{Cuint}),G_OBJECT_GET_CLASS(w),n)
-    v = gvalue(ByteString)
+    v = gvalue(String)
     first = true
     for i = 1:unsafe_load(n)
         param = unsafe_load(unsafe_load(props,i))

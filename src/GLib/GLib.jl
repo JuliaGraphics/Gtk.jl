@@ -1,5 +1,9 @@
 module GLib
 
+if VERSION < v"0.5.0-dev"
+    include("../compat_string.jl")
+end
+
 if false
 function include(x)
     println("including $x")
@@ -61,7 +65,7 @@ importall .CompatGLib
 typealias AbstractStringLike Union{AbstractString,Symbol}
 bytestring(s) = Base.bytestring(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8},own::Bool) = UTF8String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 

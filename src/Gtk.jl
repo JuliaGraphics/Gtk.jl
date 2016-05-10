@@ -28,6 +28,10 @@ import .Graphics: width, height, getgc
 using Cairo
 import Cairo: destroy
 
+if VERSION < v"0.5.0-dev"
+    include("compat_string.jl")
+end
+
 typealias Index Union{Integer,AbstractVector{TypeVar(:I,Integer)}}
 
 export GAccessor
