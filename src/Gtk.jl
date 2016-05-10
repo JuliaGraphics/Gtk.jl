@@ -6,7 +6,7 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-importall .GLib.Compat
+importall .GLib.CompatGLib
 import .GLib: setproperty!, getproperty, AbstractStringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,

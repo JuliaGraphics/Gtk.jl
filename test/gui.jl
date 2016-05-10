@@ -1,7 +1,7 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!
-import Gtk.GLib.Compat: int32, int8, uint32
+import Gtk.GLib.CompatGLib: int32, int8, uint32
 
 ## Window
 w = @Window("Window", 400, 300) |> showall

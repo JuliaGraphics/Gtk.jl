@@ -20,7 +20,7 @@ export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
 
-module Compat
+module CompatGLib
     export @assign_if_unassigned
     macro assign_if_unassigned(expr)
         # BinDeps often fails and generates corrupt deps.jl files
@@ -55,7 +55,7 @@ module Compat
         QuoteNode(x) = Base.qn(x)
     end
 end
-importall .Compat
+importall .CompatGLib
 
 # local function, handles Symbol and makes UTF8-strings easier
 typealias AbstractStringLike Union{AbstractString,Symbol}
