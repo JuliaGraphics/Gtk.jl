@@ -1,28 +1,34 @@
 # id = VERSION >= v"0.4-"get, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
-        ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w) #TODO: assert that length(param_types) is correct
-    if isgeneric(cb)
-        if !isbits(user_data) || VERSION >= v"0.4-"
-            if VERSION >= v"0.4-"
-                callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
-            else
-                callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,CT))
-            end
-            ref, deref = gc_ref_closure(user_data)
-            return ccall((:g_signal_connect_data,libgobject), Culong,
-                (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
-                    w,
-                    bytestring(sig),
-                    callback,
-                    ref,
-                    deref,
-                    after*GConnectFlags.AFTER)
+if VERSION < v"0.5.0-dev"
+    function signal_connect{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
+            ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w)
+        if isgeneric(cb)
+            return signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
         end
+        # oops, Julia doesn't support this natively yet -- fake it instead
+        return _signal_connect(cb, w, sig, after, true,param_types,user_data)
     end
-    # oops, Julia doesn't support this natively yet -- fake it instead
-    return _signal_connect(cb, w, sig, after, true,param_types,user_data)
+else
+    function signal_connect{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
+            ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w)
+        signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
+    end
+end
+
+function signal_connect_generic{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
+        ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w)  #TODO: assert that length(param_types) is correct
+    callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
+    ref, deref = gc_ref_closure(user_data)
+    return ccall((:g_signal_connect_data,libgobject), Culong,
+                 (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
+                 w,
+                 bytestring(sig),
+                 callback,
+                 ref,
+                 deref,
+                 after*GConnectFlags.AFTER)
 end
 
 # id = signal_connect(widget, :event) do obj, evt_args...
