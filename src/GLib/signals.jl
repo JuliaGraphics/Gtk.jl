@@ -17,9 +17,9 @@ else
     end
 end
 
-function signal_connect_generic{CT,RT}(cb::Function,w::GObject,sig::AbstractStringLike,
-        ::Type{RT},param_types::Tuple,after::Bool=false,user_data::CT=w)  #TODO: assert that length(param_types) is correct
-    callback = cfunction(cb,RT,tuple(Ptr{GObject},param_types...,Ref{CT}))
+function signal_connect_generic{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
+        ::Type{RT}, param_types::Tuple, after::Bool=false, user_data::CT=w)  #TODO: assert that length(param_types) is correct
+    callback = cfunction(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
     return ccall((:g_signal_connect_data,libgobject), Culong,
                  (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, GEnum),
@@ -34,24 +34,24 @@ end
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function,w::GObject,sig::AbstractStringLike,after::Bool=false)
+function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool=false)
     _signal_connect(cb, w, sig, after, false,nothing,nothing)
 end
-function _signal_connect(cb::Function,w::GObject,sig::AbstractStringLike,after::Bool,gtk_call_conv::Bool,param_types,user_data)
+function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
     @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object,libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+WORD_SIZE*2, w)
-    closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
-    unsafe_store!(closure_env, cb, 1)
+    closure_env = convert(Ptr{Ptr{Void}}, closuref + sizeof_gclosure)
     if gtk_call_conv
-        env = Any[param_types,user_data]
-        unsafe_store!(closure_env, env, 2)
+        env = Any[param_types, user_data]
         ref_env, deref_env = gc_ref_closure(env)
+        unsafe_store!(closure_env, ref_env, 2)
         ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
             (Ptr{Void}, Ptr{Void}, Ptr{Void}), closuref, ref_env, deref_env)
     else
         unsafe_store!(convert(Ptr{Int},closure_env), 0, 2)
     end
     ref_cb, deref_cb = gc_ref_closure(cb)
+    unsafe_store!(closure_env, ref_cb, 1)
     ccall((:g_closure_add_invalidate_notifier,libgobject), Void,
         (Ptr{Void}, Ptr{Void}, Ptr{Void}), closuref, ref_cb, deref_cb)
     ccall((:g_closure_set_marshal,libgobject), Void,
@@ -59,12 +59,12 @@ function _signal_connect(cb::Function,w::GObject,sig::AbstractStringLike,after::
     return ccall((:g_signal_connect_closure,libgobject), Culong,
         (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}, Cint), w, bytestring(sig), closuref, after)
 end
-function GClosureMarshal(closuref, return_value, n_param_values,
-                         param_values, invocation_hint, marshal_data)
+function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param_values::Cuint,
+                         param_values::Ptr{GValue}, invocation_hint::Ptr{Void}, marshal_data::Ptr{Void})
     @assert sizeof_gclosure > 0
-    closure_env = convert(Ptr{Any},closuref+sizeof_gclosure)
+    closure_env = convert(Ptr{Any}, closuref + sizeof_gclosure)
     cb = unsafe_load(closure_env, 1)
-    gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int},closure_env), 2))
+    gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int}, closure_env),  2))
     params = Array(Any, n_param_values)
     local retval = nothing
     g_siginterruptible(cb) do

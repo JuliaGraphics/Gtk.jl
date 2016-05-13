@@ -357,7 +357,13 @@ if VERSION >= v"0.4-"
         end
         nothing
     end
-    gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Ref{T}, Ptr{Void})))
+    if VERSION >= v"0.5-"
+        gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Any, Ptr{Void})))
+        _gc_unref(x::ANY, ::Ptr{Void}) = gc_unref(x)
+    else
+        gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Ref{T}, Ptr{Void})))
+        _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+    end
 else
     function gc_ref(x::ANY)
         global gc_preserve
@@ -378,8 +384,8 @@ else
         nothing
     end
     gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (T, Ptr{Void})))
+    _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 end
-_gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Void, (Ptr{GObject},), x)
