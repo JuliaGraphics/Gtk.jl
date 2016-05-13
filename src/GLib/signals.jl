@@ -97,15 +97,17 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
         end
         # note: make sure not to leak any of the GValue objects into this task switch, since many of them were alloca'd
         retval = cb(params...) # widget, args...
-    end
-    if return_value != C_NULL && retval !== nothing
-        gtyp = unsafe_load(return_value).g_type
-        if gtyp != g_type(Void) && gtyp != 0
-            try
-                return_value[] = gvalue(retval)
-            catch
-                blame(cb)
-                println("ERROR: failed to set return value of type $(typeof(retval)); did your callback return an unintentional value?")
+        if return_value != C_NULL && retval !== nothing
+            gtyp = unsafe_load(return_value).g_type
+            if gtyp != g_type(Void) && gtyp != 0
+                try
+                    return_value[] = gvalue(retval)
+                catch
+                    @async begin # make this async to prevent task switches from being present right here
+                        blame(cb)
+                        println("ERROR: failed to set return value of type $(typeof(retval)); did your callback return an unintentional value?")
+                    end
+                end
             end
         end
     end
@@ -113,7 +115,7 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
 end
 
 function blame(cb)
-    if isgeneric(cb)
+    if VERSION > v"0.5.0-dev" || isgeneric(cb)
         warn("Executing ", cb, ":")
     else
         warn("Executing ", Base.uncompressed_ast(cb.code).args[3].args[1])   # just show file/line
@@ -219,9 +221,10 @@ function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), b
         end
         f()
     catch err
-        try
+        bt = catch_backtrace()
+        @async begin # make this async to prevent task switches from being present right here
             blame(cb)
-            Base.display_error(err, catch_backtrace())
+            Base.display_error(err, bt)
             println()
         end
     end
