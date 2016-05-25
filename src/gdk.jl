@@ -142,6 +142,7 @@ immutable GdkEventKey <: GdkEvent
     group::UInt8
     flags::UInt32
 end
+GdkEventKey() = (uz32 = UInt32(0); GdkEventKey(GEnum(0), C_NULL, Int8(0), uz32, uz32, uz32, Int32(0), C_NULL, UInt16(0), 0x00, uz32))
 
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
@@ -178,4 +179,3 @@ end
 
 keyval(name::AbstractString) =
   ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{UInt8},),bytestring(name))
-
