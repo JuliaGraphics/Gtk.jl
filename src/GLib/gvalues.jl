@@ -155,7 +155,7 @@ end
 function getproperty{T}(w::GObject, name::AbstractStringLike, ::Type{T})
     v = gvalue(T)
     ccall((:g_object_get_property,libgobject), Void,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, bytestring(name), v)
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), v)
     val = v[T]
     ccall((:g_value_unset,libgobject),Void,(Ptr{GValue},), v)
     return val
@@ -164,7 +164,7 @@ end
 setproperty!{T}(w::GObject, name::AbstractStringLike, ::Type{T}, value) = setproperty!(w, name, convert(T,value))
 function setproperty!(w::GObject, name::AbstractStringLike, value)
     ccall((:g_object_set_property, libgobject), Void,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, bytestring(name), gvalue(value))
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), gvalue(value))
     w
 end
 
@@ -193,7 +193,7 @@ function show(io::IO, w::GObject)
         else
             first = false
         end
-        print(io,bytestring(param.name))
+        print(io,GLib.bytestring(param.name))
         if (param.flags & READABLE) != 0 &&
            (param.flags & DEPRECATED) == 0 &&
            (ccall((:g_value_type_transformable,libgobject),Cint,
@@ -201,7 +201,7 @@ function show(io::IO, w::GObject)
             ccall((:g_object_get_property,libgobject), Void,
                 (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, param.name, v)
             str = ccall((:g_value_get_string,libgobject),Ptr{UInt8},(Ptr{GValue},), v)
-            value = (str == C_NULL ? "NULL" : bytestring(str))
+            value = (str == C_NULL ? "NULL" : GLib.bytestring(str))
             if param.value_type == g_type(AbstractString) && str != C_NULL
                 print(io,"=\"",value,'"')
             else

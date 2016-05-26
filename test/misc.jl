@@ -41,4 +41,6 @@ showall(win)
 end
 destroy(win)
 
+@assert isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
+
 end
