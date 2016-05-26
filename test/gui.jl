@@ -308,6 +308,10 @@ for c in choices
     push!(combo, c)
 end
 w = @Window(combo, "ComboBoxText")|>showall
+lsl = ListStoreLeaf(combo)
+@assert length(lsl) == 3
+empty!(combo)
+@assert length(lsl) == 0
 destroy(w)
 
 combo = @ComboBoxText(true)
