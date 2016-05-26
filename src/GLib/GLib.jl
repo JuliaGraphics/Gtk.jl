@@ -44,8 +44,14 @@ module CompatGLib
     TupleType(types...) = Tuple{types...}
     const unsafe_convert = Base.unsafe_convert
     import Base.Libdl: dlopen, dlsym_e
+    if VERSION >= v"0.5.0-dev+4257"
+        using Base.Sys.WORD_SIZE
+    else
+        using Base.WORD_SIZE
+    end
 end
 importall .CompatGLib
+using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
 typealias AbstractStringLike Union{AbstractString,Symbol}
