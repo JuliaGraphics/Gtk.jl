@@ -53,6 +53,9 @@ end
 delete!(cb::GtkComboBoxText,i::Integer) =
     (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GObject},Cint),cb,i-1); cb)
 
+empty!(cb::GtkComboBoxText) =
+    (ccall((:gtk_combo_box_text_remove_all,libgtk),Void,(Ptr{GObject},),cb); cb)
+
 immutable GtkTreeIter
     stamp::Cint
     user_data::Ptr{Void}
@@ -116,6 +119,8 @@ function GtkListStoreLeaf(types::Type...)
     handle = ccall((:gtk_list_store_newv,libgtk),Ptr{GObject},(Cint,Ptr{GLib.GType}), length(types), gtypes)
     GtkListStoreLeaf(handle)
 end
+
+GtkListStoreLeaf(combo::GtkComboBoxText) = GtkListStoreLeaf(ccall((:gtk_combo_box_get_model,libgtk),Ptr{GObject},(Ptr{GObject},),combo))
 
 ## index is integer for a liststore, vector of ints for tree
 iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index-1))
