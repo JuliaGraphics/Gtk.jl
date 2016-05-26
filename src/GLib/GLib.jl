@@ -49,9 +49,14 @@ importall .CompatGLib
 
 # local function, handles Symbol and makes UTF8-strings easier
 typealias AbstractStringLike Union{AbstractString,Symbol}
-bytestring(s) = Base.bytestring(s)
+bytestring(s) = String(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+if VERSION >= v"0.5.0-dev+4200"
+    bytestring(s::Ptr{UInt8}) = String(s)
+else
+    bytestring(s::Ptr{UInt8}) = Base.bytestring(s)
+end
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 
