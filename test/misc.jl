@@ -33,8 +33,8 @@ are expected and a sign of normal operation.
 @test bar4(3,5) == unhandled
 
 # Do-block syntax
-c = @GtkCanvas()
-win = @GtkWindow(c)
+c = GtkCanvas()
+win = GtkWindow(c)
 showall(win)
 @guarded draw(c) do widget
     error("oops")

@@ -19,7 +19,7 @@ GtkLabelLeaf(title) = GtkLabelLeaf(
 GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new,libgtk),Ptr{GObject},(Ptr{GObject},),C_NULL))
 
-GtkTextViewLeaf(buffer::GtkTextBuffer=@GtkTextBuffer()) = GtkTextViewLeaf(
+GtkTextViewLeaf(buffer::GtkTextBuffer=GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer,libgtk),Ptr{GObject},(Ptr{GObject},),buffer))
 
 GtkTextMarkLeaf(left_gravity::Bool=false) = GtkTextMarkLeaf(
@@ -353,7 +353,7 @@ function user_action(f::Function, buffer::GtkTextBuffer)
 end
 
 function create_tag(buffer::GtkTextBuffer, tag_name::AbstractString; properties...)
-    tag = @GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
+    tag = GtkTextTag(ccall((:gtk_text_buffer_create_tag,libgtk), Ptr{GObject},
                 (Ptr{GObject},Ptr{UInt8},Ptr{Void}),
                 buffer, bytestring(tag_name), C_NULL))
     for (k,v) in properties

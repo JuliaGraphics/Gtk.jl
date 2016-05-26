@@ -152,9 +152,9 @@ export
 
 
 # Gtk3 objects
-export @GtkGrid, @GtkGLArea
+export GtkGrid, GtkGLArea
 export GtkGridLeaf, GtkGLAreaLeaf
 
 # Gtk2 objects
-export @GtkTable, @GtkAlignment
+export GtkTable, GtkAlignment
 export GtkTableLeaf, GtkAlignmentLeaf

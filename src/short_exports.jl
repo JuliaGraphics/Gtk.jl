@@ -46,6 +46,7 @@ const Paned = GtkPaned
 const Pixbuf = GdkPixbuf
 const ProgressBar = GtkProgressBar
 const RadioButton = GtkRadioButton
+const RadioButtonGroup = GtkRadioButtonGroup
 const Scale = GtkScale
 const ScrolledWindow = GtkScrolledWindow
 const SeparatorMenuItem = GtkSeparatorMenuItem
@@ -122,6 +123,7 @@ export G_, GObject,
     Pixbuf,
     ProgressBar,
     RadioButton,
+    RadioButtonGroup,
     Scale,
     ScrolledWindow,
     SeparatorMenuItem,
