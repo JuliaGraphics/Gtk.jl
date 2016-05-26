@@ -40,6 +40,11 @@ include("long_exports.jl")
 include("long_leaf_exports.jl")
 include(joinpath("..","deps","ext.jl"))
 
+const libgtk_version = VersionNumber(
+    ccall((:gtk_get_major_version,libgtk),Cint, ()),
+    ccall((:gtk_get_minor_version,libgtk),Cint, ()),
+    ccall((:gtk_get_micro_version,libgtk),Cint, ()))
+
 include("interfaces.jl")
 include("boxes.jl")
 include("gtktypes.jl")
