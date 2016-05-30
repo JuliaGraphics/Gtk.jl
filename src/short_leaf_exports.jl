@@ -222,8 +222,9 @@ export G_Leaf,
 
 # Gtk 3
 @g_type_delegate Grid = GtkGrid
-export @Grid
-export GridLeaf
+@g_type_delegate GLArea = GtkGLArea
+export @Grid, @GLArea
+export GridLeaf, GLAreaLeaf
 
 # Gtk 2
 @g_type_delegate Table = GtkTable
