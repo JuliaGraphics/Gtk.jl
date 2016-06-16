@@ -1,6 +1,6 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
-import Gtk.deleteat!
+import Gtk.deleteat!, Gtk.libgtk_version
 
 ## Window
 w = @Window("Window", 400, 300) |> showall
@@ -144,12 +144,23 @@ push!(w, ex)
 showall(w)
 destroy(w)
 
-## Grid
+## Table
 grid = @Table(3,3)
 w = @Window(grid, "Grid", 400, 400)
 grid[2,2] = @Button("2,2")
 grid[2,3] = @Button("2,3")
 grid[1,1] = "grid"
+showall(w)
+destroy(w)
+
+## Grid
+grid = @Grid()
+w = @Window(grid, "Grid", 400, 400)
+grid[2,2] = @Button("2,2")
+grid[2,3] = @Button("2,3")
+grid[1,1] = "grid"
+insert!(grid,1,:top)
+libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
 showall(w)
 destroy(w)
 

@@ -57,9 +57,24 @@ if gtk_version == 3
         end
     end
 
+    function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
+        if side == :row
+            ccall((:gtk_grid_remove_row,libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+        elseif side == :col
+            ccall((:gtk_grid_remove_column,libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+        else
+            error(string("invalid GtkPositionType ",s))
+        end
+    end
+
     function insert!(grid::GtkGrid, sibling, side::Symbol)
         ccall((:gtk_grid_insert_next_to,libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
     end
+end
+
+if libgtk_version >= v"3.16.0"
+    ### GtkGLArea was introduced inside Gtk3.16.0 (earlier it existed as a separate library)
+    GtkGLAreaLeaf() = GtkGLAreaLeaf(ccall((:gtk_gl_area_new, libgtk), Ptr{GObject}, ()))
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)

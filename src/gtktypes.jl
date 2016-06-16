@@ -13,12 +13,24 @@ function _gtksubtype_constructors(name::Symbol)
     end
 end
 
+macro gtktype_custom_symname_and_lib(name, symname, lib)
+    quote
+        @Gtype $(esc(name)) $(esc(lib)) $(esc(symname))
+        _gtksubtype_constructors($(QuoteNode(name)))
+    end
+end
+
+macro gtktype_custom_symname(name, symname)
+    quote
+        @gtktype_custom_symname_and_lib $(esc(name)) $(esc(symname)) libgtk
+    end
+end
+
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = Symbol(join([lowercase(s) for s in groups],"_"))
     quote
-        @Gtype $(esc(name)) libgtk $(esc(symname))
-        _gtksubtype_constructors($(QuoteNode(name)))
+        @gtktype_custom_symname $(esc(name)) $(esc(symname))
     end
 end
 @gtktype GtkWidget
@@ -114,6 +126,7 @@ if gtk_version == 3
 @gtktype GtkCellAreaContext
 @gtktype GtkCssProvider
 @gtktype GtkStyleContext
+
 else
     type GtkApplication end
     GtkApplicationLeaf(x...) = error("GtkApplication is not available until Gtk3.0")
@@ -154,3 +167,12 @@ else
     end
 end
 
+if libgtk_version >= v"3.16.0"
+@gtktype_custom_symname GtkGLArea gtk_gl_area
+else
+type GtkGLArea end
+    GtkGLAreaLeaf(x...) = error("GtkGLArea is not fully available until Gtk3.16.0 (though available as separate library)")
+    macro GtkGLArea(args...)
+        :( GtkGLAreaLeaf($(args...)) )
+    end
+end
