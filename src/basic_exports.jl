@@ -4,7 +4,8 @@ export new, width, height, #minsize, maxsize
     visible, destroy, stop, depth, isancestor,
     hasparent, toplevel, setproperty!, getproperty,
     selected, hasselection, unselect!, selectall!, unselectall!,
-    pagenumber, present, complete, user_action,
+    pagenumber, present, fullscreen, unfullscreen,
+     maximize, unmaximize, complete, user_action,
     keyval, prev, up, down, popup
     #property, margin, padding, align
     #raise, focus, destroy, enabled

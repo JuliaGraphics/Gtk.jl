@@ -22,11 +22,23 @@ end
 @assert getproperty(w, "title", AbstractString) == "Window"
 setproperty!(w, :title, "Window 2")
 @assert getproperty(w, :title, AbstractString) == "Window 2"
+
 destroy(w); yield()
 @assert !getproperty(w, :visible, Bool)
 w=WeakRef(w)
 gc(); yield(); gc()
 @assert w.value === nothing
+
+## change Window size
+w = @Window("Window", 400, 300)
+fullscreen(w)
+unfullscreen(w)
+maximize(w)
+sleep(0.1)
+@assert getproperty(w, :is_maximized, Bool) == true
+unmaximize(w)
+sleep(0.1)
+@assert getproperty(w, :is_maximized, Bool) == false
 
 ## Frame
 w = @Window(
