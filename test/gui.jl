@@ -34,10 +34,10 @@ w = @Window("Window", 400, 300)
 fullscreen(w)
 unfullscreen(w)
 maximize(w)
-sleep(0.1)
+sleep(1)
 @assert getproperty(w, :is_maximized, Bool) == true
 unmaximize(w)
-sleep(0.1)
+sleep(1)
 @assert getproperty(w, :is_maximized, Bool) == false
 
 ## Frame
