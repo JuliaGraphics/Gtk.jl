@@ -178,24 +178,24 @@ function setproperty!(text::Mutable{GtkTextIter},key::Symbol,value)
     end
     return text
 end
-Base.(:(==))(lhs::TI,rhs::TI) = bool(ccall((:gtk_text_iter_equal,libgtk),
+@compat(Base.:(==))(lhs::TI,rhs::TI) = bool(ccall((:gtk_text_iter_equal,libgtk),
     Cint,(Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)))
-Base.(:(!=))(lhs::TI,rhs::TI) = !(lhs == rhs)
-Base.(:(<))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
+@compat(Base.:(!=))(lhs::TI,rhs::TI) = !(lhs == rhs)
+@compat(Base.:(<))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)) < 0
-Base.(:(<=))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
+@compat(Base.:(<=))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)) <= 0
-Base.(:(>))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
+@compat(Base.:(>))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)) > 0
-Base.(:(>=))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
+@compat(Base.:(>=))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
     (Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)) >= 0
 start(iter::TI) = mutable(iter)
 function next(::TI,iter::Mutable{GtkTextIter})
     (getproperty(iter,:char)::Char, iter+1)
 end
 done(::TI,iter) = getproperty(iter,:is_end)::Bool
-Base.(:+)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
-Base.(:-)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
+@compat(Base.:+)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
+@compat(Base.:-)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
     bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
         (Ptr{GtkTextIter},Cint), iter, count))

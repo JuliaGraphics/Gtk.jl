@@ -262,7 +262,7 @@ function g_yield(data)
 end
 
 type _GPollFD
-  @windows ? fd::Int : fd::Cint
+  @static is_windows() ? fd::Int : fd::Cint
   events::Cushort
   revents::Cushort
   _GPollFD(fd, ev) = new(fd, ev, 0)
@@ -307,7 +307,7 @@ function uv_prepare(src::Ptr{Void},timeout::Ptr{Cint})
         tmout_ms = -1
     elseif uv_pollfd.revents != 0
         tmout_ms = 0
-    elseif @windows ? (VERSION < v"0.3-") : false # uv_backend_timeout broken on windows before Julia v0.3-rc2
+    elseif is_windows() ? (VERSION < v"0.3-") : false # uv_backend_timeout broken on windows before Julia v0.3-rc2
         tmout_ms = 10
     else
         ccall(:uv_update_time,Void,(Ptr{Void},),evt)
@@ -373,7 +373,7 @@ function __init__gmainloop__()
     ccall((:g_source_set_callback,GLib.libglib),Void,(Ptr{Void},Ptr{Void},UInt,Ptr{Void}),
         src,cfunction(g_yield,Cint,(UInt,)),1,C_NULL)
 
-    uv_fd = @windows ? -1 : ccall(:uv_backend_fd,Cint,(Ptr{Void},),Base.eventloop())
+    uv_fd = is_windows() ? -1 : ccall(:uv_backend_fd,Cint,(Ptr{Void},),Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, typemax(Cushort))
     if (uv_pollfd::_GPollFD).fd != -1
         ccall((:g_source_add_poll,GLib.libglib),Void,(Ptr{Void},Ptr{_GPollFD}),src,&(uv_pollfd::_GPollFD))
