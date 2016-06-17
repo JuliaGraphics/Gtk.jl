@@ -57,8 +57,14 @@ using .CompatGLib.WORD_SIZE
 typealias AbstractStringLike Union{AbstractString,Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
-if VERSION >= v"0.5.0-dev+4200"
+if VERSION >= v"0.5.0-dev+4612"
+    bytestring(s::Ptr{UInt8},own::Bool) = unsafe_wrap(String,s,ccall(:strlen,Csize_t,(Ptr{UInt8},),s),own)
+else
+    bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+end
+if VERSION >= v"0.5.0-dev+4612"
+    bytestring(s::Ptr{UInt8}) = unsafe_string(s)
+elseif VERSION >= v"0.5.0-dev+4200"
     bytestring(s::Ptr{UInt8}) = String(s)
 else
     bytestring(s::Ptr{UInt8}) = Base.bytestring(s)
