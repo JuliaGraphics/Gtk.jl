@@ -2,6 +2,8 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Gtk
 
+using Compat
+
 const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
