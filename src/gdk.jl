@@ -179,3 +179,12 @@ end
 
 keyval(name::AbstractString) =
   ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{UInt8},),bytestring(name))
+
+screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
+screen_size() = screen_size(ccall((:gdk_screen_get_default,libgdk),
+                                          Ptr{Void}, ()))
+
+function screen_size(screen::Ptr{Void})
+    return (ccall((:gdk_screen_get_width, libgdk), Cint, (Ptr{Void},), screen),
+            ccall((:gdk_screen_get_height,libgdk), Cint, (Ptr{Void},), screen))
+end

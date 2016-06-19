@@ -22,6 +22,9 @@ export add_events, signal_emit,
     on_signal_destroy, on_signal_button_press,
     on_signal_button_release, on_signal_motion
 
+# Gdk info and manipulation
+export screen_size
+
 export @guarded
 
 # Tk-compatibility (reference of potentially missing functionality):
