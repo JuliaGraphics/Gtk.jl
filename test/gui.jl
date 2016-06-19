@@ -2,11 +2,16 @@
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version
 
+wdth, hght = screen_size()
+@assert wdth > 0 && hght > 0
+
 ## Window
 w = @Window("Window", 400, 300) |> showall
 @assert width(w) == 400
 @assert height(w) == 300
 @assert size(w) == (400, 300)
+wdth, hght = screen_size(w)
+@assert wdth > 0 && hght > 0
 G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
 ## Check Window positions
