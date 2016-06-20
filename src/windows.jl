@@ -19,6 +19,12 @@ resize!(win::GtkWindow, w::Integer, h::Integer) = ccall((:gtk_window_resize,libg
 
 present(win::GtkWindow) = ccall((:gtk_window_present,libgtk),Void,(Ptr{GObject},),win)
 
+fullscreen(win::GtkWindow) = ccall((:gtk_window_fullscreen,libgtk),Void,(Ptr{GObject},),win)
+unfullscreen(win::GtkWindow) = ccall((:gtk_window_unfullscreen,libgtk),Void,(Ptr{GObject},),win)
+
+maximize(win::GtkWindow) = ccall((:gtk_window_maximize,libgtk),Void,(Ptr{GObject},),win)
+unmaximize(win::GtkWindow) = ccall((:gtk_window_unmaximize,libgtk),Void,(Ptr{GObject},),win)
+
 function push!(win::GtkWindow, accel_group::GtkAccelGroup)
   ccall((:gtk_window_add_accel_group,libgtk),Void,(Ptr{GObject},Ptr{GObject}),win,accel_group)
   win
