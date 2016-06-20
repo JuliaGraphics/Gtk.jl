@@ -25,8 +25,6 @@ unfullscreen(win::GtkWindow) = ccall((:gtk_window_unfullscreen,libgtk),Void,(Ptr
 maximize(win::GtkWindow) = ccall((:gtk_window_maximize,libgtk),Void,(Ptr{GObject},),win)
 unmaximize(win::GtkWindow) = ccall((:gtk_window_unmaximize,libgtk),Void,(Ptr{GObject},),win)
 
-
-
 function push!(win::GtkWindow, accel_group::GtkAccelGroup)
   ccall((:gtk_window_add_accel_group,libgtk),Void,(Ptr{GObject},Ptr{GObject}),win,accel_group)
   win

@@ -30,15 +30,18 @@ gc(); yield(); gc()
 @assert w.value === nothing
 
 ## change Window size
-w = @Window("Window", 400, 300)
-fullscreen(w)
-unfullscreen(w)
-maximize(w)
-sleep(1)
-@assert getproperty(w, :is_maximized, Bool) == true
-unmaximize(w)
-sleep(1)
-@assert getproperty(w, :is_maximized, Bool) == false
+if  libgtk_version >= v"3.16.0"
+  w = @Window("Window", 400, 300)
+  fullscreen(w)
+  unfullscreen(w)
+  maximize(w)
+  sleep(0.1)
+  @assert getproperty(w, :is_maximized, Bool) == true
+  unmaximize(w)
+  sleep(0.1)
+  @assert getproperty(w, :is_maximized, Bool) == false
+  destroy(w)
+end
 
 ## Frame
 w = @Window(
