@@ -115,17 +115,17 @@ end
 @Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
 #TODO: @gtktype GtkScaleButton
 
-if gtk_version == 3
-@gtktype GtkApplication
-@gtktype GtkApplicationWindow
-@gtktype GtkSwitch
-@gtktype GtkGrid
-@gtktype GtkOverlay # this is a GtkBin, although it behaves more like a container
-@gtktype GtkCellArea
-@gtktype GtkCellAreaBox
-@gtktype GtkCellAreaContext
-@gtktype GtkCssProvider
-@gtktype GtkStyleContext
+if libgtk_version >= v"3"
+    @gtktype GtkApplication
+    @gtktype GtkApplicationWindow
+    @gtktype GtkSwitch
+    @gtktype GtkGrid
+    @gtktype GtkOverlay # this is a GtkBin, although it behaves more like a container
+    @gtktype GtkCellArea
+    @gtktype GtkCellAreaBox
+    @gtktype GtkCellAreaContext
+    @gtktype GtkCssProvider
+    @gtktype GtkStyleContext
 
 else
     type GtkApplication end

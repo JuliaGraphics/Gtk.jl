@@ -131,8 +131,8 @@ for child in g1
 end
 setproperty!(g1,:pack_type,b11,0) #GTK_PACK_START
 setproperty!(g1,:pack_type,b12,0) #GTK_PACK_START
-setproperty!(g1,:pack_type,b21,1) #GTK_PACK_END
-setproperty!(g1,:pack_type,b22,1) #GTK_PACK_END
+setproperty!(g2,:pack_type,b21,1) #GTK_PACK_END
+setproperty!(g2,:pack_type,b22,1) #GTK_PACK_END
 
 ## Now shrink window
 showall(w)
@@ -163,15 +163,17 @@ showall(w)
 destroy(w)
 
 ## Grid
-grid = @Grid()
-w = @Window(grid, "Grid", 400, 400)
-grid[2,2] = @Button("2,2")
-grid[2,3] = @Button("2,3")
-grid[1,1] = "grid"
-insert!(grid,1,:top)
-libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
-showall(w)
-destroy(w)
+if libgtk_version >= v"3"
+  grid = @Grid()
+  w = @Window(grid, "Grid", 400, 400)
+  grid[2,2] = @Button("2,2")
+  grid[2,3] = @Button("2,3")
+  grid[1,1] = "grid"
+  insert!(grid,1,:top)
+  libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
+  showall(w)
+  destroy(w)
+end
 
 
 ## Widgets
@@ -342,8 +344,10 @@ end
 w = @Window(combo, "ComboBoxText")|>showall
 lsl = ListStoreLeaf(combo)
 @assert length(lsl) == 3
-empty!(combo)
-@assert length(lsl) == 0
+if libgtk_version >= v"3"
+    empty!(combo)
+    @assert length(lsl) == 0
+end
 destroy(w)
 
 combo = @ComboBoxText(true)
@@ -503,11 +507,13 @@ destroy(win)
 #destroy(w)
 
 ## Selectors
-import Gtk.GtkFileChooserAction, Gtk.GtkResponseType
-dlg = @FileChooserDialog("Select file", @Null(), GtkFileChooserAction.OPEN,
-                        (("_Cancel", GtkResponseType.CANCEL),
-                         ("_Open", GtkResponseType.ACCEPT)))
-destroy(dlg)
+if libgtk_version >= v"2.4"
+    import Gtk.GtkFileChooserAction, Gtk.GtkResponseType
+    dlg = @FileChooserDialog("Select file", @Null(), GtkFileChooserAction.OPEN,
+                            (("_Cancel", GtkResponseType.CANCEL),
+                             ("_Open", GtkResponseType.ACCEPT)))
+    destroy(dlg)
+end
 
 ## List view
 ls=@ListStore(Int32,Bool)
@@ -662,21 +668,22 @@ destroy(w)
 # CSS
 
 ## CssProviderLeaf(filename="...")
+if libgtk_version >= v"3"
+    style_file = joinpath(dirname(Base.source_path()), "style_test.css")
 
-style_file = joinpath(dirname(Base.source_path()), "style_test.css")
+    l = @Label "I am some large blue text!"
+    w = @Window(l)
 
-l = @Label "I am some large blue text!"
-w = @Window(l)
+    screen   = Gtk.GAccessor.screen(w)
+    provider = CssProviderLeaf(filename=style_file)
 
-screen   = Gtk.GAccessor.screen(w)
-provider = CssProviderLeaf(filename=style_file)
+    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
+          (Ptr{Void}, Ptr{GObject}, Cuint),
+          screen, provider, 1)
 
-ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
-      (Ptr{Void}, Ptr{GObject}, Cuint),
-      screen, provider, 1)
+    showall(w)
 
-showall(w)
+    ### add css tests here
 
-### add css tests here
-
-destroy(w)
+    destroy(w)
+end

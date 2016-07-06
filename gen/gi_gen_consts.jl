@@ -28,7 +28,7 @@ end
 
 nam(t) = t[1]
 
-function write_gtk_consts(fn,gtk_version=3)
+function write_gtk_consts(fn)
     body = Expr(:block)
     toplevel = Expr(:toplevel,Expr(:module, true, :GConstants, body))
     exprs = body.args
