@@ -33,6 +33,7 @@ macro gtktype(name)
         @gtktype_custom_symname $(esc(name)) $(esc(symname))
     end
 end
+@gtktype GdkRGBA
 @gtktype GtkWidget
 @gtktype GtkContainer
 @gtktype GtkBin
