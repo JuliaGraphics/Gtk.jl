@@ -39,15 +39,17 @@ run(widget::GtkDialog) = GLib.g_sigatom() do
 end
 
 const SingleComma = r"(?<!,),(?!,)"
-function GtkFileFilterLeaf(; name::Union{String,Void} = nothing, pattern::String = "", mimetype::String = "")
+function GtkFileFilterLeaf(; name::Union{AbstractString,Void} = nothing, pattern::AbstractString = "", mimetype::AbstractString = "")
     filt = GtkFileFilterLeaf(ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ()))
     if !isempty(pattern)
+        pattern = String(pattern)
         name == nothing && (name = pattern)
         for p in split(pattern, SingleComma)
             p = replace(p, ",,", ",")   # escape sequence for , is ,,
             ccall((:gtk_file_filter_add_pattern,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, p)
         end
     elseif !isempty(mimetype)
+        mimetype = String(mimetype)
         name == nothing && (name = mimetype)
         for m in split(mimetype, SingleComma)
             m = replace(m, ",,", ",")
@@ -56,10 +58,10 @@ function GtkFileFilterLeaf(; name::Union{String,Void} = nothing, pattern::String
     else
         ccall((:gtk_file_filter_add_pixbuf_formats,libgtk), Void, (Ptr{GObject},), filt)
     end
-    ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
+    ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : String(name))
     filt
 end
-GtkFileFilterLeaf(pattern::String; name::Union{String,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
+GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
 
 GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 
