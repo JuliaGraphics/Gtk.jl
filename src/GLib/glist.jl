@@ -16,9 +16,9 @@ immutable _GList{T} <: _LList{T}
     prev::Ptr{_GList{T}}
 end
 eltype{T}(::Type{_LList{T}}) = T
-eltype{L<:_LList}(::Type{L}) = eltype(super(L))
+eltype{L<:_LList}(::Type{L}) = eltype(supertype(L))
 _listdatatype{T}(::Type{_LList{T}}) = T
-_listdatatype{L<:_LList}(::Type{L}) = _listdatatype(super(L))
+_listdatatype{L<:_LList}(::Type{L}) = _listdatatype(supertype(L))
 
 type GList{L<:_LList,T} <: AbstractVector{T}
     handle::Ptr{L}
@@ -44,7 +44,7 @@ deref_to{L<:_LList}(::Type{L}, x::Ptr) = convert(eltype(L),deref_to(_listdatatyp
 ref_to{T}(::Type{T}, x) = gc_ref(x) # create a reference to something for putting in the glist
 ref_to{L<:_LList}(::Type{L}, x) = ref_to(_listdatatype(L), x)
 empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
-empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{super(L)}, li))
+empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{supertype(L)}, li))
 
 ## Standard Iteration protocol
 start{L}(list::LList{L}) = convert(Ptr{L},list)
