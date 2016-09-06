@@ -39,12 +39,14 @@ gc(); yield(); gc()
 if  libgtk_version >= v"3.16.0"
   w = @Window("Window", 400, 300)
   fullscreen(w)
+  sleep(1)
   unfullscreen(w)
+  sleep(1)
   maximize(w)
-  sleep(0.1)
+  sleep(1)
   @assert getproperty(w, :is_maximized, Bool) == true
   unmaximize(w)
-  sleep(0.1)
+  sleep(1)
   @assert getproperty(w, :is_maximized, Bool) == false
   destroy(w)
 end
