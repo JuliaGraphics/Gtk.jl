@@ -1,4 +1,4 @@
-if libgtk_version >= v"2.4"
+if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug for v < 3
 
     #https://developer.gnome.org/gtk2/stable/SelectorWidgets.html
 
