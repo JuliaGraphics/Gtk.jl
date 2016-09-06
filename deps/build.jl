@@ -1,4 +1,4 @@
-using BinDeps
+using BinDeps, Compat
 
 @BinDeps.setup
 
@@ -16,12 +16,12 @@ deps = [
     gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
 ]
 
-@linux_only begin
+if @compat is_linux()
     provides(AptGet, "libgtk-3-0", deps)
     provides(Yum, "gtk3", deps)
 end
 
-@windows_only begin
+if @compat is_windows()
     using WinRPM
     provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
@@ -40,7 +40,7 @@ end
     run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
 end
 
-@osx_only begin
+if @compat is_apple()
     using Homebrew
     provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
         """
