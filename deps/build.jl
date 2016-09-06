@@ -9,6 +9,9 @@ deps = [
     gobject = library_dependency("gobject", aliases = ["libgobject-2.0", "libgobject-2.0-0"], group = group)
     gtk = library_dependency("gtk", aliases = ["libgtk-3", "libgtk-3-0"], group = group)
     gdk = library_dependency("gdk", aliases = ["libgdk-3", "libgdk-3-0"], group = group)
+    # for gtk2 use these two lines instead of the previous two
+    #gtk = library_dependency("gtk", aliases = ["libgtk-quartz-2.0", "libgtk-win32-2.0-0", "libgtk-x11-2.0"], group = group)
+    #gdk = library_dependency("gdk", aliases = ["libgdk-quartz-2.0", "libgdk-win32-2.0-0", "libgdk-x11-2.0"], group = group)
     gdk_pixbuf = library_dependency("gdk_pixbuf", aliases = ["libgdk_pixbuf-2.0", "libgdk_pixbuf-2.0-0"], group = group)
     gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
 ]
