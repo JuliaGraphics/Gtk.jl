@@ -1,6 +1,7 @@
 ## Tests
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version
+using Compat
 
 wdth, hght = screen_size()
 @assert wdth > 0 && hght > 0
@@ -568,6 +569,64 @@ push!(toolbar,@SeparatorToolItem(), @ToggleToolButton("gtk-open"), @MenuToolButt
 G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = @Window(toolbar, "Toolbar")|>showall
 destroy(w)
+
+## FileFilter
+# This is just for testing, and be careful of garbage collection while using this
+immutable GtkFileFilterInfo
+  contains::Cint
+  filename::Ptr{Int8}
+  uri::Ptr{Int8}
+  display_name::Ptr{Int8}
+  mime_type::Ptr{Int8}
+end
+GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
+  GtkFileFilterInfo(
+    ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) | 
+      (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
+      (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) | 
+      (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
+    isa(filename, AbstractString)? pointer(filename): C_NULL,
+    isa(uri, AbstractString)? pointer(uri): C_NULL,
+    isa(display_name, AbstractString)? pointer(display_name): C_NULL,
+    isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
+
+function name(filter::FileFilter)
+  nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
+  (nameptr == C_NULL)? nothing : Compat.unsafe_string(nameptr)
+end
+needed(filter::FileFilter) =
+  ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
+filter(filt::FileFilter, info::GtkFileFilterInfo) =
+  ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
+
+emptyfilter = @FileFilter()
+@assert name(emptyfilter) == nothing
+
+fname = "test.csv"
+fdisplay = "test.csv"
+fmime = "text/csv"
+csvfileinfo = GtkFileFilterInfo(; filename = fname, display_name = fdisplay, mime_type = fmime)
+println("file info contains: ", csvfileinfo.contains)
+# Should reject anything really
+@assert filter(emptyfilter, csvfileinfo) == false
+# Name is set internally as the pattern if no name is given
+csvfilter1 = @FileFilter("*.csv")
+@assert name(csvfilter1) == "*.csv"
+@assert needed(csvfilter1) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
+@assert filter(csvfilter1, csvfileinfo)
+csvfilter2 = @FileFilter("*.csv"; name="Comma Separated Format")
+@assert name(csvfilter2) == "Comma Separated Format"
+@assert needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
+@assert filter(csvfilter2, csvfileinfo)
+csvfilter3 = @FileFilter(; mimetype="text/csv")
+@assert name(csvfilter3) == "text/csv"
+@assert needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
+@assert filter(csvfilter3, csvfileinfo)
+csvfilter4 = @FileFilter(; pattern="*.csv", mimetype="text/csv")
+# Pattern takes precedence over mime-type, causing mime-type to be ignored
+@assert name(csvfilter4) == "*.csv"
+@assert needed(csvfilter4) & Gtk.GtkFileFilterFlags.MIME_TYPE == 0
+@assert filter(csvfilter4, csvfileinfo)
 
 # Canvas mouse callback stack operations
 c = @Canvas()
