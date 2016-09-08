@@ -41,7 +41,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     end
 
     const SingleComma = r"(?<!,),(?!,)"
-    function GtkFileFilterLeaf(; name::Union{String,Void} = nothing, pattern::String = "", mimetype::String = "")
+    function GtkFileFilterLeaf(; name::Union{AbstractString,Void} = nothing, pattern::AbstractString = "", mimetype::AbstractString = "")
         filt = GtkFileFilterLeaf(ccall((:gtk_file_filter_new,libgtk), Ptr{GObject}, ()))
         if !isempty(pattern)
             name == nothing && (name = pattern)
@@ -61,7 +61,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
         filt
     end
-    GtkFileFilterLeaf(pattern::String; name::Union{String,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
+    GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
 
     GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 
