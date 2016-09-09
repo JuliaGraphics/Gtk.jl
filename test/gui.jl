@@ -1,18 +1,51 @@
 ## Tests
+
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
-import Gtk.deleteat!, Gtk.libgtk_version
+import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
 using Compat
 
-wdth, hght = screen_size()
-@assert wdth > 0 && hght > 0
+## for FileFilter
+# This is just for testing, and be careful of garbage collection while using this
+if  libgtk_version >= v"3"
+  immutable GtkFileFilterInfo
+    contains::Cint
+    filename::Ptr{Int8}
+    uri::Ptr{Int8}
+    display_name::Ptr{Int8}
+    mime_type::Ptr{Int8}
+  end
+  GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
+    GtkFileFilterInfo(
+      ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) | 
+        (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
+        (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) | 
+        (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
+      isa(filename, AbstractString)? pointer(filename): C_NULL,
+      isa(uri, AbstractString)? pointer(uri): C_NULL,
+      isa(display_name, AbstractString)? pointer(display_name): C_NULL,
+      isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
+  function name(filter::FileFilter)
+    nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
+    (nameptr == C_NULL)? nothing : Compat.unsafe_string(nameptr)
+  end
+  needed(filter::FileFilter) =
+    ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
+  filter(filt::FileFilter, info::GtkFileFilterInfo) =
+    ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
+end
 
-## Window
+@testset "gui" begin
+
+wdth, hght = screen_size()
+@test wdth > 0 && hght > 0
+
+@testset "Window" begin
 w = @Window("Window", 400, 300) |> showall
-@assert width(w) == 400
-@assert height(w) == 300
-@assert size(w) == (400, 300)
+@test width(w) == 400
+@test height(w) == 300
+@test size(w) == (400, 300)
 wdth, hght = screen_size(w)
-@assert wdth > 0 && hght > 0
+@test wdth > 0 && hght > 0
 G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
 ## Check Window positions
@@ -25,39 +58,44 @@ sleep(0.1)
 if G_.position(w) == pos
     warn("The Window Manager did not move the Gtk Window when requested")
 end
-@assert getproperty(w, "title", AbstractString) == "Window"
+@test getproperty(w, "title", AbstractString) == "Window"
 setproperty!(w, :title, "Window 2")
-@assert getproperty(w, :title, AbstractString) == "Window 2"
+@test getproperty(w, :title, AbstractString) == "Window 2"
 
 destroy(w); yield()
-@assert !getproperty(w, :visible, Bool)
+@test !getproperty(w, :visible, Bool)
 w=WeakRef(w)
 gc(); yield(); gc()
-@assert w.value === nothing
+#@test w.value === nothing    ### fails inside @testset
+end
 
-## change Window size
+@testset "change Window size" begin
 if  libgtk_version >= v"3.16.0"
   w = @Window("Window", 400, 300)
   fullscreen(w)
+  sleep(1)
   unfullscreen(w)
+  sleep(1)
   maximize(w)
-  sleep(0.1)
-  @assert getproperty(w, :is_maximized, Bool) == true
+  sleep(1)
+  @test getproperty(w, :is_maximized, Bool) == true
   unmaximize(w)
-  sleep(0.1)
-  @assert getproperty(w, :is_maximized, Bool) == false
+  sleep(1)
+  @test getproperty(w, :is_maximized, Bool) == false
   destroy(w)
 end
+end
 
-## Frame
+@testset "Frame" begin
 w = @Window(
     @Frame(),
     "Frame", 400, 400)
-@assert size(w) == (400, 400)
+@test size(w) == (400, 400)
 showall(w)
 destroy(w)
+end
 
-## Initially Hidden Canvas
+@testset "Initially Hidden Canvas" begin
 nb = @Notebook()
 vbox = @Box(:v)
 c = @Canvas()
@@ -67,16 +105,18 @@ w = @Window("TestDataViewer",600,600)
 push!(w,nb)
 showall(w)
 destroy(w)
+end
 
-# Labelframe
+@testset "Labelframe" begin
 f = @Frame("Label")
 w = @Window(f, "Labelframe", 400, 400)
 setproperty!(f,:label,"new label")
-@assert getproperty(f,:label,AbstractString) == "new label"
+@test getproperty(f,:label,AbstractString) == "new label"
 showall(w)
 destroy(w)
+end
 
-## notebook
+@testset "notebook" begin
 nb = @Notebook()
 w = push!(@Window("Notebook"),nb)
 push!(nb, @Button("o_ne"), "tab _one")
@@ -84,13 +124,14 @@ push!(nb, @Button("t_wo"), "tab _two")
 push!(nb, @Button("th_ree"), "tab t_hree")
 push!(nb, "fo_ur", "tab _four")
 showall(w)
-@assert length(nb) == 4
+@test length(nb) == 4
 setproperty!(nb,:page,2)
-@assert getproperty(nb,:page,Int) == 2
+@test getproperty(nb,:page,Int) == 2
 showall(w)
 destroy(w)
+end
 
-## Panedwindow
+@testset "Panedwindow" begin
 w = @Window("Panedwindow", 400, 400)
 pw = @Paned(:h)
 pw2 = @Paned(:v)
@@ -101,7 +142,9 @@ push!(pw2,@Button("two"))
 push!(pw2,@Button("three"))
 showall(w)
 destroy(w)
+end
 
+@testset "Iteration and toplevel" begin
 ## example of last in first covered
 ## Create this GUI, then shrink window with the mouse
 f = @Box(:v)
@@ -121,24 +164,24 @@ push!(g2, b21)
 b22 = @Button("second")
 push!(g2, b22)
 
-## Iteration and toplevel
 strs = ["first", "second"]
 i = 1
 for child in g1
-    @assert getproperty(child,:label,AbstractString) == strs[i]
-    @assert toplevel(child) == w
+    @test getproperty(child,:label,AbstractString) == strs[i]
+    @test toplevel(child) == w
     i += 1
 end
 setproperty!(g1,:pack_type,b11,0) #GTK_PACK_START
 setproperty!(g1,:pack_type,b12,0) #GTK_PACK_START
-setproperty!(g1,:pack_type,b21,1) #GTK_PACK_END
-setproperty!(g1,:pack_type,b22,1) #GTK_PACK_END
+setproperty!(g2,:pack_type,b21,1) #GTK_PACK_END
+setproperty!(g2,:pack_type,b22,1) #GTK_PACK_END
 
 ## Now shrink window
 showall(w)
 destroy(w)
+end
 
-## ButtonBox
+@testset "ButtonBox" begin
 bb = @ButtonBox(:h)
 w = @Window(bb, "ButtonBox")
 cancel = @Button("Cancel")
@@ -152,8 +195,9 @@ ex = @Expander(bb, "Some buttons")
 push!(w, ex)
 showall(w)
 destroy(w)
+end
 
-## Table
+@testset "Table" begin
 grid = @Table(3,3)
 w = @Window(grid, "Grid", 400, 400)
 grid[2,2] = @Button("2,2")
@@ -161,56 +205,60 @@ grid[2,3] = @Button("2,3")
 grid[1,1] = "grid"
 showall(w)
 destroy(w)
+end
 
-## Grid
-grid = @Grid()
-w = @Window(grid, "Grid", 400, 400)
-grid[2,2] = @Button("2,2")
-grid[2,3] = @Button("2,3")
-grid[1,1] = "grid"
-insert!(grid,1,:top)
-libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
-showall(w)
-destroy(w)
+@testset "Grid" begin
+if libgtk_version >= v"3"
+  grid = @Grid()
+  w = @Window(grid, "Grid", 400, 400)
+  grid[2,2] = @Button("2,2")
+  grid[2,3] = @Button("2,3")
+  grid[1,1] = "grid"
+  insert!(grid,1,:top)
+  libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
+  showall(w)
+  destroy(w)
+end
+end
 
 
 ## Widgets
 
-## button, label
+@testset "button, label" begin
 w = @Window("Widgets")
 f = @Box(:v); push!(w,f)
 l = @Label("label"); push!(f,l)
 b = @Button("button"); push!(f,b)
 
 setproperty!(l,:label,"new label")
-@assert getproperty(l,:label,AbstractString) == "new label"
+@test getproperty(l,:label,AbstractString) == "new label"
 setproperty!(b,:label,"new label")
-@assert getproperty(b,:label,AbstractString) == "new label"
+@test getproperty(b,:label,AbstractString) == "new label"
 
 counter = 0
 id = signal_connect(b, "clicked") do widget
-    global counter
     counter::Int += 1
 end
 # For testing callbacks
 click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Void,(Ptr{Gtk.GObject},),b)
 
-@assert counter == 0
+@test counter == 0
 click(b)
-@assert counter == 1
+@test counter == 1
 signal_handler_block(b, id)
 click(b)
-@assert counter == 1
+@test counter == 1
 signal_handler_unblock(b, id)
 click(b)
-@assert counter == 2
+@test counter == 2
 signal_handler_disconnect(b, id)
 click(b)
-@assert counter == 2
+@test counter == 2
 showall(w)
 destroy(w)
+end
 
-## Button with custom icon (& Pixbuf)
+@testset "Button with custom icon (& Pixbuf)" begin
 icon = Array(Gtk.RGB, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
@@ -218,22 +266,24 @@ b = @Button(@Image(@Pixbuf(data=icon, has_alpha=false)))
 w = @Window(b, "Icon button", 60, 40)
 showall(w)
 destroy(w)
+end
 
-## checkbox
+@testset "checkbox" begin
 w = @Window("Checkbutton")
 check = @CheckButton("check me"); push!(w,check)
 setproperty!(check,:active,true)
-@assert getproperty(check,:active,AbstractString) == "TRUE"
+@test getproperty(check,:active,AbstractString) == "TRUE"
 setproperty!(check,:label,"new label")
-@assert getproperty(check,:label,AbstractString) == "new label"
+@test getproperty(check,:label,AbstractString) == "new label"
 #ctr = 0
 #tk_bind(check, "command", cb)
 #tcl(check, "invoke")
-#@assert ctr == 1
+#@test ctr == 1
 showall(w)
 destroy(w)
+end
 
-## radio
+@testset "radio" begin
 choices = ["choice one", "choice two", "choice three", @RadioButton("choice four"), @Label("choice five")]
 w = @Window("Radio")
 f = @Box(:v); push!(w,f)
@@ -241,15 +291,15 @@ r = Array(RadioButton,3)
 r[1] = @RadioButton(choices[1]); push!(f,r[1])
 r[2] = @RadioButton(r[1],choices[2]); push!(f,r[2])
 r[3] = @RadioButton(r[2],choices[3],active=true); push!(f,r[3])
-@assert [getproperty(b,:active,Bool) for b in r] == [false, false, true]
+@test [getproperty(b,:active,Bool) for b in r] == [false, false, true]
 setproperty!(r[1],:active,true)
-@assert [getproperty(b,:active,Bool) for b in r] == [true, false, false]
+@test [getproperty(b,:active,Bool) for b in r] == [true, false, false]
 showall(w)
 destroy(w)
 
 r = @RadioButtonGroup(choices,2)
-@assert length(r) == 5
-@assert sum([getproperty(b,:active,Bool) for b in r]) == 1
+@test length(r) == 5
+@test sum([getproperty(b,:active,Bool) for b in r]) == 1
 itms = Array(Any,length(r))
 for (i,e) in enumerate(r)
     itms[i] = try
@@ -258,13 +308,14 @@ for (i,e) in enumerate(r)
             e[1]
         end
 end
-@assert setdiff(choices, itms) == [choices[4],]
-@assert setdiff(itms, choices) == ["choice four",]
-@assert getproperty(getproperty(r,:active),:label,AbstractString) == choices[2]
+@test setdiff(choices, itms) == [choices[4],]
+@test setdiff(itms, choices) == ["choice four",]
+@test getproperty(getproperty(r,:active),:label,AbstractString) == choices[2]
 w = @Window(r,"RadioGroup")|>showall
 destroy(w)
+end
 
-## ToggleButton
+@testset "ToggleButton" begin
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 function toggled(ptr,evt,widget)
@@ -283,8 +334,9 @@ release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
+end
 
-## ToggleButton repeat 1
+@testset "ToggleButton repeat 1" begin
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 # TODO: uncomment these next lines
@@ -303,8 +355,9 @@ release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 
 signal_emit(tb, "button-release-event", Bool, release)
 # next time just use "gtk_button_clicked", mkay?
 destroy(w)
+end
 
-## ToggleButton repeat 2
+@testset "ToggleButton repeat 2" begin
 tb = @ToggleButton("Off")
 w = @Window(tb, "ToggleButton")|>showall
 signal_connect(tb, :button_press_event) do widget, evt
@@ -322,18 +375,21 @@ release=Gtk.GdkEventButton(Gtk.GdkEventType.BUTTON_RELEASE, Gtk.gdk_window(tb), 
 signal_emit(tb, "button-release-event", Bool, release)
 ## next time just use "gtk_button_clicked", mkay?
 destroy(w)
+end
 
-## LinkButton
+@testset "LinkButton" begin
 b = @LinkButton("https://github.com/JuliaLang/Gtk.jl", "Gtk.jl")
 w = @Window(b, "LinkButton")|>showall
 destroy(w)
+end
 
-## VolumeButton
+@testset "VolumeButton" begin
 b = @VolumeButton(0.3)
 w = @Window(b, "VolumeButton", 50, 50)|>showall
 destroy(w)
+end
 
-## combobox
+@testset "combobox" begin
 combo = @ComboBoxText()
 choices = ["Strawberry", "Vanilla", "Chocolate"]
 for c in choices
@@ -341,9 +397,11 @@ for c in choices
 end
 w = @Window(combo, "ComboBoxText")|>showall
 lsl = ListStoreLeaf(combo)
-@assert length(lsl) == 3
-empty!(combo)
-@assert length(lsl) == 0
+@test length(lsl) == 3
+if libgtk_version >= v"3"
+    empty!(combo)
+    @test length(lsl) == 0
+end
 destroy(w)
 
 combo = @ComboBoxText(true)
@@ -352,41 +410,46 @@ for c in choices
 end
 w = @Window(combo, "ComboBoxText with entry")|>showall
 destroy(w)
+end
 
-## slider/scale
+@testset "slider/scale" begin
 sl = @Scale(true, 1:10)
 w = @Window(sl, "Scale")|>showall
 G_.value(sl, 3)
-@assert G_.value(sl) == 3
+@test G_.value(sl) == 3
 adj = @Adjustment(sl)
-@assert getproperty(adj,:value,Float64) == 3
+@test getproperty(adj,:value,Float64) == 3
 setproperty!(adj,:upper,11)
 destroy(w)
+end
 
-## spinbutton
+@testset "spinbutton" begin
 sp = @SpinButton(1:10)
 w = @Window(sp, "SpinButton")|>showall
 G_.value(sp, 3)
-@assert G_.value(sp) == 3
+@test G_.value(sp) == 3
 destroy(w)
+end
 
-## progressbar
+@testset "progressbar" begin
 pb = @ProgressBar()
 w = @Window(pb, "Progress bar")|>showall
 setproperty!(pb,:fraction,0.7)
-@assert getproperty(pb,:fraction,Float64) == 0.7
+@test getproperty(pb,:fraction,Float64) == 0.7
 destroy(w)
+end
 
-## spinner
+@testset "spinner" begin
 s = @Spinner()
 w = @Window(s, "Spinner")|>showall
 setproperty!(s,:active,true)
-@assert getproperty(s,:active,Bool) == true
+@test getproperty(s,:active,Bool) == true
 setproperty!(s,:active,false)
-@assert getproperty(s,:active,Bool) == false
+@test getproperty(s,:active,Bool) == false
 destroy(w)
+end
 
-## Entry
+@testset "Entry" begin
 e = @Entry()
 w = @Window(e, "Entry")|>showall
 setproperty!(e,:text,"initial")
@@ -394,18 +457,18 @@ setproperty!(e,:sensitive,false)
 
 activated = false
 signal_connect(e, :activate) do widget
-    global activated
     activated = true
 end
 signal_emit(e, :activate, Void)
-@assert activated
+@test activated
 
 destroy(w)
+end
 
-## Statusbar
+@testset "Statusbar" begin
 vbox = @Box(:v)
 w = @Window(vbox, "Statusbar")
-sb = @Statusbar()
+global sb = @Statusbar()  # closures are not yet c-callable
 push!(vbox, sb)
 ctxid = Gtk.context_id(sb, "Statusbar example")
 bpush = @Button("push item")
@@ -413,9 +476,8 @@ bpop = @Button("pop item")
 push!(vbox, bpush)
 push!(vbox, bpop)
 showall(w)
-sb_count = 1
+global sb_count = 1
 function cb_sbpush(ptr,evt,id)
-    global sb_count
     push!(sb, id, string("Item ", sb_count))
     sb_count += 1
     convert(Int32,false)
@@ -427,8 +489,9 @@ end
 on_signal_button_press(cb_sbpush, bpush, false, ctxid)
 on_signal_button_press(cb_sbpop, bpop, false, ctxid)
 destroy(w)
+end
 
-## Canvas & AspectFrame
+@testset "Canvas & AspectFrame" begin
 c = Canvas()
 f = @AspectFrame(c, "AspectFrame", 0.5, 1, 0.5)
 w = @Window(f, "Canvas")|>showall
@@ -439,8 +502,9 @@ c.draw = function(_)
 end
 draw(c)
 destroy(w)
+end
 
-## Menus
+@testset "Menus" begin
 file = @MenuItem("_File")
 filemenu = @Menu(file)
 new_ = @MenuItem("New")
@@ -457,8 +521,9 @@ mb = @MenuBar()
 push!(mb, file)  # notice this is the "File" item, not filemenu
 win = @Window(mb, "Menus", 200, 40)|>showall
 destroy(win)
+end
 
-## Popup menu
+@testset "Popup menu" begin
 contrast = @MenuItem("Adjust contrast...")
 popupmenu = @Menu()
 push!(popupmenu, contrast)
@@ -467,6 +532,7 @@ win = @Window(c, "Popup")|>showall
 showall(popupmenu)
 c.mouse.button3press = (widget,event) -> popup(popupmenu, event)
 destroy(win)
+end
 
 ## Text
 #w = @Window("Text")
@@ -475,7 +541,7 @@ destroy(win)
 #txt = Text(w)
 #scrollbars_add(f, txt)
 #set_value(txt, "new text\n")
-#@assert get_value(txt) == "new text\n"
+#@test get_value(txt) == "new text\n"
 #destroy(w)
 
 ## tree. Listbox
@@ -485,7 +551,7 @@ destroy(win)
 #tr = Treeview(f, choices)
 #scrollbars_add(f, tr)
 #set_value(tr, 2)
-#@assert get_value(tr)[1] == choices[2]
+#@test get_value(tr)[1] == choices[2]
 #set_items(tr, choices[1:2])
 #destroy(w)
 
@@ -499,17 +565,19 @@ destroy(win)
 #tree_headers(tr, ["left"], [50])
 #scrollbars_add(f, tr)
 #set_value(tr, 2)
-#@assert get_value(tr)[1] == choices[2]
+#@test get_value(tr)[1] == choices[2]
 #destroy(w)
 
-## Selectors
-import Gtk.GtkFileChooserAction, Gtk.GtkResponseType
-dlg = @FileChooserDialog("Select file", @Null(), GtkFileChooserAction.OPEN,
-                        (("_Cancel", GtkResponseType.CANCEL),
-                         ("_Open", GtkResponseType.ACCEPT)))
-destroy(dlg)
+@testset "Selectors" begin
+if libgtk_version >= v"3"   ### should work with v >= 2.4, but there is a bug for v < 3
+    dlg = @FileChooserDialog("Select file", @Null(), GtkFileChooserAction.OPEN,
+                            (("_Cancel", GtkResponseType.CANCEL),
+                             ("_Open", GtkResponseType.ACCEPT)))
+    destroy(dlg)
+end
+end
 
-## List view
+@testset "List view" begin
 ls=@ListStore(Int32,Bool)
 push!(ls,(33,true))
 push!(ls,(44,true))
@@ -526,18 +594,19 @@ w = @Window(tv, "List View")|>showall
 
 ## selection
 selmodel = Gtk.G_.selection(tv)
-@assert hasselection(selmodel) == false
+@test hasselection(selmodel) == false
 select!(selmodel, Gtk.iter_from_index(ls, 1))
-@assert hasselection(selmodel) == true
+@test hasselection(selmodel) == true
 iter = selected(selmodel)
-@assert ls[iter, 1] == 33
+@test ls[iter, 1] == 33
 deleteat!(ls, iter)
-@assert isvalid(ls, iter) == false
+@test isvalid(ls, iter) == false
 
 destroy(w)
+end
 
 
-## Tree view
+@testset "Tree view" begin
 ts=@TreeStore(AbstractString)
 iter1 = push!(ts,("one",))
 iter2 = push!(ts,("two",),iter1)
@@ -551,13 +620,13 @@ w = @Window(tv, "Tree View")|>showall
 
 iter = Gtk.iter_from_index(ts, [1])
 ts[iter,1] = "ONE"
-@assert ts[iter,1] == "ONE"
-@assert map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
+@test ts[iter,1] == "ONE"
+@test map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
 
 destroy(w)
+end
 
-## Toolbar
-import Gtk.GtkToolbarStyle
+@testset "Toolbar" begin
 tb1 = @ToolButton("gtk-open")
 tb2 = @ToolButton("gtk-new")
 tb3 = @ToolButton("gtk-media-next")
@@ -569,38 +638,12 @@ push!(toolbar,@SeparatorToolItem(), @ToggleToolButton("gtk-open"), @MenuToolButt
 G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = @Window(toolbar, "Toolbar")|>showall
 destroy(w)
-
-## FileFilter
-# This is just for testing, and be careful of garbage collection while using this
-immutable GtkFileFilterInfo
-  contains::Cint
-  filename::Ptr{Int8}
-  uri::Ptr{Int8}
-  display_name::Ptr{Int8}
-  mime_type::Ptr{Int8}
 end
-GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
-  GtkFileFilterInfo(
-    ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) | 
-      (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
-      (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) | 
-      (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
-    isa(filename, AbstractString)? pointer(filename): C_NULL,
-    isa(uri, AbstractString)? pointer(uri): C_NULL,
-    isa(display_name, AbstractString)? pointer(display_name): C_NULL,
-    isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
 
-function name(filter::FileFilter)
-  nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
-  (nameptr == C_NULL)? nothing : Compat.unsafe_string(nameptr)
-end
-needed(filter::FileFilter) =
-  ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
-filter(filt::FileFilter, info::GtkFileFilterInfo) =
-  ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
-
+@testset "FileFilter" begin
+if libgtk_version >= v"3"
 emptyfilter = @FileFilter()
-@assert name(emptyfilter) == nothing
+@test name(emptyfilter) == nothing
 
 fname = "test.csv"
 fdisplay = "test.csv"
@@ -608,27 +651,30 @@ fmime = "text/csv"
 csvfileinfo = GtkFileFilterInfo(; filename = fname, display_name = fdisplay, mime_type = fmime)
 println("file info contains: ", csvfileinfo.contains)
 # Should reject anything really
-@assert filter(emptyfilter, csvfileinfo) == false
+@test filter(emptyfilter, csvfileinfo) == false
 # Name is set internally as the pattern if no name is given
 csvfilter1 = @FileFilter("*.csv")
-@assert name(csvfilter1) == "*.csv"
-@assert needed(csvfilter1) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
-@assert filter(csvfilter1, csvfileinfo)
+@test name(csvfilter1) == "*.csv"
+@test needed(csvfilter1) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
+@test filter(csvfilter1, csvfileinfo)
 csvfilter2 = @FileFilter("*.csv"; name="Comma Separated Format")
-@assert name(csvfilter2) == "Comma Separated Format"
-@assert needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
-@assert filter(csvfilter2, csvfileinfo)
+@test name(csvfilter2) == "Comma Separated Format"
+@test needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
+@test filter(csvfilter2, csvfileinfo)
 csvfilter3 = @FileFilter(; mimetype="text/csv")
-@assert name(csvfilter3) == "text/csv"
-@assert needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
-@assert filter(csvfilter3, csvfileinfo)
+@test name(csvfilter3) == "text/csv"
+@test needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
+@test filter(csvfilter3, csvfileinfo)
 csvfilter4 = @FileFilter(; pattern="*.csv", mimetype="text/csv")
 # Pattern takes precedence over mime-type, causing mime-type to be ignored
-@assert name(csvfilter4) == "*.csv"
-@assert needed(csvfilter4) & Gtk.GtkFileFilterFlags.MIME_TYPE == 0
-@assert filter(csvfilter4, csvfileinfo)
+@test name(csvfilter4) == "*.csv"
+@test needed(csvfilter4) & Gtk.GtkFileFilterFlags.MIME_TYPE == 0
+@test filter(csvfilter4, csvfileinfo)
+end
+end
 
 # Canvas mouse callback stack operations
+@testset "Canvas mouse callback stack operations" begin
 c = @Canvas()
 w = @Window(c)
 showall(w)
@@ -649,34 +695,40 @@ pop!((c.mouse,:button1press))
 signal_emit(c, "button-press-event", Bool, press1)
 signal_emit(c, "button-press-event", Bool, press2)
 str = takebuf_string(io)
-@assert str == "cb1_1\ncb2_1\ncb1_2\ncb2_1\ncb1_2\ncb2_2\ncb1_1\ncb2_2\n"
+@test str == "cb1_1\ncb2_1\ncb1_2\ncb2_1\ncb1_2\ncb2_2\ncb1_1\ncb2_2\n"
 
 c.mouse.scroll = (widget,event) -> println(io, "scrolling")
 scroll = Gtk.GdkEventScroll(Gtk.GdkEventType.SCROLL, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, UInt32(0), Gtk.GdkScrollDirection.UP, convert(Ptr{Float64},C_NULL), 0.0, 0.0, 0.0, 0.0)
 signal_emit(c, "scroll-event", Bool, scroll)
 str = takebuf_string(io)
-@assert str == "scrolling\n"
+@test str == "scrolling\n"
 
 destroy(w)
+end
 
 # CSS
 
-## CssProviderLeaf(filename="...")
+@testset "CssProviderLeaf(filename=\"...\")" begin
+if libgtk_version >= v"3"
+    style_file = joinpath(dirname(Base.source_path()), "style_test.css")
 
-style_file = joinpath(dirname(Base.source_path()), "style_test.css")
+    l = @Label "I am some large blue text!"
+    w = @Window(l)
 
-l = @Label "I am some large blue text!"
-w = @Window(l)
+    screen   = Gtk.GAccessor.screen(w)
+    provider = CssProviderLeaf(filename=style_file)
 
-screen   = Gtk.GAccessor.screen(w)
-provider = CssProviderLeaf(filename=style_file)
+    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
+          (Ptr{Void}, Ptr{GObject}, Cuint),
+          screen, provider, 1)
 
-ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
-      (Ptr{Void}, Ptr{GObject}, Cuint),
-      screen, provider, 1)
+    showall(w)
 
-showall(w)
+    ### add css tests here
 
-### add css tests here
+    destroy(w)
+end
 
-destroy(w)
+end
+
+end  # testset gui

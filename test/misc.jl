@@ -1,6 +1,6 @@
-module TestGuarded
-
 using Gtk
+
+@testset "misc" begin
 
 const unhandled = convert(Cint, false)
 
@@ -24,13 +24,13 @@ The following messages:
 are expected and a sign of normal operation.
 """)
 
-@assert foo1(3,5) == 8
-@assert bar1(3,5) == nothing
-@assert foo2(3,5) == 8
-@assert bar2(3,5) == nothing
-@assert foo3(3,5) == 8
-@assert bar3(3,5) == nothing
-@assert bar4(3,5) == unhandled
+@test foo1(3,5) == 8
+@test bar1(3,5) == nothing
+@test foo2(3,5) == 8
+@test bar2(3,5) == nothing
+@test foo3(3,5) == 8
+@test bar3(3,5) == nothing
+@test bar4(3,5) == unhandled
 
 # Do-block syntax
 c = @GtkCanvas()
@@ -41,6 +41,6 @@ showall(win)
 end
 destroy(win)
 
-@assert isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
+@test isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
 
 end

@@ -17,7 +17,7 @@ function allocation(widget::Gtk.GtkWidget)
     ccall((:gtk_widget_get_allocation,libgtk), Void, (Ptr{GObject},Ptr{GdkRectangle}), widget, allocation_)
     return allocation_[1]
 end
-if gtk_version >= 3
+if libgtk_version >= v"3"
     width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width,libgtk),Cint,(Ptr{GObject},),w)
     height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height,libgtk),Cint,(Ptr{GObject},),w)
     size(w::GtkWidget) = (width(w),height(w))

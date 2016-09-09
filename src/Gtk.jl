@@ -79,7 +79,7 @@ include("application.jl")
 
 const ser_version = VERSION >= v"0.4-" ? Base.Serializer.ser_version : Base.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
-    fastgtkcache = joinpath(cachedir,"gtk$(gtk_version)_julia_ser$(ser_version)")
+    fastgtkcache = joinpath(cachedir,"gtk$(libgtk_version.major)_julia_ser$(ser_version)")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)
@@ -87,9 +87,9 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
             end
         end
     else
-        gboxcache = joinpath(cachedir,"gbox$(gtk_version)")
+        gboxcache = joinpath(cachedir,"gbox$(libgtk_version.major)")
         map(eval, include(gboxcache).args)
-        constcache = joinpath(cachedir,"gconsts$(gtk_version)")
+        constcache = joinpath(cachedir,"gconsts$(libgtk_version.major)")
         map(eval,include(constcache).args)
     end
 end

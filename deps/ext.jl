@@ -1,4 +1,5 @@
-const gtk_version = 3 # This is the only configuration option
+# for gtk2, set this var to 2 and edit deps/build.jl as described therein
+const gtk_version = 3
 
 const _depspath = joinpath(dirname(@__FILE__), "deps.jl")
 

@@ -15,7 +15,7 @@ GtkEntryCompletionLeaf() = GtkEntryCompletionLeaf(ccall((:gtk_entry_completion_n
 complete(completion::GtkEntryCompletion) =
     ccall((:gtk_entry_completion_complete,libgtk),Void,(Ptr{GObject},),completion)
 
-if gtk_version == 3
+if libgtk_version >= v"3"
     GtkScaleLeaf(vertical::Bool,min,max,step) = GtkScaleLeaf(ccall((:gtk_scale_new_with_range,libgtk),Ptr{GObject},
             (Cint,Cdouble,Cdouble,Cdouble),vertical,min,max,step))
 else

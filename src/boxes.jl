@@ -4,7 +4,7 @@ macro version_stub(min_ver, code)
         name = name.args[1]
     end
     quote
-        if gtk_version >= $(esc(min_ver))
+        if libgtk_version >= VersionNumber($(esc(min_ver)))
             $(esc(code))
         else
             type $(esc(name)) end
