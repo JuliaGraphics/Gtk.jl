@@ -5,7 +5,7 @@ if libgtk_version >= v"3"
 
     function register(app::GApplication)
        GError() do error_check
-          ret = bool(ccall((:g_application_register,libgio), Cint,
+          ret = Bool(ccall((:g_application_register,libgio), Cint,
              (Ptr{GObject},Ptr{Void}, Ptr{Ptr{GError}}), app, C_NULL, error_check))
           return ret
        end

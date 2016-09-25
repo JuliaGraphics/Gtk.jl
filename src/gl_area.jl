@@ -10,17 +10,17 @@ if libgtk_version >= v"3.16.0"
 	depth_buffer(w::GtkGLArea, value::Bool) =
 		(ccall((:gtk_gl_area_set_has_depth_buffer,libgtk),Void,(Ptr{GObject},Cint),w, value); w)
 	alpha(w::GtkGLArea) =
-		bool(ccall((:gtk_gl_area_set_has_alpha,libgtk),Cint,(Ptr{GObject},),w))
+		Bool(ccall((:gtk_gl_area_set_has_alpha,libgtk),Cint,(Ptr{GObject},),w))
 	depth_buffer(w::GtkGLArea, value::Bool) =
-		bool(ccall((:gtk_gl_area_get_has_depth_buffer,libgtk),Cint,(Ptr{GObject},),w))
+		Bool(ccall((:gtk_gl_area_get_has_depth_buffer,libgtk),Cint,(Ptr{GObject},),w))
 	stencil_buffer(w::GtkGLArea, value::Bool) =
 		(ccall((:gtk_gl_area_set_has_stencil_buffer,libgtk),Void,(Ptr{GObject},Cint),w, value); w)
 	stencil_buffer(w::GtkGLArea) =
-		bool(ccall((:gtk_gl_area_get_has_stencil_buffer,libgtk),Cint,(Ptr{GObject},),w))
+		Bool(ccall((:gtk_gl_area_get_has_stencil_buffer,libgtk),Cint,(Ptr{GObject},),w))
 	auto_render(w::GtkGLArea, value::Bool) =
 		(ccall((:gtk_gl_area_set_auto_render,libgtk),Void,(Ptr{GObject},Cint),w, value); w)
 	stencil_buffer(w::GtkGLArea) =
-		bool(ccall((:gtk_gl_area_get_auto_render,libgtk),Cint,(Ptr{GObject},),w))
+		Bool(ccall((:gtk_gl_area_get_auto_render,libgtk),Cint,(Ptr{GObject},),w))
 	#TODO: gtk_gl_area_get_required_version
 	#TODO: gtk_gl_area_set_required_version
 else

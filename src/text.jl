@@ -115,25 +115,25 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
 #    elseif key === :child_anchor
 #        convert(GtkTextChildAnchor,ccall((:gtk_text_iter_get_child_anchor,libgtk),Ptr{GtkTextChildAnchor},(Ptr{GtkTextIter},Cint),text,false))
     elseif key === :can_insert
-        bool(ccall((:gtk_text_iter_can_insert,libgtk),Cint,(Ptr{GtkTextIter},Cint),text,true))
+        Bool(ccall((:gtk_text_iter_can_insert,libgtk),Cint,(Ptr{GtkTextIter},Cint),text,true))
     elseif key === :starts_word
-        bool(ccall((:gtk_text_iter_starts_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_starts_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :ends_word
-        bool(ccall((:gtk_text_iter_ends_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_ends_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :inside_word
-        bool(ccall((:gtk_text_iter_inside_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_inside_word,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :starts_line
-        bool(ccall((:gtk_text_iter_starts_line,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_starts_line,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :ends_line
-        bool(ccall((:gtk_text_iter_ends_line,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_ends_line,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :starts_sentence
-        bool(ccall((:gtk_text_iter_starts_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_starts_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :ends_sentence
-        bool(ccall((:gtk_text_iter_ends_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_ends_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :inside_sentence
-        bool(ccall((:gtk_text_iter_inside_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_inside_sentence,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :is_cursor_position
-        bool(ccall((:gtk_text_iter_is_cursor_position,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_is_cursor_position,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :chars_in_line
         ccall((:gtk_text_iter_get_chars_in_line,libgtk),Cint,(Ptr{GtkTextIter},),text)
     elseif key === :bytes_in_line
@@ -146,9 +146,9 @@ function getproperty(text::TI, key::Symbol, outtype::Type=Any)
 #    elseif key === :language
 #        ccall((:gtk_text_iter_get_language,libgtk),Ptr{PangoLanguage},(Ptr{GtkTextIter},Ptr{GtkTextAttributes}),text)
     elseif key === :is_end
-        bool(ccall((:gtk_text_iter_is_end,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_is_end,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :is_start
-        bool(ccall((:gtk_text_iter_is_start,libgtk),Cint,(Ptr{GtkTextIter},),text))
+        Bool(ccall((:gtk_text_iter_is_start,libgtk),Cint,(Ptr{GtkTextIter},),text))
     elseif key === :char
         convert(Char,ccall((:gtk_text_iter_get_char,libgtk),UInt32,(Ptr{GtkTextIter},),text))
     elseif key === :pixbuf
@@ -178,7 +178,7 @@ function setproperty!(text::Mutable{GtkTextIter},key::Symbol,value)
     end
     return text
 end
-@compat(Base.:(==))(lhs::TI,rhs::TI) = bool(ccall((:gtk_text_iter_equal,libgtk),
+@compat(Base.:(==))(lhs::TI,rhs::TI) = Bool(ccall((:gtk_text_iter_equal,libgtk),
     Cint,(Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(lhs),mutable(rhs)))
 @compat(Base.:(!=))(lhs::TI,rhs::TI) = !(lhs == rhs)
 @compat(Base.:(<))(lhs::TI,rhs::TI) = ccall((:gtk_text_iter_compare,libgtk),Cint,
@@ -197,37 +197,37 @@ done(::TI,iter) = getproperty(iter,:is_end)::Bool
 @compat(Base.:+)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
 @compat(Base.:-)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
-    bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
+    Bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
         (Ptr{GtkTextIter},Cint), iter, count))
 function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
     if     what === :char || what === :chars
-        bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_chars,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :line || what === :lines
-        bool(ccall((:gtk_text_iter_forward_lines,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_lines,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :word || what === :words
-        bool(ccall((:gtk_text_iter_forward_word_ends,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_word_ends,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :word_cursor_position || what === :word_cursor_positions
-        bool(ccall((:gtk_text_iter_forward_cursor_positions,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_cursor_positions,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :sentence || what === :sentences
-        bool(ccall((:gtk_text_iter_forward_sentence_ends,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_sentence_ends,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :visible_word || what === :visible_words
-        bool(ccall((:gtk_text_iter_forward_visible_word_ends,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_visible_word_ends,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :visible_cursor_position || what === :visible_cursor_positions
-        bool(ccall((:gtk_text_iter_forward_visible_cursor_positions,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_visible_cursor_positions,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :visible_line || what === :visible_lines
-        bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
+        Bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
             (Ptr{GtkTextIter},Cint), iter, count))
     elseif what === :line_end || what === :line_ends
         count >= 0 || error("GtkTextIter cannot iterate line_ends backwards")
         for i = 1:count
-            if !bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
+            if !Bool(ccall((:gtk_text_iter_forward_visible_lines,libgtk),Cint,
                     (Ptr{GtkTextIter},Cint), iter, count))
                 return false
             end
@@ -302,7 +302,7 @@ function splice!(text::GtkTextBuffer,index::GtkTextRange)
         (Ptr{GObject},Ptr{GtkTextIter},Ptr{GtkTextIter}),text,first(index),last(index))
     text
 end
-in(x::TI, r::GtkTextRange) = bool(ccall((:gtk_text_iter_in_range,libgtk),Cint,
+in(x::TI, r::GtkTextRange) = Bool(ccall((:gtk_text_iter_in_range,libgtk),Cint,
     (Ptr{GtkTextIter},Ptr{GtkTextIter},Ptr{GtkTextIter}),mutable(x),first(r),last(r)))
 
 
@@ -389,7 +389,7 @@ function gtk_text_view_get_buffer(text::GtkTextView)
 end
 function gtk_text_view_get_editable(text::GtkTextView)
     # This is an internal function. Users should use text[:editable,Bool] instead
-    bool(ccall((:gtk_text_view_get_editable,libgtk),Cint,(Ptr{GObject},),text))
+    Bool(ccall((:gtk_text_view_get_editable,libgtk),Cint,(Ptr{GObject},),text))
 end
 function insert!(text::GtkTextView,index::TI,child::GtkWidget)
     index = mutable(index)
@@ -401,13 +401,13 @@ function insert!(text::GtkTextView,index::TI,child::GtkWidget)
 end
 
 function insert!(text::GtkTextView,index::TI,str::AbstractString)
-    bool(ccall((:gtk_text_buffer_insert_interactive,libgtk),Cint,
+    Bool(ccall((:gtk_text_buffer_insert_interactive,libgtk),Cint,
         (Ptr{GObject},Ptr{GtkTextIter},Ptr{UInt8},Cint,Cint),
         gtk_text_view_get_buffer(text),mutable(index),bytestring(str),sizeof(str),gtk_text_view_get_editable(text)))
     text
 end
 function insert!(text::GtkTextView,str::AbstractString)
-    bool(ccall((:gtk_text_buffer_insert_interactive_at_cursor,libgtk),Cint,
+    Bool(ccall((:gtk_text_buffer_insert_interactive_at_cursor,libgtk),Cint,
         (Ptr{GObject},Ptr{UInt8},Cint,Cint),
         gtk_text_view_get_buffer(text),bytestring(str),sizeof(str),gtk_text_view_get_editable(text)))
     text
@@ -429,7 +429,7 @@ end
 ####  GtkTextMark  ####
 
 visible(w::GtkTextMark) =
-    bool(ccall((:gtk_text_mark_get_visible,libgtk),Cint,(Ptr{GObject},),w))
+    Bool(ccall((:gtk_text_mark_get_visible,libgtk),Cint,(Ptr{GObject},),w))
 visible(w::GtkTextMark, state::Bool) =
     ccall((:gtk_text_mark_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
 show(w::GtkTextMark) = visible(w,true)
