@@ -15,6 +15,16 @@ immutable GdkPoint
 end
 # GdkPoint is not a GBoxed type
 
+immutable GdkRGBA
+   red::Cdouble
+   green::Cdouble
+   blue::Cdouble
+   alpha::Cdouble
+   GdkRGBA(red, green, blue, alpha) = new(red, green, blue, alpha)
+end
+make_gvalue(GdkRGBA, Ptr{GdkRGBA}, :boxed, (:gdk_rgba,:libgdk))
+convert(::Type{GdkRGBA}, rgba::Ptr{GdkRGBA}) = unsafe_load(rgba)
+
 gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
 
 baremodule GdkKeySyms

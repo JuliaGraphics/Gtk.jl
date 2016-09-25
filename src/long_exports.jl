@@ -1,6 +1,7 @@
 # Gtk objects
 export GObject,
     GdkPixbuf,
+    GdkRGBA,
     GtkAboutDialog,
     GtkAccelGroup,
     GtkAdjustment,

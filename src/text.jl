@@ -30,6 +30,8 @@ GtkTextTagLeaf() = GtkTextTagLeaf(
 GtkTextTagLeaf(name::AbstractString) = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(name)))
 
+
+
 immutable GtkTextIter
   dummy1::Ptr{Void}
   dummy2::Ptr{Void}
@@ -87,6 +89,12 @@ end
 #TODO
 #end
 
+# setproperty!(w::Gtk.GtkTextTag, name::Symbol, value) = setproperty!(w, string(name), value)
+# function setproperty!(w::Gtk.GtkTextTag, name::AbstractStringLike, value)
+#     println(libgobject)
+#     ccall((:g_object_set_property, libgobject), Void,
+#         (Ptr{GObject}, Ptr{UInt8}, Ptr{GdkRGBA}), w, GLib.bytestring(name), Ptr(value))
+# end
 
 #####  GtkTextIter  #####
 #TODO: search
@@ -334,6 +342,11 @@ end
 function splice!(text::GtkTextBuffer)
     ccall((:gtk_text_buffer_delete_selection,libgtk),Cint,
         (Ptr{GObject},Cint,Cint),text,false,true)
+    text
+end
+function place_cursor!(text::GtkTextBuffer,index::TI)
+    ccall((:gtk_text_buffer_place_cursor,libgtk),Void,
+        (Ptr{GObject},Ptr{GtkTextIter}),text,index)
     text
 end
 

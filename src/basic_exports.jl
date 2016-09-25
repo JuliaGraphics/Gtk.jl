@@ -6,7 +6,7 @@ export new, width, height, #minsize, maxsize
     selected, hasselection, unselect!, selectall!, unselectall!,
     pagenumber, present, fullscreen, unfullscreen,
     maximize, unmaximize, complete, user_action,
-    keyval, prev, up, down, popup
+    keyval, prev, up, down, popup, place_cursor!, create_tag, apply_tag
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 

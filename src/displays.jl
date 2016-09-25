@@ -16,7 +16,7 @@ convert{U<:Unsigned}(::Type{U},x::RGB) = convert(U,(x.r)|(x.g>>8)|(x.b>>16))
 
 immutable RGBA
     r::UInt8; g::UInt8; b::UInt8; a::UInt8
-    RGBA(r,g,b) = new(r,g,b)
+    RGBA(r,g,b,a) = new(r,g,b,q)
 end
 convert(::Type{RGBA},x::Unsigned) = RGBA(UInt8(x),UInt8(x>>8),UInt8(x>>16),UInt8(x>>24))
 convert{U<:Unsigned}(::Type{U},x::RGBA) = convert(U,(x.r)|(x.g>>8)|(x.b>>16)|(x.a>>24))
