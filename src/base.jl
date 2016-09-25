@@ -28,7 +28,7 @@ else
 end
 
 ### Functions and methods common to all GtkWidget objects
-visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
+visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
 show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
 showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)
