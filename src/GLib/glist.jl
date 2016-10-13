@@ -51,14 +51,10 @@ start{L}(list::LList{L}) = convert(Ptr{L}, list)
 next{T}(::LList, s::Ptr{T}) = (deref(s), unsafe_load(s).next) # return (value, state)
 done(::LList, s::Ptr) = (s == C_NULL)
 
+typealias LListPair{L} Tuple{LList, Ptr{L}}
 function glist_iter{L<:_LList}(list::Ptr{L}, transfer_full::Bool=false)
     # this function pairs every list element with the list head, to forestall garbage collection
     return (GList(list, transfer_full), list)
-end
-if VERSION >= v"0.4-"
-    typealias LListPair{L} Tuple{LList, Ptr{L}}
-else
-    typealias LListPair{L}(LList, Ptr{L})
 end
 function next{L<:_LList}(::LList, s::LListPair{L})
     return (deref(s[2]), (s[1], unsafe_load(s[2]).next))
@@ -92,7 +88,7 @@ copy{L<:_GSList}(list::GList{L}) = typeof(list)(ccall((:g_slist_copy, libglib), 
 copy{L<:_GList}(list::GList{L}) = typeof(list)(ccall((:g_list_copy, libglib), Ptr{L}, (Ptr{L},), list), false)
 check_undefref(p::Ptr) = (p == C_NULL ? error(UndefRefError()) : p)
 nth_first{L<:_GSList}(list::LList{L}) =
-    check_undefref(ccall((:g_slist_first, libglib), Ptr{L}, (Ptr{L}, Cuint), list))
+    check_undefref(ccall((:g_slist_first, libglib), Ptr{L}, (Ptr{L},), list))
 nth_first{L<:_GList}(list::LList{L}) =
     check_undefref(ccall((:g_list_first, libglib), Ptr{L}, (Ptr{L},), list))
 nth_last{L<:_GSList}(list::LList{L}) =
