@@ -58,7 +58,7 @@ end
 if VERSION >= v"0.4-"
     typealias LListPair{L} Tuple{LList, Ptr{L}}
 else
-    typealias LListPair{L}(LList, Ptr{L})
+    typealias LListPair{L} (LList, Ptr{L})
 end
 function next{L<:_LList}(::LList, s::LListPair{L})
     (deref(s[2]), (s[1], unsafe_load(s[2]).next))
