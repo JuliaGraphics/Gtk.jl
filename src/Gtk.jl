@@ -54,11 +54,11 @@ else
       unsafe_load(cglobal((:gtk_micro_version,libgtk),Cuint)))
 end
 
+include("gdk.jl")
 include("interfaces.jl")
 include("boxes.jl")
 include("gtktypes.jl")
 include("base.jl")
-include("gdk.jl")
 include("events.jl")
 include("container.jl")
 include("layout.jl")

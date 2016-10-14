@@ -17,8 +17,6 @@ immutable _GList{T} <: _LList{T}
 end
 eltype{T}(::Type{_LList{T}}) = T
 eltype{L<:_LList}(::Type{L}) = eltype(supertype(L))
-_listdatatype{T}(::Type{_LList{T}}) = T
-_listdatatype{L<:_LList}(::Type{L}) = _listdatatype(supertype(L))
 
 type GList{L<:_LList, T} <: AbstractVector{T}
     handle::Ptr{L}
@@ -38,6 +36,8 @@ GList{L<:_LList}(list::Ptr{L}, transfer_full::Bool=false) = GList{L, eltype(L)}(
 typealias LList{L<:_LList} Union{Ptr{L}, GList{L}}
 eltype{L<:_LList}(::LList{L}) = eltype(L)
 
+_listdatatype{T}(::Type{_LList{T}}) = T
+_listdatatype{L<:_LList}(::Type{L}) = _listdatatype(supertype(L))
 deref{L<:_LList}(item::Ptr{L}) = deref_to(L, unsafe_load(item).data) # extract something from the glist (automatically determine type)
 deref_to{T}(::Type{T}, x::Ptr) = unsafe_pointer_to_objref(x)::T # helper for extracting something from the glist (to type T)
 deref_to{L<:_LList}(::Type{L}, x::Ptr) = convert(eltype(L), deref_to(_listdatatype(L), x))
@@ -99,19 +99,23 @@ nth{L<:_GSList}(list::LList{L}, i::Integer) =
     check_undefref(ccall((:g_slist_nth, libglib), Ptr{L}, (Ptr{L}, Cuint), list, i - 1))
 nth{L<:_GList}(list::LList{L}, i::Integer) =
     check_undefref(ccall((:g_list_nth, libglib), Ptr{L}, (Ptr{L}, Cuint), list, i - 1))
-getindex{L<:_GSList}(list::LList{L}, i::Integer) =
-    deref_to(L, check_undefref(ccall((:g_list_nth_data, libglib), Ptr{_listdatatype(L)}, (Ptr{L}, Cuint), list, i - 1)))
-getindex{L<:_GList}(list::LList{L}, i::Integer) =
-    deref_to(L, check_undefref(ccall((:g_slist_nth_data, libglib), Ptr{_listdatatype(L)}, (Ptr{L}, Cuint), list, i - 1)))
-function get{L<:_GSList}(list::LList{L}, i::Integer, default)
-    p = ccall((:g_list_nth_data, libglib), Ptr{_listdatatype(L)}, (Ptr{L}, Cuint), list, i - 1)
-    p == C_NULL && return default
-    return deref_to(L, p)
+function getindex{T}(list::LList{_GSList{T}}, i::Integer)
+    p = check_undefref(ccall((:g_slist_nth_data, libglib), Ptr{T}, (Ptr{_GSList{T}}, Cuint), list, i - 1))
+    return deref_to(_GSList{T}, p)
 end
-function get{L<:_GList}(list::LList{L}, i::Integer, default)
-    p = ccall((:g_slist_nth_data, libglib), Ptr{_listdatatype(L)}, (Ptr{L}, Cuint), list, i - 1)
+function getindex{T}(list::LList{_GList{T}}, i::Integer)
+    p = check_undefref(ccall((:g_list_nth_data, libglib), Ptr{T}, (Ptr{_GList{T}}, Cuint), list, i - 1))
+    return deref_to(_GList{T}, p)
+end
+function get{T}(list::LList{_GSList{T}}, i::Integer, default)
+    p = ccall((:g_slist_nth_data, libglib), Ptr{T}, (Ptr{_GSList{T}}, Cuint), list, i - 1)
     p == C_NULL && return default
-    return deref_to(L, p)
+    return deref_to(_GSList{T}, p)
+end
+function get{T}(list::LList{_GList{T}}, i::Integer, default)
+    p = ccall((:g_list_nth_data, libglib), Ptr{T}, (Ptr{_GList{T}}, Cuint), list, i - 1)
+    p == C_NULL && return default
+    return deref_to(_GList{T}, p)
 end
 
 ### Modifying functions (!) are only allowed on a GList
@@ -153,30 +157,70 @@ function append!{L<:_GList}(l1::GList{L}, l2::GList{L})
     l1.handle = ccall((:g_list_concat, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), l1, l2)
     return l1
 end
-reverse!{L<:_GSList}(list::GList{L}) =
-    (list.handle = ccall((:g_slist_reverse, libglib), Ptr{L}, (Ptr{L},), list); list)
-reverse!{L<:_GList}(list::GList{L}) =
-    (list.handle = ccall((:g_list_reverse, libglib), Ptr{L}, (Ptr{L},), list); list)
-insert!{L<:_GSList}(list::GList{L}, i::Integer, item) =
-    (list.handle = ccall((:g_slist_insert, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}, Cint), list, ref_to(L, item), i - 1); list)
-insert!{L<:_GList}(list::GList{L}, i::Integer, item) =
-    (list.handle = ccall((:g_list_insert, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}, Cint), list, ref_to(L, item), i - 1); list)
-insert!{L<:_GSList}(list::GList{L}, i::Ptr{L}, item) =
-    (list.handle = ccall((:g_slist_insert_before, libglib), Ptr{L}, (Ptr{L}, Ptr{L}, Ptr{_listdatatype(L)}), list, i, ref_to(L, item)); list)
-insert!{L<:_GList}(list::GList{L}, i::Ptr{L}, item) =
-    (list.handle = ccall((:g_list_insert_before, libglib), Ptr{L}, (Ptr{L}, Ptr{L}, Ptr{_listdatatype(L)}), list, i, ref_to(L, item)); list)
-unshift!{L<:_GSList}(list::GList{L}, item) =
-    (list.handle = ccall((:g_slist_prepend, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}), list, ref_to(L, item)); list)
-unshift!{L<:_GList}(list::GList{L}, item) =
-    (list.handle = ccall((:g_list_prepend, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}), list, ref_to(L, item)); list)
-push!{L<:_GSList}(list::GList{L}, item) =
-    (list.handle = ccall((:g_slist_append, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}), list, ref_to(L, item)); list)
-push!{L<:_GList}(list::GList{L}, item) =
-    (list.handle = ccall((:g_list_append, libglib), Ptr{L}, (Ptr{L}, Ptr{_listdatatype(L)}), list, ref_to(L, item)); list)
-deleteat!{L<:_GSList}(list::GList{L}, i::Ptr{L}) =
-    (list.transfer_full&&empty!(i); list.handle = ccall((:g_slist_delete_link, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), list, i); list)
-deleteat!{L<:_GList}(list::GList{L}, i::Ptr{L}) =
-    (list.transfer_full&&empty!(i); list.handle = ccall((:g_list_delete_link, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), list, i); list)
+function reverse!{L<:_GSList}(list::GList{L})
+    list.handle = ccall((:g_slist_reverse, libglib), Ptr{L}, (Ptr{L},), list)
+    return list
+end
+function reverse!{L<:_GList}(list::GList{L})
+    list.handle = ccall((:g_list_reverse, libglib), Ptr{L}, (Ptr{L},), list)
+    return list
+end
+function insert!{T}(list::GList{_GSList{T}}, i::Integer, item)
+    list.handle = ccall((:g_slist_insert, libglib), Ptr{_GSList{T}},
+        (Ptr{_GSList{T}}, Ptr{T}, Cint),
+        list, ref_to(_GSList{T}, item), i - 1)
+    return list
+end
+function insert!{T}(list::GList{_GList{T}}, i::Integer, item)
+    list.handle = ccall((:g_list_insert, libglib), Ptr{_GList{T}},
+        (Ptr{_GList{T}}, Ptr{T}, Cint),
+        list, ref_to(_GList{T}, item), i - 1)
+    return list
+end
+function insert!{T}(list::GList{_GSList{T}}, i::Ptr{_GSList{T}}, item)
+    list.handle = ccall((:g_slist_insert_before, libglib), Ptr{_GSList{T}},
+        (Ptr{_GSList{T}}, Ptr{_GSList{T}}, Ptr{T}),
+        list, i, ref_to(_GSList{T}, item))
+    return list
+end
+function insert!{T}(list::GList{_GList{T}}, i::Ptr{_GList{T}}, item)
+    list.handle = ccall((:g_list_insert_before, libglib), Ptr{_GList{T}},
+        (Ptr{_GList{T}}, Ptr{_GList{T}}, Ptr{T}),
+        list, i, ref_to(_GList{T}, item))
+    return list
+end
+function unshift!{T}(list::GList{_GSList{T}}, item)
+    list.handle = ccall((:g_slist_prepend, libglib), Ptr{_GSList{T}}, (Ptr{_GSList{T}}, Ptr{T}), list, ref_to(_GSList{T}, item))
+    return list
+end
+function unshift!{T}(list::GList{_GList{T}}, item)
+    list.handle = ccall((:g_list_prepend, libglib), Ptr{_GList{T}},
+        (Ptr{_GList{T}}, Ptr{T}),
+        list, ref_to(_GList{T}, item))
+    return list
+end
+function push!{T}(list::GList{_GSList{T}}, item)
+    list.handle = ccall((:g_slist_append, libglib), Ptr{_GSList{T}},
+        (Ptr{_GSList{T}}, Ptr{T}),
+        list, ref_to(_GSList{T}, item))
+    return list
+end
+function push!{T}(list::GList{_GList{T}}, item)
+    list.handle = ccall((:g_list_append, libglib), Ptr{_GList{T}},
+        (Ptr{_GList{T}}, Ptr{T}),
+        list, ref_to(_GList{T}, item))
+    return list
+end
+function deleteat!{L<:_GSList}(list::GList{L}, i::Ptr{L})
+    list.transfer_full && empty!(i)
+    list.handle = ccall((:g_slist_delete_link, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), list, i)
+    return list
+end
+function deleteat!{L<:_GList}(list::GList{L}, i::Ptr{L})
+    list.transfer_full && empty!(i)
+    list.handle = ccall((:g_list_delete_link, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), list, i)
+    return list
+end
 function setindex!{L<:_GSList}(list::GList{L}, item, i::Ptr{L})
     list.transfer_full && empty!(i)
     idx = unsafe_load(i)
