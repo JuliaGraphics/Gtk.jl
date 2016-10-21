@@ -26,6 +26,8 @@ else
     height(w::GtkWidget) = allocation(w).height
     size(w::GtkWidget) = (a=allocation(w);(a.width,a.height))
 end
+gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
+screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
