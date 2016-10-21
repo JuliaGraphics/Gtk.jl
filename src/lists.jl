@@ -674,7 +674,7 @@ selectall!(selection::GtkTreeSelection) =
     ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
 
 unselectall!(selection::GtkTreeSelection) =
-    ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
+    ccall((:gtk_tree_selection_unselect_all,libgtk), Void, (Ptr{GObject},),selection)
 
 ### GtkTreeView
 
