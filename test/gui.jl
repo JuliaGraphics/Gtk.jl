@@ -712,6 +712,12 @@ str = takebuf_string(io)
 destroy(w)
 end
 
+@testset "overlay" begin
+o = @Overlay()
+w = @Window(o, "overlay")|>showall
+destroy(w)
+end
+  
 # CSS
 
 @testset "CssProviderLeaf(filename=\"...\")" begin
