@@ -585,8 +585,8 @@ end
 
 @testset "List view" begin
 ls=@ListStore(Int32,Bool)
-push!(ls,(33,true))
 push!(ls,(44,true))
+push!(ls,(33,true))
 insert!(ls, 2, (35, false))
 tv=@TreeView(TreeModel(ls))
 r1=@CellRendererText()
@@ -599,14 +599,22 @@ w = @Window(tv, "List View")|>showall
 
 
 ## selection
-selmodel = Gtk.G_.selection(tv)
+selmodel = G_.selection(tv)
 @test hasselection(selmodel) == false
 select!(selmodel, Gtk.iter_from_index(ls, 1))
 @test hasselection(selmodel) == true
 iter = selected(selmodel)
-@test ls[iter, 1] == 33
+@test ls[iter, 1] == 44
 deleteat!(ls, iter)
 @test isvalid(ls, iter) == false
+
+tmSorted=@TreeModelSort(ls)
+G_.model(tv,tmSorted)
+G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
+it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
+select!(selmodel, it)
+iter = selected(selmodel)
+@test TreeModel(tmSorted)[iter, 1] == 35
 
 destroy(w)
 end
