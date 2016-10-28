@@ -67,6 +67,7 @@ const ToolItem = GtkToolItem
 const Toolbar = GtkToolbar
 const TreeIter = GtkTreeIter
 const TreeModelFilter = GtkTreeModelFilter
+const TreeModelSort = GtkTreeModelSort
 const TreeSelection = GtkTreeSelection
 const TreeStore = GtkTreeStore
 const TreeView = GtkTreeView
@@ -141,6 +142,7 @@ export G_, GObject,
     Toolbar,
     TreeIter,
     TreeModelFilter,
+    TreeModelSort,
     TreeSelection,
     TreeStore,
     TreeView,

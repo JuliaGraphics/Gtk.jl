@@ -340,6 +340,12 @@ function convert_child_iter_to_iter(model::GtkTreeModelFilter, child_iter::TRI)
     filter_iter[]
 end
 
+### GtkTreeModelSort
+
+GtkTreeModelSortLeaf(child_model::GObject) = GtkTreeModelSortLeaf(
+    ccall((:gtk_tree_model_sort_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},), child_model))
+
+
 ### GtkTreeModel
 
 function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
@@ -710,8 +716,6 @@ end
 #    GtkCellAreaBox
 #    GtkCellAreaContext
 #end
-#
-#GtkTreeModelSort
 #
 #GtkCellView
 #GtkIconView
