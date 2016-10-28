@@ -249,8 +249,7 @@ pagenumber(w::GtkNotebook, child::GtkWidget) =
 
 ### GtkOverlay
 if libgtk_version >= v"3"
-    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
-        (Ptr{UInt8},), bytestring(title)))
+    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
     GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
     function push!(w::GtkOverlay, x::GtkWidget)
         ccall((:gtk_overlay_add_overlay,libgtk), Cint,
