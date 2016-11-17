@@ -272,9 +272,9 @@ function GtkImageLeaf(;resource_path=nothing,filename=nothing,icon_name=nothing,
     elseif filename !== nothing
         img = ccall((:gtk_image_new_from_file,libgtk),Ptr{GObject},(Ptr{UInt8},),bytestring(filename))
     elseif icon_name !== nothing
-        img = ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(icon_name),GtkIconSize.(size))
+        img = ccall((:gtk_image_new_from_icon_name,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(icon_name),getfield(GtkIconSize, size))
     elseif stock_id !== nothing
-        img = ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(stock_id),GtkIconSize.(size))
+        img = ccall((:gtk_image_new_from_stock,libgtk),Ptr{GObject},(Ptr{UInt8},Cint),bytestring(stock_id),getfield(GtkIconSize, size))
     else
         img = ccall((:gtk_image_new,libgtk),Ptr{GObject},())
     end
