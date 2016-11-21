@@ -51,6 +51,10 @@ module CompatGLib
     else
         using Base.WORD_SIZE
     end
+    if VERSION >= v"0.6.0-dev" && !isdefined(Base, :xor)
+        export xor
+        const xor = $
+    end
 end
 importall .CompatGLib
 using .CompatGLib.WORD_SIZE
