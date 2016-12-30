@@ -27,3 +27,6 @@ after_success:
                 Pkg.add("Coverage");
                 using Coverage;
                 Coveralls.submit(Coveralls.process_folder())'
+    # update the documentation
+    - julia -e 'Pkg.add("Documenter")'
+    - julia -e 'cd(Pkg.dir("Gtk")); ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs", "make.jl"))'
