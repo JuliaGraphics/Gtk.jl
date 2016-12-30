@@ -12,6 +12,9 @@ makedocs(
                      "manual/layout.md",
                      "manual/signals.md",
                      "manual/builder.md",
+                     "manual/textwidgets.md",
+                     "manual/combobox.md",
+                     "manual/listtreeview.md",
                      "manual/filedialogs.md",
                      "manual/customWidgets.md",
                      "manual/nonreplusage.md"

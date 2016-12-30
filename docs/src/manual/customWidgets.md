@@ -14,7 +14,7 @@ type MyButton <: Gtk.GtkButton
     other_fields
     function MyButton(label)
         btn = @GtkButton(label)
-        Gtk.gobject_move_ref(new(btn), btn)
+        return Gtk.gobject_move_ref(new(btn), btn)
     end
 end
 ```
@@ -30,7 +30,7 @@ type MyButton <: Gtk.GtkButton
 
     function MyButton()
         btn = @GtkButton("My Button")
-        Gtk.gobject_move_ref(new(btn.handle), btn)
+        return Gtk.gobject_move_ref(new(btn.handle), btn)
     end
 end
 ```
@@ -46,4 +46,30 @@ showall(win)
 
 ## Composed Widgets
 
-TODO
+While a preinitialized button might look like an artificial use cases the same pattern can be used to develop composed widgets. In that case one will typically subclass from a layout widget such as `GtkBox` or `GtkGrid`. Lets for instance build a new composed widget consisting of a text box and a button
+
+```julia
+type ComposedWidget <: Gtk.GtkBox
+    handle::Ptr{Gtk.GObject}
+    btn # handle to child
+    tv # handle to child
+
+    function ComposedWidget(label)
+        vbox = @GtkBox(:v)
+        btn = @GtkButton(label)
+        tv = @GtkTextView()
+        push!(vbox,btn,tv)
+        setproperty!(vbox,:expand,tv,true)
+        setproperty!(vbox,:spacing,10)
+        w = new(vbox.handle, btn, tv)
+        return Gtk.gobject_move_ref(w, vbox)
+    end
+end
+
+c = ComposedWidget("My Button")
+win = @GtkWindow("Composed Widget",400,200)
+push!(win, c)
+showall(win)
+
+```
+You will usually store the handles to all subwidgets in the composed type as has been done in the example. This will give you quick access to the child widgets when e.g. callback functions for ComposedWidget are called.
