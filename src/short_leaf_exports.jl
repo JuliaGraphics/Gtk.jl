@@ -66,6 +66,7 @@
 @g_type_delegate ToolItem = GtkToolItem
 @g_type_delegate Toolbar = GtkToolbar
 @g_type_delegate TreeModelFilter = GtkTreeModelFilter
+@g_type_delegate TreeModelSort = GtkTreeModelSort
 @g_type_delegate TreeSelection = GtkTreeSelection
 @g_type_delegate TreeStore = GtkTreeStore
 @g_type_delegate TreeView = GtkTreeView
@@ -140,6 +141,7 @@ export @G_,
     @ToolItem,
     @Toolbar,
     @TreeModelFilter,
+    @TreeModelSort,
     @TreeSelection,
     @TreeStore,
     @TreeView,

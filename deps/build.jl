@@ -1,4 +1,4 @@
-using BinDeps
+using BinDeps, Compat
 
 @BinDeps.setup
 
@@ -9,16 +9,19 @@ deps = [
     gobject = library_dependency("gobject", aliases = ["libgobject-2.0", "libgobject-2.0-0"], group = group)
     gtk = library_dependency("gtk", aliases = ["libgtk-3", "libgtk-3-0"], group = group)
     gdk = library_dependency("gdk", aliases = ["libgdk-3", "libgdk-3-0"], group = group)
+    # for gtk2 use these two lines instead of the previous two
+    #gtk = library_dependency("gtk", aliases = ["libgtk-quartz-2.0", "libgtk-win32-2.0-0", "libgtk-x11-2.0"], group = group)
+    #gdk = library_dependency("gdk", aliases = ["libgdk-quartz-2.0", "libgdk-win32-2.0-0", "libgdk-x11-2.0"], group = group)
     gdk_pixbuf = library_dependency("gdk_pixbuf", aliases = ["libgdk_pixbuf-2.0", "libgdk_pixbuf-2.0-0"], group = group)
     gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
 ]
 
-@linux_only begin
+if @compat is_linux()
     provides(AptGet, "libgtk-3-0", deps)
     provides(Yum, "gtk3", deps)
 end
 
-@windows_only begin
+if @compat is_windows()
     using WinRPM
     provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
@@ -37,7 +40,7 @@ end
     run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
 end
 
-@osx_only begin
+if @compat is_apple()
     using Homebrew
     provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
         """

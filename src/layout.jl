@@ -21,7 +21,7 @@
 
 rangestep(r::Range) = step(r)
 rangestep(::Integer) = 1
-if gtk_version == 3
+if libgtk_version >= v"3"
     ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
     GtkGridLeaf() = GtkGridLeaf(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
@@ -112,7 +112,7 @@ GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0<=a<=1. Use
         (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
-if gtk_version == 3
+if libgtk_version >= v"3"
     GtkBoxLeaf(vertical::Bool, spacing=0) =
         GtkBoxLeaf(ccall((:gtk_box_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
@@ -130,7 +130,7 @@ else
 end
 
 ### GtkButtonBox
-if gtk_version == 3
+if libgtk_version >= v"3"
     GtkButtonBoxLeaf(vertical::Bool) =
         GtkButtonBoxLeaf(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
             (Cint,), vertical))
@@ -149,7 +149,7 @@ end
 # this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-if gtk_version == 3
+if libgtk_version >= v"3"
     GtkPanedLeaf(vertical::Bool, spacing=0) =
         GtkPanedLeaf(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
@@ -248,9 +248,8 @@ pagenumber(w::GtkNotebook, child::GtkWidget) =
     ccall((:gtk_notebook_page_num,libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
 
 ### GtkOverlay
-if gtk_version == 3
-    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject},
-        (Ptr{UInt8},), bytestring(title)))
+if libgtk_version >= v"3"
+    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
     GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
     function push!(w::GtkOverlay, x::GtkWidget)
         ccall((:gtk_overlay_add_overlay,libgtk), Cint,

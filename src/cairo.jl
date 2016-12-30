@@ -17,7 +17,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         signal_connect(notify_realize,widget,"realize",Void,())
         signal_connect(notify_unrealize,widget,"unrealize",Void,())
         on_signal_resize(notify_resize, widget)
-        if gtk_version == 3
+        if libgtk_version >= v"3"
             signal_connect(canvas_on_draw_event,widget,"draw",Cint,(Ptr{Void},))
         else
             signal_connect(canvas_on_expose_event,widget,"expose-event",Cint,(Ptr{Void},))

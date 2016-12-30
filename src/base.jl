@@ -17,7 +17,7 @@ function allocation(widget::Gtk.GtkWidget)
     ccall((:gtk_widget_get_allocation,libgtk), Void, (Ptr{GObject},Ptr{GdkRectangle}), widget, allocation_)
     return allocation_[1]
 end
-if gtk_version >= 3
+if libgtk_version >= v"3"
     width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width,libgtk),Cint,(Ptr{GObject},),w)
     height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height,libgtk),Cint,(Ptr{GObject},),w)
     size(w::GtkWidget) = (width(w),height(w))
@@ -26,9 +26,11 @@ else
     height(w::GtkWidget) = allocation(w).height
     size(w::GtkWidget) = (a=allocation(w);(a.width,a.height))
 end
+gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
+screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 
 ### Functions and methods common to all GtkWidget objects
-visible(w::GtkWidget) = bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
+visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible,libgtk),Cint,(Ptr{GObject},),w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible,libgtk),Void,(Ptr{GObject},Cint),w,state)
 show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show,libgtk),Void,(Ptr{GObject},),w); w)
 showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all,libgtk),Void,(Ptr{GObject},),w); w)

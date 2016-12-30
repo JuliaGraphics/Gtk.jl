@@ -14,7 +14,7 @@
 @Giface GtkTreeSortable Gtk.libgtk gtk_tree_sortable
 @Giface GtkFileChooser Gtk.libgtk gtk_file_chooser
 
-if gtk_version == 3
+if libgtk_version >= v"3"
     @Giface GtkActionable Gtk.libgtk gtk_actionable
     @Giface GtkAppChooser Gtk.libgtk gtk_app_chooser
     @Giface GtkColorChooser Gtk.libgtk gtk_color_chooser

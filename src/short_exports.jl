@@ -67,6 +67,7 @@ const ToolItem = GtkToolItem
 const Toolbar = GtkToolbar
 const TreeIter = GtkTreeIter
 const TreeModelFilter = GtkTreeModelFilter
+const TreeModelSort = GtkTreeModelSort
 const TreeSelection = GtkTreeSelection
 const TreeStore = GtkTreeStore
 const TreeView = GtkTreeView
@@ -141,6 +142,7 @@ export G_, GObject,
     Toolbar,
     TreeIter,
     TreeModelFilter,
+    TreeModelSort,
     TreeSelection,
     TreeStore,
     TreeView,
@@ -180,7 +182,7 @@ export
     TreeSortable
 
 # Gtk 3
-if Gtk.gtk_version >= 3
+if Gtk.libgtk_version >= v"3"
     #objects
     const Grid = GtkGrid
     const GLArea = GtkGLArea
@@ -214,7 +216,7 @@ if Gtk.gtk_version >= 3
 end
 
 # Gtk 2
-if Gtk.gtk_version >= 2
+if v"2" <= Gtk.libgtk_version < v"3"
     #objects
     const Table = GtkTable
     const Alignment = GtkAlignment

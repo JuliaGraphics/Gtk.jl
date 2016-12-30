@@ -41,20 +41,20 @@ unshift!(cb::GtkComboBoxText,text::AbstractString) =
 insert!(cb::GtkComboBoxText,i::Integer,text::AbstractString) =
     (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{UInt8}),cb,i-1,bytestring(text)); cb)
 
-if gtk_version == 3
+if libgtk_version >= v"3"
     push!(cb::GtkComboBoxText,id::TupleType(AbstractString,Symbol),text::AbstractString) =
         (ccall((:gtk_combo_box_text_append,libgtk),Void,(Ptr{GObject},Ptr{UInt8},Ptr{UInt8}),cb,id,bytestring(text)); cb)
     unshift!(cb::GtkComboBoxText,id::TupleType(AbstractString,Symbol),text::AbstractString) =
         (ccall((:gtk_combo_box_text_prepend,libgtk),Void,(Ptr{GObject},Ptr{UInt8},Ptr{UInt8}),cb,id,bytestring(text)); cb)
     insert!(cb::GtkComboBoxText,i::Integer,id::TupleType(AbstractString,Symbol),text::AbstractString) =
         (ccall((:gtk_combo_box_text_insert_text,libgtk),Void,(Ptr{GObject},Cint,Ptr{UInt8}),cb,i-1,id,bytestring(text)); cb)
+
+    empty!(cb::GtkComboBoxText) =
+        (ccall((:gtk_combo_box_text_remove_all,libgtk),Void,(Ptr{GObject},),cb); cb)
 end
 
 delete!(cb::GtkComboBoxText,i::Integer) =
     (ccall((:gtk_combo_box_text_remove,libgtk),Void,(Ptr{GObject},Cint),cb,i-1); cb)
-
-empty!(cb::GtkComboBoxText) =
-    (ccall((:gtk_combo_box_text_remove_all,libgtk),Void,(Ptr{GObject},),cb); cb)
 
 immutable GtkTreeIter
     stamp::Cint
@@ -340,6 +340,26 @@ function convert_child_iter_to_iter(model::GtkTreeModelFilter, child_iter::TRI)
     filter_iter[]
 end
 
+### GtkTreeModelSort
+
+GtkTreeModelSortLeaf(child_model::GObject) = GtkTreeModelSortLeaf(
+    ccall((:gtk_tree_model_sort_new_with_model,libgtk),Ptr{GObject},(Ptr{GObject},), child_model))
+
+function convert_iter_to_child_iter(model::GtkTreeModelSort, sort_iter::TRI)
+    child_iter = mutable(GtkTreeIter)
+    ccall((:gtk_tree_model_sort_convert_iter_to_child_iter,libgtk),Void,
+          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}),
+          model, child_iter, mutable(sort_iter))
+    child_iter[]
+end
+
+function convert_child_iter_to_iter(model::GtkTreeModelSort, child_iter::TRI)
+    sort_iter = mutable(GtkTreeIter)
+    ccall((:gtk_tree_model_sort_convert_child_iter_to_iter,libgtk),Void,
+          (Ptr{GObject},Ptr{GtkTreeIter},Ptr{GtkTreeIter}),
+          model, sort_iter, mutable(child_iter))
+    sort_iter[]
+end
 ### GtkTreeModel
 
 function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
@@ -674,7 +694,7 @@ selectall!(selection::GtkTreeSelection) =
     ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
 
 unselectall!(selection::GtkTreeSelection) =
-    ccall((:gtk_tree_selection_select_all,libgtk), Void, (Ptr{GObject},),selection)
+    ccall((:gtk_tree_selection_unselect_all,libgtk), Void, (Ptr{GObject},),selection)
 
 ### GtkTreeView
 
@@ -705,13 +725,11 @@ function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
 end
 ### To be done
 #
-#if gtk_version == 3
+#if libgtk_version >= v"3"
 #    GtkCellArea
 #    GtkCellAreaBox
 #    GtkCellAreaContext
 #end
-#
-#GtkTreeModelSort
 #
 #GtkCellView
 #GtkIconView

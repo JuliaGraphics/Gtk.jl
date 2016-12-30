@@ -28,7 +28,7 @@ GtkToggleButtonLeaf(title::AbstractString) =
     GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new_with_mnemonic,libgtk),Ptr{GObject},
         (Ptr{UInt8},), bytestring(title)))
 
-if gtk_version >= 3
+if libgtk_version >= v"3"
     GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new,libgtk),Ptr{GObject},()))
     function GtkSwitchLeaf(active::Bool)
         b = GtkSwitchLeaf()

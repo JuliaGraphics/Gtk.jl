@@ -15,8 +15,6 @@ immutable GdkPoint
 end
 # GdkPoint is not a GBoxed type
 
-gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window,libgtk),Ptr{Void},(Ptr{GObject},),w)
-
 baremodule GdkKeySyms
   const VoidSymbol = 0xffffff
   const BackSpace = 0xff08
@@ -180,7 +178,6 @@ end
 keyval(name::AbstractString) =
   ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{UInt8},),bytestring(name))
 
-screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 screen_size() = screen_size(ccall((:gdk_screen_get_default,libgdk),
                                           Ptr{Void}, ()))
 
