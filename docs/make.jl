@@ -13,6 +13,7 @@ makedocs(
                      "manual/signals.md",
                      "manual/builder.md",
                      "manual/filedialogs.md",
+                     "manual/customWidgets.md",
                      "manual/nonreplusage.md"
                     ],
     ],
