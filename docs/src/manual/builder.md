@@ -54,8 +54,27 @@ connector between the XML definition and our Julia code.
 ```julia
 b = @GtkBuilder(filename=myapp.glade)
 ```
-
-
+Alternatively, if we would store above XML definition in a Julia string `myapp` we can initalize 
+the builder by
+```julia
+b = @GtkBuilder(buffer=myapp)
+```
+Now we want to access a widget from the XML file in order to actually display it on the screen. To do so
+we call
+```julia
+win = b["window1"]
+showall(win)
+```
+That is all that you need to know. You can thus see your builder as a kind of a widget store that you use 
+when you need access to your widgets. It it therefore not really necessary to bind the widgets to local
+variables anymore but instead you can always use the builder object.
 
 !!! note
-    If you are developing the code in a package you can get the package directory using the `Pkg.dir("MyPackage")` function. This allows you to put the files into the package diretory and reference them in a relative manner.
+    If you are developing the code in a package you can get the package directory using the `Pkg.dir("MyPackage")` 
+    function. This allows you to put the files into the package diretory and reference them in a relative manner.
+
+## Callbacks
+
+The XML file lets us only describe the visual structure of our widgets and not their behavior when the using 
+is interacting with it. For this reason, we will have to add callbacks to the widgets which we do in Julia code
+as it was described in [Signals and Callbacks](@ref).
