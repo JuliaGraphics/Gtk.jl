@@ -18,11 +18,29 @@ GAccessor.text(label,"My other text")
 Furthermore, a label has limited support for adding formatted text. This is done
 using the `markup` function:
 ```julia
-GAccessor.markup(label,"<b>My bold text</b>")
+GAccessor.markup(label,"""<b>My bold text</b>\n
+                          <a href=\"http://www.gtk.org\"
+                          title=\"Our website\">GTK+ website</a>""")
 ```
-The syntax for this markup text is explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html)
+The syntax for this markup text is borrowed from html and explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html)
+A label can be made selectable using
+```julia
+GAccessor.selectable(label,true)
+```
+This can be used if the user should be allowed to copy the text.
 
-TODO line wrap / multi line
+The justification of a label can be changed in the following way:
+```julia
+GAccessor.justify(label,Gtk.GConstants.GtkJustification.RIGHT)
+```
+Possible values of the enum `GtkJustification` are `LEFT`,`RIGHT`,`CENTER`, and `FILL`.
+
+Automatic line wrapping can be enabled using
+```julia
+GAccessor.text(label,repeat("Very long text! ",20))
+GAccessor.line_wrap(label,true)
+```
+Note that this will only happen, if the size of the widget is limited using layout constraints.
 
 ## Entry
 
