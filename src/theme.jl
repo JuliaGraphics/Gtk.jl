@@ -23,7 +23,7 @@ if libgtk_version >= v"3"
 
     GtkStyleContextLeaf() = GtkStyleContextLeaf(ccall((:gtk_style_context_new,libgtk),Ptr{GObject},()))
 
-    push!(context::GtkStyleContext, provider::GtkStyleProvider, priority::Integer) =
+    push!(context::GtkStyleContext, provider::GObject, priority::Integer) =
       ccall((:gtk_style_context_add_provider,libgtk),Void,(Ptr{GObject},Ptr{GObject},Cuint),
              context,provider,priority)
 end
