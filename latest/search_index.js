@@ -181,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Text Widgets",
     "title": "Text Widgets",
     "category": "section",
-    "text": ""
+    "text": "There are two basic widgets available for rendering simple text. The one is for displaying non-editable text GtkLabel the other is for editable text GtkEntry."
 },
 
 {
@@ -189,7 +189,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Text Widgets",
     "title": "Label",
     "category": "section",
-    "text": "TODO"
+    "text": "A GtkLabel is the most basic text widget that has already been used behind the scene in any previous example involving a GtkButton.  A GtkLabel is constructed by callinglabel = @GtkLabel(\"My text\")The text of a label can be changed usingGAccessor.text(label,\"My other text\")Furthermore, a label has limited support for adding formatted text. This is done using the markup function:GAccessor.markup(label,\"<b>My bold text</b>\")The syntax for this markup text is explained hereTODO line wrap / multi line"
 },
 
 {
