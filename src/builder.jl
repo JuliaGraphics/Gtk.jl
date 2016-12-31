@@ -12,7 +12,7 @@ function push!(builder::GtkBuilder;buffer=nothing,filename=nothing,resource=noth
     if buffer !== nothing
         GError() do error_check
           ret = ccall((:gtk_builder_add_from_string ,libgtk), Cuint,
-            (Ptr{GObject}, Ptr{UInt8}, Culong, Ptr{Ptr{GError}}),
+            (Ptr{GObject}, Ptr{UInt8}, Clong, Ptr{Ptr{GError}}),
             builder, bytestring(buffer), -1, error_check)
           return ret != 0
         end
@@ -39,3 +39,5 @@ next(w::GtkBuilder, list) = next(list[1],list)
 done(w::GtkBuilder, list) = done(list[1],list)
 length(builder::GtkBuilder) = length(start(builder)[1])
 getindex(builder::GtkBuilder, i::Integer) = convert(GtkWidget,start(builder)[1][i])::GtkWidget
+
+getindex(builder::GtkBuilder, widgetId::String) = GAccessor.object(builder, widgetId)
