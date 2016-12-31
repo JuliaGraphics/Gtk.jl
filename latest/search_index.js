@@ -197,7 +197,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Text Widgets",
     "title": "Entry",
     "category": "section",
-    "text": "TODO"
+    "text": "The entry widget allows the user to enter text. The entered text can be read and write usingent = @GtkEntry()\nsetproperty!(ent,:text,\"My String\")\nstr = getproperty(ent,:text,String)The maximum number of characters can be limited using setproperty!(ent,:max_length,10).Sometimes you might want to make the widget non-editable. This can be done by a call# using the accessor methods\nGAccessor.editable(GtkEditable(ent),false)\n# using the property system\nsetproperty!(ent,:text,false)If you want to use the entry to retrieve passwords you can hide the visibility of the entered text. This can be achieve by callingsetproperty!(ent,:visibility,false)To get notfied by changes to the entry one can listen the \"changed\" event.TODO: setting progress and setting icons in entry"
+},
+
+{
+    "location": "manual/textwidgets.html#Search-Entry-1",
+    "page": "Text Widgets",
+    "title": "Search Entry",
+    "category": "section",
+    "text": "A special variant of the entry that can be used as a search box is GtkSearchEntry. It is equipped with a button to clear the entry.note: Note\nCurrently GtkSearchEntry is not fully wrapped in Gtk.jl but if you add it using Glade, it can be used as an alternative to the `GtkEntry"
 },
 
 {
