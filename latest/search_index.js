@@ -41,6 +41,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "index.html#Attribution-1",
+    "page": "Home",
+    "title": "Attribution",
+    "category": "section",
+    "text": "Gtk logo is made by Andreas Nilsson [GFDL (http://www.gnu.org/copyleft/fdl.html) or CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0/)], via Wikimedia Commons"
+},
+
+{
     "location": "manual/gettingStarted.html#",
     "page": "Getting Started",
     "title": "Getting Started",
@@ -286,6 +294,22 @@ var documenterSearchIndex = {"docs": [
     "title": "File Dialogs",
     "category": "section",
     "text": "Gtk.jl supports the GtkFileChooserDialog. It also provides two functions, open_dialog and save_dialog, making this functionality easier to use. The syntax of these two functions are as follows:open_dialog(title, GtkNullContainer(), String[])\nsave_dialog(title, GtkNullContainer(), String[])If you are using these functions in the context of a GUI, you should set the parent to be the top-level window. Otherwise, for standalone usage in scripts, do not set the parent.The main flexibility comes from the filters, which can be specified as a Tuple or Vector. A filter can be specified as a string, in which case it specifies a globbing pattern, for example \"*.png\". You can specify multiple match types for a single filter by separating the patterns with a comma, for example \"*.png,*.jpg\". You can alternatively specify MIME types, or if no specification is provided it defaults to types supported by GdkPixbuf. The generic specification of a filter is@FileFilter(; name = nothing, pattern = \"\", mimetype = \"\")Here are some examples:open_dialog(\"Pick a file\")\nopen_dialog(\"Pick some files\", select_multiple=true)\nopen_dialog(\"Pick a file\", Null(), (\"*.jl\",))\nopen_dialog(\"Pick some text files\", GtkNullContainer(), (\"*.txt,*.csv\",), select_multiple=true)\nopen_dialog(\"Pick a file\", Null(), (@FileFilter(mimetype=\"text/csv\"),))\nopen_dialog(\"Pick an image file\", GtkNullContainer(), (\"*.png\", \"*.jpg\", @FileFilter(\"*.png,*.jpg\", name=\"All supported formats\")))\nopen_dialog(\"Pick an image file\", GtkNullContainer(), (@FileFilter(name=\"Supported image formats\"),))\n\nsave_dialog(\"Save as...\", Null(), (@FileFilter(\"*.png,*.jpg\", name=\"All supported formats\"), \"*.png\", \"*.jpg\"))"
+},
+
+{
+    "location": "manual/canvas.html#",
+    "page": "Drawing on Canvas",
+    "title": "Drawing on Canvas",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "manual/canvas.html#Drawing-on-Canvas-1",
+    "page": "Drawing on Canvas",
+    "title": "Drawing on Canvas",
+    "category": "section",
+    "text": "TODO"
 },
 
 {
