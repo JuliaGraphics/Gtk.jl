@@ -9,6 +9,9 @@ GUI building, using the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
 
 Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stable](https://developer.gnome.org/gtk/stable)
 
+The following Documentation on this page is in parts outdated. We currently work on updated documentation that can be found
+[here](http://juliagraphics.github.io/Gtk.jl/latest/)
+
 ## Installation
 
 Install within Julia using
