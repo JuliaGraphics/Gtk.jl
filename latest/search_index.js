@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "List and Tree Widgets",
     "title": "Tree Widget",
     "category": "section",
-    "text": "TODO"
+    "text": "Here is an example of the tree model in action:using Gtk\n\nts = @GtkTreeStore(String)\niter1 = push!(ts,(\"one\",))\niter2 = push!(ts,(\"two\",),iter1)\niter3 = push!(ts,(\"three\",),iter2)\ntv = @GtkTreeView(GtkTreeModel(ts))\nr1 = @GtkCellRendererText()\nc1 = @GtkTreeViewColumn(\"A\", r1, Dict([(\"text\",0)]))\npush!(tv,c1)\nwin = @GtkWindow(tv, \"Tree View\")\nshowall(win)\n\niter = Gtk.iter_from_index(ts, [1])\nts[iter,1] = \"ONE\""
 },
 
 {
