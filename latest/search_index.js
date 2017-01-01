@@ -261,15 +261,31 @@ var documenterSearchIndex = {"docs": [
     "page": "List and Tree Widgets",
     "title": "List and Tree Widgets",
     "category": "section",
-    "text": ""
+    "text": "The GtkTreeView is a very powerful widgets for displaying table-like or hierachical data. Other than the name might indicate the GtkTreeView is used for both lists and trees.The power of this widget comes with a slightly more complex design that one has to understand when  using the widget. The most important thing is that the widget itself does not store the displayed data. Instead there are dedicated GtkListStore and GtkTreeStore containers that will hold the data. The benefit of this approach is that it is possible to decouple the view from the data:The widget automatically updates when adding, removing or editing data from the store\nThe widget can sort its data without modifications in the store\nColumns can be reordered and resized\nFiltering can be used to show only subsets of dataWe will in the following introduce both widgets based on small and a more complex example."
 },
 
 {
-    "location": "manual/listtreeview.html#List-Widget-1",
+    "location": "manual/listtreeview.html#List-Store-1",
     "page": "List and Tree Widgets",
-    "title": "List Widget",
+    "title": "List Store",
     "category": "section",
-    "text": "TODO"
+    "text": "Lets start with a very simple example: A table with three columns representing the name, the age and the gender of a person. Each column must have a specific type.  Here, we chose to represent the gender using a boolean value where true  represents female and false represents male. We thus initialize the list store usingls = @ListStore(String, Int, Bool)Now we will the store with datapush!(ls,(\"Peter\",20,false))\npush!(ls,(\"Paul\",30,false))\npush!(ls,(\"Mary\",25,true))If we want so insert the data at a specific position we can use the insert functioninsert!(ls, 2, (\"Susanne\", 35, true))You can use ls like a matrix like container. Calling length and size will give youjulia> length(ls)\n4\n\njulia> size(ls)\n(4,3)Specific element can be be accessed usingjulia> ls[1,1]\n\"Peter\"\njulia> ls[1,1] = \"Pete\"\n\"Pete\""
+},
+
+{
+    "location": "manual/listtreeview.html#List-View-1",
+    "page": "List and Tree Widgets",
+    "title": "List View",
+    "category": "section",
+    "text": "Now we actually want to display our data. To this end we create a tree view objecttv = @TreeView(TreeModel(ls))Then we need specific renderers for each of the columns. Usually you will only need a text renderer, but in our example we want to display the boolean value using a checkbox.rTxt = @CellRendererText()\nrTog = @CellRendererToggle()Finally we create for each column a TreeViewColumn objectc1 = @TreeViewColumn(\"Name\", rTxt, Dict([(\"text\",0)]))\nc2 = @TreeViewColumn(\"Age\", rTxt, Dict([(\"text\",1)]))\nc3 = @TreeViewColumn(\"Female\", rTog, Dict([(\"active\",2)]))We need to push these column description objects to the tree viewpush!(tv, c1, c2, c3)Then we can display the tree view widget in a windowwin = @Window(tv, \"List View\")\nshowall(win)(Image: listview1)TODO"
+},
+
+{
+    "location": "manual/listtreeview.html#selection-1",
+    "page": "List and Tree Widgets",
+    "title": "selection",
+    "category": "section",
+    "text": "selmodel = G_.selection(tv) @test hasselection(selmodel) == false select!(selmodel, Gtk.iter_from_index(ls, 1)) @test hasselection(selmodel) == true iter = selected(selmodel) @test ls[iter, 1] == 44 deleteat!(ls, iter) @test isvalid(ls, iter) == falsetmSorted=@TreeModelSort(ls) G_.model(tv,tmSorted) G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING) it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1)) select!(selmodel, it) iter = selected(selmodel) @test TreeModel(tmSorted)[iter, 1] == 35destroy(w)"
 },
 
 {
