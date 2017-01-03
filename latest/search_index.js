@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Drawing on Canvas",
     "title": "Drawing on Canvas",
     "category": "section",
-    "text": "TODO"
+    "text": "Generic drawing is done on a Canvas. You control what appears on this canvas by defining a draw function:using Gtk, Graphics\nc = @GtkCanvas()\nwin = @GtkWindow(c, \"Canvas\")\n@guarded draw(c) do widget\n    ctx = getgc(c)\n    h = height(c)\n    w = width(c)\n    # Paint red rectangle\n    rectangle(ctx, 0, 0, w, h/2)\n    set_source_rgb(ctx, 1, 0, 0)\n    fill(ctx)\n    # Paint blue rectangle\n    rectangle(ctx, 0, 3h/4, w, h/4)\n    set_source_rgb(ctx, 0, 0, 1)\n    fill(ctx)\nend\nshow(c)This draw function will get called each time the window gets resized or otherwise needs to refresh its display.(Image: canvas)See Julia's standard-library documentation for more information on graphics.Errors in the draw function can corrupt Gtk's internal state; if this happens, you have to quit julia and start a fresh session. To avoid this problem, the @guarded macro wraps your code in a try/catch block and prevents the corruption. It is especially useful when initially writing and debugging code. See further discussion about when @guarded is relevant.Finally, Canvases have a field called mouse that allows you to easily write callbacks for mouse events:c.mouse.button1press = @guarded (widget, event) -> begin\n    ctx = getgc(widget)\n    set_source_rgb(ctx, 0, 1, 0)\n    arc(ctx, event.x, event.y, 5, 0, 2pi)\n    stroke(ctx)\n    reveal(widget)\nendThis will draw a green circle on the canvas at every mouse click. Resizing the window will make them go away; they were drawn on the canvas, but they weren't added to the draw function.Note the use of the @guarded macro here, too."
 },
 
 {
@@ -374,6 +374,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Composed Widgets",
     "category": "section",
     "text": "While a preinitialized button might look like an artificial use cases the same pattern can be used to develop composed widgets. In that case one will typically subclass from a layout widget such as GtkBox or GtkGrid. Lets for instance build a new composed widget consisting of a text box and a buttontype ComposedWidget <: Gtk.GtkBox\n    handle::Ptr{Gtk.GObject}\n    btn # handle to child\n    tv # handle to child\n\n    function ComposedWidget(label)\n        vbox = @GtkBox(:v)\n        btn = @GtkButton(label)\n        tv = @GtkTextView()\n        push!(vbox,btn,tv)\n        setproperty!(vbox,:expand,tv,true)\n        setproperty!(vbox,:spacing,10)\n        w = new(vbox.handle, btn, tv)\n        return Gtk.gobject_move_ref(w, vbox)\n    end\nend\n\nc = ComposedWidget(\"My Button\")\nwin = @GtkWindow(\"Composed Widget\",400,200)\npush!(win, c)\nshowall(win)\nYou will usually store the handles to all subwidgets in the composed type as has been done in the example. This will give you quick access to the child widgets when e.g. callback functions for ComposedWidget are called."
+},
+
+{
+    "location": "manual/async.html#",
+    "page": "Asynchronous UI",
+    "title": "Asynchronous UI",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "manual/async.html#Asynchronous-UI-1",
+    "page": "Asynchronous UI",
+    "title": "Asynchronous UI",
+    "category": "section",
+    "text": "Here is an example of an asynchronous update of the user interface. Since Julia has currently no possibility of multithreading we use a second process to offload the work. The example is just a proof of principle.using Gtk\n\nbtn = @GtkButton(\"Start\")\nsp = @GtkSpinner()\nent = @GtkEntry()\n\ngrid = @GtkGrid()\ngrid[1,1] = btn\ngrid[2,1] = sp\ngrid[1:2,2] = ent\n\nid = addprocs(1)[1]\n\nsignal_connect(btn, \"clicked\") do widget\n start(sp)\n @Gtk.sigatom begin\n   @async begin\n    s = @fetchfrom id begin\n      sleep(4)\n      return \"I am back\"\n    end\n    @Gtk.sigatom begin\n      stop(sp)\n      setproperty!(ent,:text,s)\n    end\n  end\n end\nend\n\nwin = @GtkWindow(grid, \"Progress Bar\", 200, 200)\nshowall(win)"
 },
 
 {
