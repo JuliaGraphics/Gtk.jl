@@ -7,7 +7,8 @@ export new, width, height, #minsize, maxsize
     pagenumber, present, fullscreen, unfullscreen,
     maximize, unmaximize, complete, user_action,
     keyval, prev, up, down, popup,
-    convert_iter_to_child_iter, convert_child_iter_to_iter
+    convert_iter_to_child_iter, convert_child_iter_to_iter,
+    pulse
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 

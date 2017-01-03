@@ -18,6 +18,7 @@ makedocs(
                      "manual/filedialogs.md",
                      "manual/canvas.md",
                      "manual/customWidgets.md",
+                     "manual/async.md",
                      "manual/nonreplusage.md"
                     ],
     ],
