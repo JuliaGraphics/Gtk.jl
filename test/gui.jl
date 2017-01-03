@@ -103,7 +103,7 @@ end
 
 @testset "Initially Hidden Canvas" begin
 nb = Notebook()
-vbox = Gtk.Box(:v)
+vbox = Gtk.GtkBox(:v)
 c = Canvas()
 push!(nb, vbox, "A")
 push!(nb, c, "B")
@@ -153,11 +153,11 @@ end
 @testset "Iteration and toplevel" begin
 ## example of last in first covered
 ## Create this GUI, then shrink window with the mouse
-f = Gtk.Box(:v)
+f = Gtk.GtkBox(:v)
 w = Window(f, "Last in, first covered", 400, 400)
 
-g1 = Gtk.Box(:h)
-g2 = Gtk.Box(:h)
+g1 = Gtk.GtkBox(:h)
+g2 = Gtk.GtkBox(:h)
 push!(f,g1)
 push!(f,g2)
 
@@ -239,7 +239,7 @@ end
 
 @testset "button, label" begin
 w = Window("Widgets")
-f = Gtk.Box(:v); push!(w,f)
+f = Gtk.GtkBox(:v); push!(w,f)
 l = Label("label"); push!(f,l)
 b = Button("button"); push!(f,b)
 
@@ -299,7 +299,7 @@ end
 @testset "radio" begin
 choices = ["choice one", "choice two", "choice three", RadioButton("choice four"), Label("choice five")]
 w = Window("Radio")
-f = Gtk.Box(:v); push!(w,f)
+f = Gtk.GtkBox(:v); push!(w,f)
 r = Array(RadioButton,3)
 r[1] = RadioButton(choices[1]); push!(f,r[1])
 r[2] = RadioButton(r[1],choices[2]); push!(f,r[2])
@@ -479,7 +479,7 @@ destroy(w)
 end
 
 @testset "Statusbar" begin
-vbox = Gtk.Box(:v)
+vbox = Gtk.GtkBox(:v)
 w = Window(vbox, "Statusbar")
 global sb = Statusbar()  # closures are not yet c-callable
 push!(vbox, sb)
