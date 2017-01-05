@@ -225,11 +225,11 @@ export G_Leaf,
 # Gtk 3
 @g_type_delegate Grid = GtkGrid
 @g_type_delegate GLArea = GtkGLArea
-export @Grid, @GLArea
+export Grid, GLArea
 export GridLeaf, GLAreaLeaf
 
 # Gtk 2
 @g_type_delegate Table = GtkTable
 @g_type_delegate Alignment = GtkAlignment
-export @Table, @Aligment
+export Table, Aligment
 export TableLeaf, AligmentLeaf

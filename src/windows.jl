@@ -71,7 +71,7 @@ ask_dialog(message::AbstractString, parent = GtkNullContainer()) =
         ask_dialog(message, "No", "Yes", parent)
 
 function ask_dialog(message::AbstractString, no_text, yes_text, parent = GtkNullContainer())
-    dlg = @GtkMessageDialog(message, ((no_text,0), (yes_text,1)),
+    dlg = GtkMessageDialog(message, ((no_text,0), (yes_text,1)),
             GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.QUESTION, parent)
     response = run(dlg)
     destroy(dlg)
@@ -94,9 +94,9 @@ for (func, flag) in (
 end
 
 function input_dialog(message::AbstractString, entry_default::AbstractString, buttons=(("Cancel",0), ("Accept",1)), parent = GtkNullContainer())
-    widget = @GtkMessageDialog(message, buttons, GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.INFO, parent)
+    widget = GtkMessageDialog(message, buttons, GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.INFO, parent)
     box = content_area(widget)
-    entry = @GtkEntry(;text=entry_default)
+    entry = GtkEntry(;text=entry_default)
     push!(box, entry)
     showall(widget)
     resp = run(widget)

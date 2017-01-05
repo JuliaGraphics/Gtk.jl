@@ -67,12 +67,12 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
 
     function makefilters!(dlgp::GtkFileChooser, filters::Union{AbstractVector,Tuple})
         for f in filters
-            ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, @GtkFileFilter(f))
+            ccall((:gtk_file_chooser_add_filter,libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, GtkFileFilter(f))
         end
     end
 
     function open_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = String[]; kwargs...)
-        dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
+        dlg = GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.OPEN,
                                     (("_Cancel", GConstants.GtkResponseType.CANCEL),
                                      ("_Open",   GConstants.GtkResponseType.ACCEPT)); kwargs...)
         dlgp = GtkFileChooser(dlg)
@@ -103,7 +103,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     end
 
     function save_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = String[]; kwargs...)
-        dlg = @GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
+        dlg = GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
                                     (("_Cancel", GConstants.GtkResponseType.CANCEL),
                                      ("_Save",   GConstants.GtkResponseType.ACCEPT)), kwargs...)
         dlgp = GtkFileChooser(dlg)
@@ -120,5 +120,4 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         destroy(dlg)
         selection
     end
-
 end

@@ -15,9 +15,6 @@ $(Expr(:toplevel, :(module GAccessor
         ccall((:g_object_set_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),object,property_name,value)
         return object
     end
-    function property(object::Gtk.GObject,property_name,value)
-        return ccall((:g_object_get_property,Gtk.GLib.libgobject),Void,(Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),object,property_name,value)
-    end
     function qdata(object::Gtk.GObject,quark)
         return ccall((:g_object_get_qdata,Gtk.GLib.libgobject),Ptr{Void},(Ptr{Gtk.GObject},UInt32),object,quark)
     end
@@ -595,9 +592,6 @@ $(Expr(:toplevel, :(module GAccessor
     function property(container::Gtk.GtkContainer,child,property_name,value)
         ccall((:gtk_container_child_set_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),container,child,property_name,value)
         return container
-    end
-    function property(container::Gtk.GtkContainer,child,property_name,value)
-        return ccall((:gtk_container_child_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),container,child,property_name,value)
     end
     function path_for_child(container::Gtk.GtkContainer,child)
         return convert(Gtk.GtkWidgetPath,ccall((:gtk_container_get_path_for_child,Gtk.libgtk),Ptr{Gtk.GtkWidgetPath},(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),container,child))
@@ -1546,9 +1540,6 @@ $(Expr(:toplevel, :(module GAccessor
         ccall((:gtk_cell_area_cell_set_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),area,renderer,property_name,value)
         return area
     end
-    function property(area::Gtk.GtkCellArea,renderer,property_name,value)
-        return ccall((:gtk_cell_area_cell_get_property,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject},Ptr{UInt8},Ptr{Void}),area,renderer,property_name,value)
-    end
     function focus_cell(area::Gtk.GtkCellArea,renderer)
         ccall((:gtk_cell_area_set_focus_cell,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),area,renderer)
         return area
@@ -1796,13 +1787,6 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function track_motion(widget::Gtk.GtkWidget)
         return convert(Bool,ccall((:gtk_drag_dest_get_track_motion,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),widget))
-    end
-    function target_list(widget::Gtk.GtkWidget)
-        return convert(Gtk.GtkTargetList,ccall((:gtk_drag_source_get_target_list,Gtk.libgtk),Ptr{Gtk.GtkTargetList},(Ptr{Gtk.GObject},),widget))
-    end
-    function target_list(widget::Gtk.GtkWidget,target_list_)
-        ccall((:gtk_drag_source_set_target_list,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GtkTargetList}),widget,target_list_)
-        return widget
     end
     function icon_pixbuf(widget::Gtk.GtkWidget,pixbuf)
         ccall((:gtk_drag_source_set_icon_pixbuf,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Gtk.GObject}),widget,pixbuf)
@@ -2842,10 +2826,6 @@ $(Expr(:toplevel, :(module GAccessor
     end
     function rgba(chooser::Gtk.GtkColorChooser,color)
         return ccall((:gtk_color_chooser_get_rgba,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),chooser,color)
-    end
-    function rgba(chooser::Gtk.GtkColorChooser,color)
-        ccall((:gtk_color_chooser_set_rgba,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Ptr{Void}),chooser,color)
-        return chooser
     end
     function use_alpha(chooser::Gtk.GtkColorChooser)
         return convert(Bool,ccall((:gtk_color_chooser_get_use_alpha,Gtk.libgtk),Cint,(Ptr{Gtk.GObject},),chooser))
