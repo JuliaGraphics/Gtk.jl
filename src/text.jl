@@ -54,13 +54,13 @@ copy(ti::Mutable{GtkTextIter}) = mutable(ti[])
 function GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
     iter = mutable(GtkTextIter)
     ccall((:gtk_text_buffer_get_iter_at_offset, libgtk), Void,
-        (Ptr{GObject}, Ptr{GtkTextIter}, Cint), text, iter, char_offset-1)
+        (Ptr{GObject}, Ptr{GtkTextIter}, Cint), text, iter, char_offset - 1)
     iter[]
 end
 function GtkTextIter(text::GtkTextBuffer, line::Integer, char_offset::Integer)
     iter = mutable(GtkTextIter)
     ccall((:gtk_text_buffer_get_iter_at_line_offset, libgtk), Void,
-        (Ptr{GObject}, Ptr{GtkTextIter}, Cint, Cint), text, iter, line-1, char_offset-1)
+        (Ptr{GObject}, Ptr{GtkTextIter}, Cint, Cint), text, iter, line - 1, char_offset - 1)
     iter[]
 end
 function GtkTextIter(text::GtkTextBuffer)

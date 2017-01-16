@@ -27,7 +27,7 @@ if libgtk_version >= v"3"
 
     function getindex(grid::GtkGrid, i::Integer, j::Integer)
         x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GObject}, (Ptr{GObject}, Cint, Cint), grid, i-1, j-1)
-        x == C_NULL && error("tried to get non-existent child at [$i $j]")
+        x == C_NULL && error("tried to get non - existent child at [$i $j]")
         return convert(GtkWidget, x)
     end
 
@@ -45,11 +45,11 @@ if libgtk_version >= v"3"
 
     function insert!(grid::GtkGrid, i::Integer, side::Symbol)
         if side == :left
-            ccall((:gtk_grid_insert_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i-1)
+            ccall((:gtk_grid_insert_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i - 1)
         elseif side == :right
             ccall((:gtk_grid_insert_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
         elseif side == :top
-            ccall((:gtk_grid_insert_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i-1)
+            ccall((:gtk_grid_insert_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i - 1)
         elseif side == :bottom
             ccall((:gtk_grid_insert_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
         else
@@ -223,7 +223,7 @@ GtkNotebookLeaf() = GtkNotebookLeaf(ccall((:gtk_notebook_new, libgtk), Ptr{GObje
 function insert!(w::GtkNotebook, position::Integer, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
     ccall((:gtk_notebook_insert_page, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
-        w, x, label, position-1) + 1
+        w, x, label, position - 1) + 1
     w
 end
 function unshift!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
@@ -240,7 +240,7 @@ function push!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::U
 end
 function splice!(w::GtkNotebook, i::Integer)
     ccall((:gtk_notebook_remove_page, libgtk), Cint,
-        (Ptr{GObject}, Cint), w, i-1)
+        (Ptr{GObject}, Cint), w, i - 1)
     w
 end
 

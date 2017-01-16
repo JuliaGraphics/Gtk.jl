@@ -39,7 +39,7 @@ push!(cb::GtkComboBoxText, text::AbstractString) =
 unshift!(cb::GtkComboBoxText, text::AbstractString) =
     (ccall((:gtk_combo_box_text_prepend_text, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), cb, bytestring(text)); cb)
 insert!(cb::GtkComboBoxText, i::Integer, text::AbstractString) =
-    (ccall((:gtk_combo_box_text_insert_text, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i-1, bytestring(text)); cb)
+    (ccall((:gtk_combo_box_text_insert_text, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, bytestring(text)); cb)
 
 if libgtk_version >= v"3"
     push!(cb::GtkComboBoxText, id::TupleType(AbstractString, Symbol), text::AbstractString) =
@@ -47,14 +47,14 @@ if libgtk_version >= v"3"
     unshift!(cb::GtkComboBoxText, id::TupleType(AbstractString, Symbol), text::AbstractString) =
         (ccall((:gtk_combo_box_text_prepend, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
     insert!(cb::GtkComboBoxText, i::Integer, id::TupleType(AbstractString, Symbol), text::AbstractString) =
-        (ccall((:gtk_combo_box_text_insert_text, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i-1, id, bytestring(text)); cb)
+        (ccall((:gtk_combo_box_text_insert_text, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
 
     empty!(cb::GtkComboBoxText) =
         (ccall((:gtk_combo_box_text_remove_all, libgtk), Void, (Ptr{GObject},), cb); cb)
 end
 
 delete!(cb::GtkComboBoxText, i::Integer) =
-    (ccall((:gtk_combo_box_text_remove, libgtk), Void, (Ptr{GObject}, Cint), cb, i-1); cb)
+    (ccall((:gtk_combo_box_text_remove, libgtk), Void, (Ptr{GObject}, Cint), cb, i - 1); cb)
 
 immutable GtkTreeIter
     stamp::Cint
@@ -123,13 +123,13 @@ end
 GtkListStoreLeaf(combo::GtkComboBoxText) = GtkListStoreLeaf(ccall((:gtk_combo_box_get_model, libgtk), Ptr{GObject}, (Ptr{GObject},), combo))
 
 ## index is integer for a liststore, vector of ints for tree
-iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index-1))
+iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index - 1))
 index_from_iter(store::GtkListStore, iter::TRI) = Int(get_string_from_iter(GtkTreeModel(store), iter)) + 1
 
 function list_store_set_values(store::GtkListStore, iter, values)
     for (i, value) in enumerate(values)
         ccall((:gtk_list_store_set_value, Gtk.libgtk), Void, (Ptr{GObject}, Ptr{GtkTreeIter}, Cint, Ptr{Gtk.GValue}),
-              store, iter, i-1, Gtk.gvalue(value))
+              store, iter, i - 1, Gtk.gvalue(value))
     end
 end
 
@@ -213,7 +213,7 @@ iter_from_index(store::GtkTreeStoreLeaf, index::Vector{Int}) = iter_from_string_
 function tree_store_set_values(treeStore::GtkTreeStoreLeaf, iter, values)
     for (i, value) in enumerate(values)
         ccall((:gtk_tree_store_set_value, Gtk.libgtk), Void, (Ptr{GObject}, Ptr{GtkTreeIter}, Cint, Ptr{Gtk.GValue}),
-              treeStore, iter, i-1, gvalue(value))
+              treeStore, iter, i - 1, gvalue(value))
     end
     iter[]
 end
@@ -310,7 +310,7 @@ getindex(store::GtkTreeStore, row::Vector{Int}) = getindex(store, iter_from_inde
 
 
 function setindex!(store::Union{GtkListStore, GtkTreeStore}, value, iter::TRI, column::Integer)
-    Gtk.G_.value(store, Gtk.mutable(iter), column-1, gvalue(value))
+    Gtk.G_.value(store, Gtk.mutable(iter), column - 1, gvalue(value))
 end
 
 function setindex!(store::GtkTreeStore, value, index::Vector{Int}, column::Integer)
@@ -365,7 +365,7 @@ end
 function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
     val = mutable(GValue())
     ccall((:gtk_tree_model_get_value, libgtk), Void, (Ptr{GObject}, Ptr{GtkTreeIter}, Cint, Ptr{GValue}),
-           treeModel, mutable(iter), column-1, val)
+           treeModel, mutable(iter), column - 1, val)
     val[Any]
 end
 
@@ -374,12 +374,12 @@ function getindex(treeModel::GtkTreeModel, iter::TRI)
 end
 
 function setindex!(treeModel::GtkTreeModel, value, iter::TRI, column::Integer)
-    G_.value(treeModel, mutable(iter), column-1, gvalue(value))
+    G_.value(treeModel, mutable(iter), column - 1, gvalue(value))
 end
 
 function setindex!(treeModel::GtkTreeModel, values, iter::TRI)
     for (i, v) in enumerate(values)
-        G_.value(treeModel, mutable(iter), i-1, gvalue(v))
+        G_.value(treeModel, mutable(iter), i - 1, gvalue(v))
     end
 end
 

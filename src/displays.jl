@@ -48,7 +48,7 @@ type MatrixStrided{T} <: AbstractMatrix{T}
         if rowstride == -1
             @assert(p == C_NULL, "MatrixStrided rowstride must be given")
             rowstride_preferred = (rowstride_req + 3) & ~3
-            nbytes_preferred = rowstride_preferred * (height-1) + width * sizeof(T)
+            nbytes_preferred = rowstride_preferred * (height - 1) + width * sizeof(T)
             if p == C_NULL || nbytes > nbytes_preferred
                 rowstride = rowstride_preferred
             else
@@ -57,7 +57,7 @@ type MatrixStrided{T} <: AbstractMatrix{T}
         else
             @assert(rowstride >= rowstride_req, "MatrixStrided rowstride must be larger than the width")
         end
-        nbytes_req = rowstride * (height-1) + width * sizeof(T)
+        nbytes_req = rowstride * (height - 1) + width * sizeof(T)
         if nbytes == -1
             nbytes = nbytes_req
         else
@@ -82,7 +82,7 @@ end
 function getindex{T}(a::MatrixStrided{T}, x::Integer, y::Integer)
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
-    return unsafe_load(a.p + (x-1) * sizeof(T) + (y-1) * a.rowstride)
+    return unsafe_load(a.p + (x - 1) * sizeof(T) + (y - 1) * a.rowstride)
 end
 function getindex{T}(a::MatrixStrided{T}, x::Index, y::Index)
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
@@ -104,7 +104,7 @@ end
 function setindex!{T}(a::MatrixStrided{T}, z, x::Integer, y::Integer)
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
-    unsafe_store!(a.p + (x-1) * sizeof(T) + (y-1) * a.rowstride, convert(T, z))
+    unsafe_store!(a.p + (x - 1) * sizeof(T) + (y - 1) * a.rowstride, convert(T, z))
     a
 end
 function setindex!{T}(a::MatrixStrided{T}, z, x::Index, y::Index)

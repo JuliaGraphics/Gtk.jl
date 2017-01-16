@@ -86,7 +86,7 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
                     params[i] = gv[Any]
                 end
                 if i > 1
-                    params[i] = convert(param_types[i-1], params[i])
+                    params[i] = convert(param_types[i - 1], params[i])
                 end
             end
             push!(params, user_data)

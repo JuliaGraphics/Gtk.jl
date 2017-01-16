@@ -357,7 +357,7 @@ if VERSION >= v"0.4-"
         if cnt == 1
             delete!(gc_preserve, x)
         else
-            gc_preserve[x] = (ref, cnt-1)
+            gc_preserve[x] = (ref, cnt - 1)
         end
         nothing
     end
@@ -383,7 +383,7 @@ else
         if cnt == 1
             delete!(gc_preserve, x)
         else
-            gc_preserve[x] = cnt-1
+            gc_preserve[x] = cnt - 1
         end
         nothing
     end
