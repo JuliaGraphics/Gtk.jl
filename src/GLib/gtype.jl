@@ -158,7 +158,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
     #    interface = unsafe_load(interfaces,i)
     #    # what do we care to do here?!
     #end
-    #c_free(interfaces)
+    #g_free(interfaces)
     parent = g_type_parent(gtyp)
     @assert parent != 0
     piname = g_type_name(parent)

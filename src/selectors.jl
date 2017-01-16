@@ -93,7 +93,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             if multiple
                 selection = String[]
             else
-                selection = utf8("")
+                selection = GLib.utf8("")
             end
         end
         destroy(dlg)
@@ -113,7 +113,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         if response == GConstants.GtkResponseType.ACCEPT
             selection = bytestring(GAccessor.filename(dlgp))
         else
-            selection = utf8("")
+            selection = GLib.utf8("")
         end
         destroy(dlg)
         return selection
