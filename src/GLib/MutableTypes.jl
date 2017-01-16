@@ -17,20 +17,20 @@ mutable{T}(x::T) = MutableX{T}(x)
 mutable(x::Mutable) = x
 mutable{T}(x::Type{T}) = MutableX{T}()
 
-function mutable{T, N}(x::Array{T, N}, i=1)
+function mutable{T, N}(x::Array{T, N}, i = 1)
     if isbits(T)
         MutableA{T, N}(x, i)
     else
         mutable(x[i])
     end
 end
-mutable{T<:Ptr, N}(x::Array{T, N}, i=1) = mutable(x[i])
-mutable{T}(x::Ptr{T}, i=1) = x+(i-1)*sizeof(T)
+mutable{T <: Ptr, N}(x::Array{T, N}, i = 1) = mutable(x[i])
+mutable{T}(x::Ptr{T}, i = 1) = x + (i-1) * sizeof(T)
 mutable{T}(x::T, i) = (i == 1 ? mutable(x) : error("Object only has one element"))
 
 _addrof{T}(b::T) = ccall(:jl_value_ptr, Ptr{T}, (Ptr{Any},), &b)
-Base.cconvert{P<:Ptr, T}(::Type{P}, b::MutableX{T}) = isbits(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
-Base.cconvert{P<:Ptr, T, N}(::Type{P}, b::MutableA{T, N}) = convert(P, pointer(b.x, b.i))
+Base.cconvert{P <: Ptr, T}(::Type{P}, b::MutableX{T}) = isbits(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
+Base.cconvert{P <: Ptr, T, N}(::Type{P}, b::MutableA{T, N}) = convert(P, pointer(b.x, b.i))
 
 deref(b::Ptr) = unsafe_load(b)
 deref(b::MutableX) = b.x

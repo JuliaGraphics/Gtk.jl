@@ -70,7 +70,7 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
     ret
 end
 function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
-        include=0, exclude=GdkModifierType.BUTTONS, after::Bool=false, closure::T=w)
+        include = 0, exclude = GdkModifierType.BUTTONS, after::Bool = false, closure::T = w)
     exclude &= ~include
     mask = GdkEventMask.POINTER_MOTION_HINT
     if     0 == include & GdkModifierType.BUTTONS
@@ -81,7 +81,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
         mask |= GdkEventMask.BUTTON2_MOTION
     elseif 0 != include & GdkModifierType.BUTTON3
         mask |= GdkEventMask.BUTTON3_MOTION
-    else #if 0 != include & (GdkModifierType.BUTTON4|GdkModifierType.BUTTON5)
+    else #if 0 != include & (GdkModifierType.BUTTON4 | GdkModifierType.BUTTON5)
         mask |= GdkEventMask.BUTTON_MOTION
     end
     add_events(widget, mask)
@@ -105,8 +105,8 @@ function on_signal_scroll(scroll_cb::Function, widget::GtkWidget, vargs...)
 end
 
 
-function reveal(c::GtkWidget, immediate::Bool=true)
-    #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Void}, (Ptr{GdkRectangle},), &allocation(c))
+function reveal(c::GtkWidget, immediate::Bool = true)
+    #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Void}, (Ptr{GdkRectangle},), & allocation(c))
     #ccall((:gdk_window_invalidate_region, libgdk), Void, (Ptr{Void}, Ptr{Void}, Bool),
     #    gdk_window(c), region, true)
     ccall((:gtk_widget_queue_draw, libgtk), Void, (Ptr{GObject},), c)
@@ -115,7 +115,7 @@ function reveal(c::GtkWidget, immediate::Bool=true)
     end
 end
 
-const default_mouse_cb = (w, event)->nothing
+const default_mouse_cb = (w, event) -> nothing
 
 if VERSION < v"0.4.0-dev"
 typealias MHStack Vector{(Symbol, Function)}
@@ -204,7 +204,7 @@ end
 
 function pop!(mh_evt::MHPair)
     mh, evt = mh_evt
-    idx = findlast(x->x[1]==evt, mh.stack)
+    idx = findlast(x -> (x[1] == evt), mh.stack)
     if idx != 0
         _, func = mh.stack[idx]
         setfield!(mh, evt, func)

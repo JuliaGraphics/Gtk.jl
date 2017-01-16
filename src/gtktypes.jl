@@ -4,8 +4,8 @@ function _gtksubtype_constructors(name::Symbol)
     typ = getfield(cm, ename)
     if GLib.g_isa(typ, GtkOrientable)
         @eval $ename(orientation::Symbol, vargs...) = $ename(
-            (orientation==:v ? true :
-            (orientation==:h ? false :
+            (orientation == :v ? true :
+            (orientation == :h ? false :
             error("invalid $($ename) orientation $orientation"))), vargs...)
     end
     if isdefined(Gtk, :GtkContainer) && GLib.g_isa(typ, GtkContainer)

@@ -23,7 +23,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     end
 
     #if VERSION >= v"0.4-"
-    #GtkFileChooserDialogLeaf(title::AbstractString, parent::GtkContainer, action::Integer, button_text_response::=>...; kwargs...) =
+    #GtkFileChooserDialogLeaf(title::AbstractString, parent::GtkContainer, action::Integer, button_text_response::= >...; kwargs...) =
     #    GtkFileChooserDialogLeaf(title::AbstractString, parent, action, button_text_response; kwargs...)
     #end
     function GtkFileChooserDialogLeaf(title::AbstractString, parent::GtkContainer, action::Integer, button_text_response; kwargs...)
@@ -61,7 +61,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         ccall((:gtk_file_filter_set_name, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
         return filt
     end
-    GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString, Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
+    GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString, Void} = nothing) = GtkFileFilterLeaf(; name = name, pattern = pattern)
 
     GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 

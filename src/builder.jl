@@ -1,12 +1,12 @@
 
-function GtkBuilderLeaf(; buffer=nothing, filename=nothing, resource=nothing)
+function GtkBuilderLeaf(; buffer = nothing, filename = nothing, resource = nothing)
     builder = GtkBuilderLeaf(ccall((:gtk_builder_new, libgtk), Ptr{GObject}, () ) )
-    push!(builder, buffer=buffer, filename=filename, resource=resource)
+    push!(builder, buffer = buffer, filename = filename, resource = resource)
     builder
 end
 
-function push!(builder::GtkBuilder;buffer=nothing, filename=nothing, resource=nothing)
-    source_count = (buffer!==nothing) + (filename!==nothing) + (resource!==nothing)
+function push!(builder::GtkBuilder; buffer = nothing, filename = nothing, resource = nothing)
+    source_count = (buffer !== nothing) + (filename !== nothing) + (resource !== nothing)
     @assert(source_count == 1,
         "push!(GtkBuilder) must have exactly one buffer, filename, or resource argument")
     if buffer !== nothing

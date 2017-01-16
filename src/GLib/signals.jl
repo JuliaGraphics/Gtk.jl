@@ -3,7 +3,7 @@
 # end
 if VERSION < v"0.5.0-dev"
     function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-            ::Type{RT}, param_types::Tuple, after::Bool=false, user_data::CT=w)
+            ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
         if isgeneric(cb)
             return signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
         end
@@ -12,13 +12,13 @@ if VERSION < v"0.5.0-dev"
     end
 else
     function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-            ::Type{RT}, param_types::Tuple, after::Bool=false, user_data::CT=w)
+            ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
         signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
     end
 end
 
 function signal_connect_generic{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-        ::Type{RT}, param_types::Tuple, after::Bool=false, user_data::CT=w)  #TODO: assert that length(param_types) is correct
+        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)  #TODO: assert that length(param_types) is correct
     callback = cfunction(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
     return ccall((:g_signal_connect_data, libgobject), Culong,
@@ -28,18 +28,18 @@ function signal_connect_generic{CT, RT}(cb::Function, w::GObject, sig::AbstractS
                  callback,
                  ref,
                  deref,
-                 after*GConnectFlags.AFTER)
+                 after * GConnectFlags.AFTER)
 end
 
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool=false)
+function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool = false)
     _signal_connect(cb, w, sig, after, false, nothing, nothing)
 end
 function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
     @assert sizeof_gclosure > 0
-    closuref = ccall((:g_closure_new_object, libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int+GLib.WORD_SIZE*2, w)
+    closuref = ccall((:g_closure_new_object, libgobject), Ptr{Void}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int + GLib.WORD_SIZE * 2, w)
     closure_env = convert(Ptr{Ptr{Void}}, closuref + sizeof_gclosure)
     if gtk_call_conv
         env = Any[param_types, user_data]
@@ -71,7 +71,7 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
         if gtk_calling_convention
             # compatibility mode, if we must
             param_types, user_data = unsafe_load(closure_env, 2)::Array{Any, 1}
-            length(param_types)+1 == n_param_values || error("GCallback called with the wrong number of parameters")
+            length(param_types) + 1 == n_param_values || error("GCallback called with the wrong number of parameters")
             for i = 1:n_param_values
                 gv = mutable(param_values, i)
                 gtyp = unsafe_load(gv).g_type
@@ -142,15 +142,15 @@ signal_handler_unblock(w::GObject, handler_id::Culong) =
 function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
     i = isa(sig, AbstractString) ? search(sig, "::") : (0:-1)
     if !isempty(i)
-        detail = @quark_str sig[last(i)+1:end]
+        detail = @quark_str sig[last(i) + 1:end]
         sig = sig[1:first(i)-1]
     else
         detail = UInt32(0)
     end
     signal_id = ccall((:g_signal_lookup, libgobject), Cuint, (Ptr{UInt8}, Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
-    return_value = RT===Void ? C_NULL : gvalue(RT)
+    return_value = RT === Void ? C_NULL : gvalue(RT)
     ccall((:g_signal_emitv, libgobject), Void, (Ptr{GValue}, Cuint, UInt32, Ptr{GValue}), gvalues(w, args...), signal_id, detail, return_value)
-    RT===Void ? nothing : return_value[RT]
+    RT === Void ? nothing : return_value[RT]
 end
 
 g_stack = nothing # need to call g_loop_run from only one stack
@@ -322,7 +322,7 @@ function uv_prepare(src::Ptr{Void}, timeout::Ptr{Cint})
         expiration = typemax(UInt64)
     elseif tmout_ms > 0
         now = ccall((:g_source_get_time, GLib.libglib), UInt64, (Ptr{Void},), src)
-        expiration = convert(UInt64, now + tmout_ms*1000)
+        expiration = convert(UInt64, now + tmout_ms * 1000)
     else #tmout_ms == 0
         expiration = UInt64(0)
     end
@@ -392,7 +392,7 @@ function __init__()
     global JuliaClosureMarshal = cfunction(GClosureMarshal, Void,
         (Ptr{Void}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Void}, Ptr{Void}))
     exiting[] = false
-    atexit(()->exiting[] = true)
+    atexit(() -> (exiting[] = true))
     __init__gtype__()
     __init__gmainloop__()
     nothing

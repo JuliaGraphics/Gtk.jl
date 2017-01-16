@@ -37,7 +37,7 @@ if libgtk_version >= v"3"
     end
 end
 
-GtkRadioButtonLeaf(group::Ptr{Void}=C_NULL) =
+GtkRadioButtonLeaf(group::Ptr{Void} = C_NULL) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new, libgtk), Ptr{GObject},
         (Ptr{Void},), group))
 GtkRadioButtonLeaf(group::Ptr{Void}, label::AbstractString) =
@@ -56,7 +56,7 @@ GtkRadioButtonLeaf(group::GtkRadioButton, child::GtkWidget, vargs...) =
     push!(GtkRadioButtonLeaf(group, vargs...), child)
 
 type GtkRadioButtonGroup <: GtkContainer # NOT a native @gtktype
-    # when iterating/indexing elements will be in reverse / *random* order
+    # when iterating/indexing elements will be in reverse / * random * order
 
     # the behavior is specified as undefined if the first
     # element is moved to a new group
@@ -70,10 +70,10 @@ macro GtkRadioButtonGroup(args...)
     :( GtkRadioButtonGroup($(map(esc, args)...)) )
 end
 GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBoxLeaf(true))
-function GtkRadioButtonGroup(elem::Vector, active::Int=1)
+function GtkRadioButtonGroup(elem::Vector, active::Int = 1)
     grp = GtkRadioButtonGroup()
     for (i, e) in enumerate(elem)
-        push!(grp, e, i==active)
+        push!(grp, e, i == active)
     end
     grp
 end
@@ -93,7 +93,7 @@ function push!(grp::GtkRadioButtonGroup, e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup, label, active::Union{Bool, Void}=nothing)
+function push!(grp::GtkRadioButtonGroup, label, active::Union{Bool, Void} = nothing)
     if isdefined(grp, :anchor)
         e = GtkRadioButtonLeaf(grp.anchor, label)
     else
@@ -156,7 +156,7 @@ function GtkLinkButtonLeaf(uri::AbstractString, visited::Bool)
 end
 
 GtkVolumeButtonLeaf() = GtkVolumeButtonLeaf(ccall((:gtk_volume_button_new, libgtk), Ptr{GObject}, ()))
-function GtkVolumeButtonLeaf(value::Real) # 0<=value<=1
+function GtkVolumeButtonLeaf(value::Real) # 0 <= value <= 1
     b = GtkVolumeButtonLeaf()
     ccall((:gtk_scale_button_set_value, libgtk), Void, (Ptr{GObject}, Cdouble), b, value)
     b

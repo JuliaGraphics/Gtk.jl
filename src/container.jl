@@ -39,7 +39,7 @@ done(w::GtkBin, s::Bool) = true
 done(w::GtkBin, s::GtkWidget) = false
 length(w::GtkBin) = done(w, start(w)) ? 0 : 1
 function getindex(w::GtkBin, i::Integer)
-    i!=1 && error(BoundsError())
+    i != 1 && error(BoundsError())
     c = start(w)
     c == false && error(BoundsError())
     c::GtkWidget

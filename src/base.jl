@@ -24,7 +24,7 @@ if libgtk_version >= v"3"
 else
     width(w::GtkWidget) = allocation(w).width
     height(w::GtkWidget) = allocation(w).height
-    size(w::GtkWidget) = (a=allocation(w);(a.width, a.height))
+    size(w::GtkWidget) = (a = allocation(w); (a.width, a.height))
 end
 gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window, libgtk), Ptr{Void}, (Ptr{GObject},), w)
 screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))

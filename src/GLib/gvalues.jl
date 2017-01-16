@@ -27,7 +27,7 @@ function gvalues(xs...)
         gv[] = T  # init type
         gv[T] = x # init value
     end
-    finalizer(v, (v)->for i = 1:length(v)
+    finalizer(v, (v) -> for i = 1:length(v)
             ccall((:g_value_unset, libgobject), Void, (Ptr{GValue},), pointer(v, i))
         end)
     v
@@ -46,9 +46,9 @@ getindex{T}(gv::GV, i::Int, ::Type{T}) = getindex(mutable(gv, i), T)
 getindex(gv::GV, i::Int) = getindex(mutable(gv, i))
 getindex(v::GV, i::Int, ::Type{Void}) = nothing
 
-let handled=Set()
+let handled = Set()
 global make_gvalue, getindex
-function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool=true, fundamental::Bool=false)
+function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = true, fundamental::Bool = false)
     with_id === :error && return
     if isa(with_id, Tuple)
         with_id = with_id::TupleType(Symbol, Any)
@@ -56,11 +56,11 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool=tr
     end
     if pass_x !== Union{} && !(pass_x in handled)
         eval(current_module(), quote
-            function Base.setindex!{T<:$pass_x}(v::GLib.GV, ::Type{T})
+            function Base.setindex!{T <: $pass_x}(v::GLib.GV, ::Type{T})
                 ccall((:g_value_init, GLib.libgobject), Void, (Ptr{GLib.GValue}, Csize_t), v, $with_id)
                 v
             end
-            function Base.setindex!{T<:$pass_x}(v::GLib.GV, x, ::Type{T})
+            function Base.setindex!{T <: $pass_x}(v::GLib.GV, x, ::Type{T})
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))
                     elseif to_gtype == :pointer || to_gtype == :boxed
@@ -70,7 +70,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool=tr
                     end)
                 ccall(($(string("g_value_set_", to_gtype)), GLib.libgobject), Void, (Ptr{GLib.GValue}, $as_ctype), v, x)
                 if isa(v, GLib.MutableTypes.MutableX)
-                    finalizer(v, (v::GLib.MutableTypes.MutableX)->ccall((:g_value_unset, GLib.libgobject), Void, (Ptr{GLib.GValue},), v))
+                    finalizer(v, (v::GLib.MutableTypes.MutableX) -> ccall((:g_value_unset, GLib.libgobject), Void, (Ptr{GLib.GValue},), v))
                 end
                 v
             end
@@ -82,7 +82,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool=tr
     if pass_x !== Union{} && !(pass_x in handled)
         push!(handled, pass_x)
         eval(current_module(), quote
-            function Base.getindex{T<:$pass_x}(v::GLib.GV, ::Type{T})
+            function Base.getindex{T <: $pass_x}(v::GLib.GV, ::Type{T})
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))
@@ -105,7 +105,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool=tr
                 end)
             end
         end)
-        allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(), :(()->$with_id)), fn])
+        allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(), :(() -> $with_id)), fn])
         return fn
     end
     return nothing

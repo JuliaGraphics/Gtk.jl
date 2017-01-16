@@ -1,7 +1,7 @@
 if libgtk_version >= v"3"
 
-    function GtkCssProviderLeaf(;data=nothing, filename=nothing)
-        source_count = (data!==nothing) + (filename!==nothing)
+    function GtkCssProviderLeaf(; data = nothing, filename = nothing)
+        source_count = (data !== nothing) + (filename !== nothing)
         @assert(source_count <= 1,
             "GtkCssProvider must have at most one data or filename argument")
         provider = GtkCssProviderLeaf(ccall((:gtk_css_provider_get_default, libgtk), Ptr{GObject}, ()))

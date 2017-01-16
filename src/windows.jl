@@ -1,4 +1,4 @@
-function GtkWindowLeaf(title::Union{Void, AbstractStringLike}=nothing, w::Real=-1, h::Real=-1, resizable::Bool=true, toplevel::Bool=true)
+function GtkWindowLeaf(title::Union{Void, AbstractStringLike} = nothing, w::Real = -1, h::Real = -1, resizable::Bool = true, toplevel::Bool = true)
     hnd = ccall((:gtk_window_new, libgtk), Ptr{GObject}, (GEnum,),
         toplevel?GtkWindowType.TOPLEVEL:GtkWindowType.POPUP)
     if title !== nothing
@@ -40,7 +40,7 @@ GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
                 C_NULL, C_NULL))
 
 #if VERSION >= v"0.4-"
-#GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons::=>...; kwargs...) =
+#GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons::Pair...; kwargs...) =
 #    GtkDialogLeaf(title, parent, flags, buttons; kwargs...)
 #end
 function GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons; kwargs...)
@@ -93,10 +93,10 @@ for (func, flag) in (
     end
 end
 
-function input_dialog(message::AbstractString, entry_default::AbstractString, buttons=(("Cancel", 0), ("Accept", 1)), parent = GtkNullContainer())
+function input_dialog(message::AbstractString, entry_default::AbstractString, buttons = (("Cancel", 0), ("Accept", 1)), parent = GtkNullContainer())
     widget = GtkMessageDialog(message, buttons, GtkDialogFlags.DESTROY_WITH_PARENT, GtkMessageType.INFO, parent)
     box = content_area(widget)
-    entry = GtkEntry(;text=entry_default)
+    entry = GtkEntry(; text = entry_default)
     push!(box, entry)
     showall(widget)
     resp = run(widget)

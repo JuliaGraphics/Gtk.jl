@@ -19,10 +19,10 @@ GtkLabelLeaf(title) = GtkLabelLeaf(
 GtkTextBufferLeaf() = GtkTextBufferLeaf(
     ccall((:gtk_text_buffer_new, libgtk), Ptr{GObject}, (Ptr{GObject},), C_NULL))
 
-GtkTextViewLeaf(buffer::GtkTextBuffer=GtkTextBuffer()) = GtkTextViewLeaf(
+GtkTextViewLeaf(buffer::GtkTextBuffer = GtkTextBuffer()) = GtkTextViewLeaf(
     ccall((:gtk_text_view_new_with_buffer, libgtk), Ptr{GObject}, (Ptr{GObject},), buffer))
 
-GtkTextMarkLeaf(left_gravity::Bool=false) = GtkTextMarkLeaf(
+GtkTextMarkLeaf(left_gravity::Bool = false) = GtkTextMarkLeaf(
     ccall((:gtk_text_mark_new, libgtk), Ptr{GObject}, (Ptr{UInt8}, Cint), C_NULL, left_gravity))
 
 GtkTextTagLeaf() = GtkTextTagLeaf(
@@ -90,8 +90,8 @@ end
 
 #####  GtkTextIter  #####
 #TODO: search
-getproperty(text::TI, key::AbstractString, outtype::Type=Any) = getproperty(text, Symbol(key), outtype)
-function getproperty(text::TI, key::Symbol, outtype::Type=Any)
+getproperty(text::TI, key::AbstractString, outtype::Type = Any) = getproperty(text, Symbol(key), outtype)
+function getproperty(text::TI, key::Symbol, outtype::Type = Any)
     text = mutable(text)
     return convert(outtype,
     if     key === :offset
@@ -191,7 +191,7 @@ end
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) >= 0
 start(iter::TI) = mutable(iter)
 function next(::TI, iter::Mutable{GtkTextIter})
-    (getproperty(iter, :char)::Char, iter+1)
+    (getproperty(iter, :char)::Char, iter + 1)
 end
 done(::TI, iter) = getproperty(iter, :is_end)::Bool
 @compat(Base.:+)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
@@ -277,9 +277,9 @@ first(r::GtkTextRange) = r.a
 last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(first(r))
 next(r::GtkTextRange, i) = next(i, i)
-done(r::GtkTextRange, i) = (i==last(r) || done(i, i))
-getproperty(text::GtkTextRange, key::AbstractString, outtype::Type=Any) = getproperty(text, Symbol(key), outtype)
-function getproperty(text::GtkTextRange, key::Symbol, outtype::Type=Any)
+done(r::GtkTextRange, i) = (i == last(r) || done(i, i))
+getproperty(text::GtkTextRange, key::AbstractString, outtype::Type = Any) = getproperty(text, Symbol(key), outtype)
+function getproperty(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     starttext = first(text)
     endtext = last(text)
     return convert(outtype,

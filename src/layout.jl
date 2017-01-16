@@ -31,13 +31,13 @@ if libgtk_version >= v"3"
         return convert(GtkWidget, x)
     end
 
-    function setindex!{T<:Integer, R<:Integer}(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
+    function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
         (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
         ccall((:gtk_grid_attach, libgtk), Void,
             (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
     end
     #TODO:
-    # function setindex!{T<:Integer, R<:Integer}(grid::GtkGrid, child::Array, j::Union{T, Range{T}}, i::Union{R, Range1{R}})
+    # function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child::Array, j::Union{T, Range{T}}, i::Union{R, Range1{R}})
     #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     #    ccall((:gtk_grid_attach, libgtk), Void,
     #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
@@ -78,22 +78,22 @@ if libgtk_version >= v"3.16.0"
 end
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
-GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool=false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
-GtkTableLeaf(homogeneous::Bool=false) = GtkTableLeaf(0, 0, homogeneous)
-function setindex!{T<:Integer, R<:Integer}(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
+GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool = false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
+GtkTableLeaf(homogeneous::Bool = false) = GtkTableLeaf(0, 0, homogeneous)
+function setindex!{T <: Integer, R <: Integer}(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
     (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     ccall((:gtk_table_attach_defaults, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 end
 #TODO:
-# function setindex!{T<:Integer, R<:Integer}(grid::GtkTable, child::Array, i::Union{T, Range{T}}, j::Union{R, Range{R}})
+# function setindex!{T <: Integer, R <: Integer}(grid::GtkTable, child::Array, i::Union{T, Range{T}}, j::Union{R, Range{R}})
 #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
 #    ccall((:gtk_table_attach_defaults, libgtk), Void,
 #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 # end
 
 ### GtkAlignment was deprecated in Gtk3 (replaced by properties "halign", "valign", and "margin")
-GtkAlignmentLeaf(xalign, yalign, xscale, yscale) = # % of available space, 0<=a<=1
+GtkAlignmentLeaf(xalign, yalign, xscale, yscale) = # % of available space, 0 <= a <= 1
     GtkAlignmentLeaf(ccall((:gtk_alignment_new, libgtk), Ptr{GObject},
         (Cfloat, Cfloat, Cfloat, Cfloat), xalign, yalign, xscale, yscale))
 
@@ -104,20 +104,20 @@ GtkFrameLeaf() = GtkFrameLeaf(ccall((:gtk_frame_new, libgtk), Ptr{GObject},
         (Ptr{UInt8},), C_NULL))
 
 ### GtkAspectFrame
-GtkAspectFrameLeaf(label, xalign, yalign, ratio) = # % of available space, 0<=a<=1
+GtkAspectFrameLeaf(label, xalign, yalign, ratio) = # % of available space, 0 <= a <= 1
     GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
         (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, ratio, false))
-GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0<=a<=1. Uses the aspect ratio of the child
+GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0 <= a <= 1. Uses the aspect ratio of the child
     GtkAspectFrameLeaf(ccall((:gtk_aspect_frame_new, libgtk), Ptr{GObject},
         (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
 if libgtk_version >= v"3"
-    GtkBoxLeaf(vertical::Bool, spacing=0) =
+    GtkBoxLeaf(vertical::Bool, spacing = 0) =
         GtkBoxLeaf(ccall((:gtk_box_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
 else
-    GtkBoxLeaf(vertical::Bool, spacing=0) =
+    GtkBoxLeaf(vertical::Bool, spacing = 0) =
         GtkBoxLeaf(
             if vertical
                 ccall((:gtk_vbox_new, libgtk), Ptr{GObject},
@@ -150,7 +150,7 @@ end
 
 ### GtkPaned
 if libgtk_version >= v"3"
-    GtkPanedLeaf(vertical::Bool, spacing=0) =
+    GtkPanedLeaf(vertical::Bool, spacing = 0) =
         GtkPanedLeaf(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
             (Cint, Cint), vertical, spacing))
 else
@@ -185,7 +185,7 @@ function setindex!(pane::GtkPaned, child, i::Integer)
     end
 end
 
-function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool=true)
+function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool = true)
     if i == 1
         ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint, Cint), pane, child, resize, shrink)
     elseif i == 2
@@ -223,19 +223,19 @@ GtkNotebookLeaf() = GtkNotebookLeaf(ccall((:gtk_notebook_new, libgtk), Ptr{GObje
 function insert!(w::GtkNotebook, position::Integer, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
     ccall((:gtk_notebook_insert_page, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Cint),
-        w, x, label, position-1)+1
+        w, x, label, position-1) + 1
     w
 end
 function unshift!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
     ccall((:gtk_notebook_prepend_page, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
-        w, x, label)+1
+        w, x, label) + 1
     w
 end
 function push!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
     ccall((:gtk_notebook_append_page, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
-        w, x, label)+1
+        w, x, label) + 1
     w
 end
 function splice!(w::GtkNotebook, i::Integer)

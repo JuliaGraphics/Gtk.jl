@@ -9,7 +9,7 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     back::CairoSurface   # backing store
     backcc::CairoContext
 
-    function GtkCanvas(w=-1, h=-1)
+    function GtkCanvas(w = -1, h = -1)
         da = ccall((:gtk_drawing_area_new, libgtk), Ptr{GObject}, ())
         ccall((:gtk_widget_set_size_request, libgtk), Void, (Ptr{GObject}, Int32, Int32), da, w, h)
         widget = new(da, false, false, MouseHandler(), nothing, nothing)
@@ -77,7 +77,7 @@ function draw(redraw::Function, widget::GtkCanvas)
     nothing
 end
 
-function draw(widget::GtkCanvas, immediate::Bool=true)
+function draw(widget::GtkCanvas, immediate::Bool = true)
     if widget.is_realized && widget.is_sized
         if isa(widget.draw, Function)
             widget.draw(widget)
