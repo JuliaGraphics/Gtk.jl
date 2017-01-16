@@ -47,7 +47,7 @@ empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
 empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{supertype(L)}, li))
 
 ## Standard Iteration protocol
-start{L}(list::LList{L}) = convert(Ptr{L}, list)
+start{L}(list::LList{L}) = unsafe_convert(Ptr{L}, list)
 next{T}(::LList, s::Ptr{T}) = (deref(s), unsafe_load(s).next) # return (value, state)
 done(::LList, s::Ptr) = (s == C_NULL)
 
@@ -71,6 +71,7 @@ strides(list::LList) = (1,)
 stride(list::LList, k::Integer) = (k > 1 ? length(list) : 1)
 size(list::LList) = (length(list),)
 isempty{L}(list::LList{L}) = (unsafe_convert(Ptr{L}, list) == C_NULL)
+iteratorsize{L<:LList}(::Type{L}) = HasLength()
 
 shift!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))

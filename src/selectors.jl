@@ -19,7 +19,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     function push!(widget::GtkDialog, text::AbstractString, response::Integer)
         ccall((:gtk_dialog_add_button,libgtk), Ptr{GObject},
               (Ptr{GObject},Ptr{UInt8},Cint), widget, text, response)
-        widget
+        return widget
     end
 
     #if VERSION >= v"0.4-"
@@ -33,7 +33,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         for (k,v) in button_text_response
             push!(w, k, v)
         end
-        w
+        return w
     end
 
     run(widget::GtkDialog) = GLib.g_sigatom() do
@@ -59,7 +59,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             ccall((:gtk_file_filter_add_pixbuf_formats,libgtk), Void, (Ptr{GObject},), filt)
         end
         ccall((:gtk_file_filter_set_name,libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
-        filt
+        return filt
     end
     GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString,Void} = nothing) = GtkFileFilterLeaf(; name=name, pattern=pattern)
 
@@ -84,10 +84,8 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         local selection
         if response == GConstants.GtkResponseType.ACCEPT
             if multiple
-                selection = String[]
-                for f in GLib.GList(ccall((:gtk_file_chooser_get_filenames,libgtk), Ptr{_GSList{UInt8}}, (Ptr{GObject},), dlgp))
-                    push!(selection, GLib.bytestring(f, true))
-                end
+                filename_list = ccall((:gtk_file_chooser_get_filenames,libgtk), Ptr{_GSList{String}}, (Ptr{GObject},), dlgp)
+                selection = String[f for f in GList(filename_list, #=transfer-full=#true)]
             else
                 selection = bytestring(GAccessor.filename(dlgp))
             end
@@ -99,7 +97,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             end
         end
         destroy(dlg)
-        selection
+        return selection
     end
 
     function save_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector,Tuple} = String[]; kwargs...)
@@ -118,6 +116,6 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             selection = utf8("")
         end
         destroy(dlg)
-        selection
+        return selection
     end
 end
