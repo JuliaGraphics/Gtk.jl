@@ -1,33 +1,33 @@
 gtk_main() = GLib.g_sigatom() do
-    ccall((:gtk_main,libgtk),Void,())
+    ccall((:gtk_main, libgtk), Void, ())
 end
 
 function gtk_quit()
-    ccall((:gtk_main_quit,libgtk),Void,())
+    ccall((:gtk_main_quit, libgtk), Void, ())
 end
 
 function __init__()
     GError() do error_check
-        ccall((:gtk_init_with_args,libgtk), Bool,
+        ccall((:gtk_init_with_args, libgtk), Bool,
             (Ptr{Void}, Ptr{Void}, Ptr{UInt8}, Ptr{Void}, Ptr{UInt8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 
     # if g_main_depth > 0, a glib main-loop is already running,
     # so we don't need to start a new one
-    if ccall((:g_main_depth,GLib.libglib),Cint,()) == 0
+    if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
         global gtk_main_task = schedule(Task(gtk_main))
     end
 end
 
 
-add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events,libgtk),Void,(Ptr{GObject},GEnum),widget,mask)
+add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, libgtk), Void, (Ptr{GObject}, GEnum), widget, mask)
 
 # widget[:event] = function(ptr, obj)
 #    stuff
 # end
-#function setindex!(w::GObject,cb::Function,sig::AbstractStringLike,vargs...)
-#    signal_connect(cb,w,sig,vargs...)
+#function setindex!(w::GObject, cb::Function, sig::AbstractStringLike, vargs...)
+#    signal_connect(cb, w, sig, vargs...)
 #end
 
 
@@ -66,7 +66,7 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
     else
         ret = Int32(false)
     end
-    ccall((:gdk_event_request_motions,libgdk), Void, (Ptr{GdkEventMotion},), eventp)
+    ccall((:gdk_event_request_motions, libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
 function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
@@ -106,21 +106,21 @@ end
 
 
 function reveal(c::GtkWidget, immediate::Bool=true)
-    #region = ccall((:gdk_region_rectangle,libgdk),Ptr{Void},(Ptr{GdkRectangle},),&allocation(c))
-    #ccall((:gdk_window_invalidate_region,libgdk),Void,(Ptr{Void},Ptr{Void},Bool),
+    #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Void}, (Ptr{GdkRectangle},), &allocation(c))
+    #ccall((:gdk_window_invalidate_region, libgdk), Void, (Ptr{Void}, Ptr{Void}, Bool),
     #    gdk_window(c), region, true)
-    ccall((:gtk_widget_queue_draw,libgtk), Void, (Ptr{GObject},), c)
+    ccall((:gtk_widget_queue_draw, libgtk), Void, (Ptr{GObject},), c)
     if immediate
-        ccall((:gdk_window_process_updates,libgdk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
+        ccall((:gdk_window_process_updates, libgdk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
     end
 end
 
 const default_mouse_cb = (w, event)->nothing
 
 if VERSION < v"0.4.0-dev"
-typealias MHStack Vector{(Symbol,Function)}
+typealias MHStack Vector{(Symbol, Function)}
 else
-typealias MHStack Vector{Tuple{Symbol,Function}}
+typealias MHStack Vector{Tuple{Symbol, Function}}
 end
 
 type MouseHandler
@@ -139,11 +139,11 @@ type MouseHandler
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         Array(Tuple{Symbol,Function}, 0))
+                         Array(Tuple{Symbol, Function}, 0))
 end
 
 if VERSION < v"0.4.0-dev"
-typealias MHPair  tuple(MouseHandler,Symbol)
+typealias MHPair  tuple(MouseHandler, Symbol)
 function findlast(testf::Function, A)
     for i = length(A):-1:1
         testf(A[i]) && return i
@@ -152,7 +152,7 @@ function findlast(testf::Function, A)
 end
 
 else
-typealias MHPair  Tuple{MouseHandler,Symbol}
+typealias MHPair  Tuple{MouseHandler, Symbol}
 end
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)

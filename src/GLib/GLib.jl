@@ -62,13 +62,13 @@ importall .CompatGLib
 using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
-typealias AbstractStringLike Union{AbstractString,Symbol}
+typealias AbstractStringLike Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
 if VERSION >= v"0.5.0-dev+4612"
-    bytestring(s::Ptr{UInt8},own::Bool) = unsafe_wrap(String,s,ccall(:strlen,Csize_t,(Ptr{UInt8},),s),own)
+    bytestring(s::Ptr{UInt8}, own::Bool) = unsafe_wrap(String, s, ccall(:strlen, Csize_t, (Ptr{UInt8},), s), own)
 else
-    bytestring(s::Ptr{UInt8},own::Bool) = String(pointer_to_array(s,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),s)),own))
+    bytestring(s::Ptr{UInt8}, own::Bool) = String(pointer_to_array(s, Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), s)), own))
 end
 if VERSION >= v"0.5.0-dev+4612"
     bytestring(s::Ptr{UInt8}) = unsafe_string(s)
@@ -78,12 +78,12 @@ else
     bytestring(s::Ptr{UInt8}) = Base.bytestring(s)
 end
 
-g_malloc(s::Integer) = ccall((:g_malloc,libglib), Ptr{Void}, (Csize_t,), s)
-g_free(p::Ptr) = ccall((:g_free,libglib), Void, (Ptr{Void},), p)
+g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
+g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
 
-include(joinpath("..","..","deps","ext_glib.jl"))
+include(joinpath("..", "..", "deps", "ext_glib.jl"))
 
-ccall((:g_type_init,libgobject),Void,())
+ccall((:g_type_init, libgobject), Void, ())
 
 include("MutableTypes.jl")
 using .MutableTypes
@@ -95,17 +95,17 @@ include("signals.jl")
 
 export @g_type_delegate
 macro g_type_delegate(eq)
-    @assert isa(eq,Expr) && eq.head == :(=) && length(eq.args) == 2
+    @assert isa(eq, Expr) && eq.head == :(=) && length(eq.args) == 2
     new = eq.args[1]
     real = eq.args[2]
-    newleaf = esc(Symbol(string(new,current_module().suffix)))
-    realleaf = esc(Symbol(string(real,current_module().suffix)))
+    newleaf = esc(Symbol(string(new, current_module().suffix)))
+    realleaf = esc(Symbol(string(real, current_module().suffix)))
     new = esc(new)
-    macroreal = QuoteNode(Symbol(string('@',real)))
+    macroreal = QuoteNode(Symbol(string('@', real)))
     quote
         const $newleaf = $realleaf
         macro $new(args...)
-            Expr(:macrocall, $macroreal, map(esc,args)...)
+            Expr(:macrocall, $macroreal, map(esc, args)...)
         end
     end
 end

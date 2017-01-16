@@ -3,15 +3,15 @@ immutable GdkRectangle <: GBoxed
     y::Int32
     width::Int32
     height::Int32
-    GdkRectangle(x,y,w,h) = new(x,y,w,h)
+    GdkRectangle(x, y, w, h) = new(x, y, w, h)
 end
-make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle,:libgdk))
+make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle, :libgdk))
 convert(::Type{GdkRectangle}, rect::Ptr{GdkRectangle}) = unsafe_load(rect)
 
 immutable GdkPoint
     x::Int32
     y::Int32
-    GdkPoint(x,y) = new(x,y)
+    GdkPoint(x, y) = new(x, y)
 end
 # GdkPoint is not a GBoxed type
 
@@ -67,26 +67,26 @@ baremodule GdkKeySyms
 end
 
 abstract GdkEvent <: GBoxed
-make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event,:libgdk))
+make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event, :libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
-    e = unsafe_load(convert(Ptr{GdkEventAny},evt))
+    e = unsafe_load(convert(Ptr{GdkEventAny}, evt))
     if     e.event_type == GdkEventType.KEY_PRESS ||
            e.event_type == GdkEventType.KEY_RELEASE
-        return unsafe_load(convert(Ptr{GdkEventKey},evt))
+        return unsafe_load(convert(Ptr{GdkEventKey}, evt))
     elseif e.event_type == GdkEventType.BUTTON_PRESS ||
            e.event_type == GdkEventType.DOUBLE_BUTTON_PRESS ||
            e.event_type == GdkEventType.TRIPLE_BUTTON_PRESS ||
            e.event_type == GdkEventType.BUTTON_RELEASE
-        return unsafe_load(convert(Ptr{GdkEventButton},evt))
+        return unsafe_load(convert(Ptr{GdkEventButton}, evt))
     elseif e.event_type == GdkEventType.SCROLL
-        return unsafe_load(convert(Ptr{GdkEventScroll},evt))
+        return unsafe_load(convert(Ptr{GdkEventScroll}, evt))
     elseif e.event_type == GdkEventType.MOTION_NOTIFY
-        return unsafe_load(convert(Ptr{GdkEventMotion},evt))
+        return unsafe_load(convert(Ptr{GdkEventMotion}, evt))
     elseif e.event_type == GdkEventType.ENTER_NOTIFY ||
            e.event_type == GdkEventType.LEAVE_NOTIFY
-        return unsafe_load(convert(Ptr{GdkEventCrossing},evt))
+        return unsafe_load(convert(Ptr{GdkEventCrossing}, evt))
     else
-        return unsafe_load(convert(Ptr{GdkEventAny},evt))
+        return unsafe_load(convert(Ptr{GdkEventAny}, evt))
     end
 end
 
@@ -176,12 +176,12 @@ immutable GdkEventCrossing <: GdkEvent
 end
 
 keyval(name::AbstractString) =
-  ccall((:gdk_keyval_from_name,libgdk),Cuint,(Ptr{UInt8},),bytestring(name))
+  ccall((:gdk_keyval_from_name, libgdk), Cuint, (Ptr{UInt8},), bytestring(name))
 
-screen_size() = screen_size(ccall((:gdk_screen_get_default,libgdk),
+screen_size() = screen_size(ccall((:gdk_screen_get_default, libgdk),
                                           Ptr{Void}, ()))
 
 function screen_size(screen::Ptr{Void})
     return (ccall((:gdk_screen_get_width, libgdk), Cint, (Ptr{Void},), screen),
-            ccall((:gdk_screen_get_height,libgdk), Cint, (Ptr{Void},), screen))
+            ccall((:gdk_screen_get_height, libgdk), Cint, (Ptr{Void},), screen))
 end

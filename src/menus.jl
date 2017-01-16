@@ -19,25 +19,25 @@
 #GtkToggleToolButton — A GtkToolItem containing a toggle button
 #GtkRadioToolButton — A toolbar item that contains a radio button
 
-GtkMenuItemLeaf() = GtkMenuItemLeaf(ccall((:gtk_menu_item_new,libgtk),Ptr{GObject},()))
+GtkMenuItemLeaf() = GtkMenuItemLeaf(ccall((:gtk_menu_item_new, libgtk), Ptr{GObject}, ()))
 GtkMenuItemLeaf(label::AbstractString) =
-    GtkMenuItemLeaf(ccall((:gtk_menu_item_new_with_mnemonic,libgtk),Ptr{GObject},
+    GtkMenuItemLeaf(ccall((:gtk_menu_item_new_with_mnemonic, libgtk), Ptr{GObject},
                 (Ptr{UInt8},), bytestring(label)))
 
-GtkSeparatorMenuItemLeaf() = GtkSeparatorMenuItemLeaf(ccall((:gtk_separator_menu_item_new,libgtk),Ptr{GObject},()))
+GtkSeparatorMenuItemLeaf() = GtkSeparatorMenuItemLeaf(ccall((:gtk_separator_menu_item_new, libgtk), Ptr{GObject}, ()))
 
-GtkMenuLeaf() = GtkMenuLeaf(ccall((:gtk_menu_new,libgtk),Ptr{GObject},()))
+GtkMenuLeaf() = GtkMenuLeaf(ccall((:gtk_menu_new, libgtk), Ptr{GObject}, ()))
 function GtkMenuLeaf(item::GtkMenuItem)
     menu = GtkMenuLeaf()
 #     GAccessor.submenu(item, menu)
-    ccall((:gtk_menu_item_set_submenu,libgtk),Void,(Ptr{GObject},Ptr{GObject}),
+    ccall((:gtk_menu_item_set_submenu, libgtk), Void, (Ptr{GObject}, Ptr{GObject}),
           item, menu)
     menu
 end
 
-GtkMenuBarLeaf() = GtkMenuBarLeaf(ccall((:gtk_menu_bar_new,libgtk),Ptr{GObject},()))
+GtkMenuBarLeaf() = GtkMenuBarLeaf(ccall((:gtk_menu_bar_new, libgtk), Ptr{GObject}, ()))
 
 popup(menu::GtkMenuShell, event::GdkEventButton) =
-    ccall((:gtk_menu_popup,libgtk), Void,
-          (Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{GObject},Ptr{Void},Cuint,UInt32),
+    ccall((:gtk_menu_popup, libgtk), Void,
+          (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Ptr{GObject}, Ptr{Void}, Cuint, UInt32),
           menu, GtkNullContainerLeaf(), GtkNullContainerLeaf(), GtkNullContainerLeaf(), C_NULL, event.button, event.time)
