@@ -3,13 +3,13 @@ function _gtksubtype_constructors(name::Symbol)
     ename = Symbol(string(name, getfield(cm, :suffix)))
     typ = getfield(cm, ename)
     if GLib.g_isa(typ, GtkOrientable)
-        @eval $ename(orientation::Symbol,vargs...) = $ename(
-            (orientation==:v ? true :
-            (orientation==:h ? false :
-            error("invalid $($ename) orientation $orientation"))),vargs...)
+        @eval $ename(orientation::Symbol, vargs...) = $ename(
+            (orientation == :v ? true :
+            (orientation == :h ? false :
+            error("invalid $($ename) orientation $orientation"))), vargs...)
     end
-    if isdefined(Gtk,:GtkContainer) && GLib.g_isa(typ, GtkContainer)
-        @eval $ename(child::GtkWidget,vargs...) = push!($ename(vargs...),child)
+    if isdefined(Gtk, :GtkContainer) && GLib.g_isa(typ, GtkContainer)
+        @eval $ename(child::GtkWidget, vargs...) = push!($ename(vargs...), child)
     end
 end
 
@@ -28,7 +28,7 @@ end
 
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
-    symname = Symbol(join([lowercase(s) for s in groups],"_"))
+    symname = Symbol(join([lowercase(s) for s in groups], "_"))
     quote
         @gtktype_custom_symname $(esc(name)) $(esc(symname))
     end

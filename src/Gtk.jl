@@ -20,7 +20,7 @@ import Base: convert, show, showall, run, size, resize!, length, getindex, setin
              select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, colon
 
-if isdefined(Base,:Graphics)
+if isdefined(Base, :Graphics)
     const Graphics = Base.Graphics
 else
     import Graphics
@@ -34,24 +34,24 @@ if VERSION < v"0.5.0-dev+3876"
     include("compat_string.jl")
 end
 
-typealias Index Union{Integer,AbstractVector{TypeVar(:I,Integer)}}
+typealias Index Union{Integer, AbstractVector{TypeVar(:I, Integer)}}
 
 export GAccessor
 include("basic_exports.jl")
 include("long_exports.jl")
 include("long_leaf_exports.jl")
-include(joinpath("..","deps","ext.jl"))
+include(joinpath("..", "deps", "ext.jl"))
 
 if gtk_version == 3
   global const libgtk_version = VersionNumber(
-      ccall((:gtk_get_major_version,libgtk),Cint, ()),
-      ccall((:gtk_get_minor_version,libgtk),Cint, ()),
-      ccall((:gtk_get_micro_version,libgtk),Cint, ()))
+      ccall((:gtk_get_major_version, libgtk), Cint, ()),
+      ccall((:gtk_get_minor_version, libgtk), Cint, ()),
+      ccall((:gtk_get_micro_version, libgtk), Cint, ()))
 else
   global const libgtk_version = VersionNumber(
-      unsafe_load(cglobal((:gtk_major_version,libgtk),Cuint)),
-      unsafe_load(cglobal((:gtk_minor_version,libgtk),Cuint)),
-      unsafe_load(cglobal((:gtk_micro_version,libgtk),Cuint)))
+      unsafe_load(cglobal((:gtk_major_version, libgtk), Cuint)),
+      unsafe_load(cglobal((:gtk_minor_version, libgtk), Cuint)),
+      unsafe_load(cglobal((:gtk_micro_version, libgtk), Cuint)))
 end
 
 include("gdk.jl")
@@ -79,7 +79,7 @@ include("application.jl")
 
 const ser_version = VERSION >= v"0.4-" ? Base.Serializer.ser_version : Base.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
-    fastgtkcache = joinpath(cachedir,"gtk$(libgtk_version.major)_julia_ser$(ser_version)")
+    fastgtkcache = joinpath(cachedir, "gtk$(libgtk_version.major)_julia_ser$(ser_version)")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)
@@ -87,10 +87,10 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
             end
         end
     else
-        gboxcache = joinpath(cachedir,"gbox$(libgtk_version.major)")
+        gboxcache = joinpath(cachedir, "gbox$(libgtk_version.major)")
         map(eval, include(gboxcache).args)
-        constcache = joinpath(cachedir,"gconsts$(libgtk_version.major)")
-        map(eval,include(constcache).args)
+        constcache = joinpath(cachedir, "gconsts$(libgtk_version.major)")
+        map(eval, include(constcache).args)
     end
 end
 const _ = GAccessor

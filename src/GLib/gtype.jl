@@ -1,7 +1,7 @@
 abstract GObject
 abstract GInterface <: GObject
 abstract GBoxed
-type GBoxedUnkown<:GBoxed
+type GBoxedUnkown <: GBoxed
     handle::Ptr{GBoxed}
 end
 
@@ -36,36 +36,36 @@ const fundamental_types = (
     (:gchararray, Ptr{UInt8},       AbstractString, :string),
     (:gpointer,   Ptr{Void},        Ptr,            :pointer),
     (:GBoxed,     Ptr{GBoxed},      GBoxed,         :boxed),
-    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
+    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec}, :param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
 # NOTE: in general do not cache ids, except for these fundamental values
-g_type_from_name(name::Symbol) = ccall((:g_type_from_name,libgobject),GType,(Ptr{UInt8},),name)
-const fundamental_ids = tuple(GType[g_type_from_name(name) for (name,c,j,f) in fundamental_types]...)
+g_type_from_name(name::Symbol) = ccall((:g_type_from_name, libgobject), GType, (Ptr{UInt8},), name)
+const fundamental_ids = tuple(GType[g_type_from_name(name) for (name, c, j, f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
 let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         if juliatype != Union{}
-            push!(jtypes.args, :( g_type{T<:$juliatype}(::Type{T}) = convert(GType,$(fundamental_ids[i])) ))
+            push!(jtypes.args, :( g_type{T <: $juliatype}(::Type{T}) = convert(GType, $(fundamental_ids[i])) ))
         end
     end
     eval(jtypes)
 end
 
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType},w))
+G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType}, w))
 G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
-G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}},hnd))
+G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}}, hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
-g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a,libgobject),Cint,(GType,GType),gtyp,is_a_type) != 0
+g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a, libgobject), Cint, (GType, GType), gtyp, is_a_type) != 0
 g_isa(gtyp, is_a_type) = g_isa(g_type(gtyp), g_type(is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
-g_type_name(g_type::GType) = Symbol(bytestring(ccall((:g_type_name,libgobject),Ptr{UInt8},(GType,),g_type),false))
+g_type_name(g_type::GType) = Symbol(bytestring(ccall((:g_type_name, libgobject), Ptr{UInt8}, (GType,), g_type), false))
 
-g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags,libgobject), Bool, (GType, GEnum), g_type, flag)
+g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags, libgobject), Bool, (GType, GEnum), g_type, flag)
 const G_TYPE_FLAG_CLASSED           = 1 << 0
 const G_TYPE_FLAG_INSTANTIATABLE    = 1 << 1
 const G_TYPE_FLAG_DERIVABLE         = 1 << 2
@@ -83,17 +83,17 @@ g_type(obj::GObject) = g_type(typeof(obj))
 
 gtypes(types...) = GType[g_type(t) for t in types]
 
-const gtype_abstracts = Dict{Symbol,Type}()
-const gtype_wrappers = Dict{Symbol,Type}()
-const gtype_ifaces = Dict{Symbol,Type}()
+const gtype_abstracts = Dict{Symbol, Type}()
+const gtype_wrappers = Dict{Symbol, Type}()
+const gtype_ifaces = Dict{Symbol, Type}()
 
 gtype_abstracts[:GObject] = GObject
 gtype_wrappers[:GObject] = GObjectLeaf
 
-let libs = Dict{AbstractString,Any}()
+let libs = Dict{AbstractString, Any}()
 global get_fn_ptr
 function get_fn_ptr(fnname, lib)
-    if !isa(lib,AbstractString)
+    if !isa(lib, AbstractString)
         lib = eval(current_module(), lib)
     end
     libptr = get(libs, lib, C_NULL)::Ptr{Void}
@@ -107,7 +107,7 @@ function g_type(name::Symbol, lib, symname::Symbol)
     if name in keys(gtype_wrappers)
         return g_type(gtype_wrappers[name])
     end
-    fnptr = get_fn_ptr(string(symname,"_get_type"), lib)
+    fnptr = get_fn_ptr(string(symname, "_get_type"), lib)
     if fnptr != C_NULL
         ccall(fnptr, GType, ())
     else
@@ -130,7 +130,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
             immutable $(esc(iname)) <: GInterface
                 handle::Ptr{GObject}
                 gc::Any
-                $(esc(iname))(x::GObject) = new(unsafe_convert(Ptr{GObject},x), x)
+                $(esc(iname))(x::GObject) = new(unsafe_convert(Ptr{GObject}, x), x)
                 # Gtk does an interface type check when calling methods. So, it's
                 # not worth repeating it here. Plus, we might as well just allow
                 # the user to lie, since we aren't using this for dispatch
@@ -138,7 +138,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
                 # to write more generic code
             end
             gtype_ifaces[$(QuoteNode(iname))] = $(esc(iname))
-            local T #to prevent Julia-0.2 from name-mangling <:T
+            local T #to prevent Julia-0.2 from name-mangling <: T
             $gtyp_decl
         end
         nothing
@@ -153,9 +153,9 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
         return :( const $(esc(iname)) = gtype_abstracts[:GObject] )
     end
     #ntypes = mutable(Cuint)
-    #interfaces = ccall((:g_type_interfaces,libgobject),Ptr{GType},(GType,Ptr{Cuint}),gtyp,ntypes)
+    #interfaces = ccall((:g_type_interfaces, libgobject), Ptr{GType}, (GType, Ptr{Cuint}), gtyp, ntypes)
     #for i = 1:ntypes[]
-    #    interface = unsafe_load(interfaces,i)
+    #    interface = unsafe_load(interfaces, i)
     #    # what do we care to do here?!
     #end
     #g_free(interfaces)
@@ -176,19 +176,19 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
 end
 
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
-    :( GLib.g_type{T<:$(esc(name))}(::Type{T}) = $(esc(symname)) )
-let handled=Set()
+    :( GLib.g_type{T <: $(esc(name))}(::Type{T}) = $(esc(symname)) )
+let handled = Set()
 function get_gtype_decl(name::Symbol, lib, symname::Symbol)
     if !(name in handled)
         push!(handled, name)
-        return :( GLib.g_type{T<:$(esc(name))}(::Type{T}) =
-                  ccall(($(QuoteNode(Symbol(string(symname,"_get_type")))), $(esc(lib))), GType, ()) )
+        return :( GLib.g_type{T <: $(esc(name))}(::Type{T}) =
+                  ccall(($(QuoteNode(Symbol(string(symname, "_get_type")))), $(esc(lib))), GType, ()) )
     end
     nothing
 end
 end #let
 
-function get_type_decl(name,iname,gtyp,gtype_decl)
+function get_type_decl(name, iname, gtyp, gtype_decl)
     ename = esc(name)
     einame = esc(iname)
     quote
@@ -206,21 +206,21 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
                 return gobject_ref(new(handle))
             end
         end
-        local kwargs, T #to prevent Julia-0.2 from name-mangling kwargs, <:T
+        local kwargs, T #to prevent Julia-0.2 from name-mangling kwargs, <: T
         function $ename(args...; kwargs...)
             if isempty(kwargs)
                 error(MethodError($ename, args))
             end
             w = $ename(args...)
-            for (kw,val) in kwargs
+            for (kw, val) in kwargs
                 setproperty!(w, kw, val)
             end
             w
         end
         gtype_wrappers[$(QuoteNode(iname))] = $ename
         macro $einame(args...)
-            Base.depwarn(string("\@",$einame," is deprecated, use ", $einame, " instead."), :Gtk)
-            Expr(:call, $ename, map(esc,args)...)
+            Base.depwarn(string("\@", $einame, " is deprecated, use ", $einame, " instead."), :Gtk)
+            Expr(:call, $ename, map(esc, args)...)
         end
         function $einame(args...; kwargs...)
             $ename(args...; kwargs...)
@@ -230,14 +230,14 @@ function get_type_decl(name,iname,gtyp,gtype_decl)
     end
 end
 
-macro Gtype_decl(name,gtyp,gtype_decl)
-    get_type_decl(name,Symbol(string(name,current_module().suffix)),gtyp,gtype_decl)
+macro Gtype_decl(name, gtyp, gtype_decl)
+    get_type_decl(name, Symbol(string(name, current_module().suffix)), gtyp, gtype_decl)
 end
 
-macro Gtype(iname,lib,symname)
+macro Gtype(iname, lib, symname)
     gtyp = g_type(iname, lib, symname)
     if gtyp == 0
-        return Expr(:call,:error,string("Could not find ",symname," in ",lib,
+        return Expr(:call, :error, string("Could not find ", symname, " in ", lib,
             ". This is likely a issue with a missing Gtk.jl version check."))
     end
     @assert iname === g_type_name(gtyp)
@@ -245,14 +245,14 @@ macro Gtype(iname,lib,symname)
         error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
     gtype_decl = get_gtype_decl(iname, lib, symname)
-    name = Symbol(string(iname,current_module().suffix))
+    name = Symbol(string(iname, current_module().suffix))
     get_type_decl(name, iname, gtyp, gtype_decl)
 end
 
-macro Gabstract(iname,lib,symname)
+macro Gabstract(iname, lib, symname)
     gtyp = g_type(iname, lib, symname)
     if gtyp == 0
-        return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
+        return Expr(:call, :error, string("Could not find ", symname, " in ", lib, ". This is likely a issue with a missing Gtk.jl version check."))
     end
     @assert iname === g_type_name(gtyp)
     Expr(:block,
@@ -260,10 +260,10 @@ macro Gabstract(iname,lib,symname)
         get_gtype_decl(iname, lib, symname))
 end
 
-macro Giface(iname,lib,symname)
+macro Giface(iname, lib, symname)
     gtyp = g_type(iname, lib, symname)
     if gtyp == 0
-        return Expr(:call,:error,string("Could not find ",symname," in ",lib,". This is likely a issue with a missing Gtk.jl version check."))
+        return Expr(:call, :error, string("Could not find ", symname, " in ", lib, ". This is likely a issue with a missing Gtk.jl version check."))
     end
     @assert iname === g_type_name(gtyp)
     gtype_decl = get_gtype_decl(iname, lib, symname)
@@ -275,12 +275,12 @@ macro quark_str(q)
     :( ccall((:g_quark_from_string, libglib), UInt32, (Ptr{UInt8},), bytestring($q)) )
 end
 
-unsafe_convert{T<:GBoxed}(::Type{Ptr{T}}, box::T) = convert(Ptr{T}, box.handle)
+unsafe_convert{T <: GBoxed}(::Type{Ptr{T}}, box::T) = convert(Ptr{T}, box.handle)
 convert(::Type{GBoxed}, unbox::Ptr{GBoxed}) = GBoxedUnkown(unbox)
-convert{T<:GBoxed}(::Type{GBoxed}, unbox::Ptr{T}) = GBoxedUnkown(unbox)
-convert{T<:GBoxed}(::Type{T}, unbox::Ptr{GBoxed}) = convert(T, convert(Ptr{T}, unbox))
-convert{T<:GBoxed}(::Type{T}, unbox::Ptr{T}) = T(unbox)
-convert{T<:GBoxed}(::Type{T}, unbox::GBoxedUnkown) = convert(T, unbox.handle)
+convert{T <: GBoxed}(::Type{GBoxed}, unbox::Ptr{T}) = GBoxedUnkown(unbox)
+convert{T <: GBoxed}(::Type{T}, unbox::Ptr{GBoxed}) = convert(T, convert(Ptr{T}, unbox))
+convert{T <: GBoxed}(::Type{T}, unbox::Ptr{T}) = T(unbox)
+convert{T <: GBoxed}(::Type{T}, unbox::GBoxedUnkown) = convert(T, unbox.handle)
 
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object
@@ -290,14 +290,14 @@ unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = w.handle
 # this method should be used by gtk methods returning widgets of unknown type
 # and/or that might have been wrapped by julia before,
 # instead of a direct call to the constructor
-convert{T<:GObject}(::Type{T}, w::Ptr{GObject}) = convert(T,convert(Ptr{T},w)) # this definition must be first due to a 0.2 dispatch bug
+convert{T <: GObject}(::Type{T}, w::Ptr{GObject}) = convert(T, convert(Ptr{T}, w)) # this definition must be first due to a 0.2 dispatch bug
 
-function convert{T<:GObject}(::Type{T}, ptr::Ptr{T})
+function convert{T <: GObject}(::Type{T}, ptr::Ptr{T})
     hnd = convert(Ptr{GObject}, ptr)
     if hnd == C_NULL
         throw(UndefRefError())
     end
-    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject},UInt32), hnd, jlref_quark::UInt32)
+    x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject}, UInt32), hnd, jlref_quark::UInt32)
     if x != C_NULL
         return gobject_ref(unsafe_pointer_to_objref(x)::T)
     end
@@ -316,10 +316,10 @@ function wrap_gobject(hnd::Ptr{GObject})
     return T(hnd)
 end
 
-eltype{T<:GObject}(::Type{_LList{T}}) = T
-ref_to{T<:GObject}(::Type{T}, x) = gobject_ref(unsafe_convert(Ptr{GObject},x))
-deref_to{T<:GObject}(::Type{T}, x::Ptr) = convert(T,x)
-empty!{T<:GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
+eltype{T <: GObject}(::Type{_LList{T}}) = T
+ref_to{T <: GObject}(::Type{T}, x) = gobject_ref(unsafe_convert(Ptr{GObject}, x))
+deref_to{T <: GObject}(::Type{T}, x::Ptr) = convert(T, x)
+empty!{T <: GObject}(li::Ptr{_LList{Ptr{T}}}) = gc_unref(unsafe_load(li).data)
 
 ### Miscellaneous types
 baremodule GConnectFlags
@@ -331,7 +331,7 @@ baremodule GConnectFlags
         elseif s === :swapped
             SWAPPED
         else
-            Main.Base.error(Main.Base.string("invalid GConnectFlag ",s))
+            Main.Base.error(Main.Base.string("invalid GConnectFlag ", s))
         end
 end
 
@@ -342,22 +342,22 @@ if VERSION >= v"0.4-"
         global gc_preserve
         local ref::Ref{Any}, cnt::Int
         if x in keys(gc_preserve)
-            ref, cnt = gc_preserve[x]::Tuple{Ref{Any},Int}
+            ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
         else
             ref = Ref{Any}(x)
             cnt = 0
         end
-        gc_preserve[x] = (ref, cnt+1)
-        return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any},ref)))
+        gc_preserve[x] = (ref, cnt + 1)
+        return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any}, ref)))
     end
     function gc_unref(x::ANY)
         global gc_preserve
-        ref, cnt = gc_preserve[x]::Tuple{Ref{Any},Int}
+        ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
         @assert cnt > 0
         if cnt == 1
             delete!(gc_preserve, x)
         else
-            gc_preserve[x] = (ref, cnt-1)
+            gc_preserve[x] = (ref, cnt - 1)
         end
         nothing
     end
@@ -372,7 +372,7 @@ else
     function gc_ref(x::ANY)
         global gc_preserve
         isbits(x) && error("can't gc-preserve an isbits object")
-        gc_preserve[x] = (get(gc_preserve, x, 0)::Int)+1
+        gc_preserve[x] = (get(gc_preserve, x, 0)::Int) + 1
         return pointer_from_objref(x)
     end
     function gc_unref(x::ANY)
@@ -383,7 +383,7 @@ else
         if cnt == 1
             delete!(gc_preserve, x)
         else
-            gc_preserve[x] = cnt-1
+            gc_preserve[x] = cnt - 1
         end
         nothing
     end
@@ -395,7 +395,7 @@ end
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Void, (Ptr{GObject},), x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Void, (Ptr{GObject},), x)
 
-const gc_preserve_glib = Dict{Union{WeakRef,GObject},Bool}() # glib objects
+const gc_preserve_glib = Dict{Union{WeakRef, GObject}, Bool}() # glib objects
 const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
 const topfinalizer = Ref(true) # keep recursion to a minimum by only iterating from the top
 const await_finalize = Any[]
@@ -436,11 +436,11 @@ function addref(x::ANY)
     # for v0.4 compat, this is toplevel function
     ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
     finalizer(x, delref)
-    delete!(gc_preserve_glib,x) # in v0.2, the WeakRef assignment below wouldn't update the key
+    delete!(gc_preserve_glib, x) # in v0.2, the WeakRef assignment below wouldn't update the key
     gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
     nothing
 end
-function gobject_ref{T<:GObject}(x::T)
+function gobject_ref{T <: GObject}(x::T)
     gc_preserve_glib_lock[] = true
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
@@ -496,9 +496,9 @@ function gc_unref(x::GObject)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
         if VERSION >= v"0.4-"
-            deref = cfunction(gc_unref_weak,Void,(Ref{typeof(x)},))
+            deref = cfunction(gc_unref_weak, Void, (Ref{typeof(x)},))
         else
-            deref = cfunction(gc_unref_weak,Void,(typeof(x),))
+            deref = cfunction(gc_unref_weak, Void, (typeof(x),))
         end
         ccall((:g_object_weak_ref, libgobject), Void, (Ptr{GObject}, Ptr{Void}, Any), x, deref, x)
     else
