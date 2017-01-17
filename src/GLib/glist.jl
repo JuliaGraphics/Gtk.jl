@@ -47,7 +47,7 @@ empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
 empty!{L<:_LList}(li::Ptr{L}) = empty!(convert(Ptr{supertype(L)}, li))
 
 ## Standard Iteration protocol
-start{L}(list::LList{L}) = convert(Ptr{L}, list)
+start{L}(list::LList{L}) = unsafe_convert(Ptr{L}, list)
 next{T}(::LList, s::Ptr{T}) = (deref(s), unsafe_load(s).next) # return (value, state)
 done(::LList, s::Ptr) = (s == C_NULL)
 
@@ -71,6 +71,9 @@ strides(list::LList) = (1,)
 stride(list::LList, k::Integer) = (k > 1 ? length(list) : 1)
 size(list::LList) = (length(list),)
 isempty{L}(list::LList{L}) = (unsafe_convert(Ptr{L}, list) == C_NULL)
+if VERSION > v"0.6.0-"
+    Base.iteratorsize{L<:LList}(::Type{L}) = Base.HasLength()
+end
 
 shift!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
@@ -250,19 +253,19 @@ empty!{N<:Number}(li::Ptr{_LList{N}}) = nothing
 ### Handle storing pointers to numbers
 eltype{N<:Number}(::Type{_LList{Ptr{N}}}) = N
 deref_to{N<:Number}(::Type{Ptr{N}}, p::Ptr) = unsafe_load(p)
-ref_to{N<:Number}(::Type{Ptr{N}}, x) = unsafe_store!(convert(Ptr{N}, c_malloc(N.size)), x)
-empty!{N<:Number}(li::Ptr{_GSList{Ptr{N}}}) = c_free(unsafe_load(li).data)
-empty!{N<:Number}(li::Ptr{_GList{Ptr{N}}}) = c_free(unsafe_load(li).data)
+ref_to{N<:Number}(::Type{Ptr{N}}, x) = unsafe_store!(convert(Ptr{N}, g_malloc(N.size)), x)
+empty!{N<:Number}(li::Ptr{_GSList{Ptr{N}}}) = g_free(unsafe_load(li).data)
+empty!{N<:Number}(li::Ptr{_GList{Ptr{N}}}) = g_free(unsafe_load(li).data)
 
 ### Store (byte)strings as pointers
 deref_to{S<:String}(::Type{S}, p::Ptr) = bytestring(convert(Ptr{UInt8}, p))
 function ref_to{S<:String}(::Type{S}, x)
     s = bytestring(x)
     l = sizeof(s)
-    p = convert(Ptr{UInt8}, c_malloc(l + 1))
+    p = convert(Ptr{UInt8}, g_malloc(l + 1))
     unsafe_copy!(p, convert(Ptr{UInt8}, pointer(s)), l)
     unsafe_store!(p, '\0', l + 1)
     return p
 end
-empty!{S<:String}(li::Ptr{_GSList{S}}) = c_free(unsafe_load(li).data)
-empty!{S<:String}(li::Ptr{_GList{S}}) = c_free(unsafe_load(li).data)
+empty!{S<:String}(li::Ptr{_GSList{S}}) = g_free(unsafe_load(li).data)
+empty!{S<:String}(li::Ptr{_GList{S}}) = g_free(unsafe_load(li).data)

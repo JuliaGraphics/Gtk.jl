@@ -64,8 +64,8 @@ type MatrixStrided{T} <: AbstractMatrix{T}
             @assert(nbytes >= nbytes_req, "MatrixStrided nbytes too small to contain array")
         end
         if p == C_NULL
-            a = new(c_malloc(nbytes),nbytes,rowstride,width,height)
-            finalize(a, (a)->c_free(a.p))
+            a = new(g_malloc(nbytes),nbytes,rowstride,width,height)
+            finalize(a, (a)->g_free(a.p))
         else
             a = new(p,nbytes,rowstride,width,height)
         end

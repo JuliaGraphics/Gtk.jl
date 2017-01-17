@@ -212,7 +212,7 @@ end
 function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), but this function never throws
     global g_sigatom_flag, g_stack
     prev = g_sigatom_flag[]
-    @assert prev $ (current_task() !== g_stack)
+    @assert xor(prev, (current_task() !== g_stack))
     try
         if prev
             # also know that current_task() === g_stack

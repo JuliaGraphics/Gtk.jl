@@ -51,6 +51,12 @@ module CompatGLib
     else
         using Base.WORD_SIZE
     end
+    if VERSION >= v"0.6.0-dev" && !isdefined(Base, :xor)
+        export xor
+        const xor = $
+    end
+    export utf8
+    const utf8 = String
 end
 importall .CompatGLib
 using .CompatGLib.WORD_SIZE
@@ -71,6 +77,9 @@ elseif VERSION >= v"0.5.0-dev+4200"
 else
     bytestring(s::Ptr{UInt8}) = Base.bytestring(s)
 end
+
+g_malloc(s::Integer) = ccall((:g_malloc,libglib), Ptr{Void}, (Csize_t,), s)
+g_free(p::Ptr) = ccall((:g_free,libglib), Void, (Ptr{Void},), p)
 
 include(joinpath("..","..","deps","ext_glib.jl"))
 
