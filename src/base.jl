@@ -13,7 +13,7 @@ function toplevel(w::GtkWidget)
     convert(GtkWidget, p)
 end
 function allocation(widget::Gtk.GtkWidget)
-    allocation_ = Array(GdkRectangle)
+    allocation_ = Ref{GdkRectangle}()
     ccall((:gtk_widget_get_allocation, libgtk), Void, (Ptr{GObject}, Ptr{GdkRectangle}), widget, allocation_)
     return allocation_[1]
 end

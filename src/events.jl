@@ -120,26 +120,26 @@ const default_mouse_cb = (w, event) -> nothing
 if VERSION < v"0.4.0-dev"
 typealias MHStack Vector{(Symbol, Function)}
 else
-typealias MHStack Vector{Tuple{Symbol, Function}}
+typealias MHStack Vector{Tuple{Symbol, Any}}
 end
 
 type MouseHandler
-    button1press::Function
-    button1release::Function
-    button2press::Function
-    button2release::Function
-    button3press::Function
-    button3release::Function
-    motion::Function
-    button1motion::Function
-    scroll::Function
+    button1press
+    button1release
+    button2press
+    button2release
+    button3press
+    button3release
+    motion
+    button1motion
+    scroll
     stack::MHStack
     widget::GtkWidget
 
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         Array(Tuple{Symbol, Function}, 0))
+                         Array{Tuple{Symbol, Any}, 1}(0))
 end
 
 if VERSION < v"0.4.0-dev"
@@ -195,7 +195,7 @@ function mousescroll_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
 end
 
 
-function push!(mh_evt::MHPair, func::Function)
+function push!(mh_evt::MHPair, func)
     mh, evt = mh_evt
     push!(mh.stack, (evt, getfield(mh, evt)))
     setfield!(mh, evt, func)

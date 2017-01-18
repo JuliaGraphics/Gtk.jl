@@ -205,10 +205,11 @@ end
 setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put, libgtk), Void,
     (Ptr{GObject}, Ptr{GObject}, Cint, Cint), layout, child, i, j)
 function size(layout::GtkLayout)
-    sz = Array(Cuint, 2)
+    w = Ref{Cuint}()
+    h = Ref{Cuint}()
     ccall((:gtk_layout_get_size, libgtk), Void,
-        (Ptr{GObject}, Ptr{Cuint}, Ptr{Cuint}), layout, pointer(sz, 1), pointer(sz, 2))
-    (sz[1], sz[2])
+        (Ptr{GObject}, Ptr{Cuint}, Ptr{Cuint}), layout, w, h)
+    return (w[], h[])
 end
 width(layout::GtkLayout) = size(layout)[1]
 height(layout::GtkLayout) = size(layout)[2]

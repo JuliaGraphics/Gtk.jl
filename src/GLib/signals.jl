@@ -65,7 +65,7 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
     closure_env = convert(Ptr{Any}, closuref + sizeof_gclosure)
     cb = unsafe_load(closure_env, 1)
     gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int}, closure_env),  2))
-    params = Array(Any, n_param_values)
+    params = Array{Any, 1}(n_param_values)
     local retval = nothing
     g_siginterruptible(cb) do
         if gtk_calling_convention
