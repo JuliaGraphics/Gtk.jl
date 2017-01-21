@@ -329,6 +329,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "manual/keyevents.html#",
+    "page": "Key Events",
+    "title": "Key Events",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "manual/keyevents.html#Key-Events-1",
+    "page": "Key Events",
+    "title": "Key Events",
+    "category": "section",
+    "text": "In order to capture a keyboard event one can connect to the key-press-event from the active window. An example is given byusing Gtk\n\nwin = @GtkWindow(\"Key Press Example\")\n\nsignal_connect(win, \"key-press-event\") do widget, event\n  println(\"You pressed key \", event.keyval)\nendYou can then check if event.keyval has a certain value and invoke an action in that case."
+},
+
+{
     "location": "manual/canvas.html#",
     "page": "Drawing on Canvas",
     "title": "Drawing on Canvas",
