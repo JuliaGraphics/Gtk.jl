@@ -3,12 +3,7 @@
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
 using Compat
-if VERSION < v"0.6.0-"
-    take!(b::IOBuffer) = takebuf_array(b)
-    if VERSION < v"0.5.0-"
-        const String = Base.UTF8String
-    end
-end
+using Compat: String
 
 ## for FileFilter
 # This is just for testing, and be careful of garbage collection while using this
