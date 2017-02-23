@@ -71,7 +71,7 @@ strides(list::LList) = (1,)
 stride(list::LList, k::Integer) = (k > 1 ? length(list) : 1)
 size(list::LList) = (length(list),)
 isempty{L}(list::LList{L}) = (unsafe_convert(Ptr{L}, list) == C_NULL)
-if VERSION > v"0.6.0-"
+if isdefined(Base, :iteratorsize)
     Base.iteratorsize{L <: LList}(::Type{L}) = Base.HasLength()
 end
 
