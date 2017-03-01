@@ -66,7 +66,7 @@ baremodule GdkKeySyms
   const Hyper_R = 0xffee
 end
 
-abstract GdkEvent <: GBoxed
+@compat abstract type GdkEvent <: GBoxed end
 make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event, :libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     e = unsafe_load(convert(Ptr{GdkEventAny}, evt))

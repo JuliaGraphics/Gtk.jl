@@ -1,12 +1,12 @@
-abstract GObject
-abstract GInterface <: GObject
-abstract GBoxed
+@compat abstract type GObject end
+@compat abstract type GInterface <: GObject end
+@compat abstract type GBoxed  end
 type GBoxedUnkown <: GBoxed
     handle::Ptr{GBoxed}
 end
 
-typealias GEnum Int32
-typealias GType Csize_t
+@compat const  GEnum = Int32
+@compat const  GType = Csize_t
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{UInt8}
@@ -168,7 +168,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
             const $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
         else
             $piface_decl
-            abstract $(esc(iname)) <: $(esc(piname))
+            @compat abstract type $(esc(iname)) <: $(esc(piname)) end
             gtype_abstracts[$(QuoteNode(iname))] = $(esc(iname))
         end
         nothing

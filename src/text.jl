@@ -47,7 +47,7 @@ immutable GtkTextIter
   dummy14::Ptr{Void}
   GtkTextIter() = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
-typealias TI Union{Mutable{GtkTextIter}, GtkTextIter}
+@compat const  TI = Union{Mutable{GtkTextIter}, GtkTextIter}
 zero(::Type{GtkTextIter}) = GtkTextIter()
 copy(ti::GtkTextIter) = ti
 copy(ti::Mutable{GtkTextIter}) = mutable(ti[])

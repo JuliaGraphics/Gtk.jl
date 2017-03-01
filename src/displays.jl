@@ -87,7 +87,7 @@ end
 function getindex{T}(a::MatrixStrided{T}, x::Index, y::Index)
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
-    z = Array(T, length(x), length(y))
+    z = Matrix{T}(length(x), length(y))
     const rs = a.rowstride
     const st = sizeof(T)
     const p = a.p

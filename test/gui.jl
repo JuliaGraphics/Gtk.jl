@@ -272,7 +272,7 @@ destroy(w)
 end
 
 @testset "Button with custom icon (& Pixbuf)" begin
-icon = Array(Gtk.RGB, 40, 20)
+icon = Matrix{Gtk.RGB}(40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
 b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
@@ -300,7 +300,7 @@ end
 choices = ["choice one", "choice two", "choice three", RadioButton("choice four"), Label("choice five")]
 w = Window("Radio")
 f = Gtk.GtkBox(:v); push!(w,f)
-r = Array(RadioButton,3)
+r = Vector{RadioButton}(3)
 r[1] = RadioButton(choices[1]); push!(f,r[1])
 r[2] = RadioButton(r[1],choices[2]); push!(f,r[2])
 r[3] = RadioButton(r[2],choices[3],active=true); push!(f,r[3])
@@ -313,7 +313,7 @@ destroy(w)
 r = RadioButtonGroup(choices,2)
 @test length(r) == 5
 @test sum([getproperty(b,:active,Bool) for b in r]) == 1
-itms = Array(Any,length(r))
+itms = Vector{Any}(length(r))
 for (i,e) in enumerate(r)
     itms[i] = try
             getproperty(e,:label,AbstractString)
@@ -732,7 +732,7 @@ o = Overlay()
 w = Window(o, "overlay")|>showall
 destroy(w)
 end
-  
+
 # CSS
 
 @testset "CssProviderLeaf(filename=\"...\")" begin

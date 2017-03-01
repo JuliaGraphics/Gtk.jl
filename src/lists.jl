@@ -64,7 +64,7 @@ immutable GtkTreeIter
     GtkTreeIter() = new(0, C_NULL, C_NULL, C_NULL)
 end
 
-typealias TRI Union{Mutable{GtkTreeIter}, GtkTreeIter}
+@compat const  TRI = Union{Mutable{GtkTreeIter}, GtkTreeIter}
 zero(::Type{GtkTreeIter}) = GtkTreeIter()
 copy(ti::GtkTreeIter) = ti
 copy(ti::Mutable{GtkTreeIter}) = mutable(ti[])

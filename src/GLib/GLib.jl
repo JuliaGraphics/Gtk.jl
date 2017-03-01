@@ -54,10 +54,14 @@ importall .CompatGLib
 using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
-typealias AbstractStringLike Union{AbstractString, Symbol}
+@compat const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8}, own::Bool) = unsafe_wrap(String, s, ccall(:strlen, Csize_t, (Ptr{UInt8},), s), own)
+function bytestring(s::Ptr{UInt8}, own::Bool)
+    # unsafe_wrap(String, s, ccall(:strlen, Csize_t, (Ptr{UInt8},), s), own)
+    @assert own==false #println("own=$own")
+    return bytestring(s)
+end
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
