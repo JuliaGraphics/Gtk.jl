@@ -34,7 +34,7 @@ if VERSION < v"0.5.0-dev+3876"
     include("compat_string.jl")
 end
 
-typealias Index Union{Integer, AbstractVector{TypeVar(:I, Integer)}}
+@compat const Index{I<:Integer} = Union{I, AbstractVector{I}}
 
 export GAccessor
 include("basic_exports.jl")

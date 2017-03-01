@@ -4,5 +4,5 @@ Graphics 0.1
 BinDeps
 @windows WinRPM
 @osx Homebrew
-Compat 0.9.5
+Compat 0.19
 BaseTestNext
