@@ -1,5 +1,5 @@
 # julia Gtk interface
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 module Gtk
 
 using Compat
@@ -29,10 +29,6 @@ import .Graphics: width, height, getgc
 
 using Cairo
 import Cairo: destroy
-
-if VERSION < v"0.5.0-dev+3876"
-    include("compat_string.jl")
-end
 
 @compat const Index{I<:Integer} = Union{I, AbstractVector{I}}
 
@@ -77,7 +73,7 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-const ser_version = VERSION >= v"0.4-" ? Base.Serializer.ser_version : Base.ser_version
+const ser_version = Base.Serializer.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     fastgtkcache = joinpath(cachedir, "gtk$(libgtk_version.major)_julia_ser$(ser_version)")
     if isfile(fastgtkcache) && true
@@ -114,8 +110,4 @@ module ShortNames
     include("short_leaf_exports.jl")
 end
 using .ShortNames
-if VERSION < v"0.3-"
-  GLib.__init__()
-  Gtk.__init__()
-end
 end

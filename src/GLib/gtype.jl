@@ -337,59 +337,31 @@ end
 
 ### Garbage collection [prevention]
 const gc_preserve = ObjectIdDict() # reference counted closures
-if VERSION >= v"0.4-"
-    function gc_ref(x::ANY)
-        global gc_preserve
-        local ref::Ref{Any}, cnt::Int
-        if x in keys(gc_preserve)
-            ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
-        else
-            ref = Ref{Any}(x)
-            cnt = 0
-        end
-        gc_preserve[x] = (ref, cnt + 1)
-        return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any}, ref)))
-    end
-    function gc_unref(x::ANY)
-        global gc_preserve
+function gc_ref(x::ANY)
+    global gc_preserve
+    local ref::Ref{Any}, cnt::Int
+    if x in keys(gc_preserve)
         ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
-        @assert cnt > 0
-        if cnt == 1
-            delete!(gc_preserve, x)
-        else
-            gc_preserve[x] = (ref, cnt - 1)
-        end
-        nothing
-    end
-    if VERSION >= v"0.5-"
-        gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Any, Ptr{Void})))
-        _gc_unref(x::ANY, ::Ptr{Void}) = gc_unref(x)
     else
-        gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Ref{T}, Ptr{Void})))
-        _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+        ref = Ref{Any}(x)
+        cnt = 0
     end
-else
-    function gc_ref(x::ANY)
-        global gc_preserve
-        isbits(x) && error("can't gc-preserve an isbits object")
-        gc_preserve[x] = (get(gc_preserve, x, 0)::Int) + 1
-        return pointer_from_objref(x)
-    end
-    function gc_unref(x::ANY)
-        global gc_preserve
-        @assert !isbits(x)
-        cnt = gc_preserve[x]::Int
-        @assert cnt > 0
-        if cnt == 1
-            delete!(gc_preserve, x)
-        else
-            gc_preserve[x] = cnt - 1
-        end
-        nothing
-    end
-    gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (T, Ptr{Void})))
-    _gc_unref(x::Any, ::Ptr{Void}) = gc_unref(x)
+    gc_preserve[x] = (ref, cnt + 1)
+    return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any}, ref)))
 end
+function gc_unref(x::ANY)
+    global gc_preserve
+    ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
+    @assert cnt > 0
+    if cnt == 1
+        delete!(gc_preserve, x)
+    else
+        gc_preserve[x] = (ref, cnt - 1)
+    end
+    nothing
+end
+gc_ref_closure{T}(x::T) = (gc_ref(x), cfunction(_gc_unref, Void, (Any, Ptr{Void})))
+_gc_unref(x::ANY, ::Ptr{Void}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Void, (Ptr{GObject},), x)
@@ -445,11 +417,7 @@ function gobject_ref{T <: GObject}(x::T)
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
-        if VERSION >= v"0.4-"
-            deref = cfunction(gc_unref, Void, (Ref{T},))
-        else
-            deref = cfunction(gc_unref, Void, (T,))
-        end
+        deref = cfunction(gc_unref, Void, (Ref{T},))
         ccall((:g_object_set_qdata_full, libgobject), Void,
             (Ptr{GObject}, UInt32, Any, Ptr{Void}), x, jlref_quark::UInt32, x,
             deref) # add a circular reference to the Julia object in the GObject
@@ -495,11 +463,7 @@ function gc_unref(x::GObject)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
-        if VERSION >= v"0.4-"
-            deref = cfunction(gc_unref_weak, Void, (Ref{typeof(x)},))
-        else
-            deref = cfunction(gc_unref_weak, Void, (typeof(x),))
-        end
+        deref = cfunction(gc_unref_weak, Void, (Ref{typeof(x)},))
         ccall((:g_object_weak_ref, libgobject), Void, (Ptr{GObject}, Ptr{Void}, Any), x, deref, x)
     else
         ccall((:g_object_steal_qdata, libgobject), Any, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)

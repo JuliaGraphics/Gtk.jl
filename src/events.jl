@@ -58,7 +58,7 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
-        if isbits(T) && VERSION >= v"0.4"
+        if isbits(T)
             ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T), p, eventp, closure.closure)
         else
             ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
@@ -86,7 +86,7 @@ function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
     end
     add_events(widget, mask)
     @assert Base.isstructtype(T)
-    if isbits(T) || VERSION < v"0.4-"
+    if isbits(T)
         cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
     else
         cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))
@@ -117,11 +117,7 @@ end
 
 const default_mouse_cb = (w, event) -> nothing
 
-if VERSION < v"0.4.0-dev"
-typealias MHStack Vector{(Symbol, Function)}
-else
 typealias MHStack Vector{Tuple{Symbol, Function}}
-end
 
 type MouseHandler
     button1press::Function
@@ -142,18 +138,7 @@ type MouseHandler
                          Array(Tuple{Symbol, Function}, 0))
 end
 
-if VERSION < v"0.4.0-dev"
-typealias MHPair  tuple(MouseHandler, Symbol)
-function findlast(testf::Function, A)
-    for i = length(A):-1:1
-        testf(A[i]) && return i
-    end
-    0
-end
-
-else
 typealias MHPair  Tuple{MouseHandler, Symbol}
-end
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)

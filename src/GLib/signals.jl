@@ -1,20 +1,9 @@
 # id = VERSION >= v"0.4-"get, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-if VERSION < v"0.5.0-dev"
-    function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-            ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
-        if isgeneric(cb)
-            return signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
-        end
-        # oops, Julia doesn't support this natively yet -- fake it instead
-        return _signal_connect(cb, w, sig, after, true, param_types, user_data)
-    end
-else
-    function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-            ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
-        signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
-    end
+function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
+        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
+    signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
 end
 
 function signal_connect_generic{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
@@ -115,11 +104,7 @@ function GClosureMarshal(closuref::Ptr{Void}, return_value::Ptr{GValue}, n_param
 end
 
 function blame(cb)
-    if VERSION > v"0.5.0-dev" || isgeneric(cb)
-        warn("Executing ", cb, ":")
-    else
-        warn("Executing ", Base.uncompressed_ast(cb.code).args[3].args[1])   # just show file/line
-    end
+    warn("Executing ", cb, ":")
 end
 
 # Signals API for the cb pointer
@@ -287,16 +272,9 @@ function new_gsource(source_funcs::_GSourceFuncs)
 end
 
 expiration = UInt64(0)
-if VERSION < v"0.3-"
-    _isempty_workqueue() = isempty(Base.Workqueue) || (length(Base.Workqueue) == 1 && Base.Workqueue[1] === Base.Scheduler)
-    function uv_loop_alive(evt)
-        ccall(:uv_stop, Void, (Ptr{Void},), evt)
-        ccall(:uv_run, Cint, (Ptr{Void}, Cint), evt, 2) != 0
-    end
-else
-    _isempty_workqueue() = isempty(Base.Workqueue)
-    uv_loop_alive(evt) = ccall(:uv_loop_alive, Cint, (Ptr{Void},), evt) != 0
-end
+_isempty_workqueue() = isempty(Base.Workqueue)
+uv_loop_alive(evt) = ccall(:uv_loop_alive, Cint, (Ptr{Void},), evt) != 0
+
 function uv_prepare(src::Ptr{Void}, timeout::Ptr{Cint})
     global expiration, uv_pollfd
     local tmout_ms::Cint
@@ -307,8 +285,6 @@ function uv_prepare(src::Ptr{Void}, timeout::Ptr{Cint})
         tmout_ms = -1
     elseif uv_pollfd.revents != 0
         tmout_ms = 0
-    elseif is_windows() ? (VERSION < v"0.3-") : false # uv_backend_timeout broken on windows before Julia v0.3-rc2
-        tmout_ms = 10
     else
         ccall(:uv_update_time, Void, (Ptr{Void},), evt)
         tmout_ms = ccall(:uv_backend_timeout, Cint, (Ptr{Void},), evt)
