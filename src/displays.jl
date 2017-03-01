@@ -33,7 +33,7 @@ type MatrixStrided{T} <: AbstractMatrix{T}
     rowstride::Int
     width::Int
     height::Int
-    function MatrixStrided(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1)
+    function (::Type{MatrixStrided{T}}){T}(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1)
         if width == -1
             @assert(rowstride > 0, "MatrixStrided rowstride must be > 0 if width not given")
             width = div(rowstride, sizeof(T))
@@ -64,10 +64,10 @@ type MatrixStrided{T} <: AbstractMatrix{T}
             @assert(nbytes >= nbytes_req, "MatrixStrided nbytes too small to contain array")
         end
         if p == C_NULL
-            a = new(g_malloc(nbytes), nbytes, rowstride, width, height)
+            a = new{T}(g_malloc(nbytes), nbytes, rowstride, width, height)
             finalize(a, a -> g_free(a.p))
         else
-            a = new(p, nbytes, rowstride, width, height)
+            a = new{T}(p, nbytes, rowstride, width, height)
         end
         a
     end

@@ -21,11 +21,12 @@ eltype{L <: _LList}(::Type{L}) = eltype(supertype(L))
 type GList{L <: _LList, T} <: AbstractVector{T}
     handle::Ptr{L}
     transfer_full::Bool
-    function GList(handle, transfer_full::Bool) # if transfer_full == true, then also free the elements when finalizing the list
+    function (::Type{GList{L,T}}){L<:_LList,T}(handle, transfer_full::Bool)
+        # if transfer_full == true, then also free the elements when finalizing the list
         # this function assumes the caller will take care of holding a pointer to the returned object
         # until it wants to be garbage collected
         @assert T == eltype(L)
-        l = new(handle, transfer_full)
+        l = new{L,T}(handle, transfer_full)
         finalizer(l, empty!)
         return l
     end

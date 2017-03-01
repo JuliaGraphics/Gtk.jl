@@ -5,8 +5,8 @@ export mutable, Mutable, deref
 @compat abstract type Mutable{T} end
 type MutableX{T} <: Mutable{T}
     x::T
-    MutableX() = new()
-    MutableX(x) = new(x)
+    (::Type{MutableX{T}}){T}() = new{T}()
+    (::Type{MutableX{T}}){T}(x) = new{T}(x)
 end
 immutable MutableA{T, N} <: Mutable{T}
     x::Array{T, N}
