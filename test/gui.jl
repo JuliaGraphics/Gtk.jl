@@ -24,10 +24,12 @@ if  libgtk_version >= v"3"
       isa(uri, AbstractString)? pointer(uri): C_NULL,
       isa(display_name, AbstractString)? pointer(display_name): C_NULL,
       isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
+
   function name(filter::FileFilter)
     nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
-    (nameptr == C_NULL)? nothing : Compat.unsafe_string(nameptr)
+    (nameptr == C_NULL)? nothing : unsafe_string(nameptr)
   end
+
   needed(filter::FileFilter) =
     ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
   filter(filt::FileFilter, info::GtkFileFilterInfo) =

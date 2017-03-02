@@ -63,7 +63,7 @@ G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a, libgobject), Cint, (GType, GType), gtyp, is_a_type) != 0
 g_isa(gtyp, is_a_type) = g_isa(g_type(gtyp), g_type(is_a_type))
 g_type_parent(child::GType) = ccall((:g_type_parent, libgobject), GType, (GType,), child)
-g_type_name(g_type::GType) = Symbol(bytestring(ccall((:g_type_name, libgobject), Ptr{UInt8}, (GType,), g_type), false))
+g_type_name(g_type::GType) = Symbol(bytestring(ccall((:g_type_name, libgobject), Ptr{UInt8}, (GType,), g_type)))
 
 g_type_test_flags(g_type::GType, flag) = ccall((:g_type_test_flags, libgobject), Bool, (GType, GEnum), g_type, flag)
 const G_TYPE_FLAG_CLASSED           = 1 << 0

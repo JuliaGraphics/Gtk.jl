@@ -285,16 +285,16 @@ function getproperty(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     return convert(outtype,
     if     key === :slice
         bytestring(ccall((:gtk_text_iter_get_slice, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :visible_slice
         bytestring(ccall((:gtk_text_iter_get_visible_slice, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :text
         bytestring(ccall((:gtk_text_iter_get_text, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :visible_text
         bytestring(ccall((:gtk_text_iter_get_visible_text, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     end)::outtype
 end
 function splice!(text::GtkTextBuffer, index::GtkTextRange)

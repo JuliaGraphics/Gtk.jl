@@ -57,12 +57,8 @@ using .CompatGLib.WORD_SIZE
 @compat const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
-function bytestring(s::Ptr{UInt8}, own::Bool)
-    # unsafe_wrap(String, s, ccall(:strlen, Csize_t, (Ptr{UInt8},), s), own)
-    @assert own==false #println("own=$own")
-    return bytestring(s)
-end
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
+# bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
 g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
