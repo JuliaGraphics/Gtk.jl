@@ -132,6 +132,8 @@ type MouseHandler
     button3release::Function
     motion::Function
     button1motion::Function
+    button2motion::Function
+    button3motion::Function
     scroll::Function
     stack::MHStack
     widget::GtkWidget
@@ -139,6 +141,7 @@ type MouseHandler
     MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
                          default_mouse_cb, default_mouse_cb, default_mouse_cb,
+                         default_mouse_cb, default_mouse_cb,
                          Array(Tuple{Symbol, Function}, 0))
 end
 
@@ -157,11 +160,11 @@ end
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
-    if event.button == 1
+    if      event.button == 1
         this.button1press(this.widget, event)
-    elseif event.button == 2
+    elseif  event.button == 2
         this.button2press(this.widget, event)
-    elseif event.button == 3
+    elseif  event.button == 3
         this.button3press(this.widget, event)
     end
     Int32(false)
@@ -184,6 +187,10 @@ function mousemove_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     this.motion(this.widget, event)
     if event.state & GdkModifierType.BUTTON1 != 0
         this.button1motion(this.widget, event)
+    elseif event.state & GdkModifierType.BUTTON2 != 0
+        this.button2motion(this.widget, event)
+    elseif event.state & GdkModifierType.BUTTON3 != 0
+        this.button3motion(this.widget, event)
     end
     Int32(false)
 end
