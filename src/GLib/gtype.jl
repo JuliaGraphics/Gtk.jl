@@ -5,8 +5,9 @@ type GBoxedUnkown <: GBoxed
     handle::Ptr{GBoxed}
 end
 
-@compat const  GEnum = Int32
-@compat const  GType = Csize_t
+const  GEnum = Int32
+const  GType = Csize_t
+
 immutable GParamSpec
   g_type_instance::Ptr{Void}
   name::Ptr{UInt8}

@@ -54,7 +54,7 @@ importall .CompatGLib
 using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
-@compat const  AbstractStringLike = Union{AbstractString, Symbol}
+const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
