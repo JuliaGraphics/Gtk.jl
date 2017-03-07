@@ -76,7 +76,7 @@ let gtk_version = Gtk.gtk_version
         println(cache)
         Base.println(cache,"end")
     end
-    const ser_version = VERSION >= v"0.4-" ? Base.Serializer.ser_version : Base.ser_version
+    const ser_version = Base.Serializer.ser_version
     open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
         serialize(cache, gbox)
         serialize(cache, gconsts)

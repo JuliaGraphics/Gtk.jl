@@ -4,11 +4,7 @@ if isfile(_depspath)
     include(_depspath)
 end
 
-if VERSION >= v"0.5.0-dev+4257"
-    const KERNEL = Base.Sys.KERNEL
-else
-    const KERNEL = Base.OS_NAME
-end
+const KERNEL = Base.Sys.KERNEL
 
 if KERNEL == :Windows
     @assign_if_unassigned libgobject = "libgobject-2.0-0"

@@ -47,7 +47,7 @@ immutable GtkTextIter
   dummy14::Ptr{Void}
   GtkTextIter() = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
-typealias TI Union{Mutable{GtkTextIter}, GtkTextIter}
+@compat const  TI = Union{Mutable{GtkTextIter}, GtkTextIter}
 zero(::Type{GtkTextIter}) = GtkTextIter()
 copy(ti::GtkTextIter) = ti
 copy(ti::Mutable{GtkTextIter}) = mutable(ti[])
@@ -77,7 +77,7 @@ function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
 end
 show(io::IO, iter::GtkTextIter) = print("GtkTextIter(...)")
 
-immutable GtkTextRange <: Range
+immutable GtkTextRange <: Range{Char}
     a::MutableTypes.MutableX{GtkTextIter}
     b::MutableTypes.MutableX{GtkTextIter}
     GtkTextRange(a, b) = new(mutable(copy(a)), mutable(copy(b)))
@@ -285,16 +285,16 @@ function getproperty(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     return convert(outtype,
     if     key === :slice
         bytestring(ccall((:gtk_text_iter_get_slice, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :visible_slice
         bytestring(ccall((:gtk_text_iter_get_visible_slice, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :text
         bytestring(ccall((:gtk_text_iter_get_text, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     elseif key === :visible_text
         bytestring(ccall((:gtk_text_iter_get_visible_text, libgtk), Ptr{UInt8},
-            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext), true)
+            (Ptr{GtkTextIter}, Ptr{GtkTextIter}), starttext, endtext))
     end)::outtype
 end
 function splice!(text::GtkTextBuffer, index::GtkTextRange)

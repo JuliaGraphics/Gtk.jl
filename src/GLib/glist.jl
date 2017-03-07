@@ -4,7 +4,7 @@
 
 ### an _LList is expected to have a data::Ptr{T} and next::Ptr{_LList{T}} element
 ### they are expected to be allocated and freed by GLib (e.g. with malloc/free)
-abstract _LList{T}
+@compat abstract type _LList{T} end
 
 immutable _GSList{T} <: _LList{T}
     data::Ptr{T}
@@ -21,11 +21,12 @@ eltype{L <: _LList}(::Type{L}) = eltype(supertype(L))
 type GList{L <: _LList, T} <: AbstractVector{T}
     handle::Ptr{L}
     transfer_full::Bool
-    function GList(handle, transfer_full::Bool) # if transfer_full == true, then also free the elements when finalizing the list
+    function (::Type{GList{L,T}}){L<:_LList,T}(handle, transfer_full::Bool)
+        # if transfer_full == true, then also free the elements when finalizing the list
         # this function assumes the caller will take care of holding a pointer to the returned object
         # until it wants to be garbage collected
         @assert T == eltype(L)
-        l = new(handle, transfer_full)
+        l = new{L,T}(handle, transfer_full)
         finalizer(l, empty!)
         return l
     end
@@ -33,7 +34,7 @@ end
 GList{T}(list::Type{T}) = GList(convert(Ptr{_GList{T}}, C_NULL), true)
 GList{L <: _LList}(list::Ptr{L}, transfer_full::Bool = false) = GList{L, eltype(L)}(list, transfer_full)
 
-typealias LList{L <: _LList} Union{Ptr{L}, GList{L}}
+@compat const  LList{L <: _LList} = Union{Ptr{L}, GList{L}}
 eltype{L <: _LList}(::LList{L}) = eltype(L)
 
 _listdatatype{T}(::Type{_LList{T}}) = T
@@ -51,7 +52,7 @@ start{L}(list::LList{L}) = unsafe_convert(Ptr{L}, list)
 next{T}(::LList, s::Ptr{T}) = (deref(s), unsafe_load(s).next) # return (value, state)
 done(::LList, s::Ptr) = (s == C_NULL)
 
-typealias LListPair{L} Tuple{LList, Ptr{L}}
+@compat const  LListPair{L} = Tuple{LList, Ptr{L}}
 function glist_iter{L <: _LList}(list::Ptr{L}, transfer_full::Bool = false)
     # this function pairs every list element with the list head, to forestall garbage collection
     return (GList(list, transfer_full), list)

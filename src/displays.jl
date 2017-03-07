@@ -33,7 +33,7 @@ type MatrixStrided{T} <: AbstractMatrix{T}
     rowstride::Int
     width::Int
     height::Int
-    function MatrixStrided(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1)
+    function (::Type{MatrixStrided{T}}){T}(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1)
         if width == -1
             @assert(rowstride > 0, "MatrixStrided rowstride must be > 0 if width not given")
             width = div(rowstride, sizeof(T))
@@ -64,10 +64,10 @@ type MatrixStrided{T} <: AbstractMatrix{T}
             @assert(nbytes >= nbytes_req, "MatrixStrided nbytes too small to contain array")
         end
         if p == C_NULL
-            a = new(g_malloc(nbytes), nbytes, rowstride, width, height)
+            a = new{T}(g_malloc(nbytes), nbytes, rowstride, width, height)
             finalize(a, a -> g_free(a.p))
         else
-            a = new(p, nbytes, rowstride, width, height)
+            a = new{T}(p, nbytes, rowstride, width, height)
         end
         a
     end
@@ -87,7 +87,7 @@ end
 function getindex{T}(a::MatrixStrided{T}, x::Index, y::Index)
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
-    z = Array(T, length(x), length(y))
+    z = Matrix{T}(length(x), length(y))
     const rs = a.rowstride
     const st = sizeof(T)
     const p = a.p

@@ -2,10 +2,6 @@ module GLib
 
 using Compat
 
-if VERSION < v"0.5.0-dev+3876"
-    include("../compat_string.jl")
-end
-
 if false
 function include(x)
     println("including $x")
@@ -46,11 +42,7 @@ module CompatGLib
     TupleType(types...) = Tuple{types...}
     const unsafe_convert = Base.unsafe_convert
     import Base.Libdl: dlopen, dlsym_e
-    if VERSION >= v"0.5.0-dev+4257"
-        using Base.Sys.WORD_SIZE
-    else
-        using Base.WORD_SIZE
-    end
+    using Base.Sys.WORD_SIZE
     if VERSION >= v"0.6.0-dev" && !isdefined(Base, :xor)
         export xor
         const xor = $
@@ -62,21 +54,11 @@ importall .CompatGLib
 using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
-typealias AbstractStringLike Union{AbstractString, Symbol}
+const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
-if VERSION >= v"0.5.0-dev+4612"
-    bytestring(s::Ptr{UInt8}, own::Bool) = unsafe_wrap(String, s, ccall(:strlen, Csize_t, (Ptr{UInt8},), s), own)
-else
-    bytestring(s::Ptr{UInt8}, own::Bool) = String(pointer_to_array(s, Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), s)), own))
-end
-if VERSION >= v"0.5.0-dev+4612"
-    bytestring(s::Ptr{UInt8}) = unsafe_string(s)
-elseif VERSION >= v"0.5.0-dev+4200"
-    bytestring(s::Ptr{UInt8}) = String(s)
-else
-    bytestring(s::Ptr{UInt8}) = Base.bytestring(s)
-end
+bytestring(s::Ptr{UInt8}) = unsafe_string(s)
+# bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
 g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
