@@ -6,7 +6,7 @@ immutable GValue
     field3::UInt64
     GValue() = new(0, 0, 0)
 end
-@compat const  GV = Union{Mutable{GValue}, Ptr{GValue}}
+const GV = Union{Mutable{GValue}, Ptr{GValue}}
 Base.zero(::Type{GValue}) = GValue()
 function gvalue{T}(::Type{T})
     v = mutable(GValue())

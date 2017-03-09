@@ -64,7 +64,7 @@ immutable GtkTreeIter
     GtkTreeIter() = new(0, C_NULL, C_NULL, C_NULL)
 end
 
-@compat const  TRI = Union{Mutable{GtkTreeIter}, GtkTreeIter}
+const TRI = Union{Mutable{GtkTreeIter}, GtkTreeIter}
 zero(::Type{GtkTreeIter}) = GtkTreeIter()
 copy(ti::GtkTreeIter) = ti
 copy(ti::Mutable{GtkTreeIter}) = mutable(ti[])
@@ -487,13 +487,7 @@ type TreeIterator
     iter::Union{Void, TRI}
 end
 TreeIterator(store::GtkTreeStore, iter = nothing) = TreeIterator(store, GtkTreeModel(store), iter)
-function Base.length(iter::TreeIterator)
-    count = 0
-    for x in iter
-        count += 1
-    end
-    return count
-end
+Base.iteratorsize(::TreeIterator) = Base.SizeUnknown()
 
 ## iterator interface for depth first search
 function start(x::TreeIterator)

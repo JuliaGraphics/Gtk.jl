@@ -117,7 +117,7 @@ end
 
 const default_mouse_cb = (w, event) -> nothing
 
-@compat const  MHStack = Vector{Tuple{Symbol, Function}}
+const MHStack = Vector{Tuple{Symbol, Function}}
 
 type MouseHandler
     button1press::Function
@@ -141,7 +141,7 @@ type MouseHandler
                          Vector{Tuple{Symbol, Function}}())
 end
 
-@compat const MHPair = Tuple{MouseHandler, Symbol}
+const MHPair = Tuple{MouseHandler, Symbol}
 
 function mousedown_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
