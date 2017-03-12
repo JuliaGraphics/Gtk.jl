@@ -56,6 +56,7 @@ if @compat is_apple()
         """)
     provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
     provides(Homebrew.HB, "gdk-pixbuf", gdk_pixbuf, os = :Darwin)
+    Homebrew.add("gnome-icon-theme")
 end
 
 @BinDeps.install Dict([
