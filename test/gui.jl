@@ -190,10 +190,6 @@ destroy(w)
 end
 
 @testset "ButtonBox" begin
-bb = ButtonBox(:h)
-w = Window(bb, "ButtonBox")
-cancel = Button("Cancel")
-ok = Button("OK")
 ## ButtonBox
 bb = ButtonBox(:h)
 w = Window(bb, "ButtonBox")
