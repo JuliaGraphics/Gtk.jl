@@ -132,14 +132,17 @@ type MouseHandler
     button3motion::Function
     scroll::Function
     stack::MHStack
+    ids::Vector{Culong}
     widget::GtkWidget
 
-    MouseHandler() = new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         default_mouse_cb, default_mouse_cb, default_mouse_cb,
-                         default_mouse_cb, default_mouse_cb,
-                         Vector{Tuple{Symbol, Function}}())
+    MouseHandler(ids::Vector{Culong}) =
+        new(default_mouse_cb, default_mouse_cb, default_mouse_cb,
+            default_mouse_cb, default_mouse_cb, default_mouse_cb,
+            default_mouse_cb, default_mouse_cb, default_mouse_cb,
+            default_mouse_cb, default_mouse_cb,
+            Vector{Tuple{Symbol, Function}}(), ids)
 end
+MouseHandler() = MouseHandler(Culong[])
 
 const MHPair = Tuple{MouseHandler, Symbol}
 

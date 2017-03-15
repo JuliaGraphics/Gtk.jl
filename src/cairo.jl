@@ -12,7 +12,8 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     function GtkCanvas(w = -1, h = -1)
         da = ccall((:gtk_drawing_area_new, libgtk), Ptr{GObject}, ())
         ccall((:gtk_widget_set_size_request, libgtk), Void, (Ptr{GObject}, Int32, Int32), da, w, h)
-        widget = new(da, false, false, MouseHandler(), nothing, nothing)
+        ids = Vector{Culong}(0)
+        widget = new(da, false, false, MouseHandler(ids), nothing, nothing)
         widget.mouse.widget = widget
         signal_connect(notify_realize, widget, "realize", Void, ())
         signal_connect(notify_unrealize, widget, "unrealize", Void, ())
@@ -22,10 +23,10 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
         else
             signal_connect(canvas_on_expose_event, widget, "expose-event", Cint, (Ptr{Void},))
         end
-        on_signal_button_press(mousedown_cb, widget, false, widget.mouse)
-        on_signal_button_release(mouseup_cb, widget, false, widget.mouse)
-        on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse)
-        on_signal_scroll(mousescroll_cb, widget, false, widget.mouse)
+        push!(ids, on_signal_button_press(mousedown_cb, widget, false, widget.mouse))
+        push!(ids, on_signal_button_release(mouseup_cb, widget, false, widget.mouse))
+        push!(ids, on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse))
+        push!(ids, on_signal_scroll(mousescroll_cb, widget, false, widget.mouse))
         return gobject_ref(widget)
     end
 end
