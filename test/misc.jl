@@ -39,6 +39,7 @@ showall(win)
 @guarded draw(c) do widget
     error("oops")
 end
+@test !isempty(c.mouse.ids)  # check storage of signal-handler ids (see GtkReactive)
 destroy(win)
 
 @test isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
