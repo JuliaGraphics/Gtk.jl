@@ -24,7 +24,7 @@ If this produces errors, please see [installation troubleshooting](doc/installat
 
 ## Precompilation
 
-Startup time for packages that use Gtk can be dramatically reduced by [precompiling Gtk](doc/precompilation.md).
+Gtk is precompilable by normal mechanisms. For further reduction of startup time for applications that use Gtk, one can even [build it into your local installation of julia](doc/precompilation.md).
 
 ## Usage
 
