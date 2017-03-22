@@ -10,7 +10,11 @@ GUI building, using the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
 Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stable](https://developer.gnome.org/gtk/stable)
 
 The following Documentation on this page is in parts outdated. We currently work on updated documentation that can be found
-[here](http://juliagraphics.github.io/Gtk.jl/latest/)
+[here](http://juliagraphics.github.io/Gtk.jl/latest/).
+
+Finally, there are higher-level wrappers that might simplify your
+usage of Gtk, such as
+[GtkReactive](https://juliagizmos.github.io/GtkReactive.jl/stable/).
 
 ## Installation
 
