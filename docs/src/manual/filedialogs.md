@@ -21,6 +21,14 @@ The generic specification of a filter is
 @FileFilter(; name = nothing, pattern = "", mimetype = "")
 ```
 
+If on the other hand you want to choose a folder instead of a file, set the `action` to `GtkFileChooserAction.SELECT_FOLDER`:
+```julia
+dir = open_dialog("Select Dataset Folder", action=GtkFileChooserAction.SELECT_FOLDER)
+if isdir(dir)
+   # do something with dir
+end
+```
+
 Here are some examples:
 ```julia
 open_dialog("Pick a file")
