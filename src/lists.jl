@@ -370,7 +370,7 @@ function getindex(treeModel::GtkTreeModel, iter::TRI, column::Integer)
 end
 
 function getindex(treeModel::GtkTreeModel, iter::TRI)
-    ntuple( ncolumns(treeModel), i -> treeModel[iter, i] )
+    ntuple( i -> treeModel[iter, i], ncolumns(treeModel) )
 end
 
 function setindex!(treeModel::GtkTreeModel, value, iter::TRI, column::Integer)
