@@ -90,6 +90,7 @@ using .GConstants
 
 include("windows.jl")
 include("gl_area.jl")
+include("shortcuts.jl")
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
