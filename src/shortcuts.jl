@@ -26,7 +26,7 @@ Represents a combination of keys.
 
     Shortcut("c",PrimaryModifier) # Ctrl-c (Windows & Linux) or Command-c (OS X)
 
-    Shortcut("C",PrimaryModifier + GdkModifierType.SHIFT) # Ctrl-Shit-c (notice the capital A)
+    Shortcut("C",PrimaryModifier + GdkModifierType.SHIFT) # Ctrl-Shit-c (notice the capital C)
 
 """
 immutable Shortcut
