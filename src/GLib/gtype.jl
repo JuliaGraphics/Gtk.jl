@@ -277,11 +277,14 @@ macro quark_str(q)
 end
 
 unsafe_convert{T <: GBoxed}(::Type{Ptr{T}}, box::T) = convert(Ptr{T}, box.handle)
+convert(::Type{GBoxed}, boxed::GBoxed) = boxed
+convert(::Type{GBoxedUnkown}, boxed::GBoxedUnkown) = boxed
+convert{T <: GBoxed}(::Type{T}, boxed::T) = boxed
+convert{T <: GBoxed}(::Type{T}, boxed::GBoxed) = convert(T, boxed.handle)
 convert(::Type{GBoxed}, unbox::Ptr{GBoxed}) = GBoxedUnkown(unbox)
 convert{T <: GBoxed}(::Type{GBoxed}, unbox::Ptr{T}) = GBoxedUnkown(unbox)
 convert{T <: GBoxed}(::Type{T}, unbox::Ptr{GBoxed}) = convert(T, convert(Ptr{T}, unbox))
 convert{T <: GBoxed}(::Type{T}, unbox::Ptr{T}) = T(unbox)
-convert{T <: GBoxed}(::Type{T}, unbox::GBoxedUnkown) = convert(T, unbox.handle)
 
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object

@@ -20,6 +20,8 @@ repr = Base.print_to_string(wrap) #should display properties
 @test contains(repr,"title=NULL")
 @test contains(repr,"type=GTK_WINDOW_TOPLEVEL")
 
+@test isa(convert(Gtk.GLib.GBoxedUnkown, Gtk.GLib.GBoxedUnkown(C_NULL)), Gtk.GLib.GBoxedUnkown)
+
 end
 
 # TODO
