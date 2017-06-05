@@ -45,6 +45,7 @@ I use MacPorts:
 2. `push!(DL_LOAD_PATH,"/opt/local/lib")` You will need to repeat this step every time you restart julia, or put this line in your `~/.juliarc.jl` file.
 
 If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
+Furthermore, you may have to install the icon theme yourself using `brew install gnome-icon-theme` (or `Homebrew.add("gnome-icon-theme")`).
 
 ### Linux
 
