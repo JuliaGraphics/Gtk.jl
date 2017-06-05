@@ -46,6 +46,8 @@ I use MacPorts:
 
 If you want to use Homebrew, the built-in formula is deficient (it does not support the Quartz backend). See [Homebrew#27](https://github.com/JuliaLang/Homebrew.jl/issues/27) for possible eventual workarounds.
 
+If you see a warning such as `(<unknown>:950): Gtk-WARNING **: Error loading theme icon 'go-next' for stock`, then chances are that you have to install the icon theme manually using `brew install gnome-icon-theme` (or `Homebrew.add("gnome-icon-theme")`).
+
 ### Linux
 
 Try any of the following lines until something is successful:
