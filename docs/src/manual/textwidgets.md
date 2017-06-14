@@ -6,10 +6,10 @@ displaying non-editable text `GtkLabel` the other is for editable text `GtkEntry
 ## Label
 
 A `GtkLabel` is the most basic text widget that has already been used behind the
-scene in any previous example involving a `GtkButton`. 
+scene in any previous example involving a `GtkButton`.
 A `GtkLabel` is constructed by calling
 ```julia
-label = @GtkLabel("My text")
+label = GtkLabel("My text")
 ```
 The text of a label can be changed using
 ```julia
@@ -46,7 +46,7 @@ Note that this will only happen, if the size of the widget is limited using layo
 
 The entry widget allows the user to enter text. The entered text can be read and write using
 ```julia
-ent = @GtkEntry()
+ent = GtkEntry()
 setproperty!(ent,:text,"My String")
 str = getproperty(ent,:text,String)
 ```
@@ -64,7 +64,7 @@ This can be achieve by calling
 ```julia
 setproperty!(ent,:visibility,false)
 ```
-To get notfied by changes to the entry one can listen the "changed" event.
+To get notified by changes to the entry one can listen the "changed" event.
 
 TODO: setting progress and setting icons in entry
 

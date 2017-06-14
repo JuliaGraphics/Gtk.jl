@@ -4,7 +4,7 @@ In order to capture a keyboard event one can connect to the `key-press-event` fr
 ```
 using Gtk
 
-win = @GtkWindow("Key Press Example")
+win = GtkWindow("Key Press Example")
 
 signal_connect(win, "key-press-event") do widget, event
   println("You pressed key ", event.keyval)

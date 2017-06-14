@@ -1,8 +1,8 @@
 # Custom/Composed Widgets
 
-In practice one usually has to customize a widget to ones own needs. 
+In practice, one usually has to customize a widget to ones own needs.
 Furthermore, it is also useful to group widgets together to break up
-a comple user interface into manageble parts. Both use cases are discussed next.
+a complete user interface into manageable parts. Both use cases are discussed next.
 
 ## Custom Widgets
 
@@ -13,7 +13,7 @@ type MyButton <: Gtk.GtkButton
     handle::Ptr{Gtk.GObject}
     other_fields
     function MyButton(label)
-        btn = @GtkButton(label)
+        btn = GtkButton(label)
         return Gtk.gobject_move_ref(new(btn), btn)
     end
 end
@@ -29,24 +29,24 @@ type MyButton <: Gtk.GtkButton
     handle::Ptr{Gtk.GObject}
 
     function MyButton()
-        btn = @GtkButton("My Button")
+        btn = GtkButton("My Button")
         return Gtk.gobject_move_ref(new(btn.handle), btn)
     end
 end
 ```
 
-We can now add this button to e.g. a window or any layout container just as if `MyButton` would be be a regular `GtkWidget`.
+We can now add this button to e.g. a window or any layout container just as if `MyButton` would be a regular `GtkWidget`.
 
 ```julia
 btn = MyButton()
-win = @GtkWindow("Custom Widget",400,200)
+win = GtkWindow("Custom Widget",400,200)
 push!(win, btn)
 showall(win)
 ```
 
 ## Composed Widgets
 
-While a preinitialized button might look like an artificial use cases the same pattern can be used to develop composed widgets. In that case one will typically subclass from a layout widget such as `GtkBox` or `GtkGrid`. Lets for instance build a new composed widget consisting of a text box and a button
+While a pre-initialized button might look like an artificial use cases, the same pattern can be used to develop composed widgets. In that case one will typically subclass from a layout widget such as `GtkBox` or `GtkGrid`. Lets for instance build a new composed widget consisting of a text box and a button
 
 ```julia
 type ComposedWidget <: Gtk.GtkBox
@@ -55,9 +55,9 @@ type ComposedWidget <: Gtk.GtkBox
     tv # handle to child
 
     function ComposedWidget(label)
-        vbox = @GtkBox(:v)
-        btn = @GtkButton(label)
-        tv = @GtkTextView()
+        vbox = GtkBox(:v)
+        btn = GtkButton(label)
+        tv = GtkTextView()
         push!(vbox,btn,tv)
         setproperty!(vbox,:expand,tv,true)
         setproperty!(vbox,:spacing,10)
@@ -67,7 +67,7 @@ type ComposedWidget <: Gtk.GtkBox
 end
 
 c = ComposedWidget("My Button")
-win = @GtkWindow("Composed Widget",400,200)
+win = GtkWindow("Composed Widget",400,200)
 push!(win, c)
 showall(win)
 
