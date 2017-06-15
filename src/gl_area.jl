@@ -19,8 +19,11 @@ if libgtk_version >= v"3.16.0"
 		(ccall((:gtk_gl_area_set_auto_render, libgtk), Void, (Ptr{GObject}, Cint), w, value); w)
 	auto_render(w::GtkGLArea) =
 		Bool(ccall((:gtk_gl_area_get_auto_render, libgtk), Cint, (Ptr{GObject},), w))
+
+
 	#TODO: gtk_gl_area_get_required_version
-	#TODO: gtk_gl_area_set_required_version
+    gl_area_set_required_version(w::GtkGLArea, major::Integer, minor::Integer) =
+        ccall((:gtk_gl_area_set_required_version, libgtk), Void, (Ptr{GObject}, Cint, Cint), w, major, minor)
 else
 	#TODO: gtk_gl_area_get_context
 	gl_area_func_not_available() = error("GtkGLArea is not available until Gtk3.16.0")
@@ -38,5 +41,5 @@ else
 	auto_render(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
 	stencil_buffer(w::GtkGLArea) = gl_area_func_not_available()
 	#TODO: gtk_gl_area_get_required_version
-	#TODO: gtk_gl_area_set_required_version
+
 end
