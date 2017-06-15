@@ -7,11 +7,11 @@ to offload the work. The example is just a proof of principle.
 ```julia
 using Gtk
 
-btn = @GtkButton("Start")
-sp = @GtkSpinner()
-ent = @GtkEntry()
+btn = GtkButton("Start")
+sp = GtkSpinner()
+ent = GtkEntry()
 
-grid = @GtkGrid()
+grid = GtkGrid()
 grid[1,1] = btn
 grid[2,1] = sp
 grid[1:2,2] = ent
@@ -34,8 +34,8 @@ signal_connect(btn, "clicked") do widget
  end
 end
 
-win = @GtkWindow(grid, "Progress Bar", 200, 200)
+win = GtkWindow(grid, "Progress Bar", 200, 200)
 showall(win)
-``` 
+```
 
 

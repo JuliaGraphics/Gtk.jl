@@ -3,17 +3,17 @@
 You will usually want to add more than one widget to you application. To this end, Gtk provides several layout widget. Instead of using a precise positioning, the Gtk layout widgets take an approach where widgets are aligned in boxes and tables.
 
 !!! note
-    While doing the layout using Julia code is possible for small examples it is in general adviced to instead create the layout using Glade in combination with GtkBuilder [Builder and Glade](@ref).
+    While doing the layout using Julia code is possible for small examples it is in general advised to instead create the layout using Glade in combination with GtkBuilder [Builder and Glade](@ref).
 
 ## Box
 
 The most simple layout widget is the `GtkBox`. It can be either be horizontally or vertical aligned. It allow to add an arbitrary number of widgets.
 ```julia
-win = @GtkWindow("New title")
-hbox = @GtkBox(:h)  # :h makes a horizontal layout, :v a vertical layout
+win = GtkWindow("New title")
+hbox = GtkBox(:h)  # :h makes a horizontal layout, :v a vertical layout
 push!(win, hbox)
-cancel = @GtkButton("Cancel")
-ok = @GtkButton("OK")
+cancel = GtkButton("Cancel")
+ok = GtkButton("OK")
 push!(hbox, cancel)
 push!(hbox, ok)
 showall(win)
@@ -42,12 +42,12 @@ The first line sets the `expand` property of the `ok` button within the `hbox` c
 
 More generally, you can arrange items in a grid:
 ```julia
-win = @Window("A new window")
-g = @Grid() 
-a = @Entry()  # a widget for entering text
+win = Window("A new window")
+g = Grid()
+a = Entry()  # a widget for entering text
 setproperty!(a, :text, "This is Gtk!")
-b = @CheckButton("Check me!")
-c = @Scale(false, 0:10)     # a slider
+b = CheckButton("Check me!")
+c = Scale(false, 0:10)     # a slider
 
 # Now let's place these graphical elements into the Grid:
 g[1,1] = a    # Cartesian coordinates, g[x,y]

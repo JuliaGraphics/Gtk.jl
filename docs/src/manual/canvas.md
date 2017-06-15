@@ -5,7 +5,7 @@ Generic drawing is done on a `Canvas`. You control what appears on this canvas b
 ```julia
 using Gtk, Graphics
 c = @GtkCanvas()
-win = @GtkWindow(c, "Canvas")
+win = GtkWindow(c, "Canvas")
 @guarded draw(c) do widget
     ctx = getgc(c)
     h = height(c)

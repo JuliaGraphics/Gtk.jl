@@ -13,7 +13,7 @@ listen on the `changed` event
 ```julia
 using Gtk
 
-cb = @GtkComboBoxText()
+cb = GtkComboBoxText()
 choices = ["one", "two", "three", "four"]
 for choice in choices
   push!(cb,choice)
@@ -30,7 +30,7 @@ signal_connect(cb, "changed") do widget, others...
   println("Active element is \"$str\" at index $idx")
 end
 
-win = @GtkWindow("ComboBoxText Example",400,200)
+win = GtkWindow("ComboBoxText Example",400,200)
 push!(win, cb)
 showall(win)
 ```
