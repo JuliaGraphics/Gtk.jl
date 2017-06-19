@@ -47,7 +47,7 @@ if libgtk_version >= v"3"
     unshift!(cb::GtkComboBoxText, id::TupleType(AbstractString, Symbol), text::AbstractString) =
         (ccall((:gtk_combo_box_text_prepend, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
     insert!(cb::GtkComboBoxText, i::Integer, id::TupleType(AbstractString, Symbol), text::AbstractString) =
-        (ccall((:gtk_combo_box_text_insert_text, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
+        (ccall((:gtk_combo_box_text_insert, libgtk), Void, (Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
 
     empty!(cb::GtkComboBoxText) =
         (ccall((:gtk_combo_box_text_remove_all, libgtk), Void, (Ptr{GObject},), cb); cb)
