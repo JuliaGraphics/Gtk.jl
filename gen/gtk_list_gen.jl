@@ -9,10 +9,10 @@ function gen_g_type_lists(gtk_h)
         :GType => :g_gtype,
         )
     tdecls = cindex.search(gtk_h, cindex.TypedefDecl)
-    leafs = TupleType(Symbol,Expr)[]
-    ifaces = TupleType(Symbol,Expr)[]
-    boxes = TupleType(Symbol,Expr)[]
-    gpointers = TupleType(Symbol,Expr)[]
+    leafs = Tuple{Symbol,Expr}[]
+    ifaces = Tuple{Symbol,Expr}[]
+    boxes = Tuple{Symbol,Expr}[]
+    gpointers = Tuple{Symbol,Expr}[]
     for tdecl in tdecls
         ty = cindex.getTypedefDeclUnderlyingType(tdecl)
         if isa(ty,cindex.Pointer)
@@ -27,7 +27,7 @@ function gen_g_type_lists(gtk_h)
         if endswith(typname,"Iface")||endswith(typname,"Class")||endswith(typname,"Private")
             continue
         end
-        typname = symbol(typname)
+        typname = Symbol(typname)
         header_file = cindex.cu_file(tdecl)
         libname = get(gtklibname,basename(splitdir(header_file)[1]),nothing)
         libname == nothing && continue
@@ -35,7 +35,7 @@ function gen_g_type_lists(gtk_h)
             symname = replacelist[typname]
             symname == :nothing && continue
         else
-            symname = symbol(join([lowercase(s) for s in split(string(typname), r"(?=[A-Z])")],"_"))
+            symname = Symbol(join([lowercase(s) for s in split(string(typname), r"(?=[A-Z])")],"_"))
         end
         gtyp = g_type(typname, libname, symname)
         if gtyp == 0
@@ -49,16 +49,16 @@ function gen_g_type_lists(gtk_h)
             @assert !isptr
             push!(ifaces,(typname, :(@Giface $typname $libname $symname)))
         elseif gtyp == 0 || g_isa(gtyp, g_type_from_name(:GBoxed))
-            unref_fn = symbol(string(symname,:_free))
+            unref_fn = Symbol(string(symname,:_free))
             has_ref_fn = false
             if get_fn_ptr(unref_fn, libname) == C_NULL
-                unref_fn = symbol(string(symname,:_unref))
+                unref_fn = Symbol(string(symname,:_unref))
                 if get_fn_ptr(unref_fn, libname) == C_NULL
                     unref_fn = nothing
                     ref_fn = nothing
                 else
                     has_ref_fn = true
-                    ref_fn_sym = symbol(string(symname,:_ref))
+                    ref_fn_sym = Symbol(string(symname,:_ref))
                     @assert get_fn_ptr(ref_fn_sym, libname) != C_NULL
                     ref_fn = :(ccall(($(QuoteNode(ref_fn_sym)),$libname),Void,(Ptr{Void},),ref))
                 end
@@ -102,7 +102,7 @@ function gen_g_type_lists(gtk_h)
                         jtyp = " < $(cindex.getCursorType(cu)) >"
                         valid = false
                     end
-                    push!(paramlist.args, Expr(:(::), symbol(name), jtyp))
+                    push!(paramlist.args, Expr(:(::), Symbol(name), jtyp))
                 end
                 if valid
                     push!(boxes,(typname, ex))

@@ -4,7 +4,7 @@ using GI
 #julia gi_gen_consts.jl 2
 #julia gi_gen_consts.jl 3
 
-const_expr(name,val) =  :(const $(symbol(name)) = $(val))
+const_expr(name,val) =  :(const $(Symbol(name)) = $(val))
 
 function enum_decl(enumname,vals)
     body = Expr(:block)
@@ -15,12 +15,12 @@ function enum_decl(enumname,vals)
         name = uppercase(string(name))
         push!(body.args, const_expr(name,val) )
     end
-    Expr(:toplevel,Expr(:module, false, symbol(enumname), body))
+    Expr(:toplevel,Expr(:module, false, Symbol(enumname), body))
 end
 
 function strip_mask(vals)
     if all( [endswith(string(name),"_mask") for (name,val) in vals] )
-        [ (symbol(string(name)[1:end-5]),val) for (name,val) in vals]
+        [ (Symbol(string(name)[1:end-5]),val) for (name,val) in vals]
     else
         vals
     end
@@ -39,7 +39,7 @@ function write_gtk_consts(fn)
             push!(exprs, const_expr("G_$name",val))
     end
     for (name,vals,isflags) in GI.get_enums(glib)
-        name = symbol("G$name")
+        name = Symbol("G$name")
         push!(exprs, enum_decl(name,vals))
         push!(exports.args, name)
     end
@@ -52,7 +52,7 @@ function write_gtk_consts(fn)
         end
     end
     for (name,vals,isflags) in GI.get_enums(gtk)
-        name = symbol("Gtk$name")
+        name = Symbol("Gtk$name")
         push!(exprs, enum_decl(name,vals))
         push!(exports.args, name)
     end
@@ -71,7 +71,7 @@ function write_gtk_consts(fn)
         if name == :ModifierType
             push!(vals, (:buttons, 256+512+1024+2048+4096))
         end
-        name = symbol("Gdk$name")
+        name = Symbol("Gdk$name")
         push!(exprs, enum_decl(name,vals))
         push!(exports.args, name)
     end

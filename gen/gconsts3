@@ -3018,13 +3018,13 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_comma = 0x002c
     const GDK_KEY_minus = 0x002d
     const GDK_KEY_period = 0x002e
-    const GDK_KEY_slash = 0x02
+    const GDK_KEY_slash = 0x002f
     const GDK_KEY_colon = 0x003a
     const GDK_KEY_semicolon = 0x003b
     const GDK_KEY_less = 0x003c
     const GDK_KEY_equal = 0x003d
     const GDK_KEY_greater = 0x003e
-    const GDK_KEY_question = 0x03
+    const GDK_KEY_question = 0x003f
     const GDK_KEY_at = 0x0040
     const GDK_KEY_A = 0x0041
     const GDK_KEY_B = 0x0042
@@ -3040,7 +3040,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_L = 0x004c
     const GDK_KEY_M = 0x004d
     const GDK_KEY_N = 0x004e
-    const GDK_KEY_O = 0x04
+    const GDK_KEY_O = 0x004f
     const GDK_KEY_P = 0x0050
     const GDK_KEY_Q = 0x0051
     const GDK_KEY_R = 0x0052
@@ -3056,7 +3056,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_backslash = 0x005c
     const GDK_KEY_bracketright = 0x005d
     const GDK_KEY_asciicircum = 0x005e
-    const GDK_KEY_underscore = 0x05
+    const GDK_KEY_underscore = 0x005f
     const GDK_KEY_grave = 0x0060
     const GDK_KEY_quoteleft = 0x0060
     const GDK_KEY_a = 0x0061
@@ -3073,7 +3073,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_l = 0x006c
     const GDK_KEY_m = 0x006d
     const GDK_KEY_n = 0x006e
-    const GDK_KEY_o = 0x06
+    const GDK_KEY_o = 0x006f
     const GDK_KEY_p = 0x0070
     const GDK_KEY_q = 0x0071
     const GDK_KEY_r = 0x0072
@@ -3104,7 +3104,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_notsign = 0x00ac
     const GDK_KEY_hyphen = 0x00ad
     const GDK_KEY_registered = 0x00ae
-    const GDK_KEY_macron = 0x0a
+    const GDK_KEY_macron = 0x00af
     const GDK_KEY_degree = 0x00b0
     const GDK_KEY_plusminus = 0x00b1
     const GDK_KEY_twosuperior = 0x00b2
@@ -3120,7 +3120,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_onequarter = 0x00bc
     const GDK_KEY_onehalf = 0x00bd
     const GDK_KEY_threequarters = 0x00be
-    const GDK_KEY_questiondown = 0x0b
+    const GDK_KEY_questiondown = 0x00bf
     const GDK_KEY_Agrave = 0x00c0
     const GDK_KEY_Aacute = 0x00c1
     const GDK_KEY_Acircumflex = 0x00c2
@@ -3136,7 +3136,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Igrave = 0x00cc
     const GDK_KEY_Iacute = 0x00cd
     const GDK_KEY_Icircumflex = 0x00ce
-    const GDK_KEY_Idiaeresis = 0x0c
+    const GDK_KEY_Idiaeresis = 0x00cf
     const GDK_KEY_ETH = 0x00d0
     const GDK_KEY_Eth = 0x00d0
     const GDK_KEY_Ntilde = 0x00d1
@@ -3155,7 +3155,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Yacute = 0x00dd
     const GDK_KEY_THORN = 0x00de
     const GDK_KEY_Thorn = 0x00de
-    const GDK_KEY_ssharp = 0x0d
+    const GDK_KEY_ssharp = 0x00df
     const GDK_KEY_agrave = 0x00e0
     const GDK_KEY_aacute = 0x00e1
     const GDK_KEY_acircumflex = 0x00e2
@@ -3171,7 +3171,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_igrave = 0x00ec
     const GDK_KEY_iacute = 0x00ed
     const GDK_KEY_icircumflex = 0x00ee
-    const GDK_KEY_idiaeresis = 0x0e
+    const GDK_KEY_idiaeresis = 0x00ef
     const GDK_KEY_eth = 0x00f0
     const GDK_KEY_ntilde = 0x00f1
     const GDK_KEY_ograve = 0x00f2
@@ -3188,7 +3188,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_udiaeresis = 0x00fc
     const GDK_KEY_yacute = 0x00fd
     const GDK_KEY_thorn = 0x00fe
-    const GDK_KEY_ydiaeresis = 0x0f
+    const GDK_KEY_ydiaeresis = 0x00ff
     const GDK_KEY_Aogonek = 0x01a1
     const GDK_KEY_breve = 0x01a2
     const GDK_KEY_Lstroke = 0x01a3
@@ -3199,7 +3199,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Tcaron = 0x01ab
     const GDK_KEY_Zacute = 0x01ac
     const GDK_KEY_Zcaron = 0x01ae
-    const GDK_KEY_Zabovedot = 0x1a
+    const GDK_KEY_Zabovedot = 0x01af
     const GDK_KEY_aogonek = 0x01b1
     const GDK_KEY_ogonek = 0x01b2
     const GDK_KEY_lstroke = 0x01b3
@@ -3212,7 +3212,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_zacute = 0x01bc
     const GDK_KEY_doubleacute = 0x01bd
     const GDK_KEY_zcaron = 0x01be
-    const GDK_KEY_zabovedot = 0x1b
+    const GDK_KEY_zabovedot = 0x01bf
     const GDK_KEY_Racute = 0x01c0
     const GDK_KEY_Abreve = 0x01c3
     const GDK_KEY_Lacute = 0x01c5
@@ -3220,7 +3220,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Ccaron = 0x01c8
     const GDK_KEY_Eogonek = 0x01ca
     const GDK_KEY_Ecaron = 0x01cc
-    const GDK_KEY_Dcaron = 0x1c
+    const GDK_KEY_Dcaron = 0x01cf
     const GDK_KEY_Dstroke = 0x01d0
     const GDK_KEY_Nacute = 0x01d1
     const GDK_KEY_Ncaron = 0x01d2
@@ -3236,7 +3236,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_ccaron = 0x01e8
     const GDK_KEY_eogonek = 0x01ea
     const GDK_KEY_ecaron = 0x01ec
-    const GDK_KEY_dcaron = 0x1e
+    const GDK_KEY_dcaron = 0x01ef
     const GDK_KEY_dstroke = 0x01f0
     const GDK_KEY_nacute = 0x01f1
     const GDK_KEY_ncaron = 0x01f2
@@ -3245,7 +3245,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_uring = 0x01f9
     const GDK_KEY_udoubleacute = 0x01fb
     const GDK_KEY_tcedilla = 0x01fe
-    const GDK_KEY_abovedot = 0x1f
+    const GDK_KEY_abovedot = 0x01ff
     const GDK_KEY_Hstroke = 0x02a1
     const GDK_KEY_Hcircumflex = 0x02a6
     const GDK_KEY_Iabovedot = 0x02a9
@@ -3283,11 +3283,11 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_gcedilla = 0x03bb
     const GDK_KEY_tslash = 0x03bc
     const GDK_KEY_ENG = 0x03bd
-    const GDK_KEY_eng = 0x3b
+    const GDK_KEY_eng = 0x03bf
     const GDK_KEY_Amacron = 0x03c0
     const GDK_KEY_Iogonek = 0x03c7
     const GDK_KEY_Eabovedot = 0x03cc
-    const GDK_KEY_Imacron = 0x3c
+    const GDK_KEY_Imacron = 0x03cf
     const GDK_KEY_Ncedilla = 0x03d1
     const GDK_KEY_Omacron = 0x03d2
     const GDK_KEY_Kcedilla = 0x03d3
@@ -3297,7 +3297,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_amacron = 0x03e0
     const GDK_KEY_iogonek = 0x03e7
     const GDK_KEY_eabovedot = 0x03ec
-    const GDK_KEY_imacron = 0x3e
+    const GDK_KEY_imacron = 0x03ef
     const GDK_KEY_ncedilla = 0x03f1
     const GDK_KEY_omacron = 0x03f2
     const GDK_KEY_kcedilla = 0x03f3
@@ -3349,8 +3349,8 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_kana_ya = 0x04ac
     const GDK_KEY_kana_yu = 0x04ad
     const GDK_KEY_kana_yo = 0x04ae
-    const GDK_KEY_kana_tsu = 0x4a
-    const GDK_KEY_kana_tu = 0x4a
+    const GDK_KEY_kana_tsu = 0x04af
+    const GDK_KEY_kana_tu = 0x04af
     const GDK_KEY_prolongedsound = 0x04b0
     const GDK_KEY_kana_A = 0x04b1
     const GDK_KEY_kana_I = 0x04b2
@@ -3366,7 +3366,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_kana_SHI = 0x04bc
     const GDK_KEY_kana_SU = 0x04bd
     const GDK_KEY_kana_SE = 0x04be
-    const GDK_KEY_kana_SO = 0x4b
+    const GDK_KEY_kana_SO = 0x04bf
     const GDK_KEY_kana_TA = 0x04c0
     const GDK_KEY_kana_CHI = 0x04c1
     const GDK_KEY_kana_TI = 0x04c1
@@ -3385,7 +3385,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_kana_HU = 0x04cc
     const GDK_KEY_kana_HE = 0x04cd
     const GDK_KEY_kana_HO = 0x04ce
-    const GDK_KEY_kana_MA = 0x4c
+    const GDK_KEY_kana_MA = 0x04cf
     const GDK_KEY_kana_MI = 0x04d0
     const GDK_KEY_kana_MU = 0x04d1
     const GDK_KEY_kana_ME = 0x04d2
@@ -3401,7 +3401,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_kana_WA = 0x04dc
     const GDK_KEY_kana_N = 0x04dd
     const GDK_KEY_voicedsound = 0x04de
-    const GDK_KEY_semivoicedsound = 0x4d
+    const GDK_KEY_semivoicedsound = 0x04df
     const GDK_KEY_kana_switch = 0xff7e
     const GDK_KEY_Arabic_percent = 0x0100066a
     const GDK_KEY_Arabic_superscript_alef = 0x01000670
@@ -3413,7 +3413,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Arabic_comma = 0x05ac
     const GDK_KEY_Arabic_fullstop = 0x010006d4
     const GDK_KEY_Arabic_semicolon = 0x05bb
-    const GDK_KEY_Arabic_question_mark = 0x5b
+    const GDK_KEY_Arabic_question_mark = 0x05bf
     const GDK_KEY_Arabic_hamza = 0x05c1
     const GDK_KEY_Arabic_maddaonalef = 0x05c2
     const GDK_KEY_Arabic_hamzaonalef = 0x05c3
@@ -3428,7 +3428,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Arabic_jeem = 0x05cc
     const GDK_KEY_Arabic_hah = 0x05cd
     const GDK_KEY_Arabic_khah = 0x05ce
-    const GDK_KEY_Arabic_dal = 0x5c
+    const GDK_KEY_Arabic_dal = 0x05cf
     const GDK_KEY_Arabic_thal = 0x05d0
     const GDK_KEY_Arabic_ra = 0x05d1
     const GDK_KEY_Arabic_zain = 0x05d2
@@ -3456,7 +3456,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Arabic_dammatan = 0x05ec
     const GDK_KEY_Arabic_kasratan = 0x05ed
     const GDK_KEY_Arabic_fatha = 0x05ee
-    const GDK_KEY_Arabic_damma = 0x5e
+    const GDK_KEY_Arabic_damma = 0x05ef
     const GDK_KEY_Arabic_kasra = 0x05f0
     const GDK_KEY_Arabic_shadda = 0x05f1
     const GDK_KEY_Arabic_sukun = 0x05f2
@@ -3524,8 +3524,8 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Macedonia_kje = 0x06ac
     const GDK_KEY_Ukrainian_ghe_with_upturn = 0x06ad
     const GDK_KEY_Byelorussian_shortu = 0x06ae
-    const GDK_KEY_Cyrillic_dzhe = 0x6a
-    const GDK_KEY_Serbian_dze = 0x6a
+    const GDK_KEY_Cyrillic_dzhe = 0x06af
+    const GDK_KEY_Serbian_dze = 0x06af
     const GDK_KEY_numerosign = 0x06b0
     const GDK_KEY_Serbian_DJE = 0x06b1
     const GDK_KEY_Macedonia_GJE = 0x06b2
@@ -3547,8 +3547,8 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Macedonia_KJE = 0x06bc
     const GDK_KEY_Ukrainian_GHE_WITH_UPTURN = 0x06bd
     const GDK_KEY_Byelorussian_SHORTU = 0x06be
-    const GDK_KEY_Cyrillic_DZHE = 0x6b
-    const GDK_KEY_Serbian_DZE = 0x6b
+    const GDK_KEY_Cyrillic_DZHE = 0x06bf
+    const GDK_KEY_Serbian_DZE = 0x06bf
     const GDK_KEY_Cyrillic_yu = 0x06c0
     const GDK_KEY_Cyrillic_a = 0x06c1
     const GDK_KEY_Cyrillic_be = 0x06c2
@@ -3564,7 +3564,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Cyrillic_el = 0x06cc
     const GDK_KEY_Cyrillic_em = 0x06cd
     const GDK_KEY_Cyrillic_en = 0x06ce
-    const GDK_KEY_Cyrillic_o = 0x6c
+    const GDK_KEY_Cyrillic_o = 0x06cf
     const GDK_KEY_Cyrillic_pe = 0x06d0
     const GDK_KEY_Cyrillic_ya = 0x06d1
     const GDK_KEY_Cyrillic_er = 0x06d2
@@ -3580,7 +3580,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Cyrillic_e = 0x06dc
     const GDK_KEY_Cyrillic_shcha = 0x06dd
     const GDK_KEY_Cyrillic_che = 0x06de
-    const GDK_KEY_Cyrillic_hardsign = 0x6d
+    const GDK_KEY_Cyrillic_hardsign = 0x06df
     const GDK_KEY_Cyrillic_YU = 0x06e0
     const GDK_KEY_Cyrillic_A = 0x06e1
     const GDK_KEY_Cyrillic_BE = 0x06e2
@@ -3596,7 +3596,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Cyrillic_EL = 0x06ec
     const GDK_KEY_Cyrillic_EM = 0x06ed
     const GDK_KEY_Cyrillic_EN = 0x06ee
-    const GDK_KEY_Cyrillic_O = 0x6e
+    const GDK_KEY_Cyrillic_O = 0x06ef
     const GDK_KEY_Cyrillic_PE = 0x06f0
     const GDK_KEY_Cyrillic_YA = 0x06f1
     const GDK_KEY_Cyrillic_ER = 0x06f2
@@ -3612,7 +3612,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Cyrillic_E = 0x06fc
     const GDK_KEY_Cyrillic_SHCHA = 0x06fd
     const GDK_KEY_Cyrillic_CHE = 0x06fe
-    const GDK_KEY_Cyrillic_HARDSIGN = 0x6f
+    const GDK_KEY_Cyrillic_HARDSIGN = 0x06ff
     const GDK_KEY_Greek_ALPHAaccent = 0x07a1
     const GDK_KEY_Greek_EPSILONaccent = 0x07a2
     const GDK_KEY_Greek_ETAaccent = 0x07a3
@@ -3624,7 +3624,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Greek_UPSILONdieresis = 0x07a9
     const GDK_KEY_Greek_OMEGAaccent = 0x07ab
     const GDK_KEY_Greek_accentdieresis = 0x07ae
-    const GDK_KEY_Greek_horizbar = 0x7a
+    const GDK_KEY_Greek_horizbar = 0x07af
     const GDK_KEY_Greek_alphaaccent = 0x07b1
     const GDK_KEY_Greek_epsilonaccent = 0x07b2
     const GDK_KEY_Greek_etaaccent = 0x07b3
@@ -3651,7 +3651,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Greek_MU = 0x07cc
     const GDK_KEY_Greek_NU = 0x07cd
     const GDK_KEY_Greek_XI = 0x07ce
-    const GDK_KEY_Greek_OMICRON = 0x7c
+    const GDK_KEY_Greek_OMICRON = 0x07cf
     const GDK_KEY_Greek_PI = 0x07d0
     const GDK_KEY_Greek_RHO = 0x07d1
     const GDK_KEY_Greek_SIGMA = 0x07d2
@@ -3676,7 +3676,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Greek_mu = 0x07ec
     const GDK_KEY_Greek_nu = 0x07ed
     const GDK_KEY_Greek_xi = 0x07ee
-    const GDK_KEY_Greek_omicron = 0x7e
+    const GDK_KEY_Greek_omicron = 0x07ef
     const GDK_KEY_Greek_pi = 0x07f0
     const GDK_KEY_Greek_rho = 0x07f1
     const GDK_KEY_Greek_sigma = 0x07f2
@@ -3702,7 +3702,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_botleftparens = 0x08ac
     const GDK_KEY_toprightparens = 0x08ad
     const GDK_KEY_botrightparens = 0x08ae
-    const GDK_KEY_leftmiddlecurlybrace = 0x8a
+    const GDK_KEY_leftmiddlecurlybrace = 0x08af
     const GDK_KEY_rightmiddlecurlybrace = 0x08b0
     const GDK_KEY_topleftsummation = 0x08b1
     const GDK_KEY_botleftsummation = 0x08b2
@@ -3714,7 +3714,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_lessthanequal = 0x08bc
     const GDK_KEY_notequal = 0x08bd
     const GDK_KEY_greaterthanequal = 0x08be
-    const GDK_KEY_integral = 0x8b
+    const GDK_KEY_integral = 0x08bf
     const GDK_KEY_therefore = 0x08c0
     const GDK_KEY_variation = 0x08c1
     const GDK_KEY_infinity = 0x08c2
@@ -3723,21 +3723,21 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_similarequal = 0x08c9
     const GDK_KEY_ifonlyif = 0x08cd
     const GDK_KEY_implies = 0x08ce
-    const GDK_KEY_identical = 0x8c
+    const GDK_KEY_identical = 0x08cf
     const GDK_KEY_radical = 0x08d6
     const GDK_KEY_includedin = 0x08da
     const GDK_KEY_includes = 0x08db
     const GDK_KEY_intersection = 0x08dc
     const GDK_KEY_union = 0x08dd
     const GDK_KEY_logicaland = 0x08de
-    const GDK_KEY_logicalor = 0x8d
-    const GDK_KEY_partialderivative = 0x8e
+    const GDK_KEY_logicalor = 0x08df
+    const GDK_KEY_partialderivative = 0x08ef
     const GDK_KEY_function = 0x08f6
     const GDK_KEY_leftarrow = 0x08fb
     const GDK_KEY_uparrow = 0x08fc
     const GDK_KEY_rightarrow = 0x08fd
     const GDK_KEY_downarrow = 0x08fe
-    const GDK_KEY_blank = 0x9d
+    const GDK_KEY_blank = 0x09df
     const GDK_KEY_soliddiamond = 0x09e0
     const GDK_KEY_checkerboard = 0x09e1
     const GDK_KEY_ht = 0x09e2
@@ -3768,7 +3768,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_endash = 0x0aaa
     const GDK_KEY_signifblank = 0x0aac
     const GDK_KEY_ellipsis = 0x0aae
-    const GDK_KEY_doubbaselinedot = 0xaa
+    const GDK_KEY_doubbaselinedot = 0x0aaf
     const GDK_KEY_onethird = 0x0ab0
     const GDK_KEY_twothirds = 0x0ab1
     const GDK_KEY_onefifth = 0x0ab2
@@ -3782,7 +3782,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_leftanglebracket = 0x0abc
     const GDK_KEY_decimalpoint = 0x0abd
     const GDK_KEY_rightanglebracket = 0x0abe
-    const GDK_KEY_marker = 0xab
+    const GDK_KEY_marker = 0x0abf
     const GDK_KEY_oneeighth = 0x0ac3
     const GDK_KEY_threeeighths = 0x0ac4
     const GDK_KEY_fiveeighths = 0x0ac5
@@ -3793,7 +3793,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_leftopentriangle = 0x0acc
     const GDK_KEY_rightopentriangle = 0x0acd
     const GDK_KEY_emopencircle = 0x0ace
-    const GDK_KEY_emopenrectangle = 0xac
+    const GDK_KEY_emopenrectangle = 0x0acf
     const GDK_KEY_leftsinglequotemark = 0x0ad0
     const GDK_KEY_rightsinglequotemark = 0x0ad1
     const GDK_KEY_leftdoublequotemark = 0x0ad2
@@ -3808,7 +3808,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_filledlefttribullet = 0x0adc
     const GDK_KEY_filledrighttribullet = 0x0add
     const GDK_KEY_emfilledcircle = 0x0ade
-    const GDK_KEY_emfilledrect = 0xad
+    const GDK_KEY_emfilledrect = 0x0adf
     const GDK_KEY_enopencircbullet = 0x0ae0
     const GDK_KEY_enopensquarebullet = 0x0ae1
     const GDK_KEY_openrectbullet = 0x0ae2
@@ -3839,7 +3839,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_caret = 0x0afc
     const GDK_KEY_singlelowquotemark = 0x0afd
     const GDK_KEY_doublelowquotemark = 0x0afe
-    const GDK_KEY_cursor = 0xaf
+    const GDK_KEY_cursor = 0x0aff
     const GDK_KEY_leftcaret = 0x0ba3
     const GDK_KEY_rightcaret = 0x0ba6
     const GDK_KEY_downcaret = 0x0ba8
@@ -3852,14 +3852,14 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_jot = 0x0bca
     const GDK_KEY_quad = 0x0bcc
     const GDK_KEY_uptack = 0x0bce
-    const GDK_KEY_circle = 0xbc
+    const GDK_KEY_circle = 0x0bcf
     const GDK_KEY_upstile = 0x0bd3
     const GDK_KEY_downshoe = 0x0bd6
     const GDK_KEY_rightshoe = 0x0bd8
     const GDK_KEY_leftshoe = 0x0bda
     const GDK_KEY_lefttack = 0x0bdc
     const GDK_KEY_righttack = 0x0bfc
-    const GDK_KEY_hebrew_doublelowline = 0xcd
+    const GDK_KEY_hebrew_doublelowline = 0x0cdf
     const GDK_KEY_hebrew_aleph = 0x0ce0
     const GDK_KEY_hebrew_bet = 0x0ce1
     const GDK_KEY_hebrew_beth = 0x0ce1
@@ -3881,7 +3881,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_hebrew_lamed = 0x0cec
     const GDK_KEY_hebrew_finalmem = 0x0ced
     const GDK_KEY_hebrew_mem = 0x0cee
-    const GDK_KEY_hebrew_finalnun = 0xce
+    const GDK_KEY_hebrew_finalnun = 0x0cef
     const GDK_KEY_hebrew_nun = 0x0cf0
     const GDK_KEY_hebrew_samech = 0x0cf1
     const GDK_KEY_hebrew_samekh = 0x0cf1
@@ -3913,7 +3913,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Thai_chochoe = 0x0dac
     const GDK_KEY_Thai_yoying = 0x0dad
     const GDK_KEY_Thai_dochada = 0x0dae
-    const GDK_KEY_Thai_topatak = 0xda
+    const GDK_KEY_Thai_topatak = 0x0daf
     const GDK_KEY_Thai_thothan = 0x0db0
     const GDK_KEY_Thai_thonangmontho = 0x0db1
     const GDK_KEY_Thai_thophuthao = 0x0db2
@@ -3929,7 +3929,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Thai_phophung = 0x0dbc
     const GDK_KEY_Thai_fofa = 0x0dbd
     const GDK_KEY_Thai_phophan = 0x0dbe
-    const GDK_KEY_Thai_fofan = 0xdb
+    const GDK_KEY_Thai_fofan = 0x0dbf
     const GDK_KEY_Thai_phosamphao = 0x0dc0
     const GDK_KEY_Thai_moma = 0x0dc1
     const GDK_KEY_Thai_yoyak = 0x0dc2
@@ -3945,7 +3945,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Thai_lochula = 0x0dcc
     const GDK_KEY_Thai_oang = 0x0dcd
     const GDK_KEY_Thai_honokhuk = 0x0dce
-    const GDK_KEY_Thai_paiyannoi = 0xdc
+    const GDK_KEY_Thai_paiyannoi = 0x0dcf
     const GDK_KEY_Thai_saraa = 0x0dd0
     const GDK_KEY_Thai_maihanakat = 0x0dd1
     const GDK_KEY_Thai_saraaa = 0x0dd2
@@ -3958,7 +3958,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Thai_sarauu = 0x0dd9
     const GDK_KEY_Thai_phinthu = 0x0dda
     const GDK_KEY_Thai_maihanakat_maitho = 0x0dde
-    const GDK_KEY_Thai_baht = 0xdd
+    const GDK_KEY_Thai_baht = 0x0ddf
     const GDK_KEY_Thai_sarae = 0x0de0
     const GDK_KEY_Thai_saraae = 0x0de1
     const GDK_KEY_Thai_sarao = 0x0de2
@@ -4013,7 +4013,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_RieulPieub = 0x0eac
     const GDK_KEY_Hangul_RieulSios = 0x0ead
     const GDK_KEY_Hangul_RieulTieut = 0x0eae
-    const GDK_KEY_Hangul_RieulPhieuf = 0xea
+    const GDK_KEY_Hangul_RieulPhieuf = 0x0eaf
     const GDK_KEY_Hangul_RieulHieuh = 0x0eb0
     const GDK_KEY_Hangul_Mieum = 0x0eb1
     const GDK_KEY_Hangul_Pieub = 0x0eb2
@@ -4029,7 +4029,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_Tieut = 0x0ebc
     const GDK_KEY_Hangul_Phieuf = 0x0ebd
     const GDK_KEY_Hangul_Hieuh = 0x0ebe
-    const GDK_KEY_Hangul_A = 0xeb
+    const GDK_KEY_Hangul_A = 0x0ebf
     const GDK_KEY_Hangul_AE = 0x0ec0
     const GDK_KEY_Hangul_YA = 0x0ec1
     const GDK_KEY_Hangul_YAE = 0x0ec2
@@ -4045,7 +4045,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_U = 0x0ecc
     const GDK_KEY_Hangul_WEO = 0x0ecd
     const GDK_KEY_Hangul_WE = 0x0ece
-    const GDK_KEY_Hangul_WI = 0xec
+    const GDK_KEY_Hangul_WI = 0x0ecf
     const GDK_KEY_Hangul_YU = 0x0ed0
     const GDK_KEY_Hangul_EU = 0x0ed1
     const GDK_KEY_Hangul_YI = 0x0ed2
@@ -4061,7 +4061,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_J_RieulKiyeog = 0x0edc
     const GDK_KEY_Hangul_J_RieulMieum = 0x0edd
     const GDK_KEY_Hangul_J_RieulPieub = 0x0ede
-    const GDK_KEY_Hangul_J_RieulSios = 0xed
+    const GDK_KEY_Hangul_J_RieulSios = 0x0edf
     const GDK_KEY_Hangul_J_RieulTieut = 0x0ee0
     const GDK_KEY_Hangul_J_RieulPhieuf = 0x0ee1
     const GDK_KEY_Hangul_J_RieulHieuh = 0x0ee2
@@ -4077,7 +4077,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_J_Tieut = 0x0eec
     const GDK_KEY_Hangul_J_Phieuf = 0x0eed
     const GDK_KEY_Hangul_J_Hieuh = 0x0eee
-    const GDK_KEY_Hangul_RieulYeorinHieuh = 0xee
+    const GDK_KEY_Hangul_RieulYeorinHieuh = 0x0eef
     const GDK_KEY_Hangul_SunkyeongeumMieum = 0x0ef0
     const GDK_KEY_Hangul_SunkyeongeumPieub = 0x0ef1
     const GDK_KEY_Hangul_PanSios = 0x0ef2
@@ -4089,7 +4089,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_KEY_Hangul_J_PanSios = 0x0ef8
     const GDK_KEY_Hangul_J_KkogjiDalrinIeung = 0x0ef9
     const GDK_KEY_Hangul_J_YeorinHieuh = 0x0efa
-    const GDK_KEY_Korean_Won = 0xef
+    const GDK_KEY_Korean_Won = 0x0eff
     const GDK_KEY_Armenian_ligature_ew = 0x01000587
     const GDK_KEY_Armenian_full_stop = 0x01000589
     const GDK_KEY_Armenian_verjaket = 0x01000589
