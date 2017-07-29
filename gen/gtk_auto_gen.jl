@@ -33,7 +33,7 @@ let gtk_version = Gtk.gtk_version
         end
     end
     isfile(header) || error("gtk.h not found, please specify path")
-    args = ASCIIString[split(readall(`pkg-config --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
+    args = ASCIIString[split(readstring(`pkg-config --cflags gtk+-$gtk_version.0`),' ')...,cppargs...]
     global gtk_h, gtk_macro_h
     cd(JULIA_HOME) do
         gtk_h = cindex.parse_header(header, diagnostics=true, args=args, flags=0x41)

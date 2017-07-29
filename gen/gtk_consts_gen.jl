@@ -12,7 +12,7 @@ function gen_consts(body, gtk_h)
             if m === nothing
                 continue
             end
-            name = symbol(name)
+            name = Symbol(name)
             push!(exports.args, name)
             consts = Expr(:block)
             push!(body.args, Expr(:toplevel, Expr(:module, false, name, consts)))
@@ -50,9 +50,9 @@ function gen_consts(body, gtk_h)
                 else
                     shortdecl = decl[lprefix:end]
                 end
-                jldecl = Expr(:const, Expr(:(=), symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
+                jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
                 if ismatch(r"^[A-Za-z]", shortdecl)
-                    push!(consts.args, Expr(:const, Expr(:(=), symbol(shortdecl), jldecl)))
+                    push!(consts.args, Expr(:const, Expr(:(=), Symbol(shortdecl), jldecl)))
                 else
                     push!(consts.args, jldecl)
                 end
@@ -71,7 +71,7 @@ function gen_consts(body, gtk_h)
             if length(tokens) == 2 && isa(tokens[2], cindex.Literal)
                 tok2 = Clang.wrap_c.handle_macro_exprn(tokens, 2)[1]
                 tok2 = replace(tok2, "\$", "\\\$")
-                push!(body.args, Expr(:const, Expr(:(=), symbol(name), parse(tok2))))
+                push!(body.args, Expr(:const, Expr(:(=), Symbol(name), parse(tok2))))
             else
                 #println("Skipping: ", name, " = ", [tokens...])
             end

@@ -171,7 +171,7 @@ for gtktype in GtkBoxedMap
     push!(GtkTypeMap,gtktype)
     c_typdef_to_jl[string(gtktype)] = Expr(:., :Gtk, QuoteNode(gtktype))
 end
-const reserved_names = Set{Symbol}([symbol(x) for x in split("
+const reserved_names = Set{Symbol}([Symbol(x) for x in split("
     Base Main Core Array Expr Ptr
     type immutable module function macro ccall
     while do for if ifelse nothing quote
@@ -234,7 +234,7 @@ function g_get_gtype(ctype)
     if !isa(arg1ty, cindex.Typedef)
         return :Void
     end
-    arg1ty = symbol(cindex.spelling(cindex.getTypeDeclaration(arg1ty)))
+    arg1ty = Symbol(cindex.spelling(cindex.getTypeDeclaration(arg1ty)))
     if !(arg1ty in GtkTypeMap)
         return :Void
     end
@@ -287,17 +287,17 @@ function gen_get_set(body, gtk_h)
         if m === nothing
             continue
         end
-        method_name = symbol(m.captures[2])
+        method_name = Symbol(m.captures[2])
         header_file = cindex.cu_file(fdecl)
         libname = gtklibname[basename(splitdir(header_file)[1])]
         if libname == nothing
             continue
         end
         rettype = g_type_to_jl(cindex.return_type(fdecl))
-        argnames = [symbol(cindex.name(arg)) for arg in fargs]
+        argnames = [Symbol(cindex.name(arg)) for arg in fargs]
         for i = 1:length(argnames)
             if argnames[i] == method_name || argnames[i] in reserved_names
-                argnames[i] = symbol(string(argnames[i],'_'))
+                argnames[i] = Symbol(string(argnames[i],'_'))
             end
         end
         argtypes = [g_type_to_jl(cindex.getCursorType(arg)) for arg in fargs]
@@ -306,7 +306,7 @@ function gen_get_set(body, gtk_h)
             continue
         end
         if m.captures[1] == "get"
-            fbody = :( ccall(($(QuoteNode(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) )
+            fbody = :( ccall(($(QuoteNode(Symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) )
             gtype = g_get_gtype(cindex.return_type(fdecl))
             if gtype != :Void
                 fbody = :( convert($gtype, $fbody) )
@@ -353,7 +353,7 @@ function gen_get_set(body, gtk_h)
             push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), fargnames...), fbody))
         elseif m.captures[1] == "set"
             fbody = Expr(:block,
-                :( ccall(($(QuoteNode(symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) ),
+                :( ccall(($(QuoteNode(Symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) ),
                 Expr(:return, argnames[1])
             )
             push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), argnames[2:end]...), fbody))
