@@ -5,4 +5,3 @@ BinDeps
 @windows WinRPM
 @osx Homebrew
 Compat 0.18
-BaseTestNext
