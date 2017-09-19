@@ -52,6 +52,7 @@ if @compat is_apple()
             end
 	    ENV["GDK_PIXBUF_MODULEDIR"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders")
 	    ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
+	    run(`$(joinpath("$(Homebrew.brew_prefix)", "bin/gdk-pixbuf-query-loaders")) --update-cache`)
         end
         """)
     provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
