@@ -3,7 +3,7 @@
 If you're using Gtk from command-line scripts, one problem you may encounter is that Julia quits before you have a chance to see or interact with your windows. In such cases, the following design pattern can be helpful:
 
 ```julia
-win = @Window("gtkwait")
+win = Window("gtkwait")
 
 # Put your GUI code here
 

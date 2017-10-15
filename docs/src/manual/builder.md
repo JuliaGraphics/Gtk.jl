@@ -52,12 +52,12 @@ the extension `.glade`. Lets assume we have created a file `myapp.glade` that lo
 In order to access the widgets from Julia we first create a `GtkBuilder` object that will serve as our
 connector between the XML definition and our Julia code.
 ```julia
-b = @GtkBuilder(filename=myapp.glade)
+b = GtkBuilder(filename=myapp.glade)
 ```
 Alternatively, if we would store above XML definition in a Julia string `myapp` we can initalize
 the builder by
 ```julia
-b = @GtkBuilder(buffer=myapp)
+b = GtkBuilder(buffer=myapp)
 ```
 Now we want to access a widget from the XML file in order to actually display it on the screen. To do so
 we call
