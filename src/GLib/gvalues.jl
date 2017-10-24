@@ -51,7 +51,7 @@ global make_gvalue, getindex
 function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = true, fundamental::Bool = false)
     with_id === :error && return
     if isa(with_id, Tuple)
-        with_id = with_id::TupleType(Symbol, Any)
+        with_id = with_id::Tuple{Symbol, Any}
         with_id = :(ccall($(Expr(:tuple, Meta.quot(Symbol(string(with_id[1], "_get_type"))), with_id[2])), GType, ()))
     end
     if pass_x !== Union{} && !(pass_x in handled)

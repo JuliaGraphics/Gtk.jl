@@ -13,6 +13,7 @@ import Base: convert, copy, show, showall, showcompact, size, length, getindex, 
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
              sigatomic_begin, sigatomic_end
+using Base.Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export GEnum, GError, GValue, gvalue, make_gvalue, g_type
@@ -22,36 +23,6 @@ export signal_handler_block, signal_handler_unblock
 export setproperty!, getproperty
 export GConnectFlags
 export @sigatom
-
-module CompatGLib
-    export @assign_if_unassigned
-    macro assign_if_unassigned(expr)
-        # BinDeps often fails and generates corrupt deps.jl files
-        # (https://github.com/JuliaLang/BinDeps.jl/issues/146),
-        # but most of the time, we don't care
-        @assert expr.head === :(=)
-        left = expr.args[1]
-        right = expr.args[2]
-        quote
-            if !isdefined(current_module(), $(QuoteNode(left)))
-                global const $(esc(left)) = $(esc(right))
-            end
-        end
-    end
-    export TupleType, dlopen, dlsym_e, unsafe_convert
-    TupleType(types...) = Tuple{types...}
-    const unsafe_convert = Base.unsafe_convert
-    import Base.Libdl: dlopen, dlsym_e
-    using Base.Sys.WORD_SIZE
-    if VERSION >= v"0.6.0-dev" && !isdefined(Base, :xor)
-        export xor
-        const xor = $
-    end
-    export utf8
-    const utf8 = String
-end
-importall .CompatGLib
-using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
