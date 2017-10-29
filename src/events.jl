@@ -207,3 +207,12 @@ function pop!(mh_evt::MHPair)
     end
     mh
 end
+
+
+function waitforsignal(widget,signal)
+  c = Condition()
+  signal_connect(widget, signal) do w
+      notify(c)
+  end
+  wait(c)
+end
