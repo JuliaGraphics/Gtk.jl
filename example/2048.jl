@@ -25,15 +25,6 @@ end
 
 
 function compactleft!(b, siz, row)
-    tmprow = zeros(Int, siz)
-    tmppos = 1
-    for j in 1:siz
-        if b[row,j] != 0
-            tmprow[tmppos] = b[row,j]
-            tmppos += 1
-        end
-    end
-    b[row,:] = tmprow
 end
 
 """
@@ -46,11 +37,19 @@ function leftshift!(b, siz)
     pointsgained = 0
     winner = false
     for i in 1:siz
-        compactleft!(b, siz, i)
         tmprow = zeros(Int, siz)
         tmppos = 1
-        for j in 1:siz-1
-            if b[i,j] == b[i,j+1]
+        for j in 1:siz
+            if b[i,j] != 0
+                tmprow[tmppos] = b[i,j]
+                tmppos += 1
+            end
+        end
+        b[i,:] = tmprow
+        tmprow = zeros(Int, siz)
+        tmppos = 1
+        for j in 1:siz
+            if j < siz && b[i,j] == b[i,j+1]
                 b[i,j] = 2 * b[i,j]
                 b[i,j+1] = 0
                 pointsgained += b[i,j]
@@ -63,9 +62,7 @@ function leftshift!(b, siz)
                 tmppos += 1
             end
         end
-        tmprow[siz] = b[i,siz]
         b[i,:] = tmprow
-        compactleft!(b, siz, i)
     end
     pointsgained, winner
 end
@@ -130,7 +127,7 @@ function app2048(bsize)
         update!()
     end
     function undo!(w)
-        if gameover == false
+        if gameover == false && length(pastboardstates) > 0
             board = pop!(pastboardstates)
             update!()
         end
@@ -169,3 +166,4 @@ end
 
 const boardsize = 4
 app2048(boardsize)
+
