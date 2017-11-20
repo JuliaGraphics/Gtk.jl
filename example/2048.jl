@@ -24,9 +24,6 @@ function shifttiles!(b, siz, direction)
 end
 
 
-function compactleft!(b, siz, row)
-end
-
 """
     leftshift!
 Work row by row. First, compact tiles to the left if possible. Second, find and
