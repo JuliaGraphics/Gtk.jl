@@ -133,11 +133,11 @@ function app2048(bsize)
         end
     end
     function keypress(w, event)
-        presses = Dict(37 => Up,    # code rotated 90 degrees
-                       38 => Left,  # because of Gtk coordinates
-                       39 => Down,  # y is downward positive
-                       40 => Right)
-        keycode = event.hardware_keycode
+        presses = Dict(0xff51 => Up,      # code rotated 90 degrees
+                       0xff52 => Left,    # because of Gtk coordinates
+                       0xff53 => Down,  
+                       0xff54 => Right)
+        keycode = event.keyval
         if haskey(presses, keycode) && gameover == false
             push!(pastboardstates, copy(board))
             newpoints, havewon = shifttiles!(board, bsize, presses[keycode])
