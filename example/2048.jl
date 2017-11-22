@@ -1,3 +1,10 @@
+#=======================================================================
+The game 2048 is a video game originally authored by Gabriele Cirulli.
+See https://en.wikipedia.org/wiki/2048_(video_game) or, on Youtube,
+https://gaming.youtube.com/game/UCkIzbSwpjk5eRRNaZPxTy2w
+This example includes use of the Toolbar and Grid features of Gtk.jl.
+========================================================================#
+
 using Gtk.ShortNames
 
 @enum Direction2048 Right Left Up Down
