@@ -22,7 +22,7 @@ function shifttiles!(b, siz, direction)
     elseif direction == Down
         tmpb = rotr90(b); points, winner = leftshift!(tmpb, siz); tmpb = rotl90(tmpb)
     else # left movement function as coded
-        return leftshift!(b, siz)
+        return leftshift!(b, siz) # b already modified so skip copy step below
     end
     for i in 1:siz, j in 1:siz
         b[i,j] = tmpb[i,j]   # copy tmpb contents back to b (modifies b)
