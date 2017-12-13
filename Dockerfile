@@ -44,10 +44,10 @@ RUN set -ex; \
 ENV PATH $JULIA_PATH/bin:$PATH
 
 # Copy the current directory contents into the container at /app
-ADD . /app
+ADD . /Gtk
 
 # Set the working directory to /app
-WORKDIR /app/Gtk
+WORKDIR /Gtk
 
 RUN echo 'APT::Get::Assume-Yes "true";' | tee -a /etc/apt/apt.conf.d/00Do-not-ask
 
