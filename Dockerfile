@@ -20,7 +20,6 @@ ENV JULIA_PATH /usr/local/julia
 ENV JULIA_VERSION 0.6.1
 
 RUN set -ex; \
-	\
 # https://julialang.org/downloads/#julia-command-line-version
 # https://julialang-s3.julialang.org/bin/checksums/julia-0.6.1.sha256
 # this "case" statement is generated via "update.sh"
@@ -32,10 +31,8 @@ RUN set -ex; \
 		i386) tarArch='i686'; dirArch='x86'; sha256='88cf40e45558958f9a23540d52209fd050d82512bbbe8dec03db7d0976cc645a' ;; \
 		*) echo >&2 "error: current architecture ($dpkgArch) does not have a corresponding Julia binary release"; exit 1 ;; \
 	esac; \
-	\
 	curl -fL -o julia.tar.gz     "https://julialang-s3.julialang.org/bin/linux/${dirArch}/${JULIA_VERSION%[.-]*}/julia-${JULIA_VERSION}-linux-${tarArch}.tar.gz"; \
 	curl -fL -o julia.tar.gz.asc "https://julialang-s3.julialang.org/bin/linux/${dirArch}/${JULIA_VERSION%[.-]*}/julia-${JULIA_VERSION}-linux-${tarArch}.tar.gz.asc"; \
-	\
 	mkdir "$JULIA_PATH"; \
 	tar -xzf julia.tar.gz -C "$JULIA_PATH" --strip-components 1; \
 	rm julia.tar.gz
