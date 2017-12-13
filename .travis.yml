@@ -1,12 +1,25 @@
 language: julia
-sudo: false
-os:
-  - linux
-  - osx
-julia:
-  - 0.5
-  - 0.6
-  - nightly
+sudo: required
+services:
+  - docker
+
+matrix:
+  include:
+    - os: linux
+      julia: 0.5
+    - os: linux
+      julia: 0.6
+    - os: linux
+      julia: nightly
+    - os: osx
+      julia: 0.5
+    - os: osx
+      julia: 0.6
+    - os: osx
+      julia: nightly
+    - os: linux
+      julia: 0.6
+      env: DOCKER_BUILD=true
 notifications:
     email: false
 addons:
@@ -16,12 +29,7 @@ addons:
             - xauth
             - libgtk-3-0
 script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
-    - $TESTCMD -e 'Pkg.clone(pwd()); using BinDeps;
-          println(BinDeps.debug("Gtk"));
-          Pkg.build("Gtk");
-          Pkg.test("Gtk"; coverage=true)'
+    - ./travis-script.sh
 after_success:
     - julia -e 'cd(Pkg.dir("Gtk"));
                 Pkg.add("Coverage");
