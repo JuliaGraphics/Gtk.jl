@@ -6,7 +6,7 @@ if [[ -a .git/shallow ]]; then
 	git fetch --unshallow
 fi
 if [[ "$DOCKER_BUILD" = true ]]; then 
-	docker build -t gtkjl . && sudo docker run gtkjl
+	docker build -t gtkjl . && docker run gtkjl
 else
 	if [[ `uname` = "Linux" ]]; then 
 		TESTCMD="xvfb-run julia"
