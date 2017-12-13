@@ -2,9 +2,6 @@
 
 set -ex
 
-if [[ -a .git/shallow ]]; then 
-	git fetch --unshallow
-fi
 if [[ "$DOCKER_BUILD" = true ]]; then 
 	docker build -t gtkjl . && docker run gtkjl
 else
