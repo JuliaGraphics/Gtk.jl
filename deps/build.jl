@@ -17,7 +17,7 @@ deps = [
 ]
 
 if @compat is_linux()
-    provides(AptGet, "libgtk-3-0", deps)
+    provides(AptGet, "libgtk-3-dev", deps)
     provides(Yum, "gtk3", deps)
 end
 
