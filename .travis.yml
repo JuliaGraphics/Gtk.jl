@@ -7,18 +7,18 @@ git:
 
 matrix:
   include:
-    - os: linux
-      julia: 0.5
-    - os: linux
-      julia: 0.6
-    - os: linux
-      julia: nightly
-    - os: osx
-      julia: 0.5
-    - os: osx
-      julia: 0.6
-    - os: osx
-      julia: nightly
+    # - os: linux
+    #   julia: 0.5
+    # - os: linux
+    #   julia: 0.6
+    # - os: linux
+    #   julia: nightly
+    # - os: osx
+    #   julia: 0.5
+    # - os: osx
+    #   julia: 0.6
+    # - os: osx
+    #   julia: nightly
     - os: linux
       julia: 0.6
       env: DOCKER_BUILD=true
