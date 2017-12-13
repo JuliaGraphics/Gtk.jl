@@ -53,3 +53,10 @@ RUN echo 'APT::Get::Assume-Yes "true";' | tee -a /etc/apt/apt.conf.d/00Do-not-as
 
 RUN julia -e "Pkg.init()"
 RUN DEBIAN_FRONTEND=noninteractive julia -e "Pkg.clone(pwd()); Pkg.build(\"Gtk\")"
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		xvfb \
+		xauth
+
+RUN xvfb-run julia -e "Pkg.test(\"Gtk\")"

@@ -3,7 +3,7 @@
 set -ex
 
 if [[ "$DOCKER_BUILD" = true ]]; then 
-	docker build -t gtkjl . && docker run gtkjl
+	docker build -t gtkjl .
 else
 	if [[ `uname` = "Linux" ]]; then 
 		TESTCMD="xvfb-run julia"
