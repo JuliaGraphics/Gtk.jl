@@ -23,7 +23,7 @@ New native Gtk types can be most easily added by invoking the `Gtk.@GTypes` macr
 
 and then defining the appropriate outer constructors. Note that the `@GTypes` macro expects a variable `suffix` to be defined in the current module, which will be appended to the name of the type to create a unique type instance.
 
-Please pay attention to existing constructors that already exist to avoid user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+Please pay attention to existing constructors that already exist to aNothing user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
 
 ---
 
@@ -36,7 +36,7 @@ This is useful for `GList` iteration when wishing to return strings created by a
 
 ### `GLib.gc_ref(x::ANY)` / `GLib.gc_unref(x::ANY)` / `GLib.gobject_ref(x::GObject)`
 
-As the names suggests, these functions increase / decrease the reference count of a Julia object `x`, to prevent garbage-collection of this object while it is in use by `Glib`. Note that `GLib.gc_unref(w::GObject)` should typically not be called, since it will immediately destroy the Julia reference `w`, and will be called automatically by the Julia garbage-collector once their are no remaining references to this object (in GLib or Julia). The function `gc_ref` returns a pointer to the gc-protected memory (as a `*jl_value_t` / `Ptr{Void}`) for use in ccall, whereas `gobject_ref` returns `x` for use in method chaining.
+As the names suggests, these functions increase / decrease the reference count of a Julia object `x`, to prevent garbage-collection of this object while it is in use by `Glib`. Note that `GLib.gc_unref(w::GObject)` should typically not be called, since it will immediately destroy the Julia reference `w`, and will be called automatically by the Julia garbage-collector once their are no remaining references to this object (in GLib or Julia). The function `gc_ref` returns a pointer to the gc-protected memory (as a `*jl_value_t` / `Ptr{Nothing}`) for use in ccall, whereas `gobject_ref` returns `x` for use in method chaining.
 
 ### `mutable{T}(::Type{T})`
 

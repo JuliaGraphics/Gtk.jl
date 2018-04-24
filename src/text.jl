@@ -31,20 +31,20 @@ GtkTextTagLeaf(name::AbstractString) = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new, libgtk), Ptr{GObject}, (Ptr{UInt8},), bytestring(name)))
 
 immutable GtkTextIter
-  dummy1::Ptr{Void}
-  dummy2::Ptr{Void}
+  dummy1::Ptr{Nothing}
+  dummy2::Ptr{Nothing}
   dummy3::Cint
   dummy4::Cint
   dummy5::Cint
   dummy6::Cint
   dummy7::Cint
   dummy8::Cint
-  dummy9::Ptr{Void}
-  dummy10::Ptr{Void}
+  dummy9::Ptr{Nothing}
+  dummy10::Ptr{Nothing}
   dummy11::Cint
   dummy12::Cint
   dummy13::Cint
-  dummy14::Ptr{Void}
+  dummy14::Ptr{Nothing}
   GtkTextIter() = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
 const TI = Union{Mutable{GtkTextIter}, GtkTextIter}
@@ -53,25 +53,25 @@ copy(ti::GtkTextIter) = ti
 copy(ti::Mutable{GtkTextIter}) = mutable(ti[])
 function GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
     iter = mutable(GtkTextIter)
-    ccall((:gtk_text_buffer_get_iter_at_offset, libgtk), Void,
+    ccall((:gtk_text_buffer_get_iter_at_offset, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Cint), text, iter, char_offset - 1)
     iter[]
 end
 function GtkTextIter(text::GtkTextBuffer, line::Integer, char_offset::Integer)
     iter = mutable(GtkTextIter)
-    ccall((:gtk_text_buffer_get_iter_at_line_offset, libgtk), Void,
+    ccall((:gtk_text_buffer_get_iter_at_line_offset, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Cint, Cint), text, iter, line - 1, char_offset - 1)
     iter[]
 end
 function GtkTextIter(text::GtkTextBuffer)
     iter = mutable(GtkTextIter)
-    ccall((:gtk_text_buffer_get_start_iter, libgtk), Void,
+    ccall((:gtk_text_buffer_get_start_iter, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}), text, iter)
     iter[]
 end
 function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
     iter = mutable(GtkTextIter)
-    ccall((:gtk_text_buffer_get_iter_at_mark, libgtk), Void,
+    ccall((:gtk_text_buffer_get_iter_at_mark, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GObject}), text, iter, mark)
     iter[]
 end
@@ -234,10 +234,10 @@ function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
         end
         true
 #    elseif what === :end
-#        ccall((:gtk_text_iter_forward_to_end, libgtk), Void, (Ptr{Void},), iter)
+#        ccall((:gtk_text_iter_forward_to_end, libgtk), Nothing, (Ptr{Nothing},), iter)
 #        true
 #    elseif what === :begin
-#        ccall((:gtk_text_iter_set_offset, libgtk), Void, (Ptr{Void}, Cint), iter, 0)
+#        ccall((:gtk_text_iter_set_offset, libgtk), Nothing, (Ptr{Nothing}, Cint), iter, 0)
 #        true
     else
         warn("GtkTextIter doesn't have iterator of type $what")
@@ -298,7 +298,7 @@ function getproperty(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     end)::outtype
 end
 function splice!(text::GtkTextBuffer, index::GtkTextRange)
-    ccall((:gtk_text_buffer_delete, libgtk), Void,
+    ccall((:gtk_text_buffer_delete, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}), text, first(index), last(index))
     text
 end
@@ -317,17 +317,17 @@ length(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_char_count, libgtk), C
     (Ptr{GObject},), text)
 #get_line_count(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_line_count, libgtk), Cint, (Ptr{GObject},), text)
 function insert!(text::GtkTextBuffer, index::TI, str::AbstractString)
-    ccall((:gtk_text_buffer_insert, libgtk), Void,
+    ccall((:gtk_text_buffer_insert, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{UInt8}, Cint), text, mutable(index), bytestring(str), sizeof(str))
     text
 end
 function insert!(text::GtkTextBuffer, str::AbstractString)
-    ccall((:gtk_text_buffer_insert_at_cursor, libgtk), Void,
+    ccall((:gtk_text_buffer_insert_at_cursor, libgtk), Nothing,
         (Ptr{GObject}, Ptr{UInt8}, Cint), text, bytestring(str), sizeof(str))
     text
 end
 function splice!(text::GtkTextBuffer, index::TI)
-    ccall((:gtk_text_buffer_backspace, libgtk), Void,
+    ccall((:gtk_text_buffer_backspace, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Cint, Cint), text, mutable(index), false, true)
     text
 end
@@ -338,10 +338,10 @@ function splice!(text::GtkTextBuffer)
 end
 
 begin_user_action(buffer::GtkTextBuffer) =
-  ccall((:gtk_text_buffer_begin_user_action, libgtk), Void, (Ptr{GObject},), buffer)
+  ccall((:gtk_text_buffer_begin_user_action, libgtk), Nothing, (Ptr{GObject},), buffer)
 
 end_user_action(buffer::GtkTextBuffer) =
-  ccall((:gtk_text_buffer_end_user_action, libgtk), Void, (Ptr{GObject},), buffer)
+  ccall((:gtk_text_buffer_end_user_action, libgtk), Nothing, (Ptr{GObject},), buffer)
 
 function user_action(f::Function, buffer::GtkTextBuffer)
     begin_user_action(buffer)
@@ -354,7 +354,7 @@ end
 
 function create_tag(buffer::GtkTextBuffer, tag_name::AbstractString; properties...)
     tag = GtkTextTag(ccall((:gtk_text_buffer_create_tag, libgtk), Ptr{GObject},
-                (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}),
+                (Ptr{GObject}, Ptr{UInt8}, Ptr{Nothing}),
                 buffer, bytestring(tag_name), C_NULL))
     for (k, v) in properties
         setproperty!(tag, k, v)
@@ -363,19 +363,19 @@ function create_tag(buffer::GtkTextBuffer, tag_name::AbstractString; properties.
 end
 
 function apply_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
-    ccall((:gtk_text_buffer_apply_tag_by_name, libgtk), Void,
+    ccall((:gtk_text_buffer_apply_tag_by_name, libgtk), Nothing,
          (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
          buffer, bytestring(name), mutable(itstart), mutable(itend))
 end
 
 function remove_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
-    ccall((:gtk_text_buffer_remove_tag_by_name, libgtk), Void,
+    ccall((:gtk_text_buffer_remove_tag_by_name, libgtk), Nothing,
          (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
          buffer, bytestring(name), mutable(itstart), mutable(itend))
 end
 
 function remove_all_tags(buffer::GtkTextBuffer, itstart::TI, itend::TI)
-    ccall((:gtk_text_buffer_remove_all_tags, libgtk), Void,
+    ccall((:gtk_text_buffer_remove_all_tags, libgtk), Nothing,
          (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
          buffer, mutable(itstart), mutable(itend))
 end
@@ -393,9 +393,9 @@ function gtk_text_view_get_editable(text::GtkTextView)
 end
 function insert!(text::GtkTextView, index::TI, child::GtkWidget)
     index = mutable(index)
-    anchor = ccall((:gtk_text_buffer_create_child_anchor, libgtk), Ptr{Void},
+    anchor = ccall((:gtk_text_buffer_create_child_anchor, libgtk), Ptr{Nothing},
         (Ptr{GObject}, Ptr{GtkTextIter}), gtk_text_view_get_buffer(text), index)
-    ccall((:gtk_text_view_add_child_at_anchor, libgtk), Void,
+    ccall((:gtk_text_view_add_child_at_anchor, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GtkTextIter}), text, index, anchor)
     text
 end
@@ -413,7 +413,7 @@ function insert!(text::GtkTextView, str::AbstractString)
     text
 end
 function splice!(text::GtkTextView, index::TI)
-    ccall((:gtk_text_buffer_backspace, libgtk), Void,
+    ccall((:gtk_text_buffer_backspace, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GtkTextIter}, Cint, Cint),
         gtk_text_view_get_buffer(text), mutable(index), true, gtk_text_view_get_editable(text))
     text
@@ -431,5 +431,5 @@ end
 visible(w::GtkTextMark) =
     Bool(ccall((:gtk_text_mark_get_visible, libgtk), Cint, (Ptr{GObject},), w))
 visible(w::GtkTextMark, state::Bool) =
-    ccall((:gtk_text_mark_set_visible, libgtk), Void, (Ptr{GObject}, Cint), w, state)
+    ccall((:gtk_text_mark_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
 show(w::GtkTextMark) = visible(w, true)

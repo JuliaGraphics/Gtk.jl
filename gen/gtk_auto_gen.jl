@@ -9,7 +9,7 @@ function without_linenums!(ex::Expr)
     linenums_filter(x,ex) = true
     linenums_filter(x::LineNumberNode,ex) = false
     linenums_filter(x::Expr,ex) = x.head !== :line
-    linenums_filter(x::Void,ex) = ex.head !== :block
+    linenums_filter(x::Nothing,ex) = ex.head !== :block
     filter!((x)->linenums_filter(x,ex), ex.args)
     for arg in ex.args
         if isa(arg,Expr)

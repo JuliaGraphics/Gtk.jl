@@ -4,24 +4,24 @@ type GtkCanvas <: GtkDrawingArea # NOT an @GType
     is_realized::Bool
     is_sized::Bool
     mouse::MouseHandler
-    resize::Union{Function, Void}
-    draw::Union{Function, Void}
+    resize::Union{Function, Nothing}
+    draw::Union{Function, Nothing}
     back::CairoSurface   # backing store
     backcc::CairoContext
 
     function GtkCanvas(w = -1, h = -1)
         da = ccall((:gtk_drawing_area_new, libgtk), Ptr{GObject}, ())
-        ccall((:gtk_widget_set_size_request, libgtk), Void, (Ptr{GObject}, Int32, Int32), da, w, h)
+        ccall((:gtk_widget_set_size_request, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), da, w, h)
         ids = Vector{Culong}(0)
         widget = new(da, false, false, MouseHandler(ids), nothing, nothing)
         widget.mouse.widget = widget
-        signal_connect(notify_realize, widget, "realize", Void, ())
-        signal_connect(notify_unrealize, widget, "unrealize", Void, ())
+        signal_connect(notify_realize, widget, "realize", Nothing, ())
+        signal_connect(notify_unrealize, widget, "unrealize", Nothing, ())
         on_signal_resize(notify_resize, widget)
         if libgtk_version >= v"3"
-            signal_connect(canvas_on_draw_event, widget, "draw", Cint, (Ptr{Void},))
+            signal_connect(canvas_on_draw_event, widget, "draw", Cint, (Ptr{Nothing},))
         else
-            signal_connect(canvas_on_expose_event, widget, "expose-event", Cint, (Ptr{Void},))
+            signal_connect(canvas_on_expose_event, widget, "expose-event", Cint, (Ptr{Nothing},))
         end
         push!(ids, on_signal_button_press(mousedown_cb, widget, false, widget.mouse))
         push!(ids, on_signal_button_release(mouseup_cb, widget, false, widget.mouse))
@@ -90,25 +90,25 @@ end
 function cairo_surface_for(widget::GtkCanvas)
     w, h = width(widget), height(widget)
     CairoSurface(
-        ccall((:gdk_window_create_similar_surface, libgdk), Ptr{Void},
-        (Ptr{Void}, GEnum, Int32, Int32),
+        ccall((:gdk_window_create_similar_surface, libgdk), Ptr{Nothing},
+        (Ptr{Nothing}, GEnum, Int32, Int32),
         gdk_window(widget), Cairo.CONTENT_COLOR_ALPHA, w, h),
     w, h)
 end
 
-function canvas_on_draw_event(::Ptr{GObject}, cc::Ptr{Void}, widget::GtkCanvas) # cc is a Cairo context
-    ccall((:cairo_set_source_surface, Cairo._jl_libcairo), Void,
-        (Ptr{Void}, Ptr{Void}, Float64, Float64), cc, widget.back.ptr, 0, 0)
-    ccall((:cairo_paint, Cairo._jl_libcairo), Void, (Ptr{Void},), cc)
+function canvas_on_draw_event(::Ptr{GObject}, cc::Ptr{Nothing}, widget::GtkCanvas) # cc is a Cairo context
+    ccall((:cairo_set_source_surface, Cairo._jl_libcairo), Nothing,
+        (Ptr{Nothing}, Ptr{Nothing}, Float64, Float64), cc, widget.back.ptr, 0, 0)
+    ccall((:cairo_paint, Cairo._jl_libcairo), Nothing, (Ptr{Nothing},), cc)
     Int32(false) # propagate the event further
 end
 
-function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Void}, widget::GtkCanvas) # e is a GdkEventExpose
-    cc = ccall((:gdk_cairo_create, libgdk), Ptr{Void}, (Ptr{Void},), gdk_window(widget))
-    ccall((:cairo_set_source_surface, Cairo._jl_libcairo), Void,
-        (Ptr{Void}, Ptr{Void}, Float64, Float64), cc, widget.back.ptr, 0, 0)
-    ccall((:cairo_paint, Cairo._jl_libcairo), Void, (Ptr{Void},), cc)
-    ccall((:cairo_destroy, Cairo._jl_libcairo), Void, (Ptr{Void},), cc)
+function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanvas) # e is a GdkEventExpose
+    cc = ccall((:gdk_cairo_create, libgdk), Ptr{Nothing}, (Ptr{Nothing},), gdk_window(widget))
+    ccall((:cairo_set_source_surface, Cairo._jl_libcairo), Nothing,
+        (Ptr{Nothing}, Ptr{Nothing}, Float64, Float64), cc, widget.back.ptr, 0, 0)
+    ccall((:cairo_paint, Cairo._jl_libcairo), Nothing, (Ptr{Nothing},), cc)
+    ccall((:cairo_destroy, Cairo._jl_libcairo), Nothing, (Ptr{Nothing},), cc)
     Int32(false) # propagate the event further
 end
 

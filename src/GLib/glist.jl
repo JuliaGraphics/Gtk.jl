@@ -130,7 +130,7 @@ function empty!{L <: _GSList}(list::GList{L})
                 s = next(list, s)[2]
             end
         end
-        ccall((:g_slist_free, libglib), Void, (Ptr{L},), list)
+        ccall((:g_slist_free, libglib), Nothing, (Ptr{L},), list)
         list.handle = C_NULL
     end
     return list
@@ -144,7 +144,7 @@ function empty!{L <: _GList}(list::GList{L})
                 s = next(list, s)[2]
             end
         end
-        ccall((:g_list_free, libglib), Void, (Ptr{L},), list)
+        ccall((:g_list_free, libglib), Nothing, (Ptr{L},), list)
         list.handle = C_NULL
     end
     return list

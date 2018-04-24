@@ -122,7 +122,7 @@ const GtkBoxedMap = Set{Symbol}([
     :GtkWidgetPath,
     ])
 cl_to_jl = Dict(
-    cindex.VoidType         => :Void,
+    cindex.NothingType         => :Nothing,
     cindex.BoolType         => :Bool,
     cindex.Char_U           => :UInt8,
     cindex.UChar            => :Cuchar,
@@ -144,10 +144,10 @@ cl_to_jl = Dict(
     cindex.LongDouble       => :Float64,
     cindex.Enum             => :Cint,
     cindex.UInt128          => :UInt128,
-    cindex.FirstBuiltin     => :Void,
+    cindex.FirstBuiltin     => :Nothing,
     )
 c_typdef_to_jl = Dict{ASCIIString,Any}(
-    "va_list"               => :Void,
+    "va_list"               => :Nothing,
     "size_t"                => :Csize_t,
     "ptrdiff_t"             => :Cptrdiff_t,
     "GError"                => :(Gtk.GError),
@@ -161,8 +161,8 @@ c_typdef_to_jl = Dict{ASCIIString,Any}(
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
-    "GList"                 => :(Gtk._GList{Void}),
-    "GSList"                => :(Gtk._GSList{Void}),
+    "GList"                 => :(Gtk._GList{Nothing}),
+    "GSList"                => :(Gtk._GSList{Nothing}),
     )
 for gtktype in GtkTypeMap
     c_typdef_to_jl[string(gtktype)] = :(Gtk.GObject)
@@ -195,32 +195,32 @@ const gtklibname = Dict{ASCIIString,Any}(
     "deprecated" => nothing,
     )
 
-g_type_to_jl(ctype::cindex.Invalid) = :Void
-g_type_to_jl(ctype::cindex.Unexposed) = :Void
+g_type_to_jl(ctype::cindex.Invalid) = :Nothing
+g_type_to_jl(ctype::cindex.Unexposed) = :Nothing
 function g_type_to_jl(ctype::cindex.Pointer)
     typ = g_type_to_jl(cindex.pointee_type(ctype))
-    if typ == :Void
-        return :(Ptr{Void})
+    if typ == :Nothing
+        return :(Ptr{Nothing})
     end
     :(Ptr{$typ})
 end
 function g_type_to_jl(ctype::cindex.Typedef)
     decl = cindex.getTypeDeclaration(ctype)
     if isa(decl,cindex.NoDeclFound)
-        return :Void
+        return :Nothing
     end
     typname = cindex.spelling(decl)
     if typname in keys(c_typdef_to_jl)
         return c_typdef_to_jl[typname]
     end
     decl = g_type_to_jl(cindex.getTypedefDeclUnderlyingType(decl))
-    if decl === :Void || decl === :Void
+    if decl === :Nothing || decl === :Nothing
         return g_type_to_jl(cindex.getCanonicalType(ctype))
     end
     decl
 end
 function g_type_to_jl(ctype)
-    get(cl_to_jl,typeof(ctype),:Void)
+    get(cl_to_jl,typeof(ctype),:Nothing)
 end
 
 function g_get_gtype(ctype)
@@ -228,15 +228,15 @@ function g_get_gtype(ctype)
         return :Bool
     end
     if !isa(ctype, cindex.Pointer)
-        return :Void
+        return :Nothing
     end
     arg1ty = cindex.pointee_type(ctype)
     if !isa(arg1ty, cindex.Typedef)
-        return :Void
+        return :Nothing
     end
     arg1ty = Symbol(cindex.spelling(cindex.getTypeDeclaration(arg1ty)))
     if !(arg1ty in GtkTypeMap)
-        return :Void
+        return :Nothing
     end
     return Expr(:., :Gtk, QuoteNode(arg1ty))
 end
@@ -276,7 +276,7 @@ function gen_get_set(body, gtk_h)
             continue
         end
         arg1ty = g_get_gtype(cindex.getCursorType(fargs[1]))
-        if arg1ty === :Void
+        if arg1ty === :Nothing
             continue
         end
         spell = cindex.spelling(fdecl)
@@ -302,13 +302,13 @@ function gen_get_set(body, gtk_h)
         end
         argtypes = [g_type_to_jl(cindex.getCursorType(arg)) for arg in fargs]
         @assert length(argnames) == length(argtypes)
-        if any(argtypes .== :Void) || any(argtypes .== :Void)
+        if any(argtypes .== :Nothing) || any(argtypes .== :Nothing)
             continue
         end
         if m.captures[1] == "get"
             fbody = :( ccall(($(QuoteNode(Symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) )
             gtype = g_get_gtype(cindex.return_type(fdecl))
-            if gtype != :Void
+            if gtype != :Nothing
                 fbody = :( convert($gtype, $fbody) )
             end
             fbody = Expr(:block, fbody)
@@ -326,18 +326,18 @@ function gen_get_set(body, gtk_h)
                 if i > last_inarg
                     atype = cindex.getPointeeType(atype)
                     T = g_type_to_jl(atype)
-                    if T !== :Void && T !== :Void && T != :(Gtk.GObject)
+                    if T !== :Nothing && T !== :Nothing && T != :(Gtk.GObject)
                         retval = argnames[i]
                         unshift!(fbody.args, :( $retval = Gtk.mutable($T) ))
                         retval = :( $retval[] )
                         gtype = g_get_gtype(atype)
-                        if gtype !== :Void
+                        if gtype !== :Nothing
                             retval = :( convert($gtype, $retval) )
                             T = gtype
                         end
                         if multiret
                             push!(fbody.args[end].args, retval)
-                        elseif rettype !== :Void
+                        elseif rettype !== :Nothing
                             fbody.args[end] = Expr(:tuple, fbody.args[end], retval)
                             multiret = true
                         else
@@ -369,11 +369,11 @@ function gen_get_set(body, gtk_h)
             return list
         end
         function default_icon_list(list::Gtk.GList)
-            ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Void, (Ptr{Gtk._GList{Void}},), list)
+            ccall((:gtk_window_set_default_icon_list,Gtk.libgtk), Nothing, (Ptr{Gtk._GList{Nothing}},), list)
             return list
         end
         function position(w::Gtk.GtkWindow,x::Integer,y::Integer)
-            ccall((:gtk_window_move,Gtk.libgtk),Void,(Ptr{Gtk.GObject},Cint,Cint),w,x,y)
+            ccall((:gtk_window_move,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},Cint,Cint),w,x,y)
             w
         end
     end)

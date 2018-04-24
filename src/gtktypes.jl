@@ -14,24 +14,24 @@ function _gtksubtype_constructors(name::Symbol)
 end
 
 macro gtktype_custom_symname_and_lib(name, symname, lib)
-    quote
-        @Gtype $(esc(name)) $(esc(lib)) $(esc(symname))
+    esc(quote
+        @Gtype $name $lib $symname
         _gtksubtype_constructors($(QuoteNode(name)))
-    end
+    end)
 end
 
 macro gtktype_custom_symname(name, symname)
-    quote
-        @gtktype_custom_symname_and_lib $(esc(name)) $(esc(symname)) libgtk
-    end
+    esc(quote
+        @gtktype_custom_symname_and_lib $(name) $(symname) libgtk
+    end)
 end
 
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = Symbol(join([lowercase(s) for s in groups], "_"))
-    quote
-        @gtktype_custom_symname $(esc(name)) $(esc(symname))
-    end
+    esc(quote
+        @gtktype_custom_symname $name $symname
+    end)
 end
 @gtktype GtkWidget
 @gtktype GtkContainer

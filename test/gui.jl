@@ -6,7 +6,7 @@ using Compat
 
 ## for FileFilter
 # This is just for testing, and be careful of garbage collection while using this
-if  libgtk_version >= v"3"
+if  Gtk.libgtk_version >= v"3"
   immutable GtkFileFilterInfo
     contains::Cint
     filename::Ptr{Int8}
@@ -251,7 +251,7 @@ id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
 # For testing callbacks
-click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Void,(Ptr{Gtk.GObject},),b)
+click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 
 @test counter == 0
 click(b)
@@ -470,7 +470,7 @@ activated = false
 signal_connect(e, :activate) do widget
     activated = true
 end
-signal_emit(e, :activate, Void)
+signal_emit(e, :activate, Nothing)
 @test activated
 
 destroy(w)
@@ -743,8 +743,8 @@ if libgtk_version >= v"3"
     screen   = Gtk.GAccessor.screen(w)
     provider = CssProviderLeaf(filename=style_file)
 
-    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
-          (Ptr{Void}, Ptr{GObject}, Cuint),
+    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Nothing,
+          (Ptr{Nothing}, Ptr{GObject}, Cuint),
           screen, provider, 1)
 
     showall(w)
