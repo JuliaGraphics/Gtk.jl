@@ -37,6 +37,7 @@ end
 @gtktype GtkContainer
 @gtktype GtkBin
 @gtktype GtkDialog
+@gtktype GtkNativeDialog
 @gtktype GtkMenuShell
 
 @gtktype GtkAccelGroup
@@ -95,6 +96,7 @@ end
 @gtktype GtkMenu
 @gtktype GtkMenuBar
 @gtktype GtkFileChooserDialog
+@gtktype GtkFileChooserNative
 @gtktype GtkFileFilter
 @gtktype GtkLabel
 @gtktype GtkTextBuffer

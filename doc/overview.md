@@ -191,6 +191,8 @@ all elements in the enum.
     .  .  .  +- GtkSpinner
     .  .  .  +- GtkSwitch
     .  .  .  +- GtkTextView
+    .  .  +- GtkNativeDialog
+    .  .  .  +- GtkFileChooserNative
     .  +- GParamSpec
     .  +- GSList{T}
     .  +- GValue

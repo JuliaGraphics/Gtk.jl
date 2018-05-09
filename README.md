@@ -500,13 +500,15 @@ We can create a canvas that, when right clicked, reveals a context menu:
 
 #### File dialogs
 
-Gtk.jl supports the `GtkFileChooserDialog`.
-It also provides two functions, `open_dialog` and `save_dialog`, making this functionality easier to use.
-The syntax of these two functions are as follows:
+Gtk.jl supports the `GtkFileChooserDialog` and the `GtkFileChooserNative`.
+It also provides four functions, `open_dialog` and `save_dialog` as well as `open_dialog_native` and `save_dialog_native`, making this functionality easier to use.
+The syntax of these four functions are as follows:
 
 ```jl
-open_dialog(title, GtkNullContainer(), ASCIIString[])
-save_dialog(title, GtkNullContainer(), ASCIIString[])
+open_dialog(title, GtkNullContainer(), String[])
+save_dialog(title, GtkNullContainer(), String[])
+open_dialog_native(title, GtkNullContainer(), String[])
+save_dialog_native(title, GtkNullContainer(), String[])
 ```
 
 If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
@@ -518,7 +520,7 @@ You can specify multiple match types for a single filter by separating the patte
 You can alternatively specify MIME types, or if no specification is provided it defaults to types supported by `GdkPixbuf`.
 The generic specification of a filter is
 ```jl
-@FileFilter(; name = nothing, pattern = "", mimetype = "")
+FileFilter(; name = nothing, pattern = "", mimetype = "")
 ```
 
 Here are some examples:
@@ -527,11 +529,11 @@ open_dialog("Pick a file")
 open_dialog("Pick some files", select_multiple=true)
 open_dialog("Pick a file", Null(), ("*.jl",))
 open_dialog("Pick some text files", GtkNullContainer(), ("*.txt,*.csv",), select_multiple=true)
-open_dialog("Pick a file", Null(), (@FileFilter(mimetype="text/csv"),))
-open_dialog("Pick an image file", GtkNullContainer(), ("*.png", "*.jpg", @FileFilter("*.png,*.jpg", name="All supported formats")))
-open_dialog("Pick an image file", GtkNullContainer(), (@FileFilter(name="Supported image formats"),))
+open_dialog("Pick a file", Null(), (FileFilter(mimetype="text/csv"),))
+open_dialog("Pick an image file", GtkNullContainer(), ("*.png", "*.jpg", FileFilter("*.png,*.jpg", name="All supported formats")))
+open_dialog("Pick an image file", GtkNullContainer(), (FileFilter(name="Supported image formats"),))
 
-save_dialog("Save as...", Null(), (@FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
+save_dialog("Save as...", Null(), (FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
 ```
 
 #### Message dialogs

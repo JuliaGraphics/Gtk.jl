@@ -1,12 +1,14 @@
 # File Dialogs
 
-Gtk.jl supports the `GtkFileChooserDialog`.
-It also provides two functions, `open_dialog` and `save_dialog`, making this functionality easier to use.
-The syntax of these two functions are as follows:
+Gtk.jl supports the `GtkFileChooserDialog` and the `GtkFileChooserNative`.
+It also provides four functions, `open_dialog` and `save_dialog` as well as `open_dialog_native` and `save_dialog_native`, making this functionality easier to use.
+The syntax of these four functions are as follows:
 
 ```julia
 open_dialog(title, GtkNullContainer(), String[])
 save_dialog(title, GtkNullContainer(), String[])
+open_dialog_native(title, GtkNullContainer(), String[])
+save_dialog_native(title, GtkNullContainer(), String[])
 ```
 
 If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
