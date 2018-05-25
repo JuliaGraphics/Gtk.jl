@@ -8,6 +8,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     #GtkHSV — A 'color wheel' widget
     #GtkFileChooser — File chooser interface used by GtkFileChooserWidget and GtkFileChooserDialog
     #GtkFileChooserButton — A button to launch a file selection dialog
+    #GtkFileChooserNative — A native file chooser dialog, suitable for “File/Open” or “File/Save” commands
     #GtkFileChooserDialog — A file chooser dialog, suitable for "File/Open" or "File/Save" commands
     #GtkFileChooserWidget — File chooser widget that can be embedded in other widgets
     #GtkFileFilter — A filter for selecting a file subset
@@ -36,8 +37,19 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         return w
     end
 
+    function GtkFileChooserNativeLeaf(title::AbstractString, parent::GtkContainer, action::Integer, open::AbstractString, cancel::AbstractString; kwargs...)
+        w = GtkFileChooserNativeLeaf(ccall((:gtk_file_chooser_native_new, libgtk), Ptr{GObject},
+                    (Ptr{UInt8}, Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}),
+                    title, parent, action, open, cancel); kwargs...)
+        return w
+    end
+
     run(widget::GtkDialog) = GLib.g_sigatom() do
         ccall((:gtk_dialog_run, libgtk), Cint, (Ptr{GObject},), widget)
+    end
+
+    run(widget::GtkNativeDialog) = GLib.g_sigatom() do
+        ccall((:gtk_native_dialog_run, libgtk), Cint, (Ptr{GObject},), widget)
     end
 
     const SingleComma = r"(?<!,), (?!,)"
@@ -100,10 +112,37 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         return selection
     end
 
+    function open_dialog_native(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector, Tuple} = String[]; kwargs...)
+        dlg = GtkFileChooserNative(title, parent, GConstants.GtkFileChooserAction.OPEN,"_Open","_Cancel"; kwargs...)
+        dlgp = GtkFileChooser(dlg)
+        if !isempty(filters)
+            makefilters!(dlgp, filters)
+        end
+        response = run(dlg)
+        multiple = getproperty(dlg, :select_multiple, Bool)
+        local selection
+        if response == GConstants.GtkResponseType.ACCEPT
+            if multiple
+                filename_list = ccall((:gtk_file_chooser_get_filenames, libgtk), Ptr{_GSList{String}}, (Ptr{GObject},), dlgp)
+                selection = String[f for f in GList(filename_list, #=transfer-full=#true)]
+            else
+                selection = bytestring(GAccessor.filename(dlgp))
+            end
+        else
+            if multiple
+                selection = String[]
+            else
+                selection = GLib.utf8("")
+            end
+        end
+        GLib.gc_unref(dlg) #destroy(dlg)
+        return selection
+    end
+
     function save_dialog(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector, Tuple} = String[]; kwargs...)
         dlg = GtkFileChooserDialog(title, parent, GConstants.GtkFileChooserAction.SAVE,
                                     (("_Cancel", GConstants.GtkResponseType.CANCEL),
-                                     ("_Save",   GConstants.GtkResponseType.ACCEPT)), kwargs...)
+                                     ("_Save",   GConstants.GtkResponseType.ACCEPT)); kwargs...)
         dlgp = GtkFileChooser(dlg)
         if !isempty(filters)
             makefilters!(dlgp, filters)
@@ -116,6 +155,23 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             selection = GLib.utf8("")
         end
         destroy(dlg)
+        return selection
+    end
+
+    function save_dialog_native(title::AbstractString, parent = GtkNullContainer(), filters::Union{AbstractVector, Tuple} = String[]; kwargs...)
+        dlg = GtkFileChooserNative(title, parent, GConstants.GtkFileChooserAction.SAVE,"_Save","_Cancel"; kwargs...)
+        dlgp = GtkFileChooser(dlg)
+        if !isempty(filters)
+            makefilters!(dlgp, filters)
+        end
+        ccall((:gtk_file_chooser_set_do_overwrite_confirmation, libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
+        response = run(dlg)
+        if response == GConstants.GtkResponseType.ACCEPT
+            selection = bytestring(GAccessor.filename(dlgp))
+        else
+            selection = GLib.utf8("")
+        end
+        GLib.gc_unref(dlg) #destroy(dlg)
         return selection
     end
 end

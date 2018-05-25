@@ -176,3 +176,20 @@ type GtkGLArea end
         :( GtkGLAreaLeaf($(args...)) )
     end
 end
+
+if libgtk_version >= v"3.20.0"
+    @gtktype GtkNativeDialog
+    @gtktype GtkFileChooserNative
+else
+    type GtkNativeDialog end
+    GtkNativeDialogLeaf(x...) = error("GtkNativeDialog is not available until Gtk3.20")
+    macro GtkNativeDialog(args...)
+        :( GtkNativeDialogLeaf($(args...)) )
+    end
+
+    type GtkFileChooserNative end
+    GtkFileChooserNativeLeaf(x...) = error("GtkFileChooserNative is not available until Gtk3.20")
+    macro GtkFileChooserNative(args...)
+        :( GtkFileChooserNativeLeaf($(args...)) )
+    end
+end
