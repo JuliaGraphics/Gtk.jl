@@ -459,11 +459,14 @@ Now let's populate it with entries:
     quit = @MenuItem("Quit")
     push!(filemenu, quit)
 ```
-Finally, let's place our file item inside another type of menu, the `MenuBar`:
+Finally, let's place our file item inside another type of menu, the `MenuBar`, and push that into a vertical `Box`. This way, we can include more widgets in our window:
 ```jl
     mb = @MenuBar()
     push!(mb, file)  # notice this is the "File" item, not filemenu
-    win = @Window(mb, "Menus", 200, 40)
+    b = @Box(:v)
+    l = @Label("A label")
+    push!(b, mb, l)
+    win = @Window(b, "Menus with a label", 200, 40)
     showall(mb)
 ```
 ![menu](doc/figures/menu.png)
