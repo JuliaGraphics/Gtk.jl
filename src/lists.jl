@@ -124,7 +124,7 @@ GtkListStoreLeaf(combo::GtkComboBoxText) = GtkListStoreLeaf(ccall((:gtk_combo_bo
 
 ## index is integer for a liststore, vector of ints for tree
 iter_from_index(store::GtkListStore, index::Int) = iter_from_string_index(store, string(index - 1))
-index_from_iter(store::GtkListStore, iter::TRI) = Int(get_string_from_iter(GtkTreeModel(store), iter)) + 1
+index_from_iter(store::GtkListStore, iter::TRI) = parse(Int, get_string_from_iter(GtkTreeModel(store), iter)) + 1
 
 function list_store_set_values(store::GtkListStore, iter, values)
     for (i, value) in enumerate(values)
