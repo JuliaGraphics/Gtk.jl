@@ -12,7 +12,7 @@ import .GLib: setproperty!, getproperty, AbstractStringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
-    signal_emit
+    signal_emit, unsafe_convert
 
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!, deleteat!,

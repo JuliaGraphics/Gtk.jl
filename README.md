@@ -339,7 +339,7 @@ id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate,
 
 In some situations you may want or need to use an [approach that is more analagous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
 
-Warning: it is essential to aNothing task switching inside Gtk callbacks,
+Warning: it is essential to avoid task switching inside Gtk callbacks,
 as this corrupts the Gtk C-stack. For example, use `@async print` or queue a message for yourself.
 You can also call `GLib.g_yield()` if you need to block. However, if you are still seeing segfaults in some random method due to there existing a callback that recursively calls the glib main loop (such as making a dialog box) or otherwise causes `g_yield` to be called, wrap the faulting code in `GLib.@sigatom`. This will postpone execution of that code block until it can be run on the proper stack (but will otherwise acts like normal control flow).
 
@@ -413,7 +413,7 @@ See Julia's standard-library documentation for more information on graphics.
 
 Errors in the `draw` function can corrupt Gtk's internal state; if
 this happens, you have to quit julia and start a fresh session. To
-aNothing this problem, the `@guarded` macro wraps your code in a
+avoid this problem, the `@guarded` macro wraps your code in a
 `try/catch` block and prevents the corruption. It is especially useful
 when initially writing and debugging code. See [further
 discussion](doc/more_signals.md) about when `@guarded` is relevant.

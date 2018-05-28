@@ -23,7 +23,7 @@ New native Gtk types can be most easily added by invoking the `Gtk.@GTypes` macr
 
 and then defining the appropriate outer constructors. Note that the `@GTypes` macro expects a variable `suffix` to be defined in the current module, which will be appended to the name of the type to create a unique type instance.
 
-Please pay attention to existing constructors that already exist to aNothing user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
+Please pay attention to existing constructors that already exist to avoid user confusion: for example, the first argument to a `GtkContainer` may optionally be its first child widget. And keyword arguments are reserved for setting properties after construction.
 
 ---
 

@@ -64,7 +64,7 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
             for i = 1:n_param_values
                 gv = mutable(param_values, i)
                 gtyp = unsafe_load(gv).g_type
-                # aNothing auto-unboxing for some builtin types in gtk_calling_convention mode
+                # avoid auto-unboxing for some builtin types in gtk_calling_convention mode
                 if g_isa(gtyp, g_type(GObject))
                     params[i] = ccall((:g_value_get_object, libgobject), Ptr{GObject}, (Ptr{GValue},), gv)
                 elseif g_isa(gtyp, g_type(GBoxed))

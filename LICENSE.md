@@ -81,7 +81,7 @@ The Gtk project is licensed under the GNU Lesser General Public License, version
 > the original authors' reputations.
 >
 >   Finally, any free program is threatened constantly by software
-> patents.  We wish to aNothing the danger that companies distributing free
+> patents.  We wish to avoid the danger that companies distributing free
 > software will individually obtain patent licenses, thus in effect
 > transforming the program into proprietary software.  To prevent this,
 > we have made it clear that any patent must be licensed for everyone's

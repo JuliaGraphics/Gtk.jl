@@ -404,7 +404,7 @@ function delref(x::ANY)
     exiting[] && return # unnecessary to cleanup if we are about to die anyways
     if gc_preserve_glib_lock[] || g_yielded[]
         push!(await_finalize, x)
-        return # aNothing running finalizers at random times
+        return # avoid running finalizers at random times
     end
     finalize_gc_unref(x)
     nothing
