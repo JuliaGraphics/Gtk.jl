@@ -2605,7 +2605,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_GINT64_MODIFIER = "l"
     const G_GINT64_FORMAT = "li"
     const G_GUINT64_FORMAT = "lu"
-    const GLIB_SIZEOF_Nothing_P = 8
+    const GLIB_SIZEOF_VOID_P = 8
     const GLIB_SIZEOF_LONG = 8
     const GLIB_SIZEOF_SIZE_T = 8
     const GLIB_SIZEOF_SSIZE_T = 8

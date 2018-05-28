@@ -2559,7 +2559,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_GINT64_MODIFIER = "l"
     const G_GINT64_FORMAT = "li"
     const G_GUINT64_FORMAT = "lu"
-    const GLIB_SIZEOF_Nothing_P = 8
+    const GLIB_SIZEOF_VOID_P = 8
     const GLIB_SIZEOF_LONG = 8
     const GLIB_SIZEOF_SIZE_T = 8
     const GLIB_SIZEOF_SSIZE_T = 8
@@ -2754,7 +2754,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_MAX_TIMECOORD_AXES = 128
     const GDK_PIXBUF_FEATURES_H = 1
     const GDK_PIXBUF_VERSION = "2.30.7"
-    const GDK_KEY_NothingSymbol = 0x000fffff
+    const GDK_KEY_VoidSymbol = 0x000fffff
     const GDK_KEY_BackSpace = 0xff08
     const GDK_KEY_Tab = 0xff09
     const GDK_KEY_Linefeed = 0xff0a
