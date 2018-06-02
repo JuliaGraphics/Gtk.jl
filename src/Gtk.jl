@@ -26,7 +26,7 @@ import .Graphics: width, height, getgc
 using Cairo
 import Cairo: destroy
 
-@compat const Index{I<:Integer} = Union{I, AbstractVector{I}}
+const Index{I<:Integer} = Union{I, AbstractVector{I}}
 
 export GAccessor
 include("basic_exports.jl")

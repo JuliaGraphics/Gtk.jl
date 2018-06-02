@@ -18,7 +18,7 @@ function append!(w::GtkContainer, children)
     end
     w
 end
-@compat Base.:|>(parent::GtkContainer, child::Union{GObject, AbstractString}) = push!(parent, child)
+Base.:|>(parent::GtkContainer, child::Union{GObject, AbstractString}) = push!(parent, child)
 
 start(w::GtkContainer) = glist_iter(ccall((:gtk_container_get_children, libgtk), Ptr{_GList{GObject}}, (Ptr{GObject},), w))
 next(w::GtkContainer, list) = next(list[1], list)
