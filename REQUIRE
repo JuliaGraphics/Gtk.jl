@@ -1,7 +1,7 @@
-julia 0.5
+julia 0.6
 Cairo 0.2.2
 Graphics 0.1
 BinDeps
 @windows WinRPM
 @osx Homebrew
-Compat 0.18
+Compat 0.66.0

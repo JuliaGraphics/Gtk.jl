@@ -2,7 +2,7 @@ module MutableTypes
 using Compat
 export mutable, Mutable, deref
 
-@compat abstract type Mutable{T} end
+abstract type Mutable{T} end
 type MutableX{T} <: Mutable{T}
     x::T
     (::Type{MutableX{T}}){T}() = new{T}()
@@ -12,7 +12,7 @@ immutable MutableA{T, N} <: Mutable{T}
     x::Array{T, N}
     i::Int
 end
-@compat const  MutableV{T} = MutableA{T, 1}
+const  MutableV{T} = MutableA{T, 1}
 
 mutable{T}(x::T) = MutableX{T}(x)
 mutable(x::Mutable) = x

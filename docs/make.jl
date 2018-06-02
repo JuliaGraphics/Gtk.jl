@@ -26,7 +26,7 @@ makedocs(
 )
 
 deploydocs(repo   = "github.com/JuliaGraphics/Gtk.jl.git",
-           julia  = "0.5",
+           julia  = "0.6",
            target = "build",
            deps   = nothing,
            make   = nothing)
