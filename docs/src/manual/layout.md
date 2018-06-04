@@ -38,6 +38,24 @@ setproperty!(hbox,:spacing,10)
 ```
 The first line sets the `expand` property of the `ok` button within the `hbox` container.
 
+Note that these aren't evenly-sized, and that doesn't change if we set the `cancel` button's `expand` property to `true`. `ButtonBox` is created specifically for this purpose, so let's use it instead:
+
+```julia
+destroy(hbox)
+ok = @Button("OK")
+cancel = @Button("Cancel")
+hbox = @ButtonBox(:h)
+push!(f, hbox)
+push!(hbox, cancel)
+push!(hbox, ok)
+```
+
+Now we get this:
+
+![window](doc/figures/twobuttons2.png)
+
+which may be closer to what you had in mind.
+
 ## Grid
 
 More generally, you can arrange items in a grid:
