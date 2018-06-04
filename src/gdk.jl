@@ -16,7 +16,7 @@ end
 # GdkPoint is not a GBoxed type
 
 baremodule GdkKeySyms
-    const NothingSymbol = 0xffffff
+    const VoidSymbol = 0xffffff
     const BackSpace = 0xff08
     const Tab = 0xff09
     const Linefeed = 0xff0a

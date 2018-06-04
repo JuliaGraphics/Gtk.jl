@@ -124,7 +124,7 @@ const GtkBoxedMap = Set{Symbol}([
     :GtkWidgetPath,
     ])
 cl_to_jl = Dict(
-    cindex.NothingType         => :Void,
+    cindex.VoidType         => :Void,
     cindex.BoolType         => :Bool,
     cindex.Char_U           => :UInt8,
     cindex.UChar            => :Cuchar,

@@ -19,7 +19,7 @@ end
 const fundamental_types = (
     #(:name,      Ctype,            JuliaType,      g_value_fn)
     (:invalid,    Void,             Union{},        :error),
-    (:Void,       Void,             Void,           :error),
+    (:void,       Void,             Void,           :error),
     (:GInterface, Ptr{Void},        GInterface,     :error),
     (:gchar,      Int8,             Int8,           :schar),
     (:guchar,     UInt8,            UInt8,          :uchar),
@@ -46,7 +46,7 @@ g_type_from_name(name::Symbol) = ccall((:g_type_from_name, libgobject), GType, (
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name, c, j, f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
-let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:Void)) ))
+let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         if juliatype != Union{}

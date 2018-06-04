@@ -24,7 +24,7 @@ where:
 - `signalname` is a string or symbol identifying the signal, e.g.,
   `"clicked"` or `"button-press-event"`
 - `return_type` is the type of the value returned by your
-  callback. Usually `Void` (for `Void`) or `Cint` (for `gboolean`)
+  callback. Usually `Void` (for `void`) or `Cint` (for `gboolean`)
 - `parameter_type_tuple` specifies the types of the *middle* arguments
   to the callback function, omitting the first (the widget) and last
   (`user_data`).  For example, for [`"clicked"`](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) we have
@@ -56,14 +56,14 @@ showall(win)
 const counter = [0]  # Pack counter value inside array to make it a reference
 
 # "clicked" callback declaration is
-#     Void user_function(GtkButton *button, gpointer user_data)
+#     void user_function(GtkButton *button, gpointer user_data)
 # But user_data gets converted into a Julia object automatically
 function button_cb(widgetptr::Ptr, user_data)
      widget = convert(Button, widgetptr)  # pointer -> object
      lbl, cntr = user_data                # unpack the user_data tuple
      cntr[] = cntr[]+1                    # increment counter[1]
      setproperty!(lbl, :label, string(cntr[]))
-     nothing                              # return type is Void
+     nothing                              # return type is void
 end
 
 signal_connect(button_cb, button, "clicked", Void, (), false, (label, counter))
