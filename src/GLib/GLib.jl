@@ -12,7 +12,8 @@ end
 import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
-             sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert
+             sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
+             setproperty!
 
 using Base.Libdl
 
@@ -32,12 +33,12 @@ bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 # bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
 
-g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
-g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
+g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
+g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
 
 include(joinpath("..", "..", "deps", "ext_glib.jl"))
 
-ccall((:g_type_init, libgobject), Nothing, ())
+ccall((:g_type_init, libgobject), Void, ())
 
 include("MutableTypes.jl")
 using .MutableTypes

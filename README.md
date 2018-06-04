@@ -309,7 +309,7 @@ Notice that _both_ of the callback functions executed!
 Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://developer.gnome.org/gobject/stable/gobject-Signals.html#gobject-Signals.description).
 Callbacks for some [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
 
-The [`"clicked"` signal callback](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) should return `nothing` (`Nothing` in C parlance), so you can't prevent other callbacks from running.
+The [`"clicked"` signal callback](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) should return `nothing` (`Void` in C parlance), so you can't prevent other callbacks from running.
 However, we can disconnect the first signal handler:
 ```jl
     signal_handler_disconnect(b, id)

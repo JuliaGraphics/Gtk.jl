@@ -60,7 +60,7 @@ function gen_g_type_lists(gtk_h)
                     has_ref_fn = true
                     ref_fn_sym = Symbol(string(symname,:_ref))
                     @assert get_fn_ptr(ref_fn_sym, libname) != C_NULL
-                    ref_fn = :(ccall(($(QuoteNode(ref_fn_sym)),$libname),Nothing,(Ptr{Nothing},),ref))
+                    ref_fn = :(ccall(($(QuoteNode(ref_fn_sym)),$libname),Void,(Ptr{Void},),ref))
                 end
             else
                 ref_fn = nothing
@@ -78,8 +78,8 @@ function gen_g_type_lists(gtk_h)
                             $ref_fn
                             x = new(ref)
                             $(if unref_fn !== nothing
-                                :(finalizer(x, (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Nothing,
-                                    (Ptr{Nothing},),x.handle)))
+                                :(finalizer(x, (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Void,
+                                    (Ptr{Void},),x.handle)))
                             else
                                 nothing
                             end)
@@ -98,7 +98,7 @@ function gen_g_type_lists(gtk_h)
                         name = gensym()
                     end
                     jtyp = g_type_to_jl(cindex.getCursorType(cu))
-                    if jtyp === :Nothing
+                    if jtyp === :Void
                         jtyp = " < $(cindex.getCursorType(cu)) >"
                         valid = false
                     end

@@ -93,13 +93,13 @@ end
 
 immutable GdkEventAny <: GdkEvent
     event_type::GEnum
-    gdk_window::Ptr{Nothing}
+    gdk_window::Ptr{Void}
     send_event::Int8
 end
 
 immutable GdkEventButton <: GdkEvent
     event_type::GEnum
-    gdk_window::Ptr{Nothing}
+    gdk_window::Ptr{Void}
     send_event::Int8
     time::UInt32
     x::Float64
@@ -107,21 +107,21 @@ immutable GdkEventButton <: GdkEvent
     axes::Ptr{Float64}
     state::UInt32
     button::UInt32
-    gdk_device::Ptr{Nothing}
+    gdk_device::Ptr{Void}
     x_root::Float64
     y_root::Float64
 end
 
 immutable GdkEventScroll <: GdkEvent
     event_type::GEnum
-    gdk_window::Ptr{Nothing}
+    gdk_window::Ptr{Void}
     send_event::Int8
     time::UInt32
     x::Float64
     y::Float64
     state::UInt32
     direction::GEnum
-    gdk_device::Ptr{Nothing}
+    gdk_device::Ptr{Void}
     x_root::Float64
     y_root::Float64
     delta_x::Float64
@@ -130,7 +130,7 @@ end
 
 immutable GdkEventKey <: GdkEvent
     event_type::GEnum
-    gdk_window::Ptr{Nothing}
+    gdk_window::Ptr{Void}
     send_event::Int8
     time::UInt32
     state::UInt32
@@ -147,7 +147,7 @@ is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
 immutable GdkEventMotion <: GdkEvent
   event_type::GEnum
-  gdk_window::Ptr{Nothing}
+  gdk_window::Ptr{Void}
   send_event::Int8
   time::UInt32
   x::Float64
@@ -155,16 +155,16 @@ immutable GdkEventMotion <: GdkEvent
   axes::Ptr{Float64}
   state::UInt32
   is_hint::Int16
-  gdk_device::Ptr{Nothing}
+  gdk_device::Ptr{Void}
   x_root::Float64
   y_root::Float64
 end
 
 immutable GdkEventCrossing <: GdkEvent
   event_type::GEnum
-  gdk_window::Ptr{Nothing}
+  gdk_window::Ptr{Void}
   send_event::Int8
-  gdk_subwindow::Ptr{Nothing}
+  gdk_subwindow::Ptr{Void}
   time::UInt32
   x::Float64
   y::Float64
@@ -180,9 +180,9 @@ keyval(name::AbstractString) =
   ccall((:gdk_keyval_from_name, libgdk), Cuint, (Ptr{UInt8},), bytestring(name))
 
 screen_size() = screen_size(ccall((:gdk_screen_get_default, libgdk),
-                                          Ptr{Nothing}, ()))
+                                          Ptr{Void}, ()))
 
-function screen_size(screen::Ptr{Nothing})
-    return (ccall((:gdk_screen_get_width, libgdk), Cint, (Ptr{Nothing},), screen),
-            ccall((:gdk_screen_get_height, libgdk), Cint, (Ptr{Nothing},), screen))
+function screen_size(screen::Ptr{Void})
+    return (ccall((:gdk_screen_get_width, libgdk), Cint, (Ptr{Void},), screen),
+            ccall((:gdk_screen_get_height, libgdk), Cint, (Ptr{Void},), screen))
 end

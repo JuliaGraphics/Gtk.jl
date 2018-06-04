@@ -1,15 +1,15 @@
 gtk_main() = GLib.g_sigatom() do
-    ccall((:gtk_main, libgtk), Nothing, ())
+    ccall((:gtk_main, libgtk), Void, ())
 end
 
 function gtk_quit()
-    ccall((:gtk_main_quit, libgtk), Nothing, ())
+    ccall((:gtk_main_quit, libgtk), Void, ())
 end
 
 function __init__()
     GError() do error_check
         ccall((:gtk_init_with_args, libgtk), Bool,
-            (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{GError}),
+            (Ptr{Void}, Ptr{Void}, Ptr{UInt8}, Ptr{Void}, Ptr{UInt8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 
@@ -21,7 +21,7 @@ function __init__()
 end
 
 
-add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, libgtk), Nothing, (Ptr{GObject}, GEnum), widget, mask)
+add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, libgtk), Void, (Ptr{GObject}, GEnum), widget, mask)
 
 # widget[:event] = function(ptr, obj)
 #    stuff
@@ -32,11 +32,11 @@ add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, li
 
 
 function on_signal_resize(resize_cb::Function, widget::GtkWidget, vargs...)
-    signal_connect(resize_cb, widget, "size-allocate", Nothing, (Ptr{GdkRectangle},), vargs...)
+    signal_connect(resize_cb, widget, "size-allocate", Void, (Ptr{GdkRectangle},), vargs...)
 end
 
 function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
-    signal_connect(destroy_cb, widget, "destroy", Nothing, (), vargs...)
+    signal_connect(destroy_cb, widget, "destroy", Void, (), vargs...)
 end
 
 function on_signal_button_press(press_cb::Function, widget::GtkWidget, vargs...)
@@ -50,7 +50,7 @@ end
 
 type Gtk_signal_motion{T}
     closure::T
-    callback::Ptr{Nothing}
+    callback::Ptr{Void}
     include::UInt32
     exclude::UInt32
 end
@@ -66,7 +66,7 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
     else
         ret = Int32(false)
     end
-    ccall((:gdk_event_request_motions, libgdk), Nothing, (Ptr{GdkEventMotion},), eventp)
+    ccall((:gdk_event_request_motions, libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
 function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
@@ -106,12 +106,12 @@ end
 
 
 function reveal(c::GtkWidget, immediate::Bool = true)
-    #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Nothing}, (Ptr{GdkRectangle},), & allocation(c))
-    #ccall((:gdk_window_invalidate_region, libgdk), Nothing, (Ptr{Nothing}, Ptr{Nothing}, Bool),
+    #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Void}, (Ptr{GdkRectangle},), & allocation(c))
+    #ccall((:gdk_window_invalidate_region, libgdk), Void, (Ptr{Void}, Ptr{Void}, Bool),
     #    gdk_window(c), region, true)
-    ccall((:gtk_widget_queue_draw, libgtk), Nothing, (Ptr{GObject},), c)
+    ccall((:gtk_widget_queue_draw, libgtk), Void, (Ptr{GObject},), c)
     if immediate
-        ccall((:gdk_window_process_updates, libgdk), Nothing, (Ptr{Nothing}, Int32), gdk_window(c), true)
+        ccall((:gdk_window_process_updates, libgdk), Void, (Ptr{Void}, Int32), gdk_window(c), true)
     end
 end
 
