@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Dialogs",
     "title": "Message dialogs",
     "category": "section",
-    "text": "Gtk.jl also supports GtkMessageDialog and provides several convenience functions:  info_dialog, ask_dialog, warn_dialog, and error_dialog.  Each inputs a string and an optional parent container, and returns nothing, except for ask_dialog which returns true if the user clicked yes.info_dialog(\"Julia rocks!\")\nask_dialog(\"Do you like chocolate ice cream?\", \"I like it\", \"Not at all\") && println(\"That\'s my favorite too.\")\nwarn_dialog(\"Oops!... I did it again\", window)"
+    "text": "Gtk.jl also supports GtkMessageDialog and provides several convenience functions:  info_dialog, ask_dialog, warn_dialog, and error_dialog.  Each inputs a string and an optional parent container, and returns nothing, except for ask_dialog which returns true if the user clicked yes.info_dialog(\"Julia rocks!\")\nask_dialog(\"Do you like chocolate ice cream?\", \"Not at all\", \"I like it\") && println(\"That\'s my favorite too.\")\nwarn_dialog(\"Oops!... I did it again\")"
 },
 
 {
