@@ -1,6 +1,6 @@
-@compat abstract type GObject end
-@compat abstract type GInterface <: GObject end
-@compat abstract type GBoxed  end
+abstract type GObject end
+abstract type GInterface <: GObject end
+abstract type GBoxed  end
 type GBoxedUnkown <: GBoxed
     handle::Ptr{GBoxed}
 end
@@ -171,7 +171,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
             const $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
         else
             $piface_decl
-            @compat abstract type $(esc(iname)) <: $(esc(piname)) end
+            abstract type $(esc(iname)) <: $(esc(piname)) end
             gtype_abstracts[$(QuoteNode(iname))] = $(esc(iname))
         end
         nothing

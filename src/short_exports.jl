@@ -26,6 +26,7 @@ const Entry = GtkEntry
 const EntryCompletion = GtkEntryCompletion
 const Expander = GtkExpander
 const FileChooserDialog = GtkFileChooserDialog
+const FileChooserNative = GtkFileChooserNative
 const FileFilter = GtkFileFilter
 const FontButton = GtkFontButton
 const Frame = GtkFrame
@@ -39,6 +40,7 @@ const MenuBar = GtkMenuBar
 const MenuItem = GtkMenuItem
 const MenuToolButton = GtkMenuToolButton
 const MessageDialog = GtkMessageDialog
+const NativeDialog = GtkNativeDialog
 const Notebook = GtkNotebook
 const Null = GtkNullContainer
 const Overlay = GtkOverlay
@@ -103,6 +105,7 @@ export G_, GObject,
     EntryCompletion,
     Expander,
     FileChooserDialog,
+    FileChooserNative,
     FileFilter,
     FontButton,
     Frame,
@@ -116,6 +119,7 @@ export G_, GObject,
     MenuItem,
     MenuToolButton,
     MessageDialog,
+    NativeDialog,
     Notebook,
     Null,
     Overlay,

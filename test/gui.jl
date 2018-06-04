@@ -609,6 +609,7 @@ selmodel = G_.selection(tv)
 select!(selmodel, Gtk.iter_from_index(ls, 1))
 @test hasselection(selmodel) == true
 iter = selected(selmodel)
+@test Gtk.index_from_iter(ls, iter) == 1
 @test ls[iter, 1] == 44
 deleteat!(ls, iter)
 @test isvalid(ls, iter) == false

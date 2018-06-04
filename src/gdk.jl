@@ -67,7 +67,7 @@ baremodule GdkKeySyms
     const KP_Enter = 0xff8d
 end
 
-@compat abstract type GdkEvent <: GBoxed end
+abstract type GdkEvent <: GBoxed end
 make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event, :libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     e = unsafe_load(convert(Ptr{GdkEventAny}, evt))

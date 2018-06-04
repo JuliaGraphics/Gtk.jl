@@ -25,6 +25,7 @@
 @g_type_delegate EntryCompletion = GtkEntryCompletion
 @g_type_delegate Expander = GtkExpander
 @g_type_delegate FileChooserDialog = GtkFileChooserDialog
+@g_type_delegate FileChooserNative = GtkFileChooserNative
 @g_type_delegate FileFilter = GtkFileFilter
 @g_type_delegate FontButton = GtkFontButton
 @g_type_delegate Frame = GtkFrame
@@ -101,6 +102,7 @@ export @G_,
     @EntryCompletion,
     @Expander,
     @FileChooserDialog,
+    @FileChooserNative,
     @FileFilter,
     @FontButton,
     @Frame,

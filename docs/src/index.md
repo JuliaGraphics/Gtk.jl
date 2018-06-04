@@ -6,7 +6,7 @@
 
 Gtk.jl is a is a Julia package providing bindings for the Gtk library: [http://www.gtk.org/](http://www.gtk.org/)
 
-Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stable](https://developer.gnome.org/gtk/stable) 
+Complete Gtk documentation is available at [https://developer.gnome.org/gtk/stable](https://developer.gnome.org/gtk/stable)
 
 ## Installation
 
@@ -15,6 +15,12 @@ Install Gtk.jl within Julia using
 ```julia
 Pkg.add("Gtk")
 ```
+
+If this produces errors, please see [installation troubleshooting](doc/installation.md).
+
+## Precompilation
+
+Gtk is precompilable by normal mechanisms. For further reduction of startup time for applications that use Gtk, one can even [build it into your local installation of julia](doc/precompilation.md).
 
 ## Usage
 

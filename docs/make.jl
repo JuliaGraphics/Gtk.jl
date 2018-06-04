@@ -20,14 +20,14 @@ makedocs(
                      "manual/canvas.md",
                      "manual/customWidgets.md",
                      "manual/async.md",
-                     "manual/nonreplusage.md"
+                     "manual/nonreplusage.md",
+                     "manual/packages.md"
                     ],
     ],
 )
 
 deploydocs(repo   = "github.com/JuliaGraphics/Gtk.jl.git",
-           julia  = "0.5",
+           julia  = "0.6",
            target = "build",
            deps   = nothing,
            make   = nothing)
-

@@ -12,7 +12,7 @@ export new, width, height, #minsize, maxsize
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
-export open_dialog, save_dialog
+export open_dialog, open_dialog_native, save_dialog, save_dialog_native
 export info_dialog, ask_dialog, warn_dialog, error_dialog, input_dialog
 
 # GLib-imported event handling

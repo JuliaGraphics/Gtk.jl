@@ -1,12 +1,16 @@
-# File Dialogs
+# Dialogs
 
-Gtk.jl supports the `GtkFileChooserDialog`.
-It also provides two functions, `open_dialog` and `save_dialog`, making this functionality easier to use.
-The syntax of these two functions are as follows:
+## File Dialogs
+
+Gtk.jl supports the `GtkFileChooserDialog` and the `GtkFileChooserNative`.
+It also provides four functions, `open_dialog` and `save_dialog` as well as `open_dialog_native` and `save_dialog_native`, making this functionality easier to use.
+The syntax of these four functions are as follows:
 
 ```julia
 open_dialog(title, GtkNullContainer(), String[])
 save_dialog(title, GtkNullContainer(), String[])
+open_dialog_native(title, GtkNullContainer(), String[])
+save_dialog_native(title, GtkNullContainer(), String[])
 ```
 
 If you are using these functions in the context of a GUI, you should set the parent to be the top-level window.
@@ -40,4 +44,17 @@ open_dialog("Pick an image file", GtkNullContainer(), ("*.png", "*.jpg", FileFil
 open_dialog("Pick an image file", GtkNullContainer(), (FileFilter(name="Supported image formats"),))
 
 save_dialog("Save as...", Null(), (FileFilter("*.png,*.jpg", name="All supported formats"), "*.png", "*.jpg"))
+```
+
+
+
+## Message dialogs
+
+Gtk.jl also supports `GtkMessageDialog` and provides several convenience functions:  `info_dialog`, `ask_dialog`, `warn_dialog`, and `error_dialog`.  Each inputs a string and an optional parent container, and returns nothing, except for `ask_dialog` which returns true if the user clicked `yes`.
+
+
+```jl
+info_dialog("Julia rocks!")
+ask_dialog("Do you like chocolate ice cream?", "Not at all", "I like it") && println("That's my favorite too.")
+warn_dialog("Oops!... I did it again")
 ```

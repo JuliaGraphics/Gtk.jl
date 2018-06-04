@@ -178,24 +178,24 @@ function setproperty!(text::Mutable{GtkTextIter}, key::Symbol, value)
     end
     return text
 end
-@compat(Base.:(==))(lhs::TI, rhs::TI) = Bool(ccall((:gtk_text_iter_equal, libgtk),
+Base.:(==)(lhs::TI, rhs::TI) = Bool(ccall((:gtk_text_iter_equal, libgtk),
     Cint, (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)))
-@compat(Base.:(!=))(lhs::TI, rhs::TI) = !(lhs == rhs)
-@compat(Base.:(<))(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
+Base.:(!=)(lhs::TI, rhs::TI) = !(lhs == rhs)
+Base.:(<)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) < 0
-@compat(Base.:(<=))(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
+Base.:(<=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) <= 0
-@compat(Base.:(>))(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
+Base.:(>)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) > 0
-@compat(Base.:(>=))(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
+Base.:(>=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) >= 0
 start(iter::TI) = mutable(iter)
 function next(::TI, iter::Mutable{GtkTextIter})
     (getproperty(iter, :char)::Char, iter + 1)
 end
 done(::TI, iter) = getproperty(iter, :is_end)::Bool
-@compat(Base.:+)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
-@compat(Base.:-)(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
+Base.:+(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
+Base.:-(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
     Bool(ccall((:gtk_text_iter_forward_chars, libgtk), Cint,
         (Ptr{GtkTextIter}, Cint), iter, count))
