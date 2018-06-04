@@ -55,6 +55,6 @@ Gtk.jl also supports `GtkMessageDialog` and provides several convenience functio
 
 ```jl
 info_dialog("Julia rocks!")
-ask_dialog("Do you like chocolate ice cream?", "I like it", "Not at all") && println("That's my favorite too.")
-warn_dialog("Oops!... I did it again", window)
+ask_dialog("Do you like chocolate ice cream?", "Not at all", "I like it") && println("That's my favorite too.")
+warn_dialog("Oops!... I did it again")
 ```
