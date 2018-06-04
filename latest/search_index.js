@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Introduction",
     "category": "section",
-    "text": "Gtk.jl is a is a Julia package providing bindings for the Gtk library: http://www.gtk.org/Complete Gtk documentation is available at https://developer.gnome.org/gtk/stable "
+    "text": "Gtk.jl is a is a Julia package providing bindings for the Gtk library: http://www.gtk.org/Complete Gtk documentation is available at https://developer.gnome.org/gtk/stable"
 },
 
 {
@@ -29,7 +29,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "Install Gtk.jl within Julia usingPkg.add(\"Gtk\")"
+    "text": "Install Gtk.jl within Julia usingPkg.add(\"Gtk\")If this produces errors, please see installation troubleshooting."
+},
+
+{
+    "location": "index.html#Precompilation-1",
+    "page": "Home",
+    "title": "Precompilation",
+    "category": "section",
+    "text": "Gtk is precompilable by normal mechanisms. For further reduction of startup time for applications that use Gtk, one can even build it into your local installation of julia."
 },
 
 {
@@ -109,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Layout",
     "title": "Box",
     "category": "section",
-    "text": "The most simple layout widget is the GtkBox. It can be either be horizontally or vertical aligned. It allow to add an arbitrary number of widgets.win = GtkWindow(\"New title\")\nhbox = GtkBox(:h)  # :h makes a horizontal layout, :v a vertical layout\npush!(win, hbox)\ncancel = GtkButton(\"Cancel\")\nok = GtkButton(\"OK\")\npush!(hbox, cancel)\npush!(hbox, ok)\nshowall(win)We can address individual \"slots\" in this container:julia> length(hbox)\n2\n\njulia> getproperty(hbox[1], :label, String)\n\"Cancel\"\n\njulia> getproperty(hbox[2], :label, String)\n\"OK\"This layout may not be exactly what you\'d like. Perhaps you\'d like the ok button to fill the available space, and to insert some blank space between them:setproperty!(hbox,:expand,ok,true)\nsetproperty!(hbox,:spacing,10)The first line sets the expand property of the ok button within the hbox container."
+    "text": "The most simple layout widget is the GtkBox. It can be either be horizontally or vertical aligned. It allow to add an arbitrary number of widgets.win = GtkWindow(\"New title\")\nhbox = GtkBox(:h)  # :h makes a horizontal layout, :v a vertical layout\npush!(win, hbox)\ncancel = GtkButton(\"Cancel\")\nok = GtkButton(\"OK\")\npush!(hbox, cancel)\npush!(hbox, ok)\nshowall(win)We can address individual \"slots\" in this container:julia> length(hbox)\n2\n\njulia> getproperty(hbox[1], :label, String)\n\"Cancel\"\n\njulia> getproperty(hbox[2], :label, String)\n\"OK\"This layout may not be exactly what you\'d like. Perhaps you\'d like the ok button to fill the available space, and to insert some blank space between them:setproperty!(hbox,:expand,ok,true)\nsetproperty!(hbox,:spacing,10)The first line sets the expand property of the ok button within the hbox container.Note that these aren\'t evenly-sized, and that doesn\'t change if we set the cancel button\'s expand property to true. ButtonBox is created specifically for this purpose, so let\'s use it instead:destroy(hbox)\nok = @Button(\"OK\")\ncancel = @Button(\"Cancel\")\nhbox = @ButtonBox(:h)\npush!(f, hbox)\npush!(hbox, cancel)\npush!(hbox, ok)Now we get this:(Image: window)which may be closer to what you had in mind."
 },
 
 {
@@ -314,18 +322,34 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "manual/filedialogs.html#",
-    "page": "File Dialogs",
-    "title": "File Dialogs",
+    "page": "Dialogs",
+    "title": "Dialogs",
     "category": "page",
     "text": ""
 },
 
 {
+    "location": "manual/filedialogs.html#Dialogs-1",
+    "page": "Dialogs",
+    "title": "Dialogs",
+    "category": "section",
+    "text": ""
+},
+
+{
     "location": "manual/filedialogs.html#File-Dialogs-1",
-    "page": "File Dialogs",
+    "page": "Dialogs",
     "title": "File Dialogs",
     "category": "section",
     "text": "Gtk.jl supports the GtkFileChooserDialog and the GtkFileChooserNative. It also provides four functions, open_dialog and save_dialog as well as open_dialog_native and save_dialog_native, making this functionality easier to use. The syntax of these four functions are as follows:open_dialog(title, GtkNullContainer(), String[])\nsave_dialog(title, GtkNullContainer(), String[])\nopen_dialog_native(title, GtkNullContainer(), String[])\nsave_dialog_native(title, GtkNullContainer(), String[])If you are using these functions in the context of a GUI, you should set the parent to be the top-level window. Otherwise, for standalone usage in scripts, do not set the parent.The main flexibility comes from the filters, which can be specified as a Tuple or Vector. A filter can be specified as a string, in which case it specifies a globbing pattern, for example \"*.png\". You can specify multiple match types for a single filter by separating the patterns with a comma, for example \"*.png,*.jpg\". You can alternatively specify MIME types, or if no specification is provided it defaults to types supported by GdkPixbuf. The generic specification of a filter isFileFilter(; name = nothing, pattern = \"\", mimetype = \"\")If on the other hand you want to choose a folder instead of a file, set the action to GtkFileChooserAction.SELECT_FOLDER:dir = open_dialog(\"Select Dataset Folder\", action=GtkFileChooserAction.SELECT_FOLDER)\nif isdir(dir)\n   # do something with dir\nendHere are some examples:open_dialog(\"Pick a file\")\nopen_dialog(\"Pick some files\", select_multiple=true)\nopen_dialog(\"Pick a file\", Null(), (\"*.jl\",))\nopen_dialog(\"Pick some text files\", GtkNullContainer(), (\"*.txt,*.csv\",), select_multiple=true)\nopen_dialog(\"Pick a file\", Null(), (FileFilter(mimetype=\"text/csv\"),))\nopen_dialog(\"Pick an image file\", GtkNullContainer(), (\"*.png\", \"*.jpg\", FileFilter(\"*.png,*.jpg\", name=\"All supported formats\")))\nopen_dialog(\"Pick an image file\", GtkNullContainer(), (FileFilter(name=\"Supported image formats\"),))\n\nsave_dialog(\"Save as...\", Null(), (FileFilter(\"*.png,*.jpg\", name=\"All supported formats\"), \"*.png\", \"*.jpg\"))"
+},
+
+{
+    "location": "manual/filedialogs.html#Message-dialogs-1",
+    "page": "Dialogs",
+    "title": "Message dialogs",
+    "category": "section",
+    "text": "Gtk.jl also supports GtkMessageDialog and provides several convenience functions:  info_dialog, ask_dialog, warn_dialog, and error_dialog.  Each inputs a string and an optional parent container, and returns nothing, except for ask_dialog which returns true if the user clicked yes.info_dialog(\"Julia rocks!\")\nask_dialog(\"Do you like chocolate ice cream?\", \"I like it\", \"Not at all\") && println(\"That\'s my favorite too.\")\nwarn_dialog(\"Oops!... I did it again\", window)"
 },
 
 {
@@ -422,6 +446,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Non REPL Usage",
     "category": "section",
     "text": "If you\'re using Gtk from command-line scripts, one problem you may encounter is that Julia quits before you have a chance to see or interact with your windows. In such cases, the following design pattern can be helpful:win = Window(\"gtkwait\")\n\n# Put your GUI code here\n\nif !isinteractive()\n    c = Condition()\n    signal_connect(win, :destroy) do widget\n        notify(c)\n    end\n    wait(c)\nendBy waiting on a Condition, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit)."
+},
+
+{
+    "location": "manual/packages.html#",
+    "page": "High-Level Packages",
+    "title": "High-Level Packages",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "manual/packages.html#High-Level-Packages-1",
+    "page": "High-Level Packages",
+    "title": "High-Level Packages",
+    "category": "section",
+    "text": "Finally, there are higher-level wrappers that might simplify your usage of Gtk, such as GtkReactive."
 },
 
 ]}
