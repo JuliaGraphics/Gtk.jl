@@ -92,7 +92,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             makefilters!(dlgp, filters)
         end
         response = run(dlg)
-        multiple = getproperty(dlg, :select_multiple, Bool)
+        multiple = get_gtk_property(dlg, :select_multiple, Bool)
         local selection
         if response == GConstants.GtkResponseType.ACCEPT
             if multiple
@@ -119,7 +119,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
             makefilters!(dlgp, filters)
         end
         response = run(dlg)
-        multiple = getproperty(dlg, :select_multiple, Bool)
+        multiple = get_gtk_property(dlg, :select_multiple, Bool)
         local selection
         if response == GConstants.GtkResponseType.ACCEPT
             if multiple

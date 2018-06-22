@@ -6,11 +6,11 @@ GtkWindowLeaf(name="", parent, width-request=-1, height-request=-1, visible=TRUE
 ```
 This shows you a list of properties of the object. For example, notice that the `title` property is set to `"My window"`. We can change the title in the following way:
 ```julia
-julia> setproperty!(win, :title, "New title")
+julia> set_gtk_property!(win, :title, "New title")
 ```
 To get the property, you have to specify the return type as a second argument:
 ```julia
-julia> getproperty(win, :title, String)
+julia> get_gtk_property(win, :title, String)
 "New title"
 ```
 This is necessary because Gtk, a C library, maintains the state; you have to specify what type of Julia object you want to create from the pointers it passes back.
@@ -19,7 +19,7 @@ To access particular properties, you can either use symbols, like `:title`, or s
 When using symbols, you'll need to convert any Gtk names that use `-` into names with `_`:
 
 ```julia
-julia> getproperty(win, :double_buffered, Bool)
+julia> get_gtk_property(win, :double_buffered, Bool)
 true
 ```
 

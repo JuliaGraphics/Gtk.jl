@@ -39,7 +39,7 @@ showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Void, (P
 modifyfont(w::GtkWidget, font_desc::Ptr{Void}) =
    ccall((:gtk_widget_modify_font, libgtk), Void, (Ptr{GObject}, Ptr{Void}), w, font_desc)
 
-function getproperty{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T})
+function get_gtk_property{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T})
     v = gvalue(T)
     ccall((:gtk_container_child_get_property, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), v)
@@ -49,8 +49,8 @@ function getproperty{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWid
 end
 
 #property(w::GtkContainer, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
-setproperty!{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}, value) = setproperty!(w, name, child, convert(T, value))
-function setproperty!(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, value)
+set_gtk_property!{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}, value) = set_gtk_property!(w, name, child, convert(T, value))
+function set_gtk_property!(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, value)
     ccall((:gtk_container_child_set_property, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))
     w
@@ -98,9 +98,9 @@ function _guarded(ex, retval)
 end
 
 
-@deprecate getindex(w::GtkContainer, child::GtkWidget, name::AbstractStringLike, T::Type) getproperty(w, name, child, T)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike, T::Type) setproperty!(w, name, child, T, value)
-@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike) setproperty!(w, name, child, value)
+@deprecate getindex(w::GtkContainer, child::GtkWidget, name::AbstractStringLike, T::Type) get_gtk_property(w, name, child, T)
+@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike, T::Type) set_gtk_property!(w, name, child, T, value)
+@deprecate setindex!(w::GtkContainer, value, child::GtkWidget, name::AbstractStringLike) set_gtk_property!(w, name, child, value)
 
 GtkAccelGroupLeaf() = GtkAccelGroupLeaf(
     ccall((:gtk_accel_group_new, libgtk), Ptr{GObject}, ()))

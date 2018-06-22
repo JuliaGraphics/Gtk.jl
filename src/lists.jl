@@ -607,7 +607,7 @@ function GtkTreeViewColumnLeaf(renderer::GtkCellRenderer, mapping)
 end
 
 function GtkTreeViewColumnLeaf(title::AbstractString, renderer::GtkCellRenderer, mapping)
-    setproperty!(GtkTreeViewColumnLeaf(renderer, mapping), :title, title)
+    set_gtk_property!(GtkTreeViewColumnLeaf(renderer, mapping), :title, title)
 end
 
 empty!(treeColumn::GtkTreeViewColumn) =

@@ -79,18 +79,18 @@ function app2048(bsize)
     win = Window("2048 Game", 400, 400) |> (Frame() |> (box = Box(:v)))
     toolbar = Toolbar()
     newgame = ToolButton("New Game")
-    setproperty!(newgame, :label, "New Game")
-    setproperty!(newgame, :is_important, true)
+    set_gtk_property!(newgame, :label, "New Game")
+    set_gtk_property!(newgame, :is_important, true)
     undomove = ToolButton("Undo Move")
-    setproperty!(undomove, :label, "Undo Move")
-    setproperty!(undomove, :is_important, true)
+    set_gtk_property!(undomove, :label, "Undo Move")
+    set_gtk_property!(undomove, :is_important, true)
     map(w->push!(toolbar,w),[newgame,undomove])
     grid = Grid()
     map(w -> push!(box, w),[toolbar, grid])
     buttons = Array{Gtk.GtkButtonLeaf,2}(bsize, bsize)
     for i in 1:bsize, j in 1:bsize
         grid[i,j] = buttons[i,j] = Button()
-        setproperty!(buttons[i,j], :expand, true)
+        set_gtk_property!(buttons[i,j], :expand, true)
     end
     board = zeros(Int, (bsize,bsize))
     pastboardstates = []
@@ -102,9 +102,9 @@ function app2048(bsize)
     function update!()
         for i in 1:bsize, j in 1:bsize
             label = (board[i,j] > 0) ? board[i,j]: " "
-            setproperty!(buttons[i,j], :label, label)
+            set_gtk_property!(buttons[i,j], :label, label)
         end
-        setproperty!(win, :title, "$won 2048 Game  (Score: $score)")
+        set_gtk_property!(win, :title, "$won 2048 Game  (Score: $score)")
     end
     function newrandomtile!()
         blanks = Array{Tuple{Int,Int},1}()
@@ -125,7 +125,7 @@ function app2048(bsize)
         gameover = false
         for i in 1:bsize, j in 1:bsize
             board[i,j] = 0
-            setproperty!(buttons[i,j], :label, " ")
+            set_gtk_property!(buttons[i,j], :label, " ")
         end
         newrandomtile!()
         update!()

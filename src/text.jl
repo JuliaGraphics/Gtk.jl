@@ -90,8 +90,8 @@ end
 
 #####  GtkTextIter  #####
 #TODO: search
-getproperty(text::TI, key::AbstractString, outtype::Type = Any) = getproperty(text, Symbol(key), outtype)
-function getproperty(text::TI, key::Symbol, outtype::Type = Any)
+get_gtk_property(text::TI, key::AbstractString, outtype::Type = Any) = get_gtk_property(text, Symbol(key), outtype)
+function get_gtk_property(text::TI, key::Symbol, outtype::Type = Any)
     text = mutable(text)
     return convert(outtype,
     if     key === :offset
@@ -139,8 +139,8 @@ function getproperty(text::TI, key::Symbol, outtype::Type = Any)
     elseif key === :bytes_in_line
         ccall((:gtk_text_iter_get_bytes_in_line, libgtk), Cint, (Ptr{GtkTextIter},), text)
 #    elseif key === :attributes
-#        view = getproperty(text, :view)::GtkTextView
-#        attrs = getproperty(view, :default_attributes)::GtkTextAttributes
+#        view = get_gtk_property(text, :view)::GtkTextView
+#        attrs = get_gtk_property(view, :default_attributes)::GtkTextAttributes
 #        ccall((:gtk_text_iter_get_attributes, libgtk), Cint, (Ptr{GtkTextIter}, Ptr{GtkTextAttributes}), text, &attrs)
 #        attrs
 #    elseif key === :language
@@ -158,8 +158,8 @@ function getproperty(text::TI, key::Symbol, outtype::Type = Any)
         false
     end)::outtype
 end
-setproperty!(text::Mutable{GtkTextIter}, key::AbstractString, value) = setproperty!(text, Symbol(key), value)
-function setproperty!(text::Mutable{GtkTextIter}, key::Symbol, value)
+set_gtk_property!(text::Mutable{GtkTextIter}, key::AbstractString, value) = set_gtk_property!(text, Symbol(key), value)
+function set_gtk_property!(text::Mutable{GtkTextIter}, key::Symbol, value)
     if     key === :offset
         ccall((:gtk_text_iter_set_offset, libgtk), Cint, (Ptr{GtkTextIter}, Cint), text, value)
     elseif key === :line
@@ -191,9 +191,9 @@ Base.:(>=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) >= 0
 start(iter::TI) = mutable(iter)
 function next(::TI, iter::Mutable{GtkTextIter})
-    (getproperty(iter, :char)::Char, iter + 1)
+    (get_gtk_property(iter, :char)::Char, iter + 1)
 end
-done(::TI, iter) = getproperty(iter, :is_end)::Bool
+done(::TI, iter) = get_gtk_property(iter, :is_end)::Bool
 Base.:+(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
 Base.:-(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
@@ -258,7 +258,7 @@ function getindex(r::GtkTextRange, b::Int)
     if b < 0 || (b > 0 && !skip(a, b)) || a >= last(r)
         throw(BoundsError())
     end
-    getproperty(a, :char)::Char
+    get_gtk_property(a, :char)::Char
 end
 function length(r::GtkTextRange)
     a = mutable(copy(first(r)))
@@ -272,14 +272,14 @@ function length(r::GtkTextRange)
     end
     cnt
 end
-show(io::IO, r::GtkTextRange) = print("GtkTextRange(\"", getproperty(r, :text), "\")")
+show(io::IO, r::GtkTextRange) = print("GtkTextRange(\"", get_gtk_property(r, :text), "\")")
 first(r::GtkTextRange) = r.a
 last(r::GtkTextRange) = r.b
 start(r::GtkTextRange) = start(first(r))
 next(r::GtkTextRange, i) = next(i, i)
 done(r::GtkTextRange, i) = (i == last(r) || done(i, i))
-getproperty(text::GtkTextRange, key::AbstractString, outtype::Type = Any) = getproperty(text, Symbol(key), outtype)
-function getproperty(text::GtkTextRange, key::Symbol, outtype::Type = Any)
+get_gtk_property(text::GtkTextRange, key::AbstractString, outtype::Type = Any) = get_gtk_property(text, Symbol(key), outtype)
+function get_gtk_property(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     starttext = first(text)
     endtext = last(text)
     return convert(outtype,
@@ -357,7 +357,7 @@ function create_tag(buffer::GtkTextBuffer, tag_name::AbstractString; properties.
                 (Ptr{GObject}, Ptr{UInt8}, Ptr{Void}),
                 buffer, bytestring(tag_name), C_NULL))
     for (k, v) in properties
-        setproperty!(tag, k, v)
+        set_gtk_property!(tag, k, v)
     end
     tag
 end

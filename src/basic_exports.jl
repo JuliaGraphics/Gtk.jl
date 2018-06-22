@@ -2,7 +2,7 @@
 export new, width, height, #minsize, maxsize
     reveal, configure, draw, cairo_context,
     visible, destroy, stop, depth, isancestor,
-    hasparent, toplevel, setproperty!, getproperty,
+    hasparent, toplevel, set_gtk_property!, get_gtk_property,
     selected, hasselection, unselect!, selectall!, unselectall!,
     pagenumber, present, fullscreen, unfullscreen,
     maximize, unmaximize, complete, user_action,

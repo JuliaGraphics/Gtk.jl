@@ -62,7 +62,7 @@ function button_cb(widgetptr::Ptr, user_data)
      widget = convert(Button, widgetptr)  # pointer -> object
      lbl, cntr = user_data                # unpack the user_data tuple
      cntr[] = cntr[]+1                    # increment counter[1]
-     setproperty!(lbl, :label, string(cntr[]))
+     set_gtk_property!(lbl, :label, string(cntr[]))
      nothing                              # return type is void
 end
 

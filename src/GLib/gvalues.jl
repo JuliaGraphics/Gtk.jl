@@ -152,7 +152,8 @@ function getindex(gv::GV, ::Type{Any})
 end
 #end
 
-function getproperty(w::GObject, name::AbstractStringLike, ::Type{T}) where T
+get_gtk_property(w::GObject, name::AbstractString, ::Type{T}) where T = get_gtk_property(w, Symbol(name), T)
+function get_gtk_property(w::GObject, name::Symbol, ::Type{T}) where T
     v = gvalue(T)
     ccall((:g_object_get_property, libgobject), Void,
         (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), v)
@@ -161,18 +162,32 @@ function getproperty(w::GObject, name::AbstractStringLike, ::Type{T}) where T
     return val
 end
 
-setproperty!(w::GObject, name, ::Type{T}, value) where T = setproperty!(w, name, convert(T, value))
-setproperty!(w::GObject, name::Symbol, value) = setproperty!(w::GObject, string(name), value)
-function setproperty!(w::GObject, name::AbstractString, value) 
+set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
+set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, Symbol(name), value)
+function set_gtk_property!(w::GObject, name::Symbol, value) 
     ccall((:g_object_set_property, libgobject), Void,
         (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), gvalue(value))
+    
     w
 end
 
-@deprecate getindex(w::GObject, name::AbstractStringLike, T::Type) getproperty(w, name, T)
-@deprecate setindex!(w::GObject, value, name::AbstractStringLike, T::Type) setproperty!(w, name, T, value)
-@deprecate setindex!(w::GObject, value, name::AbstractStringLike) setproperty!(w, name, value)
+struct FieldRef{T}
+    obj::T
+    field::Symbol
 
+    global function getproperty(obj::T, field::Symbol) where {T <: GObject} 
+        isdefined(obj,field) && return getfield(obj,field)
+        new{T}(obj, field)
+    end
+end
+
+getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T) 
+
+function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
+    isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)
+    set_gtk_property!(f.obj, f.field, value) 
+end
+setindex!(f::FieldRef, value::K, ::Type{T}) where {K, T} = setindex!(f, convert(T,value), T)
 
 function show(io::IO, w::GObject)
     const READABLE   = 0x00000001

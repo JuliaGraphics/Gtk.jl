@@ -59,8 +59,8 @@ type ComposedWidget <: Gtk.GtkBox
         btn = GtkButton(label)
         tv = GtkTextView()
         push!(vbox,btn,tv)
-        setproperty!(vbox,:expand,tv,true)
-        setproperty!(vbox,:spacing,10)
+        set_gtk_property!(vbox,:expand,tv,true)
+        set_gtk_property!(vbox,:spacing,10)
         w = new(vbox.handle, btn, tv)
         return Gtk.gobject_move_ref(w, vbox)
     end

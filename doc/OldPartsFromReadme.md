@@ -61,7 +61,7 @@ Calling `parent` on a top-level object yields an error, but you can check to see
 Likewise, it's possible to get the children:
 ```jl
     for child in hbox
-        println(getproperty(child,:label,String))
+        println(get_gtk_property(child,:label,String))
     end
 ```
 
@@ -79,8 +79,8 @@ This is because a `Scale` contains another more basic type, `Adjustment`, respon
 ```jl
     sc = @Scale(false,0:10)   # range in integer steps, from 0 to 10
     adj = @Adjustment(sc)
-    setproperty!(adj,:upper,11)         # now this scale goes to 11!
-    setproperty!(adj,:value,7)
+    set_gtk_property!(adj,:upper,11)         # now this scale goes to 11!
+    set_gtk_property!(adj,:value,7)
     win = @Window(sc,"Scale") |> showall
 ```
 ![scale](doc/figures/scale.png)

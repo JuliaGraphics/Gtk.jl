@@ -60,7 +60,7 @@ function GtkMessageDialogLeaf(message::AbstractStringLike, buttons, flags::Integ
     w = GtkMessageDialogLeaf(ccall((:gtk_message_dialog_new, libgtk), Ptr{GObject},
         (Ptr{GObject}, Cint, Cint, Cint, Ptr{UInt8}),
         parent, flags, typ, GtkButtonsType.NONE, C_NULL); kwargs...)
-    setproperty!(w, :text, message)
+    set_gtk_property!(w, :text, message)
     for (k, v) in buttons
         push!(w, k, v)
     end
@@ -87,7 +87,7 @@ for (func, flag) in (
             (Ptr{GObject}, Cint, Cint, Cint, Ptr{UInt8}),
             parent, GtkDialogFlags.DESTROY_WITH_PARENT,
             $flag, GtkButtonsType.CLOSE, C_NULL))
-        setproperty!(w, :text, message)
+        set_gtk_property!(w, :text, message)
         run(w)
         destroy(w)
     end
@@ -100,7 +100,7 @@ function input_dialog(message::AbstractString, entry_default::AbstractString, bu
     push!(box, entry)
     showall(widget)
     resp = run(widget)
-    entry_text = getproperty(entry, :text, String)
+    entry_text = get_gtk_property(entry, :text, String)
     destroy(widget)
     return resp, entry_text
 end

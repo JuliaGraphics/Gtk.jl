@@ -216,7 +216,7 @@ function get_type_decl(name, iname, gtyp, gtype_decl)
             end
             w = $ename(args...)
             for (kw, val) in kwargs
-                setproperty!(w, kw, val)
+                set_gtk_property!(w, kw, val)
             end
             w
         end

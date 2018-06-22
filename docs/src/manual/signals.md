@@ -42,7 +42,7 @@ julia> GtkButton(action-name=NULL, action-target, related-action, use-action-app
 That's quite a lot of output; let's just print the label of the button:
 ```julia
 id2 = signal_connect(b, "clicked") do widget
-    println("\"", getproperty(widget,:label,String), "\" was clicked!")
+    println("\"", get_gtk_property(widget,:label,String), "\" was clicked!")
 end
 ```
 Now you get something like this:

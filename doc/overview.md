@@ -18,7 +18,7 @@ Gtk object constructors (by convention), are the name of the Gtk object (interfa
 
 Alternatively, the user can use the macro form of the widget name to construct a new `GObject`, as shown in the example below.
 
-All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding `setproperty!` method (see below).
+All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding `set_gtk_property!` method (see below).
 
     w = @GtkWindow(title="Hello World")
 
@@ -42,11 +42,11 @@ The optimal pattern for creating objects generally depends upon the usage. Howev
                 Gtk.@Label("4"))) |>
         showall
 
-### Objects have getproperty(obj, :prop, types) and setproperty!(obj, :prop, value)
+### Objects have get_gtk_property(obj, :prop, types) and set_gtk_property!(obj, :prop, value)
 
      > warning: this API uses 0-based indexing
 
-The properties of any object can be accessed by via the `getproperty` and `setproperty!` methods. Displaying a `GtkObject` at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
+The properties of any object can be accessed by via the `get_gtk_property` and `set_gtk_property!` methods. Displaying a `GtkObject` at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the [Gtk documentation](https://developer.gnome.org/gtk3/stable/GtkWidget.html) online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace `-` with `_` as shown below.
 
 When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.
 
@@ -56,9 +56,9 @@ Some Examples:
     show(STDOUT, w) # without the STDOUT parameter, show(w) would
                     # make the window visible on the screen, instead
                     # of printing the information in the REPL
-    getproperty(w,:title,String)
-    setproperty!(w,:title,"New title")
-    setproperty!(w,:urgency_hint,Bool,true)
+    get_gtk_property(w,:title,String)
+    set_gtk_property!(w,:title,"New title")
+    set_gtk_property!(w,:urgency_hint,Bool,true)
 
 ### Objects can signal events
 

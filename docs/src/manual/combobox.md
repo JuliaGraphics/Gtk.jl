@@ -19,11 +19,11 @@ for choice in choices
   push!(cb,choice)
 end
 # Lets set the active element to be "two"
-setproperty!(cb,:active,1)
+set_gtk_property!(cb,:active,1)
 
 signal_connect(cb, "changed") do widget, others...
   # get the active index
-  idx = getproperty(cb, "active", Int)
+  idx = get_gtk_property(cb, "active", Int)
   # get the active string 
   # We need to wrap the GAccessor call into a Gtk bytestring
   str = Gtk.bytestring( GAccessor.active_text(cb) ) 

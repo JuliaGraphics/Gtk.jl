@@ -23,18 +23,18 @@ We can address individual "slots" in this container:
 julia> length(hbox)
 2
 
-julia> getproperty(hbox[1], :label, String)
+julia> get_gtk_property(hbox[1], :label, String)
 "Cancel"
 
-julia> getproperty(hbox[2], :label, String)
+julia> get_gtk_property(hbox[2], :label, String)
 "OK"
 ```
 
 This layout may not be exactly what you'd like. Perhaps you'd like the `ok` button to fill the available space, and to insert some blank space between them:
 
 ```julia
-setproperty!(hbox,:expand,ok,true)
-setproperty!(hbox,:spacing,10)
+set_gtk_property!(hbox,:expand,ok,true)
+set_gtk_property!(hbox,:spacing,10)
 ```
 The first line sets the `expand` property of the `ok` button within the `hbox` container.
 
@@ -63,7 +63,7 @@ More generally, you can arrange items in a grid:
 win = Window("A new window")
 g = Grid()
 a = Entry()  # a widget for entering text
-setproperty!(a, :text, "This is Gtk!")
+set_gtk_property!(a, :text, "This is Gtk!")
 b = CheckButton("Check me!")
 c = Scale(false, 0:10)     # a slider
 
@@ -71,8 +71,8 @@ c = Scale(false, 0:10)     # a slider
 g[1,1] = a    # Cartesian coordinates, g[x,y]
 g[2,1] = b
 g[1:2,2] = c  # spans both columns
-setproperty!(g, :column_homogeneous, true)
-setproperty!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
+set_gtk_property!(g, :column_homogeneous, true)
+set_gtk_property!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
 push!(win, g)
 showall(win)
 ```

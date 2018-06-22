@@ -13,7 +13,7 @@ import Base: convert, copy, show, showall, showcompact, size, length, getindex, 
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
-             setproperty!
+             getindex, setindex!
 
 using Base.Libdl
 
@@ -22,7 +22,7 @@ export GEnum, GError, GValue, gvalue, make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
-export setproperty!, getproperty
+export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom
 

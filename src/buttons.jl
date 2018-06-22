@@ -86,7 +86,7 @@ function push!(grp::GtkRadioButtonGroup, e::GtkRadioButton, active::Bool)
 end
 function push!(grp::GtkRadioButtonGroup, e::GtkRadioButton)
     if isdefined(grp, :anchor)
-        setproperty!(e, :group, grp.anchor)
+        set_gtk_property!(e, :group, grp.anchor)
     else
         grp.anchor = e
     end
@@ -120,21 +120,23 @@ length(w::GtkRadioButtonGroup) = length(start(w))
 getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton, start(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp, :anchor)
 
-getproperty(grp::GtkRadioButtonGroup, name::AbstractString) =  getproperty(grp, Symbol(name))
-function getproperty(grp::GtkRadioButtonGroup, name::Symbol)
+get_gtk_property(grp::GtkRadioButtonGroup, name::AbstractString) =  get_gtk_property(grp, Symbol(name))
+set_gtk_property!(grp::GtkRadioButtonGroup, name::Symbol, x) =  Base.setfield!(grp, name, x)
+
+function get_gtk_property(grp::GtkRadioButtonGroup, name::Symbol)
     if name == :active
         for b in grp
-            if getproperty(b, :active, Bool)
+            if get_gtk_property(b, :active, Bool)
                 return b
             end
         end
         error("no active elements in GtkRadioGroup")
     end
-    error("GtkRadioButtonGroup has no property \"$name\"")
+    Base.getfield(grp, name)
 end
 
 function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
-    # Users are encouraged to use the syntax `setproperty!(b, :active, true)`. This is not a public function.
+    # Users are encouraged to use the syntax `set_gtk_property!(b, :active, true)`. This is not a public function.
     ccall((:gtk_toggle_button_set_active, libgtk), Void, (Ptr{GObject}, Cint), b, active)
     b
 end
