@@ -185,7 +185,8 @@ getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T)
 
 function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
     isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)
-    set_gtk_property!(f.obj, f.field, value) 
+    set_gtk_property!(f.obj, f.field, value)
+    return f
 end
 setindex!(f::FieldRef, value::K, ::Type{T}) where {K, T} = setindex!(f, convert(T,value), T)
 

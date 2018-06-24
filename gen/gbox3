@@ -1465,7 +1465,7 @@ $(Expr(:toplevel, :(module GAccessor
         return (convert(Gtk.GtkTreePath, ccall((:gtk_tree_model_get_path, Gtk.libgtk), Ptr{Gtk.GtkTreePath}, (Ptr{Gtk.GObject}, Ptr{Gtk.GtkTreeIter}), tree_model, iter)), iter[])
     end
     function value(tree_model::Gtk.GtkTreeModel, iter, column, value_)
-        return ccall((:gtk_tree_model_get_value, Gtk.libgtk), Void, (Ptr{Gtk.GObject}, Ptr{Gtk.GtkTreeIter}, Cint, Ptr{Void}), tree_model, iter, column, value_)
+        return ccall((:gtk_tree_model_get_value, Gtk.libgtk), Void, (Ptr{Gtk.GObject}, Ref{Gtk.GtkTreeIter}, Cint, Ptr{Void}), tree_model, iter, column, value_)
     end
     function request_mode(cell::Gtk.GtkCellRenderer)
         return ccall((:gtk_cell_renderer_get_request_mode, Gtk.libgtk), Cint, (Ptr{Gtk.GObject},), cell)

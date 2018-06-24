@@ -30,7 +30,7 @@ mutable{T}(x::Ptr{T}, i = 1) = x + (i - 1) * sizeof(T)
 mutable{T}(x::T, i) = (i == 1 ? mutable(x) : error("Object only has one element"))
 
 _addrof{T}(b::T) = pointer_from_objref(b)
-Base.cconvert{P <: Ptr, T}(::Type{P}, b::MutableX{T}) = isbits(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
+Base.cconvert{P <: Ptr, T}(::Type{P}, b::MutableX{T}) = isbitstype(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
 Base.cconvert{P <: Ptr, T, N}(::Type{P}, b::MutableA{T, N}) = convert(P, pointer(b.x, b.i))
 
 deref(b::Ptr) = unsafe_load(b)

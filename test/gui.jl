@@ -4,6 +4,40 @@ using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
 using Compat
 
+## for FileFilter
+# This is just for testing, and be careful of garbage collection while using this
+if  Gtk.libgtk_version >= v"3"
+    struct GtkFileFilterInfo
+    contains::Cint
+    filename::Ptr{Int8}
+    uri::Ptr{Int8}
+    display_name::Ptr{Int8}
+    mime_type::Ptr{Int8}
+    end
+    GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
+    GtkFileFilterInfo(
+        ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) |
+        (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
+        (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) |
+        (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
+        isa(filename, AbstractString)? pointer(filename): C_NULL,
+        isa(uri, AbstractString)? pointer(uri): C_NULL,
+        isa(display_name, AbstractString)? pointer(display_name): C_NULL,
+        isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
+
+    function name(filter::FileFilter)
+    nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
+    (nameptr == C_NULL)? nothing : unsafe_string(nameptr)
+    end
+
+    needed(filter::FileFilter) =
+    ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
+    import Base.filter
+    filter(filt::FileFilter, info::GtkFileFilterInfo) =
+    ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
+end
+
+# for subtyping from GObject
 mutable struct MyWindow <: Window
     handle::Ptr{Gtk.GObject}
     testfield::String
@@ -14,39 +48,6 @@ mutable struct MyWindow <: Window
         n = new(w.handle,"Test Field")
         Gtk.gobject_move_ref(n, w)
     end
-end
-
-## for FileFilter
-# This is just for testing, and be careful of garbage collection while using this
-if  Gtk.libgtk_version >= v"3"
-  struct GtkFileFilterInfo
-    contains::Cint
-    filename::Ptr{Int8}
-    uri::Ptr{Int8}
-    display_name::Ptr{Int8}
-    mime_type::Ptr{Int8}
-  end
-  GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
-    GtkFileFilterInfo(
-      ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) |
-        (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
-        (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) |
-        (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
-      isa(filename, AbstractString)? pointer(filename): C_NULL,
-      isa(uri, AbstractString)? pointer(uri): C_NULL,
-      isa(display_name, AbstractString)? pointer(display_name): C_NULL,
-      isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
-
-  function name(filter::FileFilter)
-    nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
-    (nameptr == C_NULL)? nothing : unsafe_string(nameptr)
-  end
-
-  needed(filter::FileFilter) =
-    ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
-  import Base.filter
-  filter(filt::FileFilter, info::GtkFileFilterInfo) =
-    ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
 end
 
 @testset "gui" begin
@@ -74,7 +75,6 @@ if G_.position(w) == pos
     warn("The Window Manager did not move the Gtk Window when requested")
 end
 @test get_gtk_property(w, "title", AbstractString) == "Window"
-@test w.title[String] == "Window"
 set_gtk_property!(w, :title, "Window 2")
 @test get_gtk_property(w, :title, AbstractString) == "Window 2"
 visible(w,false)
@@ -84,10 +84,20 @@ visible(w,true)
 
 destroy(w); yield()
 @test !get_gtk_property(w, :visible, Bool)
-@test !w.visible[Bool]
 w=WeakRef(w)
 GC.gc(); yield(); GC.gc()
 #@test w.value === nothing    ### fails inside @testset
+end
+
+if VERSION >= v"0.7.0-DEV.3382"
+@testset "get/set property" begin
+    w = Window("Window", 400, 300) |> showall
+    @test w.title[String] == "Window"
+    @test w.visible[Bool]
+    w.visible[Bool] = false
+    @test w.visible[Bool] == false
+    destroy(w)
+end
 end
 
 @testset "change Window size" begin
@@ -618,25 +628,25 @@ push!(tv,c2)
 w = Window(tv, "List View")|>showall
 
 ## selection
-if false #this crashes
-    selmodel = G_.selection(tv)
-    @test hasselection(selmodel) == false
-    select!(selmodel, Gtk.iter_from_index(ls, 1))
-    @test hasselection(selmodel) == true
-    iter = selected(selmodel)
-    @test Gtk.index_from_iter(ls, iter) == 1
-    @test ls[iter, 1] == 44
-    deleteat!(ls, iter)
-    @test isvalid(ls, iter) == false
 
-    tmSorted=TreeModelSort(ls)
-    G_.model(tv,tmSorted)
-    G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
-    it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
-    select!(selmodel, it)
-    iter = selected(selmodel)
-    @test TreeModel(tmSorted)[iter, 1] == 35
-end
+selmodel = G_.selection(tv)
+@test hasselection(selmodel) == false
+select!(selmodel, Gtk.iter_from_index(ls, 1))
+@test hasselection(selmodel) == true
+iter = selected(selmodel)
+@test Gtk.index_from_iter(ls, iter) == 1
+@test ls[iter, 1] == 44
+deleteat!(ls, iter)
+@test isvalid(ls, iter) == false
+
+tmSorted=TreeModelSort(ls)
+G_.model(tv,tmSorted)
+G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
+it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
+select!(selmodel, it)
+iter = selected(selmodel)
+@test TreeModel(tmSorted)[iter, 1] == 35
+
 
 destroy(w)
 end
@@ -652,13 +662,10 @@ r1=CellRendererText()
 c1=TreeViewColumn("A", r1, Dict([("text",0)]))
 push!(tv,c1)
 w = Window(tv, "Tree View")|>showall
-
-if false #this crashes
 iter = Gtk.iter_from_index(ts, [1])
 ts[iter,1] = "ONE"
 @test ts[iter,1] == "ONE"
 @test map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
-end
 
 destroy(w)
 end
@@ -698,10 +705,14 @@ csvfilter2 = FileFilter("*.csv"; name="Comma Separated Format")
 @test name(csvfilter2) == "Comma Separated Format"
 @test needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
 @test filter(csvfilter2, csvfileinfo)
-csvfilter3 = FileFilter(; mimetype="text/csv")
-@test name(csvfilter3) == "text/csv"
-@test needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
-@test filter(csvfilter3, csvfileinfo)
+
+if @compat !is_windows()#filter fails on windows 7
+    csvfilter3 = FileFilter(; mimetype="text/csv")
+    @test name(csvfilter3) == "text/csv"
+    @test needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
+    @test filter(csvfilter3, csvfileinfo)
+end
+
 csvfilter4 = FileFilter(; pattern="*.csv", mimetype="text/csv")
 # Pattern takes precedence over mime-type, causing mime-type to be ignored
 @test name(csvfilter4) == "*.csv"
@@ -777,14 +788,18 @@ end
 
 w = MyWindow()
 showall(w)
+
 @test w.testfield == "Test Field"
 w.testfield = "setproperty!"
 @test w.testfield == "setproperty!"
-@test w.title[String] == "MyWindow"
-w.title[String] = "setindex!"
-@test w.title[String] == "setindex!"
 
-@test typeof(w.title) <: Gtk.GLib.FieldRef
+if VERSION >= v"0.7.0-DEV.3382"
+    @test w.title[String] == "MyWindow"
+    w.title[String] = "setindex!"
+    @test w.title[String] == "setindex!"
+    @test typeof(w.title) <: Gtk.GLib.FieldRef
+end
+
 destroy(w)
 
 end
