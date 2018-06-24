@@ -16,18 +16,18 @@ if  Gtk.libgtk_version >= v"3"
     end
     GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
     GtkFileFilterInfo(
-        ( (isa(filename, AbstractString)? Gtk.GtkFileFilterFlags.FILENAME:0) |
-        (isa(uri, AbstractString)? Gtk.GtkFileFilterFlags.URI:0) |
-        (isa(display_name, AbstractString)? Gtk.GtkFileFilterFlags.DISPLAY_NAME:0) |
-        (isa(mime_type, AbstractString)? Gtk.GtkFileFilterFlags.MIME_TYPE:0) ),
-        isa(filename, AbstractString)? pointer(filename): C_NULL,
-        isa(uri, AbstractString)? pointer(uri): C_NULL,
-        isa(display_name, AbstractString)? pointer(display_name): C_NULL,
-        isa(mime_type, AbstractString)? pointer(mime_type): C_NULL)
+        ( (isa(filename, AbstractString) ? Gtk.GtkFileFilterFlags.FILENAME : 0) |
+        (isa(uri, AbstractString) ? Gtk.GtkFileFilterFlags.URI : 0) |
+        (isa(display_name, AbstractString) ? Gtk.GtkFileFilterFlags.DISPLAY_NAME : 0) |
+        (isa(mime_type, AbstractString) ? Gtk.GtkFileFilterFlags.MIME_TYPE : 0) ),
+        isa(filename, AbstractString) ? pointer(filename) : C_NULL,
+        isa(uri, AbstractString) ? pointer(uri) : C_NULL,
+        isa(display_name, AbstractString) ? pointer(display_name) : C_NULL,
+        isa(mime_type, AbstractString) ? pointer(mime_type) : C_NULL)
 
     function name(filter::FileFilter)
     nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
-    (nameptr == C_NULL)? nothing : unsafe_string(nameptr)
+    (nameptr == C_NULL) ? nothing : unsafe_string(nameptr)
     end
 
     needed(filter::FileFilter) =
@@ -706,7 +706,7 @@ csvfilter2 = FileFilter("*.csv"; name="Comma Separated Format")
 @test needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
 @test filter(csvfilter2, csvfileinfo)
 
-if @compat !is_windows()#filter fails on windows 7
+if !is_windows()#filter fails on windows 7
     csvfilter3 = FileFilter(; mimetype="text/csv")
     @test name(csvfilter3) == "text/csv"
     @test needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0

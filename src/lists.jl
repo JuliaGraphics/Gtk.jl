@@ -56,7 +56,7 @@ end
 delete!(cb::GtkComboBoxText, i::Integer) =
     (ccall((:gtk_combo_box_text_remove, libgtk), Void, (Ptr{GObject}, Cint), cb, i - 1); cb)
 
-immutable GtkTreeIter
+struct GtkTreeIter
     stamp::Cint
     user_data::Ptr{Void}
     user_data2::Ptr{Void}
@@ -82,7 +82,7 @@ Base.cconvert(::Type{Ref{GtkTreeIter}},x::Gtk.Mutable{GtkTreeIter}) = Ref(x[])
 #    indices::Ptr{Cint}
 # end
 
-type GtkTreePath <: GBoxed
+mutable struct GtkTreePath <: GBoxed
     handle::Ptr{GtkTreePath}
     function GtkTreePath(pathIn::Ptr{GtkTreePath}, own::Bool = false)
         x = new( own ? pathIn :
@@ -484,7 +484,7 @@ index_from_iter(treeModel::GtkTreeModel, iter::TRI) = map(int, split(get_string_
 ## for iter in Gtk.TreeIterator(store) ## or Gtk.TreeIterator(store, piter)
 ##   println(store[iter, 1])
 ## end
-type TreeIterator
+mutable struct TreeIterator
     store::GtkTreeStore
     model::GtkTreeModel
     iter::Union{Void, TRI}

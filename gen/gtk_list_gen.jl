@@ -72,7 +72,7 @@ function gen_g_type_lists(gtk_h)
                     continue
                 end
                 push!(gpointers, (typname, quote
-                    type $typname <: GBoxed
+                    mutable struct $typname <: GBoxed
                         handle::Ptr{$typname}
                         function $typname(ref::Ptr{$typname})
                             $ref_fn

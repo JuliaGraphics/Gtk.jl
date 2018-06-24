@@ -1,6 +1,6 @@
 ### Getting and Setting Properties
 
-immutable GValue
+struct GValue
     g_type::GType
     field2::UInt64
     field3::UInt64
@@ -8,7 +8,7 @@ immutable GValue
 end
 const GV = Union{Mutable{GValue}, Ptr{GValue}}
 Base.zero(::Type{GValue}) = GValue()
-function gvalue{T}(::Type{T})
+function gvalue(::Type{T}) where T
     v = mutable(GValue())
     v[] = T
     v
@@ -42,7 +42,7 @@ setindex!(::Type{Void}, v::GV) = v
 setindex!(v::GLib.GV, x) = setindex!(v, x, typeof(x))
 setindex!(gv::GV, x, i::Int) = setindex!(mutable(gv, i), x)
 
-getindex{T}(gv::GV, i::Int, ::Type{T}) = getindex(mutable(gv, i), T)
+getindex(gv::GV, i::Int, ::Type{T}) where {T} = getindex(mutable(gv, i), T)
 getindex(gv::GV, i::Int) = getindex(mutable(gv, i))
 getindex(v::GV, i::Int, ::Type{Void}) = nothing
 
@@ -56,11 +56,11 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
     end
     if pass_x !== Union{} && !(pass_x in handled)
         eval(current_module(), quote
-            function Base.setindex!{T <: $pass_x}(v::GLib.GV, ::Type{T})
+            function Base.setindex!(v::GLib.GV, ::Type{T}) where T <: $pass_x
                 ccall((:g_value_init, GLib.libgobject), Void, (Ptr{GLib.GValue}, Csize_t), v, $with_id)
                 v
             end
-            function Base.setindex!{T <: $pass_x}(v::GLib.GV, x, ::Type{T})
+            function Base.setindex!(v::GLib.GV, x, ::Type{T}) where T <: $pass_x
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))
                     elseif to_gtype == :pointer || to_gtype == :boxed
@@ -82,7 +82,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
     if pass_x !== Union{} && !(pass_x in handled)
         push!(handled, pass_x)
         eval(current_module(), quote
-            function Base.getindex{T <: $pass_x}(v::GLib.GV, ::Type{T})
+            function Base.getindex(v::GLib.GV, ::Type{T}) where T <: $pass_x
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))

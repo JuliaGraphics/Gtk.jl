@@ -1,4 +1,4 @@
-immutable GdkRectangle <: GBoxed
+struct GdkRectangle <: GBoxed
     x::Int32
     y::Int32
     width::Int32
@@ -8,7 +8,7 @@ end
 make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle, :libgdk))
 convert(::Type{GdkRectangle}, rect::Ptr{GdkRectangle}) = unsafe_load(rect)
 
-immutable GdkPoint
+struct GdkPoint
     x::Int32
     y::Int32
     GdkPoint(x, y) = new(x, y)
@@ -91,13 +91,13 @@ function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     end
 end
 
-immutable GdkEventAny <: GdkEvent
+struct GdkEventAny <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
 end
 
-immutable GdkEventButton <: GdkEvent
+struct GdkEventButton <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -112,7 +112,7 @@ immutable GdkEventButton <: GdkEvent
     y_root::Float64
 end
 
-immutable GdkEventScroll <: GdkEvent
+struct GdkEventScroll <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -128,7 +128,7 @@ immutable GdkEventScroll <: GdkEvent
     delta_y::Float64
 end
 
-immutable GdkEventKey <: GdkEvent
+struct GdkEventKey <: GdkEvent
     event_type::GEnum
     gdk_window::Ptr{Void}
     send_event::Int8
@@ -145,7 +145,7 @@ GdkEventKey() = (uz32 = UInt32(0); GdkEventKey(GEnum(0), C_NULL, Int8(0), uz32, 
 
 is_modifier(evt::GdkEventKey) = (evt.flags & 0x0001) > 0
 
-immutable GdkEventMotion <: GdkEvent
+struct GdkEventMotion <: GdkEvent
   event_type::GEnum
   gdk_window::Ptr{Void}
   send_event::Int8
@@ -160,7 +160,7 @@ immutable GdkEventMotion <: GdkEvent
   y_root::Float64
 end
 
-immutable GdkEventCrossing <: GdkEvent
+struct GdkEventCrossing <: GdkEvent
   event_type::GEnum
   gdk_window::Ptr{Void}
   send_event::Int8

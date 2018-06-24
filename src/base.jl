@@ -39,7 +39,7 @@ showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Void, (P
 modifyfont(w::GtkWidget, font_desc::Ptr{Void}) =
    ccall((:gtk_widget_modify_font, libgtk), Void, (Ptr{GObject}, Ptr{Void}), w, font_desc)
 
-function get_gtk_property{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T})
+function get_gtk_property(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}) where T
     v = gvalue(T)
     ccall((:gtk_container_child_get_property, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), v)
@@ -49,7 +49,7 @@ function get_gtk_property{T}(w::GtkContainer, name::AbstractStringLike, child::G
 end
 
 #property(w::GtkContainer, value, child::GtkWidget, ::Type{T}) = error("missing Gtk property-name to set")
-set_gtk_property!{T}(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}, value) = set_gtk_property!(w, name, child, convert(T, value))
+set_gtk_property!(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}, value) where {T} = set_gtk_property!(w, name, child, convert(T, value))
 function set_gtk_property!(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, value)
     ccall((:gtk_container_child_set_property, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, child, bytestring(name), gvalue(value))

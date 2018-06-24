@@ -16,12 +16,12 @@ deps = [
     gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
 ]
 
-if @compat is_linux()
+if is_linux()
     provides(AptGet, "libgtk-3-dev", deps)
     provides(Yum, "gtk3", deps)
 end
 
-if @compat is_windows()
+if is_windows()
     using WinRPM
     provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
@@ -40,7 +40,7 @@ if @compat is_windows()
     run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
 end
 
-if @compat is_apple()
+if is_apple()
     using Homebrew
     provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
         """

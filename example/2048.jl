@@ -101,7 +101,7 @@ function app2048(bsize)
 
     function update!()
         for i in 1:bsize, j in 1:bsize
-            label = (board[i,j] > 0) ? board[i,j]: " "
+            label = (board[i,j] > 0) ? board[i,j] : " "
             set_gtk_property!(buttons[i,j], :label, label)
         end
         set_gtk_property!(win, :title, "$won 2048 Game  (Score: $score)")

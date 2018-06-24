@@ -55,7 +55,7 @@ GtkRadioButtonLeaf(group::GtkRadioButton, label::AbstractString) =
 GtkRadioButtonLeaf(group::GtkRadioButton, child::GtkWidget, vargs...) =
     push!(GtkRadioButtonLeaf(group, vargs...), child)
 
-type GtkRadioButtonGroup <: GtkContainer # NOT a native @gtktype
+mutable struct GtkRadioButtonGroup <: GtkContainer # NOT a native @gtktype
     # when iterating/indexing elements will be in reverse / * random * order
 
     # the behavior is specified as undefined if the first

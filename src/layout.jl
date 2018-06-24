@@ -31,7 +31,7 @@ if libgtk_version >= v"3"
         return convert(GtkWidget, x)
     end
 
-    function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
+    function setindex!(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
         (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
         ccall((:gtk_grid_attach, libgtk), Void,
             (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
@@ -80,7 +80,7 @@ end
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool = false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
 GtkTableLeaf(homogeneous::Bool = false) = GtkTableLeaf(0, 0, homogeneous)
-function setindex!{T <: Integer, R <: Integer}(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}})
+function setindex!(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
     (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     ccall((:gtk_table_attach_defaults, libgtk), Void,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))

@@ -1,13 +1,13 @@
 # id = VERSION >= v"0.4-"get, :event, Void, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)
+function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike,
+        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}
     signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
 end
 
-function signal_connect_generic{CT, RT}(cb::Function, w::GObject, sig::AbstractStringLike,
-        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w)  #TODO: assert that length(param_types) is correct
+function signal_connect_generic(cb::Function, w::GObject, sig::AbstractStringLike,
+        ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}  #TODO: assert that length(param_types) is correct
     callback = cfunction(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
     return ccall((:g_signal_connect_data, libgobject), Culong,
@@ -320,7 +320,7 @@ function uv_check(src::Ptr{Void})
         return Int32(ex <= now)
     end
 end
-function uv_dispatch{T}(src::Ptr{Void}, callback::Ptr{Void}, data::T)
+function uv_dispatch(src::Ptr{Void}, callback::Ptr{Void}, data::T) where T
     return ccall(callback, Cint, (T,), data)
 end
 

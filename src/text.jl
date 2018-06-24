@@ -30,7 +30,7 @@ GtkTextTagLeaf() = GtkTextTagLeaf(
 GtkTextTagLeaf(name::AbstractString) = GtkTextTagLeaf(
     ccall((:gtk_text_tag_new, libgtk), Ptr{GObject}, (Ptr{UInt8},), bytestring(name)))
 
-immutable GtkTextIter
+struct GtkTextIter
   dummy1::Ptr{Void}
   dummy2::Ptr{Void}
   dummy3::Cint

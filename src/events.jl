@@ -48,13 +48,13 @@ function on_signal_button_release(release_cb::Function, widget::GtkWidget, vargs
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 
-type Gtk_signal_motion{T}
+mutable struct Gtk_signal_motion{T}
     closure::T
     callback::Ptr{Void}
     include::UInt32
     exclude::UInt32
 end
-function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion{T})
+function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gtk_signal_motion{T}) where T
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
@@ -69,8 +69,8 @@ function notify_motion{T}(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure:
     ccall((:gdk_event_request_motions, libgdk), Void, (Ptr{GdkEventMotion},), eventp)
     ret
 end
-function on_signal_motion{T}(move_cb::Function, widget::GtkWidget,
-        include = 0, exclude = GdkModifierType.BUTTONS, after::Bool = false, closure::T = w)
+function on_signal_motion(move_cb::Function, widget::GtkWidget,
+        include = 0, exclude = GdkModifierType.BUTTONS, after::Bool = false, closure::T = w) where T
     exclude &= ~include
     mask = GdkEventMask.POINTER_MOTION_HINT
     if     0 == include & GdkModifierType.BUTTONS
@@ -119,7 +119,7 @@ const default_mouse_cb = (w, event) -> nothing
 
 const MHStack = Vector{Tuple{Symbol, Function}}
 
-type MouseHandler
+mutable struct MouseHandler
     button1press::Function
     button1release::Function
     button2press::Function

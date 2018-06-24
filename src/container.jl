@@ -45,7 +45,7 @@ function getindex(w::GtkBin, i::Integer)
     c::GtkWidget
 end
 
-immutable GtkNullContainer <: GtkContainer end
+struct GtkNullContainer <: GtkContainer end
 const GtkNullContainerLeaf = GtkNullContainer
 macro GtkNullContainer(args...)
     :( GtkNullContainer($(args...)) )
