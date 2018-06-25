@@ -58,7 +58,7 @@ macro g_type_delegate(eq)
     new = esc(new)
     macroreal = QuoteNode(Symbol(string('@', real)))
     quote
-        const $newleaf = $realleaf
+        $newleaf = $realleaf
         macro $new(args...)
             Expr(:macrocall, $macroreal, map(esc, args)...)
         end

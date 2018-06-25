@@ -4,7 +4,7 @@ using GI
 #julia gi_gen_consts.jl 2
 #julia gi_gen_consts.jl 3
 
-const_expr(name,val) =  :(const $(Symbol(name)) = $(val))
+const_expr(name,val) =  :($(Symbol(name)) = $(val))
 
 function enum_decl(enumname,vals)
     body = Expr(:block)

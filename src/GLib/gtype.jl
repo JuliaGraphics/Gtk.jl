@@ -128,7 +128,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
     piname = g_type_name(parent)
     quote
         if $(QuoteNode(iname)) in keys(gtype_ifaces)
-            const $(esc(iname)) = gtype_abstracts[$(Meta.quot(iname))]
+            $(esc(iname)) = gtype_abstracts[$(Meta.quot(iname))]
         else
             struct $(esc(iname)) <: GInterface
                 handle::Ptr{GObject}
@@ -153,7 +153,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
         return nothing
     end
     if iname === :GObject
-        return :( const $(esc(iname)) = gtype_abstracts[:GObject] )
+        return :( $(esc(iname)) = gtype_abstracts[:GObject] )
     end
     #ntypes = mutable(Cuint)
     #interfaces = ccall((:g_type_interfaces, libgobject), Ptr{GType}, (GType, Ptr{Cuint}), gtyp, ntypes)
@@ -168,7 +168,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
     piface_decl = get_itype_decl(piname, parent)
     quote
         if $(QuoteNode(iname)) in keys(gtype_abstracts)
-            const $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
+            $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
         else
             $piface_decl
             abstract type $(esc(iname)) <: $(esc(piname)) end
@@ -196,7 +196,7 @@ function get_type_decl(name, iname, gtyp, gtype_decl)
     einame = esc(iname)
     quote
         if $(QuoteNode(iname)) in keys(gtype_wrappers)
-            const $einame = gtype_abstracts[$(QuoteNode(iname))]
+            $einame = gtype_abstracts[$(QuoteNode(iname))]
         else
             $(get_itype_decl(iname, gtyp))
         end
