@@ -29,7 +29,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     #end
     function GtkFileChooserDialogLeaf(title::AbstractString, parent::GtkContainer, action::Integer, button_text_response; kwargs...)
         w = GtkFileChooserDialogLeaf(ccall((:gtk_file_chooser_dialog_new, libgtk), Ptr{GObject},
-                    (Ptr{UInt8}, Ptr{GObject}, Cint, Ptr{Void}),
+                    (Ptr{UInt8}, Ptr{GObject}, Cint, Ptr{Nothing}),
                     title, parent, action, C_NULL); kwargs...)
         for (k, v) in button_text_response
             push!(w, k, v)
@@ -53,33 +53,33 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
     end
 
     const SingleComma = r"(?<!,), (?!,)"
-    function GtkFileFilterLeaf(; name::Union{AbstractString, Void} = nothing, pattern::AbstractString = "", mimetype::AbstractString = "")
+    function GtkFileFilterLeaf(; name::Union{AbstractString, Nothing} = nothing, pattern::AbstractString = "", mimetype::AbstractString = "")
         filt = GtkFileFilterLeaf(ccall((:gtk_file_filter_new, libgtk), Ptr{GObject}, ()))
         if !isempty(pattern)
             name == nothing && (name = pattern)
             for p in split(pattern, SingleComma)
                 p = replace(p, ", , ", ", ")   # escape sequence for , is , ,
-                ccall((:gtk_file_filter_add_pattern, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, p)
+                ccall((:gtk_file_filter_add_pattern, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), filt, p)
             end
         elseif !isempty(mimetype)
             name == nothing && (name = mimetype)
             for m in split(mimetype, SingleComma)
                 m = replace(m, ", , ", ", ")
-                ccall((:gtk_file_filter_add_mime_type, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, m)
+                ccall((:gtk_file_filter_add_mime_type, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), filt, m)
             end
         else
-            ccall((:gtk_file_filter_add_pixbuf_formats, libgtk), Void, (Ptr{GObject},), filt)
+            ccall((:gtk_file_filter_add_pixbuf_formats, libgtk), Nothing, (Ptr{GObject},), filt)
         end
-        ccall((:gtk_file_filter_set_name, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
+        ccall((:gtk_file_filter_set_name, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), filt, name === nothing || isempty(name) ? C_NULL : name)
         return filt
     end
-    GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString, Void} = nothing) = GtkFileFilterLeaf(; name = name, pattern = pattern)
+    GtkFileFilterLeaf(pattern::AbstractString; name::Union{AbstractString, Nothing} = nothing) = GtkFileFilterLeaf(; name = name, pattern = pattern)
 
     GtkFileFilterLeaf(filter::GtkFileFilter) = filter
 
     function makefilters!(dlgp::GtkFileChooser, filters::Union{AbstractVector, Tuple})
         for f in filters
-            ccall((:gtk_file_chooser_add_filter, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), dlgp, GtkFileFilter(f))
+            ccall((:gtk_file_chooser_add_filter, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), dlgp, GtkFileFilter(f))
         end
     end
 
@@ -147,7 +147,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         if !isempty(filters)
             makefilters!(dlgp, filters)
         end
-        ccall((:gtk_file_chooser_set_do_overwrite_confirmation, libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
+        ccall((:gtk_file_chooser_set_do_overwrite_confirmation, libgtk), Nothing, (Ptr{GObject}, Cint), dlg, true)
         response = run(dlg)
         if response == GConstants.GtkResponseType.ACCEPT
             selection = bytestring(GAccessor.filename(dlgp))
@@ -164,7 +164,7 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         if !isempty(filters)
             makefilters!(dlgp, filters)
         end
-        ccall((:gtk_file_chooser_set_do_overwrite_confirmation, libgtk), Void, (Ptr{GObject}, Cint), dlg, true)
+        ccall((:gtk_file_chooser_set_do_overwrite_confirmation, libgtk), Nothing, (Ptr{GObject}, Cint), dlg, true)
         response = run(dlg)
         if response == GConstants.GtkResponseType.ACCEPT
             selection = bytestring(GAccessor.filename(dlgp))

@@ -32,20 +32,20 @@ if libgtk_version >= v"3"
     GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new, libgtk), Ptr{GObject}, ()))
     function GtkSwitchLeaf(active::Bool)
         b = GtkSwitchLeaf()
-        ccall((:gtk_switch_set_active, libgtk), Void, (Ptr{GObject}, Cint), b, active)
+        ccall((:gtk_switch_set_active, libgtk), Nothing, (Ptr{GObject}, Cint), b, active)
         b
     end
 end
 
-GtkRadioButtonLeaf(group::Ptr{Void} = C_NULL) =
+GtkRadioButtonLeaf(group::Ptr{Nothing} = C_NULL) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new, libgtk), Ptr{GObject},
-        (Ptr{Void},), group))
-GtkRadioButtonLeaf(group::Ptr{Void}, label::AbstractString) =
+        (Ptr{Nothing},), group))
+GtkRadioButtonLeaf(group::Ptr{Nothing}, label::AbstractString) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic, libgtk), Ptr{GObject},
-        (Ptr{Void}, Ptr{UInt8}), group, bytestring(label)))
+        (Ptr{Nothing}, Ptr{UInt8}), group, bytestring(label)))
 GtkRadioButtonLeaf(label::AbstractString) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_with_mnemonic, libgtk), Ptr{GObject},
-        (Ptr{Void}, Ptr{UInt8}), C_NULL, bytestring(label)))
+        (Ptr{Nothing}, Ptr{UInt8}), C_NULL, bytestring(label)))
 GtkRadioButtonLeaf(group::GtkRadioButton) =
     GtkRadioButtonLeaf(ccall((:gtk_radio_button_new_from_widget, libgtk), Ptr{GObject},
         (Ptr{GObject},), group))
@@ -93,7 +93,7 @@ function push!(grp::GtkRadioButtonGroup, e::GtkRadioButton)
     push!(grp.handle, e)
     grp
 end
-function push!(grp::GtkRadioButtonGroup, label, active::Union{Bool, Void} = nothing)
+function push!(grp::GtkRadioButtonGroup, label, active::Union{Bool, Nothing} = nothing)
     if isdefined(grp, :anchor)
         e = GtkRadioButtonLeaf(grp.anchor, label)
     else
@@ -137,7 +137,7 @@ end
 
 function gtk_toggle_button_set_active(b::GtkWidget, active::Bool)
     # Users are encouraged to use the syntax `set_gtk_property!(b, :active, true)`. This is not a public function.
-    ccall((:gtk_toggle_button_set_active, libgtk), Void, (Ptr{GObject}, Cint), b, active)
+    ccall((:gtk_toggle_button_set_active, libgtk), Nothing, (Ptr{GObject}, Cint), b, active)
     b
 end
 
@@ -149,19 +149,19 @@ GtkLinkButtonLeaf(uri::AbstractString, label::AbstractString) =
         (Ptr{UInt8}, Ptr{UInt8}), bytestring(uri), bytestring(label)))
 function GtkLinkButtonLeaf(uri::AbstractString, label::AbstractString, visited::Bool)
     b = GtkLinkButtonLeaf(uri, label)
-    ccall((:gtk_link_button_set_visited, libgtk), Void, (Ptr{GObject}, Cint), b, visited)
+    ccall((:gtk_link_button_set_visited, libgtk), Nothing, (Ptr{GObject}, Cint), b, visited)
     b
 end
 function GtkLinkButtonLeaf(uri::AbstractString, visited::Bool)
     b = GtkLinkButtonLeaf(uri)
-    ccall((:gtk_link_button_set_visited, libgtk), Void, (Ptr{GObject}, Cint), b, visited)
+    ccall((:gtk_link_button_set_visited, libgtk), Nothing, (Ptr{GObject}, Cint), b, visited)
     b
 end
 
 GtkVolumeButtonLeaf() = GtkVolumeButtonLeaf(ccall((:gtk_volume_button_new, libgtk), Ptr{GObject}, ()))
 function GtkVolumeButtonLeaf(value::Real) # 0 <= value <= 1
     b = GtkVolumeButtonLeaf()
-    ccall((:gtk_scale_button_set_value, libgtk), Void, (Ptr{GObject}, Cdouble), b, value)
+    ccall((:gtk_scale_button_set_value, libgtk), Nothing, (Ptr{GObject}, Cdouble), b, value)
     b
 end
 

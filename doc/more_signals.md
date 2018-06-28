@@ -24,7 +24,7 @@ where:
 - `signalname` is a string or symbol identifying the signal, e.g.,
   `"clicked"` or `"button-press-event"`
 - `return_type` is the type of the value returned by your
-  callback. Usually `Void` (for `void`) or `Cint` (for `gboolean`)
+  callback. Usually `Nothing` (for `void`) or `Cint` (for `gboolean`)
 - `parameter_type_tuple` specifies the types of the *middle* arguments
   to the callback function, omitting the first (the widget) and last
   (`user_data`).  For example, for [`"clicked"`](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) we have
@@ -66,7 +66,7 @@ function button_cb(widgetptr::Ptr, user_data)
      nothing                              # return type is void
 end
 
-signal_connect(button_cb, button, "clicked", Void, (), false, (label, counter))
+signal_connect(button_cb, button, "clicked", Nothing, (), false, (label, counter))
 ```
 
 You should note that the value of `counter[]` matches the display in

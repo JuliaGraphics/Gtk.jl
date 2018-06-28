@@ -2,7 +2,7 @@ using Gtk, Gtk.GLib
 
 @testset "glib" begin
 
-ccall((:gtk_init, Gtk.libgtk), Void,(Ptr{Void},Ptr{Void}),C_NULL,C_NULL)
+ccall((:gtk_init, Gtk.libgtk), Nothing,(Ptr{Nothing},Ptr{Nothing}),C_NULL,C_NULL)
 
 hnd = ccall((:gtk_window_new, Gtk.libgtk),Ptr{GObject},(Cint,),0)
 

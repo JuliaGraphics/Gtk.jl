@@ -1,37 +1,37 @@
-function GtkWindowLeaf(title::Union{Void, AbstractStringLike} = nothing, w::Real = -1, h::Real = -1, resizable::Bool = true, toplevel::Bool = true)
+function GtkWindowLeaf(title::Union{Nothing, AbstractStringLike} = nothing, w::Real = -1, h::Real = -1, resizable::Bool = true, toplevel::Bool = true)
     hnd = ccall((:gtk_window_new, libgtk), Ptr{GObject}, (GEnum,),
         toplevel ? GtkWindowType.TOPLEVEL : GtkWindowType.POPUP)
     if title !== nothing
-        ccall((:gtk_window_set_title, libgtk), Void, (Ptr{GObject}, Ptr{UInt8}), hnd, title)
+        ccall((:gtk_window_set_title, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), hnd, title)
     end
     if resizable
-        ccall((:gtk_window_set_default_size, libgtk), Void, (Ptr{GObject}, Int32, Int32), hnd, w, h)
+        ccall((:gtk_window_set_default_size, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), hnd, w, h)
     else
-        ccall((:gtk_window_set_resizable, libgtk), Void, (Ptr{GObject}, Bool), hnd, false)
-        ccall((:gtk_widget_set_size_request, libgtk), Void, (Ptr{GObject}, Int32, Int32), hnd, w, h)
+        ccall((:gtk_window_set_resizable, libgtk), Nothing, (Ptr{GObject}, Bool), hnd, false)
+        ccall((:gtk_widget_set_size_request, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), hnd, w, h)
     end
     widget = GtkWindowLeaf(hnd)
     show(widget)
     widget
 end
 
-resize!(win::GtkWindow, w::Integer, h::Integer) = ccall((:gtk_window_resize, libgtk), Void, (Ptr{GObject}, Int32, Int32), win, w, h)
+resize!(win::GtkWindow, w::Integer, h::Integer) = ccall((:gtk_window_resize, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), win, w, h)
 
-present(win::GtkWindow) = ccall((:gtk_window_present, libgtk), Void, (Ptr{GObject},), win)
+present(win::GtkWindow) = ccall((:gtk_window_present, libgtk), Nothing, (Ptr{GObject},), win)
 
-fullscreen(win::GtkWindow) = ccall((:gtk_window_fullscreen, libgtk), Void, (Ptr{GObject},), win)
-unfullscreen(win::GtkWindow) = ccall((:gtk_window_unfullscreen, libgtk), Void, (Ptr{GObject},), win)
+fullscreen(win::GtkWindow) = ccall((:gtk_window_fullscreen, libgtk), Nothing, (Ptr{GObject},), win)
+unfullscreen(win::GtkWindow) = ccall((:gtk_window_unfullscreen, libgtk), Nothing, (Ptr{GObject},), win)
 
-maximize(win::GtkWindow) = ccall((:gtk_window_maximize, libgtk), Void, (Ptr{GObject},), win)
-unmaximize(win::GtkWindow) = ccall((:gtk_window_unmaximize, libgtk), Void, (Ptr{GObject},), win)
+maximize(win::GtkWindow) = ccall((:gtk_window_maximize, libgtk), Nothing, (Ptr{GObject},), win)
+unmaximize(win::GtkWindow) = ccall((:gtk_window_unmaximize, libgtk), Nothing, (Ptr{GObject},), win)
 
 function push!(win::GtkWindow, accel_group::GtkAccelGroup)
-  ccall((:gtk_window_add_accel_group, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), win, accel_group)
+  ccall((:gtk_window_add_accel_group, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), win, accel_group)
   win
 end
 
 function splice!(win::GtkWindow, accel_group::GtkAccelGroup)
-  ccall((:gtk_window_remove_accel_group, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), win, accel_group)
+  ccall((:gtk_window_remove_accel_group, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), win, accel_group)
   accel_group
 end
 
@@ -45,7 +45,7 @@ GtkScrolledWindowLeaf() = GtkScrolledWindowLeaf(
 #end
 function GtkDialogLeaf(title::AbstractStringLike, parent::GtkContainer, flags::Integer, buttons; kwargs...)
     w = GtkDialogLeaf(ccall((:gtk_dialog_new_with_buttons, libgtk), Ptr{GObject},
-                (Ptr{UInt8}, Ptr{GObject}, Cint, Ptr{Void}),
+                (Ptr{UInt8}, Ptr{GObject}, Cint, Ptr{Nothing}),
                 title, parent, flags, C_NULL); kwargs...)
     for (k, v) in buttons
         push!(w, k, v)

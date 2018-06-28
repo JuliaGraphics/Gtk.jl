@@ -33,12 +33,12 @@ bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 # bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
 
-g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
-g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
+g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
+g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
 
 include(joinpath("..", "..", "deps", "ext_glib.jl"))
 
-ccall((:g_type_init, libgobject), Void, ())
+ccall((:g_type_init, libgobject), Nothing, ())
 
 include("MutableTypes.jl")
 using .MutableTypes

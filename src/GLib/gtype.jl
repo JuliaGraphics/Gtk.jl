@@ -9,7 +9,7 @@ const  GEnum = Int32
 const  GType = Csize_t
 
 struct GParamSpec
-  g_type_instance::Ptr{Void}
+  g_type_instance::Ptr{Nothing}
   name::Ptr{UInt8}
   flags::Cint
   value_type::GType
@@ -18,9 +18,9 @@ end
 
 const fundamental_types = (
     #(:name,      Ctype,            JuliaType,      g_value_fn)
-    (:invalid,    Void,             Union{},        :error),
-    (:void,       Void,             Void,           :error),
-    (:GInterface, Ptr{Void},        GInterface,     :error),
+    (:invalid,    Nothing,          Union{},        :error),
+    (:void,       Nothing,          Nothing,        :error),
+    (:GInterface, Ptr{Nothing},     GInterface,     :error),
     (:gchar,      Int8,             Int8,           :schar),
     (:guchar,     UInt8,            UInt8,          :uchar),
     (:gboolean,   Cint,             Bool,           :boolean),
@@ -35,9 +35,9 @@ const fundamental_types = (
     (:gfloat,     Float32,          Float32,        :float),
     (:gdouble,    Float64,          AbstractFloat,  :double),
     (:gchararray, Ptr{UInt8},       AbstractString, :string),
-    (:gpointer,   Ptr{Void},        Ptr,            :pointer),
+    (:gpointer,   Ptr{Nothing},     Ptr,            :pointer),
     (:GBoxed,     Ptr{GBoxed},      GBoxed,         :boxed),
-    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec}, :param),
+    (:GParam,     Ptr{GParamSpec},  Ptr{GParamSpec},:param),
     (:GObject,    Ptr{GObject},     GObject,        :object),
     #(:GVariant,  Ptr{GVariant},    GVariant,       :variant),
     )
@@ -46,7 +46,7 @@ g_type_from_name(name::Symbol) = ccall((:g_type_from_name, libgobject), GType, (
 const fundamental_ids = tuple(GType[g_type_from_name(name) for (name, c, j, f) in fundamental_types]...)
 
 g_type(gtyp::GType) = gtyp
-let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) ))
+let jtypes = Expr(:block, :( g_type(::Type{Nothing}) = $(g_type_from_name(:void)) ))
     for i = 1:length(fundamental_types)
         (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
         if juliatype != Union{}
@@ -56,9 +56,9 @@ let jtypes = Expr(:block, :( g_type(::Type{Void}) = $(g_type_from_name(:void)) )
     eval(jtypes)
 end
 
-G_TYPE_FROM_CLASS(w::Ptr{Void}) = unsafe_load(convert(Ptr{GType}, w))
+G_TYPE_FROM_CLASS(w::Ptr{Nothing}) = unsafe_load(convert(Ptr{GType}, w))
 G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
-G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Void}}, hnd))
+G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Nothing}}, hnd))
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a, libgobject), Cint, (GType, GType), gtyp, is_a_type) != 0
@@ -98,7 +98,7 @@ function get_fn_ptr(fnname, lib)
     if !isa(lib, AbstractString)
         lib = eval(current_module(), lib)
     end
-    libptr = get(libs, lib, C_NULL)::Ptr{Void}
+    libptr = get(libs, lib, C_NULL)::Ptr{Nothing}
     if libptr == C_NULL
         libs[lib] = libptr = dlopen(lib)
     end
@@ -353,7 +353,7 @@ function gc_ref(x::ANY)
         cnt = 0
     end
     gc_preserve[x] = (ref, cnt + 1)
-    return unsafe_load(convert(Ptr{Ptr{Void}}, unsafe_convert(Ptr{Any}, ref)))
+    return unsafe_load(convert(Ptr{Ptr{Nothing}}, unsafe_convert(Ptr{Any}, ref)))
 end
 function gc_unref(x::ANY)
     global gc_preserve
@@ -366,12 +366,12 @@ function gc_unref(x::ANY)
     end
     nothing
 end
-gc_ref_closure(x::T) where {T} = (gc_ref(x), cfunction(_gc_unref, Void, (Any, Ptr{Void})))
-_gc_unref(x::ANY, ::Ptr{Void}) = gc_unref(x)
+gc_ref_closure(x::T) where {T} = (gc_ref(x), cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
+_gc_unref(x::ANY, ::Ptr{Nothing}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
-gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Void, (Ptr{GObject},), x)
-gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Void, (Ptr{GObject},), x)
+gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Nothing, (Ptr{GObject},), x)
+gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Nothing, (Ptr{GObject},), x)
 
 const gc_preserve_glib = Dict{Union{WeakRef, GObject}, Bool}() # glib objects
 const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
@@ -413,7 +413,7 @@ function addref(x::ANY)
     # internal helper function
     # for v0.4 compat, this is toplevel function
     ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
-    finalizer(x, delref)
+    finalizer(delref, x)
     delete!(gc_preserve_glib, x) # in v0.2, the WeakRef assignment below wouldn't update the key
     gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
     nothing
@@ -423,9 +423,9 @@ function gobject_ref(x::T) where T <: GObject
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
-        deref = cfunction(gc_unref, Void, (Ref{T},))
-        ccall((:g_object_set_qdata_full, libgobject), Void,
-            (Ptr{GObject}, UInt32, Any, Ptr{Void}), x, jlref_quark::UInt32, x,
+        deref = cfunction(gc_unref, Nothing, Tuple{Ref{T}})
+        ccall((:g_object_set_qdata_full, libgobject), Nothing,
+            (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
             deref) # add a circular reference to the Julia object in the GObject
         addref(x)
     elseif strong
@@ -465,12 +465,12 @@ end
 function gc_unref(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
-    ref = ccall((:g_object_get_qdata, libgobject), Ptr{Void}, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)
+    ref = ccall((:g_object_get_qdata, libgobject), Ptr{Nothing}, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         warn("Duplicate Julia object creation detected for GObject")
-        deref = cfunction(gc_unref_weak, Void, (Ref{typeof(x)},))
-        ccall((:g_object_weak_ref, libgobject), Void, (Ptr{GObject}, Ptr{Void}, Any), x, deref, x)
+        deref = cfunction(gc_unref_weak, Nothing, (Ref{typeof(x)},))
+        ccall((:g_object_weak_ref, libgobject), Nothing, (Ptr{GObject}, Ptr{Nothing}, Any), x, deref, x)
     else
         ccall((:g_object_steal_qdata, libgobject), Any, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)
         gc_unref_weak(x)
@@ -482,7 +482,7 @@ gc_unref(::Ptr{GObject}, x::GObject) = gc_unref(x)
 gc_ref_closure(x::GObject) = (gc_ref(x), C_NULL)
 
 function gc_force_floating(x::GObject)
-    ccall((:g_object_force_floating, libgobject), Void, (Ptr{GObject},), x)
+    ccall((:g_object_force_floating, libgobject), Nothing, (Ptr{GObject},), x)
 end
 function gobject_move_ref(new::GObject, old::GObject)
     h = unsafe_convert(Ptr{GObject}, new)

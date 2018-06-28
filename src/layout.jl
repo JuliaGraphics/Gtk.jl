@@ -33,25 +33,25 @@ if libgtk_version >= v"3"
 
     function setindex!(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
         (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-        ccall((:gtk_grid_attach, libgtk), Void,
+        ccall((:gtk_grid_attach, libgtk), Nothing,
             (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
     end
     #TODO:
     # function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child::Array, j::Union{T, Range{T}}, i::Union{R, Range1{R}})
     #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-    #    ccall((:gtk_grid_attach, libgtk), Void,
+    #    ccall((:gtk_grid_attach, libgtk), Nothing,
     #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
     # end
 
     function insert!(grid::GtkGrid, i::Integer, side::Symbol)
         if side == :left
-            ccall((:gtk_grid_insert_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i - 1)
+            ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
         elseif side == :right
-            ccall((:gtk_grid_insert_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+            ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
         elseif side == :top
-            ccall((:gtk_grid_insert_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i - 1)
+            ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
         elseif side == :bottom
-            ccall((:gtk_grid_insert_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+            ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
         else
             error(string("invalid GtkPositionType ", s))
         end
@@ -59,16 +59,16 @@ if libgtk_version >= v"3"
 
     function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
         if side == :row
-            ccall((:gtk_grid_remove_row, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+            ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
         elseif side == :col
-            ccall((:gtk_grid_remove_column, libgtk), Void, (Ptr{GObject}, Cint), grid, i)
+            ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
         else
             error(string("invalid GtkPositionType ", s))
         end
     end
 
     function insert!(grid::GtkGrid, sibling, side::Symbol)
-        ccall((:gtk_grid_insert_next_to, libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
+        ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
     end
 end
 
@@ -82,13 +82,13 @@ GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool = false) = GtkTableLeaf(c
 GtkTableLeaf(homogeneous::Bool = false) = GtkTableLeaf(0, 0, homogeneous)
 function setindex!(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
     (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-    ccall((:gtk_table_attach_defaults, libgtk), Void,
+    ccall((:gtk_table_attach_defaults, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 end
 #TODO:
 # function setindex!{T <: Integer, R <: Integer}(grid::GtkTable, child::Array, i::Union{T, Range{T}}, j::Union{R, Range{R}})
 #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-#    ccall((:gtk_table_attach_defaults, libgtk), Void,
+#    ccall((:gtk_table_attach_defaults, libgtk), Nothing,
 #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
 # end
 
@@ -177,9 +177,9 @@ end
 
 function setindex!(pane::GtkPaned, child, i::Integer)
     if i == 1
-        ccall((:gtk_paned_add1, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), pane, child)
+        ccall((:gtk_paned_add1, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), pane, child)
     elseif i == 2
-        ccall((:gtk_paned_add2, libgtk), Void, (Ptr{GObject}, Ptr{GObject}), pane, child)
+        ccall((:gtk_paned_add2, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), pane, child)
     else
         error("tried to set pane $i of GtkPane")
     end
@@ -187,9 +187,9 @@ end
 
 function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool = true)
     if i == 1
-        ccall((:gtk_paned_pack1, libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint, Cint), pane, child, resize, shrink)
+        ccall((:gtk_paned_pack1, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint, Cint), pane, child, resize, shrink)
     elseif i == 2
-        ccall((:gtk_paned_pack2, libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint, Cint), pane, child, resize, shrink)
+        ccall((:gtk_paned_pack2, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint, Cint), pane, child, resize, shrink)
     else
         error("tried to set pane $i of GtkPane")
     end
@@ -198,15 +198,15 @@ end
 ### GtkLayout
 function GtkLayoutLeaf(width::Real, height::Real)
     layout = ccall((:gtk_layout_new, libgtk), Ptr{GObject},
-        (Ptr{Void}, Ptr{Void}), C_NULL, C_NULL)
-    ccall((:gtk_layout_set_size, libgtk), Void, (Ptr{GObject}, Cuint, Cuint), layout, width, height)
+        (Ptr{Nothing}, Ptr{Nothing}), C_NULL, C_NULL)
+    ccall((:gtk_layout_set_size, libgtk), Nothing, (Ptr{GObject}, Cuint, Cuint), layout, width, height)
     GtkLayoutLeaf(layout)
 end
-setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put, libgtk), Void,
+setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put, libgtk), Nothing,
     (Ptr{GObject}, Ptr{GObject}, Cint, Cint), layout, child, i, j)
 function size(layout::GtkLayout)
     sz = Vector{Cuint}(2)
-    ccall((:gtk_layout_get_size, libgtk), Void,
+    ccall((:gtk_layout_get_size, libgtk), Nothing,
         (Ptr{GObject}, Ptr{Cuint}, Ptr{Cuint}), layout, pointer(sz, 1), pointer(sz, 2))
     (sz[1], sz[2])
 end

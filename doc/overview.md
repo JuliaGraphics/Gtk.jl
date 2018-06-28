@@ -95,9 +95,9 @@ Example:
         println("That tickles")
         nothing
     end
-    id = signal_connect(widget, :event, Void, (ArgType,))
+    id = signal_connect(widget, :event, Nothing, (ArgType,))
     ## OR
-    id = signal_connect(widget, :event, Void, (ArgType,)) do ptr, args, obj
+    id = signal_connect(widget, :event, Nothing, (ArgType,)) do ptr, args, obj
         println("That tickles")
         nothing
     end
@@ -107,7 +107,7 @@ Example:
 In addition to listening for events, you can trigger your own:
 
     #syntax: signal_emit(w::GObject, sig::Union{String,Symbol}, RT::Type, args...)
-    signal_emit(widget, :event, Void, 42)
+    signal_emit(widget, :event, Nothing, 42)
 
 Note: the return type and argument types do not need to match the spec. However, the length of the args list MUST exactly match the length of the ArgType's list.
 

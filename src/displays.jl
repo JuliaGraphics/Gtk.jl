@@ -187,13 +187,13 @@ function GdkPixbufLeaf(; stream = nothing, resource_path = nothing, filename = n
     elseif xpm_data !== nothing
         @assert(width == -1 && height == -1, "GdkPixbuf cannot set the width/height of a image from xpm_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data, libgdk_pixbuf), Ptr{GObject}, (Ptr{Ptr{Void}},), xpm_data)
+            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data, libgdk_pixbuf), Ptr{GObject}, (Ptr{Ptr{Nothing}},), xpm_data)
             return pixbuf !== C_NULL
         end
     elseif inline_data !== nothing
         @assert(width == -1 && height == -1, "GdkPixbuf cannot set the width/height of a image from inline_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_inline, libgdk_pixbuf), Ptr{GObject}, (Cint, Ptr{Void}, Cint, Ptr{Ptr{GError}}), sizeof(inline_data), inline_data, true, error_check)
+            pixbuf = ccall((:gdk_pixbuf_new_from_inline, libgdk_pixbuf), Ptr{GObject}, (Cint, Ptr{Nothing}, Cint, Ptr{Ptr{GError}}), sizeof(inline_data), inline_data, true, error_check)
             return pixbuf !== C_NULL
         end
     elseif data !== nothing # RGB or RGBA array, packed however you wish
@@ -203,7 +203,7 @@ function GdkPixbufLeaf(; stream = nothing, resource_path = nothing, filename = n
         height = size(data, 2)
         ref_data, deref_data = GLib.gc_ref_closure(data)
         pixbuf = ccall((:gdk_pixbuf_new_from_data, libgdk_pixbuf), Ptr{GObject},
-            (Ptr{Void}, Cint, Cint, Cint, Cint, Cint, Cint, Ptr{Void}, Ptr{Void}),
+            (Ptr{Nothing}, Cint, Cint, Cint, Cint, Cint, Cint, Ptr{Nothing}, Ptr{Nothing}),
             data, 0, alpha, 8, width, height, bstride(data, 2),
             deref_data, ref_data)
     else
@@ -249,7 +249,7 @@ function eltype(img::GdkPixbuf)
 end
 function convert(::Type{MatrixStrided}, img::GdkPixbuf)
     MatrixStrided(
-        convert(Ptr{eltype(img)}, ccall((:gdk_pixbuf_get_pixels, libgdk_pixbuf), Ptr{Void}, (Ptr{GObject},), img)),
+        convert(Ptr{eltype(img)}, ccall((:gdk_pixbuf_get_pixels, libgdk_pixbuf), Ptr{Nothing}, (Ptr{GObject},), img)),
         width = width(img), height = height(img),
         rowstride = ccall((:gdk_pixbuf_get_rowstride, libgdk_pixbuf), Cint, (Ptr{GObject},), img))
 end
@@ -280,16 +280,16 @@ function GtkImageLeaf(; resource_path = nothing, filename = nothing, icon_name =
     end
     return GtkImageLeaf(img)
 end
-empty!(img::GtkImage) = ccall((:gtk_image_clear, libgtk), Void, (Ptr{GObject},), img)
+empty!(img::GtkImage) = ccall((:gtk_image_clear, libgtk), Nothing, (Ptr{GObject},), img)
 GdkPixbufLeaf(img::GtkImage) = GdkPixbufLeaf(ccall((:gtk_image_get_pixbuf, libgtk), Ptr{GObject}, (Ptr{GObject},), img))
 
 GtkProgressBarLeaf() = GtkProgressBarLeaf(ccall((:gtk_progress_bar_new, libgtk), Ptr{GObject}, ()))
-pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse, libgtk), Void, (Ptr{GObject},), progress)
+pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse, libgtk), Nothing, (Ptr{GObject},), progress)
 
 GtkSpinnerLeaf() = GtkSpinnerLeaf(ccall((:gtk_spinner_new, libgtk), Ptr{GObject}, ()))
 
-start(spinner::GtkSpinner) = ccall((:gtk_spinner_start, libgtk), Void, (Ptr{GObject},), spinner)
-stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop, libgtk), Void, (Ptr{GObject},), spinner)
+start(spinner::GtkSpinner) = ccall((:gtk_spinner_start, libgtk), Nothing, (Ptr{GObject},), spinner)
+stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop, libgtk), Nothing, (Ptr{GObject},), spinner)
 
 GtkStatusbarLeaf() = GtkStatusbarLeaf(ccall((:gtk_statusbar_new, libgtk), Ptr{GObject}, ()))
 context_id(status::GtkStatusbar, source) =
