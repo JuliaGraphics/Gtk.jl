@@ -36,7 +36,7 @@ GtkComboBoxTextLeaf(with_entry::Bool = false) = GtkComboBoxTextLeaf(
         end)
 push!(cb::GtkComboBoxText, text::AbstractString) =
     (ccall((:gtk_combo_box_text_append_text, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), cb, bytestring(text)); cb)
-unshift!(cb::GtkComboBoxText, text::AbstractString) =
+pushfirst!(cb::GtkComboBoxText, text::AbstractString) =
     (ccall((:gtk_combo_box_text_prepend_text, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), cb, bytestring(text)); cb)
 insert!(cb::GtkComboBoxText, i::Integer, text::AbstractString) =
     (ccall((:gtk_combo_box_text_insert_text, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, bytestring(text)); cb)
@@ -44,7 +44,7 @@ insert!(cb::GtkComboBoxText, i::Integer, text::AbstractString) =
 if libgtk_version >= v"3"
     push!(cb::GtkComboBoxText, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_append, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
-    unshift!(cb::GtkComboBoxText, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
+    pushfirst!(cb::GtkComboBoxText, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
     insert!(cb::GtkComboBoxText, i::Integer, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_insert, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
@@ -144,7 +144,7 @@ function push!(listStore::GtkListStore, values::Tuple)
     iter[]
 end
 
-function unshift!(listStore::GtkListStore, values::Tuple)
+function pushfirst!(listStore::GtkListStore, values::Tuple)
     iter = mutable(GtkTreeIter)
     ccall((:gtk_list_store_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}), listStore, iter)
     list_store_set_values(listStore, iter, values)
@@ -234,7 +234,7 @@ function push!(treeStore::GtkTreeStore, values::Tuple, parent = nothing)
     iter[]
 end
 
-function unshift!(treeStore::GtkTreeStore, values::Tuple, parent = nothing)
+function pushfirst!(treeStore::GtkTreeStore, values::Tuple, parent = nothing)
     iter = mutable(GtkTreeIter)
     if parent == nothing
         ccall((:gtk_tree_store_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{Nothing}), treeStore, iter, C_NULL)
@@ -490,7 +490,7 @@ mutable struct TreeIterator
     iter::Union{Nothing, TRI}
 end
 TreeIterator(store::GtkTreeStore, iter = nothing) = TreeIterator(store, GtkTreeModel(store), iter)
-Base.iteratorsize(::TreeIterator) = Base.SizeUnknown()
+Base.IteratorSize(::TreeIterator) = Base.SizeUnknown()
 
 ## iterator interface for depth first search
 function start(x::TreeIterator)
@@ -602,7 +602,7 @@ GtkCellRendererSpinnerLeaf() = GtkCellRendererSpinnerLeaf(
 GtkTreeViewColumnLeaf() = GtkTreeViewColumnLeaf(ccall((:gtk_tree_view_column_new, libgtk), Ptr{GObject}, ()))
 function GtkTreeViewColumnLeaf(renderer::GtkCellRenderer, mapping)
     treeColumn = GtkTreeViewColumnLeaf()
-    unshift!(treeColumn, renderer)
+    pushfirst!(treeColumn, renderer)
     for (k, v) in mapping
         add_attribute(treeColumn, renderer, string(k), v)
     end
@@ -616,7 +616,7 @@ end
 empty!(treeColumn::GtkTreeViewColumn) =
     ccall((:gtk_tree_view_column_clear, libgtk), Nothing, (Ptr{GObject},), treeColumn)
 
-function unshift!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool = false)
+function pushfirst!(treeColumn::GtkTreeViewColumn, renderer::GtkCellRenderer, expand::Bool = false)
     ccall((:gtk_tree_view_column_pack_start, libgtk), Nothing,
           (Ptr{GObject}, Ptr{GObject}, Cint), treeColumn, renderer, expand)
     treeColumn

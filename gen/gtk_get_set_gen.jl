@@ -330,7 +330,7 @@ function gen_get_set(body, gtk_h)
                     T = g_type_to_jl(atype)
                     if T !== :Nothing && T !== :Nothing && T != :(Gtk.GObject)
                         retval = argnames[i]
-                        unshift!(fbody.args, :( $retval = Gtk.mutable($T) ))
+                        pushfirst!(fbody.args, :( $retval = Gtk.mutable($T) ))
                         retval = :( $retval[] )
                         gtype = g_get_gtype(atype)
                         if gtype !== :Nothing

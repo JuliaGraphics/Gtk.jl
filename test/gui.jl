@@ -276,7 +276,7 @@ id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
 # For testing callbacks
-click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Void,(Ptr{Gtk.GObject},),b)
+click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 
 @test counter == 0
 click(b)
@@ -495,7 +495,7 @@ activated = false
 signal_connect(e, :activate) do widget
     activated = true
 end
-signal_emit(e, :activate, Void)
+signal_emit(e, :activate, Nothing)
 @test activated
 
 destroy(w)
@@ -676,7 +676,7 @@ tb2 = ToolButton("gtk-new")
 tb3 = ToolButton("gtk-media-next")
 toolbar = Toolbar()
 push!(toolbar,tb1)
-unshift!(toolbar,tb2)
+pushfirst!(toolbar,tb2)
 push!(toolbar,tb3)
 push!(toolbar,SeparatorToolItem(), ToggleToolButton("gtk-open"), MenuToolButton("gtk-new"))
 G_.style(toolbar,GtkToolbarStyle.BOTH)
@@ -706,7 +706,7 @@ csvfilter2 = FileFilter("*.csv"; name="Comma Separated Format")
 @test needed(csvfilter2) & Gtk.GtkFileFilterFlags.DISPLAY_NAME > 0
 @test filter(csvfilter2, csvfileinfo)
 
-if !is_windows()#filter fails on windows 7
+if !Sys.iswindows()#filter fails on windows 7
     csvfilter3 = FileFilter(; mimetype="text/csv")
     @test name(csvfilter3) == "text/csv"
     @test needed(csvfilter3) & Gtk.GtkFileFilterFlags.MIME_TYPE > 0
@@ -772,8 +772,8 @@ if libgtk_version >= v"3"
     screen   = Gtk.GAccessor.screen(w)
     provider = CssProviderLeaf(filename=style_file)
 
-    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Void,
-          (Ptr{Void}, Ptr{GObject}, Cuint),
+    ccall((:gtk_style_context_add_provider_for_screen, Gtk.libgtk), Nothing,
+          (Ptr{Nothing}, Ptr{GObject}, Cuint),
           screen, provider, 1)
 
     showall(w)

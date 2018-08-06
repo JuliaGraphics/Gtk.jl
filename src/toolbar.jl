@@ -22,7 +22,7 @@ function push!(toolbar::GtkToolbar, items::GtkToolItem...)
     toolbar
 end
 
-function unshift!(toolbar::GtkToolbar, items::GtkToolItem...)
+function pushfirst!(toolbar::GtkToolbar, items::GtkToolItem...)
     for item in reverse(items)
         insert!(toolbar, 0, item)
     end

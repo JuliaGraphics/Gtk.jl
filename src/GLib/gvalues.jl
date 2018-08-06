@@ -27,9 +27,9 @@ function gvalues(xs...)
         gv[] = T  # init type
         gv[T] = x # init value
     end
-    finalizer(v, (v) -> for i = 1:length(v)
+    finalizer((v) -> for i = 1:length(v)
             ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), pointer(v, i))
-        end)
+        end, v)
     v
 end
 
@@ -70,7 +70,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
                     end)
                 ccall(($(string("g_value_set_", to_gtype)), GLib.libgobject), Nothing, (Ptr{GLib.GValue}, $as_ctype), v, x)
                 if isa(v, GLib.MutableTypes.MutableX)
-                    finalizer(v, (v::GLib.MutableTypes.MutableX) -> ccall((:g_value_unset, GLib.libgobject), Nothing, (Ptr{GLib.GValue},), v))
+                    finalizer((v::GLib.MutableTypes.MutableX) -> ccall((:g_value_unset, GLib.libgobject), Nothing, (Ptr{GLib.GValue},), v), v)
                 end
                 v
             end
@@ -105,18 +105,21 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
                 end)
             end
         end)
-        allow_reverse && unshift!(gvalue_types, [pass_x, eval(current_module(), :(() -> $with_id)), fn])
+        allow_reverse && pushfirst!(gvalue_types, [pass_x, eval(current_module(), :(() -> $with_id)), fn])
         return fn
     end
     return nothing
 end
 end #let
 
+function make_gvalue_from_fundamental_type(i)
+  (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
+  return make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
+end
+
 const gvalue_types = Any[]
-const fundamental_fns = tuple(Function[begin
-        (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-        make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
-    end for i in 1:length(fundamental_types)]...)
+const fundamental_fns = tuple(Function[ make_gvalue_from_fundamental_type(i) for
+                              i in 1:length(fundamental_types)]...)
 make_gvalue(Symbol, Ptr{UInt8}, :static_string, :(g_type(AbstractString)), false)
 make_gvalue(Type, GType, :gtype, (:g_gtype, :libgobject))
 make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
@@ -164,10 +167,10 @@ end
 
 set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
 set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, Symbol(name), value)
-function set_gtk_property!(w::GObject, name::Symbol, value) 
+function set_gtk_property!(w::GObject, name::Symbol, value)
     ccall((:g_object_set_property, libgobject), Nothing,
         (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), gvalue(value))
-    
+
     w
 end
 
@@ -175,13 +178,13 @@ struct FieldRef{T}
     obj::T
     field::Symbol
 
-    global function getproperty(obj::T, field::Symbol) where {T <: GObject} 
+    global function getproperty(obj::T, field::Symbol) where {T <: GObject}
         isdefined(obj,field) && return getfield(obj,field)
         new{T}(obj, field)
     end
 end
 
-getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T) 
+getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T)
 
 function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
     isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)

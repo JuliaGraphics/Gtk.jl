@@ -11,7 +11,7 @@ end
 
 import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
-             empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
+             empty!, append!, reverse!, pushfirst!, pop!, shift!, push!, splice!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
              getindex, setindex!
 

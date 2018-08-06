@@ -28,7 +28,7 @@ else
                 (Cdouble, Cdouble, Cdouble), min, max, step)
         end)
 end
-GtkScaleLeaf(vertical::Bool, scale::Range) = GtkScaleLeaf(vertical, minimum(scale), maximum(scale), step(scale))
+GtkScaleLeaf(vertical::Bool, scale::AbstractRange) = GtkScaleLeaf(vertical, minimum(scale), maximum(scale), step(scale))
 function push!(scale::GtkScale, value, position::Symbol, markup::AbstractString)
     ccall((:gtk_scale_add_mark, libgtk), Nothing,
         (Ptr{GObject}, Cdouble, GEnum, Ptr{UInt8}),
@@ -53,7 +53,7 @@ GtkAdjustmentLeaf(scale::GtkScale) = convert(GtkAdjustmentLeaf,
 
 GtkSpinButtonLeaf(min, max, step) = GtkSpinButtonLeaf(
     ccall((:gtk_spin_button_new_with_range, libgtk), Ptr{GObject}, (Cdouble, Cdouble, Cdouble), min, max, step))
-GtkSpinButtonLeaf(scale::Range) = GtkSpinButtonLeaf(minimum(scale), maximum(scale), step(scale))
+GtkSpinButtonLeaf(scale::AbstractRange) = GtkSpinButtonLeaf(minimum(scale), maximum(scale), step(scale))
 
 GtkAdjustmentLeaf(spinButton::GtkSpinButton) = convert(GtkAdjustmentLeaf,
     ccall((:gtk_spin_button_get_adjustment, libgtk), Ptr{GObject}, (Ptr{GObject},), spinButton))

@@ -14,7 +14,7 @@ mutable struct GtkCanvas <: GtkDrawingArea # NOT an @GType
     function GtkCanvas(w = -1, h = -1)
         da = ccall((:gtk_drawing_area_new, libgtk), Ptr{GObject}, ())
         ccall((:gtk_widget_set_size_request, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), da, w, h)
-        ids = Vector{Culong}(0)
+        ids = Vector{Culong}(undef, 0)
         widget = new(da, false, false, MouseHandler(ids), nothing, nothing)
         widget.mouse.widget = widget
         signal_connect(notify_realize, widget, "realize", Nothing, ())

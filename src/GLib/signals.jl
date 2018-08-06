@@ -54,7 +54,7 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
     closure_env = convert(Ptr{Any}, closuref + sizeof_gclosure)
     cb = unsafe_load(closure_env, 1)
     gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int}, closure_env),  2))
-    params = Vector{Any}(n_param_values)
+    params = Vector{Any}(undef, n_param_values)
     local retval = nothing
     g_siginterruptible(cb) do
         if gtk_calling_convention
@@ -142,7 +142,7 @@ g_stack = nothing # need to call g_loop_run from only one stack
 const g_yielded = Ref(false) # when true, use the `g_doatomic` queue to run sigatom functions
 const g_doatomic = [] # (work, notification) scheduler queue
 const g_sigatom_flag = Ref(false) # keep track of Base sigatomic state
-function g_sigatom(f::ANY) # calls f, where f never throws (but this function may throw)
+function g_sigatom(@nospecialize(f)) # calls f, where f never throws (but this function may throw)
     global g_sigatom_flag, g_stack, g_doatomic
     prev = g_sigatom_flag[]
     stk = g_stack
@@ -247,7 +247,7 @@ function g_yield(data)
 end
 
 mutable struct _GPollFD
-  @static is_windows() ? fd::Int : fd::Cint
+  @static Sys.iswindows() ? fd::Int : fd::Cint
   events::Cushort
   revents::Cushort
   _GPollFD(fd, ev) = new(fd, ev, 0)
@@ -349,7 +349,7 @@ function __init__gmainloop__()
     ccall((:g_source_set_callback, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{Nothing}, UInt, Ptr{Nothing}),
         src, cfunction(g_yield, Cint, (UInt,)), 1, C_NULL)
 
-    uv_fd = is_windows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
+    uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, typemax(Cushort))
     if (uv_pollfd::_GPollFD).fd != -1
         ccall((:g_source_add_poll, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{_GPollFD}), src, Ref(uv_pollfd::_GPollFD))

@@ -27,7 +27,7 @@ mutable struct GList{L <: _LList, T} <: AbstractVector{T}
         # until it wants to be garbage collected
         @assert T == eltype(L)
         l = new{L,T}(handle, transfer_full)
-        finalizer(l, empty!)
+        finalizer(empty!, l)
         return l
     end
 end
@@ -72,7 +72,7 @@ strides(list::LList) = (1,)
 stride(list::LList, k::Integer) = (k > 1 ? length(list) : 1)
 size(list::LList) = (length(list),)
 isempty(list::LList{L}) where {L} = (unsafe_convert(Ptr{L}, list) == C_NULL)
-Base.iteratorsize(::Type{L}) where {L <: LList} = Base.HasLength()
+Base.IteratorSize(::Type{L}) where {L <: LList} = Base.HasLength()
 
 shift!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
@@ -191,11 +191,11 @@ function insert!(list::GList{_GList{T}}, i::Ptr{_GList{T}}, item) where T
         list, i, ref_to(_GList{T}, item))
     return list
 end
-function unshift!(list::GList{_GSList{T}}, item) where T
+function pushfirst!(list::GList{_GSList{T}}, item) where T
     list.handle = ccall((:g_slist_prepend, libglib), Ptr{_GSList{T}}, (Ptr{_GSList{T}}, Ptr{T}), list, ref_to(_GSList{T}, item))
     return list
 end
-function unshift!(list::GList{_GList{T}}, item) where T
+function pushfirst!(list::GList{_GList{T}}, item) where T
     list.handle = ccall((:g_list_prepend, libglib), Ptr{_GList{T}},
         (Ptr{_GList{T}}, Ptr{T}),
         list, ref_to(_GList{T}, item))

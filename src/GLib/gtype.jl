@@ -342,8 +342,8 @@ baremodule GConnectFlags
 end
 
 ### Garbage collection [prevention]
-const gc_preserve = ObjectIdDict() # reference counted closures
-function gc_ref(x::ANY)
+const gc_preserve = IdDict{Any, Any}() # reference counted closures
+function gc_ref(@nospecialize(x))
     global gc_preserve
     local ref::Ref{Any}, cnt::Int
     if x in keys(gc_preserve)
@@ -355,7 +355,7 @@ function gc_ref(x::ANY)
     gc_preserve[x] = (ref, cnt + 1)
     return unsafe_load(convert(Ptr{Ptr{Nothing}}, unsafe_convert(Ptr{Any}, ref)))
 end
-function gc_unref(x::ANY)
+function gc_unref(@nospecialize(x))
     global gc_preserve
     ref, cnt = gc_preserve[x]::Tuple{Ref{Any}, Int}
     @assert cnt > 0
@@ -366,8 +366,8 @@ function gc_unref(x::ANY)
     end
     nothing
 end
+_gc_unref(@nospecialize(x), ::Ptr{Nothing}) = gc_unref(x)
 gc_ref_closure(x::T) where {T} = (gc_ref(x), cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
-_gc_unref(x::ANY, ::Ptr{Nothing}) = gc_unref(x)
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Nothing, (Ptr{GObject},), x)
@@ -378,7 +378,7 @@ const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decr
 const topfinalizer = Ref(true) # keep recursion to a minimum by only iterating from the top
 const await_finalize = Any[]
 
-function finalize_gc_unref(x::ANY)
+function finalize_gc_unref(@nospecialize(x))
     # this records that the are no user references left to the object from Julia
     # and notifies GLib that it can free the object (if no reference exist from C)
     # it is intended to be called by GC, not in user code function
@@ -398,7 +398,7 @@ function finalize_gc_unref(x::ANY)
     nothing
 end
 
-function delref(x::ANY)
+function delref(@nospecialize(x))
     # internal helper function
     # for v0.4 compat, this is toplevel function
     exiting[] && return # unnecessary to cleanup if we are about to die anyways
@@ -409,7 +409,7 @@ function delref(x::ANY)
     finalize_gc_unref(x)
     nothing
 end
-function addref(x::ANY)
+function addref(@nospecialize(x))
     # internal helper function
     # for v0.4 compat, this is toplevel function
     ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
@@ -423,7 +423,7 @@ function gobject_ref(x::T) where T <: GObject
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
-        deref = cfunction(gc_unref, Nothing, Tuple{Ref{T}})
+        deref = cfunction(gc_unref, Nothing, (Ref{T},))
         ccall((:g_object_set_qdata_full, libgobject), Nothing,
             (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
             deref) # add a circular reference to the Julia object in the GObject

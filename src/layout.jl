@@ -19,7 +19,7 @@
 #GtkExpander — A container which can hide its child
 #GtkOrientable — An interface for flippable widgets
 
-rangestep(r::Range) = step(r)
+rangestep(r::AbstractRange) = step(r)
 rangestep(::Integer) = 1
 if libgtk_version >= v"3"
     ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
@@ -31,7 +31,7 @@ if libgtk_version >= v"3"
         return convert(GtkWidget, x)
     end
 
-    function setindex!(grid::GtkGrid, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
+    function setindex!(grid::GtkGrid, child, i::Union{T, AbstractRange{T}}, j::Union{R, AbstractRange{R}}) where {T <: Integer, R <: Integer}
         (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
         ccall((:gtk_grid_attach, libgtk), Nothing,
             (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
@@ -80,7 +80,7 @@ end
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool = false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))
 GtkTableLeaf(homogeneous::Bool = false) = GtkTableLeaf(0, 0, homogeneous)
-function setindex!(grid::GtkTable, child, i::Union{T, Range{T}}, j::Union{R, Range{R}}) where {T <: Integer, R <: Integer}
+function setindex!(grid::GtkTable, child, i::Union{T, AbstractRange{T}}, j::Union{R, AbstractRange{R}}) where {T <: Integer, R <: Integer}
     (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
     ccall((:gtk_table_attach_defaults, libgtk), Nothing,
         (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, last(i), first(j)-1, last(j))
@@ -226,7 +226,7 @@ function insert!(w::GtkNotebook, position::Integer, x::Union{GtkWidget, Abstract
         w, x, label, position - 1) + 1
     w
 end
-function unshift!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
+function pushfirst!(w::GtkNotebook, x::Union{GtkWidget, AbstractStringLike}, label::Union{GtkWidget, AbstractStringLike})
     ccall((:gtk_notebook_prepend_page, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}, Ptr{GObject}),
         w, x, label) + 1

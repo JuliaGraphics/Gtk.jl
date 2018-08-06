@@ -18,9 +18,9 @@ mutable struct GClosure <: GBoxed
     function GClosure(ref::Ptr{GClosure}, own::Bool = false)
         own || ccall((:g_closure_ref, Gtk.GLib.libgobject), Nothing, (Ptr{GClosure},), ref)
         x = new(ref)
-        finalizer(x, x::GClosure->begin
+        finalizer(x::GClosure->begin
                     ccall((:g_closure_unref, Gtk.GLib.libgobject), Nothing, (Ptr{GClosure},), x.handle)
-                end)
+                end, x)
         path
     end
 end

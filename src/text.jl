@@ -77,7 +77,7 @@ function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
 end
 show(io::IO, iter::GtkTextIter) = print("GtkTextIter(...)")
 
-struct GtkTextRange <: Range{Char}
+struct GtkTextRange <: AbstractRange{Char}
     a::MutableTypes.MutableX{GtkTextIter}
     b::MutableTypes.MutableX{GtkTextIter}
     GtkTextRange(a, b) = new(mutable(copy(a)), mutable(copy(b)))
@@ -251,7 +251,7 @@ end
 
 #####  GtkTextRange  #####
 
-colon(a::TI, b::TI) = GtkTextRange(a, b)
+(:)(a::TI, b::TI) = GtkTextRange(a, b)
 function getindex(r::GtkTextRange, b::Int)
     a = mutable(copy(first(r)))
     b -= 1
