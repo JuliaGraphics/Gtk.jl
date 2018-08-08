@@ -296,9 +296,11 @@ unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = w.handle
 # this method should be used by gtk methods returning widgets of unknown type
 # and/or that might have been wrapped by julia before,
 # instead of a direct call to the constructor
-convert(::Type{T}, w::Ptr{GObject}) where {T <: GObject} = convert(T, convert(Ptr{T}, w)) # this definition must be first due to a 0.2 dispatch bug
+convert(::Type{T}, w::Ptr{GObject}) where {T <: GObject} = convert_(T, convert(Ptr{T}, w)) # this definition must be first due to a 0.2 dispatch bug
+convert(::Type{T}, ptr::Ptr{T}) where T <: GObject = convert_(T, ptr)
 
-function convert(::Type{T}, ptr::Ptr{T}) where T <: GObject
+# need to introduce convert_ since otherwise there was a StackOverFlow error
+function convert_(::Type{T}, ptr::Ptr{T}) where T <: GObject
     hnd = convert(Ptr{GObject}, ptr)
     if hnd == C_NULL
         throw(UndefRefError())
