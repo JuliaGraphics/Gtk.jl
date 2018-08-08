@@ -339,15 +339,15 @@ end
 
 function __init__gmainloop__()
     global uv_sourcefuncs = _GSourceFuncs(
-        cfunction(uv_prepare, Cint, (Ptr{Nothing}, Ptr{Cint})),
-        cfunction(uv_check, Cint, (Ptr{Nothing},)),
-        cfunction(uv_dispatch, Cint, (Ptr{Nothing}, Ptr{Nothing}, Int)),
+        @cfunction(uv_prepare, Cint, (Ptr{Nothing}, Ptr{Cint})),
+        @cfunction(uv_check, Cint, (Ptr{Nothing},)),
+        @cfunction(uv_dispatch, Cint, (Ptr{Nothing}, Ptr{Nothing}, Int)),
         C_NULL, C_NULL, C_NULL)
     src = new_gsource(uv_sourcefuncs)
     ccall((:g_source_set_can_recurse, GLib.libglib), Nothing, (Ptr{Nothing}, Cint), src, true)
     ccall((:g_source_set_name, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{UInt8}), src, "uv loop")
     ccall((:g_source_set_callback, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{Nothing}, UInt, Ptr{Nothing}),
-        src, cfunction(g_yield, Cint, (UInt,)), 1, C_NULL)
+        src, @cfunction(g_yield, Cint, (UInt,)), 1, C_NULL)
 
     uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, typemax(Cushort))
@@ -365,7 +365,7 @@ function __init__()
     if isdefined(GLib, :__init__bindeps__)
         GLib.__init__bindeps__()
     end
-    global JuliaClosureMarshal = cfunction(GClosureMarshal, Nothing,
+    global JuliaClosureMarshal = @cfunction(GClosureMarshal, Nothing,
         (Ptr{Nothing}, Ptr{GValue}, Cuint, Ptr{GValue}, Ptr{Nothing}, Ptr{Nothing}))
     exiting[] = false
     atexit(() -> (exiting[] = true))

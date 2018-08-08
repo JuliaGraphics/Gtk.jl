@@ -12,7 +12,7 @@ signal_connect(cb, widget, signalname, return_type, parameter_type_tuple, after,
 ```
 where:
 
-- `cb` is your callback function. This will be compiled with `cfunction`, and you need to follow its rules. In particular, you should use a generic function
+- `cb` is your callback function. This will be compiled with `@cfunction`, and you need to follow its rules. In particular, you should use a generic function
   (i.e., one defined as `function foo(x,y,z) ... end`), and the
   arguments and return type should match the GTK+ documentation for
   the widget and signal ([see
@@ -90,7 +90,7 @@ and then use the reported type in `parameter_type_tuple`.
 #### `@guarded`
 
 The "simple" callback interface includes protections against
-corrupting Gtk state from errors, but this `cfunction`-based approach
+corrupting Gtk state from errors, but this `@cfunction`-based approach
 does not. Consequently, you may wish to use `@guarded` when writing
 these functions. ([Canvas](../README.md#canvases) draw functions and
 mouse event-handling are called through this interface, which is why

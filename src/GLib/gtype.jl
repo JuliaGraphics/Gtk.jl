@@ -367,7 +367,7 @@ function gc_unref(@nospecialize(x))
     nothing
 end
 _gc_unref(@nospecialize(x), ::Ptr{Nothing}) = gc_unref(x)
-gc_ref_closure(x::T) where {T} = (gc_ref(x), cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
+gc_ref_closure(x::T) where {T} = (gc_ref(x), @cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Nothing, (Ptr{GObject},), x)
@@ -423,7 +423,7 @@ function gobject_ref(x::T) where T <: GObject
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
         # we haven't seen this before, setup the metadata
-        deref = cfunction(gc_unref, Nothing, (Ref{T},))
+        deref = @cfunction(gc_unref, Nothing, (Ref{T},))
         ccall((:g_object_set_qdata_full, libgobject), Nothing,
             (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
             deref) # add a circular reference to the Julia object in the GObject
