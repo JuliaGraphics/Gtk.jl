@@ -89,7 +89,7 @@ function _guarded(ex, retval)
             try
                 $(ex.args[2])
             catch err
-                warn("Error in @guarded callback")
+                @warn("Error in @guarded callback")
                 Base.display_error(err, catch_backtrace())
                 $retval
             end

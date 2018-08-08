@@ -51,7 +51,7 @@ function gen_consts(body, gtk_h)
                     shortdecl = decl[lprefix:end]
                 end
                 jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
-                if ismatch(r"^[A-Za-z]", shortdecl)
+                if occursin(r"^[A-Za-z]", shortdecl)
                     push!(consts.args, Expr(:const, Expr(:(=), Symbol(shortdecl), jldecl)))
                 else
                     push!(consts.args, jldecl)
@@ -66,12 +66,12 @@ function gen_consts(body, gtk_h)
     mdecls = cindex.search(gtk_h, cindex.MacroDefinition)
     for mdecl in mdecls
         name = cindex.spelling(mdecl)
-        if ismatch(r"^G\w*[A-Za-z]$", name)
+        if occursin(r"^G\w*[A-Za-z]$", name)
             tokens = cindex.tokenize(mdecl)
             if length(tokens) == 3 && isa(tokens[2], cindex.Literal)
                 tok2 = Clang.wrap_c.handle_macro_exprn(tokens, 2)[1]
                 tok2 = replace(tok2, "\$", "\\\$")
-                push!(body.args, Expr(:const, Expr(:(=), Symbol(name), parse(tok2))))
+                push!(body.args, Expr(:const, Expr(:(=), Symbol(name), Meta.parse(tok2))))
             else
                 #println("Skipping: ", name, " = ", [tokens...])
             end

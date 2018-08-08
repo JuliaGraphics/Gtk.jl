@@ -67,12 +67,12 @@ sleep(0.1)
 ## Check Window positions
 pos = G_.position(w)
 if G_.position(w) != pos
-    warn("The Window Manager did move the Gtk Window in show")
+    @warn("The Window Manager did move the Gtk Window in show")
 end
 G_.position(w, 100, 100)
 sleep(0.1)
 if G_.position(w) == pos
-    warn("The Window Manager did not move the Gtk Window when requested")
+    @warn("The Window Manager did not move the Gtk Window when requested")
 end
 @test get_gtk_property(w, "title", AbstractString) == "Window"
 set_gtk_property!(w, :title, "Window 2")
@@ -89,7 +89,6 @@ GC.gc(); yield(); GC.gc()
 #@test w.value === nothing    ### fails inside @testset
 end
 
-if VERSION >= v"0.7.0-DEV.3382"
 @testset "get/set property" begin
     w = Window("Window", 400, 300) |> showall
     @test w.title[String] == "Window"
@@ -97,7 +96,6 @@ if VERSION >= v"0.7.0-DEV.3382"
     w.visible[Bool] = false
     @test w.visible[Bool] == false
     destroy(w)
-end
 end
 
 @testset "change Window size" begin
@@ -110,7 +108,7 @@ if  libgtk_version >= v"3.16.0"
   maximize(w)
   sleep(1)
   if !get_gtk_property(w, :is_maximized, Bool)
-      warn("The Window Manager did not maximize the Gtk Window when requested")
+      @warn("The Window Manager did not maximize the Gtk Window when requested")
   end
   unmaximize(w)
   sleep(1)
@@ -323,7 +321,7 @@ end
 choices = ["choice one", "choice two", "choice three", RadioButton("choice four"), Label("choice five")]
 w = Window("Radio")
 f = Gtk.GtkBox(:v); push!(w,f)
-r = Vector{RadioButton}(3)
+r = Vector{RadioButton}(undef, 3)
 r[1] = RadioButton(choices[1]); push!(f,r[1])
 r[2] = RadioButton(r[1],choices[2]); push!(f,r[2])
 r[3] = RadioButton(r[2],choices[3],active=true); push!(f,r[3])
@@ -631,7 +629,7 @@ w = Window(tv, "List View")|>showall
 
 selmodel = G_.selection(tv)
 @test hasselection(selmodel) == false
-select!(selmodel, Gtk.iter_from_index(ls, 1))
+partialsort!(selmodel, Gtk.iter_from_index(ls, 1))
 @test hasselection(selmodel) == true
 iter = selected(selmodel)
 @test Gtk.index_from_iter(ls, iter) == 1
@@ -643,7 +641,7 @@ tmSorted=TreeModelSort(ls)
 G_.model(tv,tmSorted)
 G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
 it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
-select!(selmodel, it)
+partialsort!(selmodel, it)
 iter = selected(selmodel)
 @test TreeModel(tmSorted)[iter, 1] == 35
 
@@ -793,12 +791,10 @@ showall(w)
 w.testfield = "setproperty!"
 @test w.testfield == "setproperty!"
 
-if VERSION >= v"0.7.0-DEV.3382"
-    @test w.title[String] == "MyWindow"
-    w.title[String] = "setindex!"
-    @test w.title[String] == "setindex!"
-    @test typeof(w.title) <: Gtk.GLib.FieldRef
-end
+@test w.title[String] == "MyWindow"
+w.title[String] = "setindex!"
+@test w.title[String] == "setindex!"
+@test typeof(w.title) <: Gtk.GLib.FieldRef
 
 destroy(w)
 
