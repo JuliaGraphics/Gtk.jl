@@ -17,7 +17,7 @@ addons:
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
     - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
-    - $TESTCMD -e 'using Pkg; Pkg.clone(pwd()); using BinDeps;
+    - $TESTCMD -e 'using Pkg; Pkg.add("BinDeps"); Pkg.clone(pwd()); using BinDeps;
           println(BinDeps.debug("Gtk"));
           Pkg.build("Gtk");
           Pkg.test("Gtk"; coverage=true)'
