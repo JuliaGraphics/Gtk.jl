@@ -1,6 +1,5 @@
-include("../src/Gtk.jl")
 module GtkTestModule
-using Base.Test
+using Test, Gtk
 
 include("gui.jl")
 include("glib.jl")

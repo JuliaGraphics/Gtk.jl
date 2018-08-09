@@ -6,10 +6,17 @@ end
 
 const KERNEL = Base.Sys.KERNEL
 
-if KERNEL == :Windows
-    @assign_if_unassigned libgobject = "libgobject-2.0-0"
-    @assign_if_unassigned libglib = "libglib-2.0-0"
-else
-    @assign_if_unassigned libgobject = "libgobject-2.0"
-    @assign_if_unassigned libglib = "libglib-2.0"
+if !isdefined(current_module(), :libgobject)
+    if KERNEL == :Windows
+        const libgobject = "libgobject-2.0-0"
+    else
+        const libgobject = "libgobject-2.0"
+    end
+end
+if !isdefined(current_module(), :libglib)
+    if KERNEL == :Windows
+        const libglib = "libglib-2.0-0"
+    else
+        const libglib = "libglib-2.0"
+    end
 end

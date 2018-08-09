@@ -9,7 +9,7 @@ a complete user interface into manageable parts. Both use cases are discussed ne
 You can subclass an existing Gtk type in Julia using the following code pattern:
 
 ```julia
-type MyButton <: Gtk.GtkButton
+mutable struct MyButton <: Gtk.GtkButton
     handle::Ptr{Gtk.GObject}
     other_fields
     function MyButton(label)
@@ -25,7 +25,7 @@ Lets use this pattern to create a button that is initialized with a default text
 The code would look like this.
 
 ```julia
-type MyButton <: Gtk.GtkButton
+mutable struct MyButton <: Gtk.GtkButton
     handle::Ptr{Gtk.GObject}
 
     function MyButton()
@@ -49,7 +49,7 @@ showall(win)
 While a pre-initialized button might look like an artificial use cases, the same pattern can be used to develop composed widgets. In that case one will typically subclass from a layout widget such as `GtkBox` or `GtkGrid`. Lets for instance build a new composed widget consisting of a text box and a button
 
 ```julia
-type ComposedWidget <: Gtk.GtkBox
+mutable struct ComposedWidget <: Gtk.GtkBox
     handle::Ptr{Gtk.GObject}
     btn # handle to child
     tv # handle to child
@@ -59,8 +59,8 @@ type ComposedWidget <: Gtk.GtkBox
         btn = GtkButton(label)
         tv = GtkTextView()
         push!(vbox,btn,tv)
-        setproperty!(vbox,:expand,tv,true)
-        setproperty!(vbox,:spacing,10)
+        set_gtk_property!(vbox,:expand,tv,true)
+        set_gtk_property!(vbox,:spacing,10)
         w = new(vbox.handle, btn, tv)
         return Gtk.gobject_move_ref(w, vbox)
     end

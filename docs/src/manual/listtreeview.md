@@ -194,7 +194,7 @@ end
 ent = GtkEntry()
 
 signal_connect(ent, "changed") do widget
-  searchText = getproperty(ent, :text, String)
+  searchText = get_gtk_property(ent, :text, String)
 
   for l=1:length(ls)
     showMe = true

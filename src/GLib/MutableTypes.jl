@@ -3,35 +3,35 @@ using Compat
 export mutable, Mutable, deref
 
 abstract type Mutable{T} end
-type MutableX{T} <: Mutable{T}
+mutable struct MutableX{T} <: Mutable{T}
     x::T
-    (::Type{MutableX{T}}){T}() = new{T}()
-    (::Type{MutableX{T}}){T}(x) = new{T}(x)
+    MutableX{T}() where {T} = new{T}()
+    MutableX{T}(x) where {T} = new{T}(x)
 end
-immutable MutableA{T, N} <: Mutable{T}
+struct MutableA{T, N} <: Mutable{T}
     x::Array{T, N}
     i::Int
 end
 const  MutableV{T} = MutableA{T, 1}
 
-mutable{T}(x::T) = MutableX{T}(x)
+mutable(x::T) where {T} = MutableX{T}(x)
 mutable(x::Mutable) = x
-mutable{T}(x::Type{T}) = MutableX{T}()
+mutable(x::Type{T}) where {T} = MutableX{T}()
 
-function mutable{T, N}(x::Array{T, N}, i = 1)
+function mutable(x::Array{T, N}, i = 1) where {T, N}
     if isbits(T)
         MutableA{T, N}(x, i)
     else
         mutable(x[i])
     end
 end
-mutable{T <: Ptr, N}(x::Array{T, N}, i = 1) = mutable(x[i])
-mutable{T}(x::Ptr{T}, i = 1) = x + (i - 1) * sizeof(T)
-mutable{T}(x::T, i) = (i == 1 ? mutable(x) : error("Object only has one element"))
+mutable(x::Array{T, N}, i = 1) where {T <: Ptr, N} = mutable(x[i])
+mutable(x::Ptr{T}, i = 1) where {T} = x + (i - 1) * sizeof(T)
+mutable(x::T, i) where {T} = (i == 1 ? mutable(x) : error("Object only has one element"))
 
-_addrof{T}(b::T) = ccall(:jl_value_ptr, Ptr{T}, (Ptr{Any},), &b)
-Base.cconvert{P <: Ptr, T}(::Type{P}, b::MutableX{T}) = isbits(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
-Base.cconvert{P <: Ptr, T, N}(::Type{P}, b::MutableA{T, N}) = convert(P, pointer(b.x, b.i))
+_addrof(b::T) where {T} = pointer_from_objref(b)
+Base.cconvert(::Type{P}, b::MutableX{T}) where {P <: Ptr, T} = isbitstype(T) ? convert(P, _addrof(b)) : convert(P, _addrof(b.x))
+Base.cconvert(::Type{P}, b::MutableA{T, N}) where {P <: Ptr, T, N} = convert(P, pointer(b.x, b.i))
 
 deref(b::Ptr) = unsafe_load(b)
 deref(b::MutableX) = b.x
@@ -42,7 +42,7 @@ Base.getindex(b::Mutable) = deref(b)
 
 Base.unsafe_store!(b::MutableX, x) = (b.x = x)
 Base.unsafe_store!(b::MutableA, x) = (b.x[b.i] = x)
-Base.setindex!{T}(b::MutableX{T}, x::T) = (b.x = x)
-Base.setindex!{T, N}(b::MutableA{T, N}, x::T) = (b.x[b.i] = x)
+Base.setindex!(b::MutableX{T}, x::T) where {T} = (b.x = x)
+Base.setindex!(b::MutableA{T, N}, x::T) where {T, N} = (b.x[b.i] = x)
 
 end

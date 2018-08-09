@@ -9,7 +9,7 @@ function without_linenums!(ex::Expr)
     linenums_filter(x,ex) = true
     linenums_filter(x::LineNumberNode,ex) = false
     linenums_filter(x::Expr,ex) = x.head !== :line
-    linenums_filter(x::Void,ex) = ex.head !== :block
+    linenums_filter(x::Nothing,ex) = ex.head !== :block
     filter!((x)->linenums_filter(x,ex), ex.args)
     for arg in ex.args
         if isa(arg,Expr)
@@ -80,7 +80,7 @@ let gtk_version = Gtk.gtk_version
         println(cache)
         Base.println(cache,"end")
     end
-    const ser_version = Base.Serializer.ser_version
+    ser_version = Base.Serializer.ser_version
     open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
         serialize(cache, gbox)
         serialize(cache, gconsts)

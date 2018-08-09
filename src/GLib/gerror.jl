@@ -1,4 +1,4 @@
-immutable GError
+struct GError
     domain::UInt32
     code::Cint
     message::Ptr{UInt8}
@@ -13,7 +13,7 @@ function GError(f::Function)
     if !f(err) || err[] != C_NULL
         gerror = GError(err[])
         emsg = bytestring(gerror.message)
-        ccall((:g_clear_error, libglib), Void, (Ptr{Ptr{GError}},), err)
+        ccall((:g_clear_error, libglib), Nothing, (Ptr{Ptr{GError}},), err)
         error(emsg)
     end
 end

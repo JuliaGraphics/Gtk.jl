@@ -28,7 +28,7 @@ signal_connect(btn, "clicked") do widget
     end
     @Gtk.sigatom begin
       stop(sp)
-      setproperty!(ent,:text,s)
+      set_gtk_property!(ent,:text,s)
     end
   end
  end

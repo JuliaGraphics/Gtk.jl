@@ -42,7 +42,7 @@ julia> GtkButton(action-name=NULL, action-target, related-action, use-action-app
 That's quite a lot of output; let's just print the label of the button:
 ```julia
 id2 = signal_connect(b, "clicked") do widget
-    println("\"", getproperty(widget,:label,String), "\" was clicked!")
+    println("\"", get_gtk_property(widget,:label,String), "\" was clicked!")
 end
 ```
 Now you get something like this:
@@ -82,7 +82,7 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
-In some situations you may want or need to use an [approach that is more analogous to julia's `cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
+In some situations you may want or need to use an [approach that is more analogous to julia's `@cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
 
 Warning: it is essential to avoid task switching inside Gtk callbacks,
 as this corrupts the Gtk C-stack. For example, use `@async print` or queue a message for yourself.

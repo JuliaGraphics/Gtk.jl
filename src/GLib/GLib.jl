@@ -11,47 +11,20 @@ end
 
 import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
              start, next, done, eltype, isempty, endof, ndims, stride, strides,
-             empty!, append!, reverse!, unshift!, pop!, shift!, push!, splice!,
-             sigatomic_begin, sigatomic_end
+             empty!, append!, reverse!, pushfirst!, pop!, shift!, push!, splice!,
+             sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
+             getindex, setindex!
+
+using Compat.Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export GEnum, GError, GValue, gvalue, make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
-export setproperty!, getproperty
+export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom
-
-module CompatGLib
-    export @assign_if_unassigned
-    macro assign_if_unassigned(expr)
-        # BinDeps often fails and generates corrupt deps.jl files
-        # (https://github.com/JuliaLang/BinDeps.jl/issues/146),
-        # but most of the time, we don't care
-        @assert expr.head === :(=)
-        left = expr.args[1]
-        right = expr.args[2]
-        quote
-            if !isdefined(current_module(), $(QuoteNode(left)))
-                global const $(esc(left)) = $(esc(right))
-            end
-        end
-    end
-    export TupleType, dlopen, dlsym_e, unsafe_convert
-    TupleType(types...) = Tuple{types...}
-    const unsafe_convert = Base.unsafe_convert
-    import Base.Libdl: dlopen, dlsym_e
-    using Base.Sys.WORD_SIZE
-    if VERSION >= v"0.6.0-dev" && !isdefined(Base, :xor)
-        export xor
-        const xor = $
-    end
-    export utf8
-    const utf8 = String
-end
-importall .CompatGLib
-using .CompatGLib.WORD_SIZE
 
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
@@ -60,12 +33,12 @@ bytestring(s::Symbol) = s
 bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 # bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
 
-g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Void}, (Csize_t,), s)
-g_free(p::Ptr) = ccall((:g_free, libglib), Void, (Ptr{Void},), p)
+g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
+g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
 
 include(joinpath("..", "..", "deps", "ext_glib.jl"))
 
-ccall((:g_type_init, libgobject), Void, ())
+ccall((:g_type_init, libgobject), Nothing, ())
 
 include("MutableTypes.jl")
 using .MutableTypes
@@ -85,7 +58,7 @@ macro g_type_delegate(eq)
     new = esc(new)
     macroreal = QuoteNode(Symbol(string('@', real)))
     quote
-        const $newleaf = $realleaf
+        $newleaf = $realleaf
         macro $new(args...)
             Expr(:macrocall, $macroreal, map(esc, args)...)
         end

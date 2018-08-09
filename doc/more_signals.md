@@ -12,7 +12,7 @@ signal_connect(cb, widget, signalname, return_type, parameter_type_tuple, after,
 ```
 where:
 
-- `cb` is your callback function. This will be compiled with `cfunction`, and you need to follow its rules. In particular, you should use a generic function
+- `cb` is your callback function. This will be compiled with `@cfunction`, and you need to follow its rules. In particular, you should use a generic function
   (i.e., one defined as `function foo(x,y,z) ... end`), and the
   arguments and return type should match the GTK+ documentation for
   the widget and signal ([see
@@ -24,7 +24,7 @@ where:
 - `signalname` is a string or symbol identifying the signal, e.g.,
   `"clicked"` or `"button-press-event"`
 - `return_type` is the type of the value returned by your
-  callback. Usually `Void` (for `void`) or `Cint` (for `gboolean`)
+  callback. Usually `Nothing` (for `void`) or `Cint` (for `gboolean`)
 - `parameter_type_tuple` specifies the types of the *middle* arguments
   to the callback function, omitting the first (the widget) and last
   (`user_data`).  For example, for [`"clicked"`](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) we have
@@ -62,11 +62,11 @@ function button_cb(widgetptr::Ptr, user_data)
      widget = convert(Button, widgetptr)  # pointer -> object
      lbl, cntr = user_data                # unpack the user_data tuple
      cntr[] = cntr[]+1                    # increment counter[1]
-     setproperty!(lbl, :label, string(cntr[]))
+     set_gtk_property!(lbl, :label, string(cntr[]))
      nothing                              # return type is void
 end
 
-signal_connect(button_cb, button, "clicked", Void, (), false, (label, counter))
+signal_connect(button_cb, button, "clicked", Nothing, (), false, (label, counter))
 ```
 
 You should note that the value of `counter[]` matches the display in
@@ -90,7 +90,7 @@ and then use the reported type in `parameter_type_tuple`.
 #### `@guarded`
 
 The "simple" callback interface includes protections against
-corrupting Gtk state from errors, but this `cfunction`-based approach
+corrupting Gtk state from errors, but this `@cfunction`-based approach
 does not. Consequently, you may wish to use `@guarded` when writing
 these functions. ([Canvas](../README.md#canvases) draw functions and
 mouse event-handling are called through this interface, which is why

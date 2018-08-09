@@ -9,7 +9,7 @@ GtkToolbarLeaf() = GtkToolbarLeaf(
     ccall((:gtk_toolbar_new, libgtk), Ptr{GObject}, ()))
 
 insert!(toolbar::GtkToolbar, pos::Integer, item::GtkToolItem) =
-    ccall((:gtk_toolbar_insert, libgtk), Void, (Ptr{GObject}, Ptr{GObject}, Cint),
+    ccall((:gtk_toolbar_insert, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint),
            toolbar, item, pos)
 
 getindex(toolbar::GtkToolbar, pos::Integer) = convert(GObject,
@@ -22,7 +22,7 @@ function push!(toolbar::GtkToolbar, items::GtkToolItem...)
     toolbar
 end
 
-function unshift!(toolbar::GtkToolbar, items::GtkToolItem...)
+function pushfirst!(toolbar::GtkToolbar, items::GtkToolItem...)
     for item in reverse(items)
         insert!(toolbar, 0, item)
     end

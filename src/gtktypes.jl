@@ -14,24 +14,24 @@ function _gtksubtype_constructors(name::Symbol)
 end
 
 macro gtktype_custom_symname_and_lib(name, symname, lib)
-    quote
-        @Gtype $(esc(name)) $(esc(lib)) $(esc(symname))
+    esc(quote
+        @Gtype $name $lib $symname
         _gtksubtype_constructors($(QuoteNode(name)))
-    end
+    end)
 end
 
 macro gtktype_custom_symname(name, symname)
-    quote
-        @gtktype_custom_symname_and_lib $(esc(name)) $(esc(symname)) libgtk
-    end
+    esc(quote
+        @gtktype_custom_symname_and_lib $(name) $(symname) libgtk
+    end)
 end
 
 macro gtktype(name)
     groups = split(string(name), r"(?=[A-Z])")
     symname = Symbol(join([lowercase(s) for s in groups], "_"))
-    quote
-        @gtktype_custom_symname $(esc(name)) $(esc(symname))
-    end
+    esc(quote
+        @gtktype_custom_symname $name $symname
+    end)
 end
 @gtktype GtkWidget
 @gtktype GtkContainer
@@ -128,13 +128,13 @@ if libgtk_version >= v"3"
     @gtktype GtkStyleContext
 
 else
-    type GtkApplication end
+    mutable struct GtkApplication end
     GtkApplicationLeaf(x...) = error("GtkApplication is not available until Gtk3.0")
     macro GtkApplication(args...)
         :( GtkApplicationLeaf($(args...)) )
     end
 
-    type GtkApplicationWindow end
+    mutable struct GtkApplicationWindow end
     GtkApplicationWindowLeaf(x...) = error("GtkApplicationWindow is not available until Gtk3.0")
     macro GtkApplicationWindow(args...)
         :( GtkApplicationWindowLeaf($(args...)) )
@@ -142,25 +142,25 @@ else
 
     @g_type_delegate GtkSwitch = GtkToggleButton
 
-    type GtkGrid end
+    mutable struct GtkGrid end
     GtkGridLeaf(x...) = error("GtkGrid is not available until Gtk3.0")
     macro GtkGrid(args...)
         :( GtkGridLeaf($(args...)) )
     end
 
-    type GtkOverlay end
+    mutable struct GtkOverlay end
     GtkOverlayLeaf(x...) = error("GtkOverlay is not available until Gtk3.2")
     macro GtkOverlay(args...)
         :( GtkOverlayLeaf($(args...)) )
     end
 
-    type GtkCssProvider end
+    mutable struct GtkCssProvider end
     GtkCssProviderLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
     macro GtkCssProvider(args...)
         :( GtkCssProviderLeaf($(args...)) )
     end
 
-    type GtkStyleContext end
+    mutable struct GtkStyleContext end
     GtkStyleContextLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
     macro GtkStyleContext(args...)
         :( GtkStyleContextLeaf($(args...)) )
@@ -170,7 +170,7 @@ end
 if libgtk_version >= v"3.16.0"
 @gtktype_custom_symname GtkGLArea gtk_gl_area
 else
-type GtkGLArea end
+mutable struct GtkGLArea end
     GtkGLAreaLeaf(x...) = error("GtkGLArea is not fully available until Gtk3.16.0 (though available as separate library)")
     macro GtkGLArea(args...)
         :( GtkGLAreaLeaf($(args...)) )
@@ -181,13 +181,13 @@ if libgtk_version >= v"3.20.0"
     @gtktype GtkNativeDialog
     @gtktype GtkFileChooserNative
 else
-    type GtkNativeDialog end
+    mutable struct GtkNativeDialog end
     GtkNativeDialogLeaf(x...) = error("GtkNativeDialog is not available until Gtk3.20")
     macro GtkNativeDialog(args...)
         :( GtkNativeDialogLeaf($(args...)) )
     end
 
-    type GtkFileChooserNative end
+    mutable struct GtkFileChooserNative end
     GtkFileChooserNativeLeaf(x...) = error("GtkFileChooserNative is not available until Gtk3.20")
     macro GtkFileChooserNative(args...)
         :( GtkFileChooserNativeLeaf($(args...)) )

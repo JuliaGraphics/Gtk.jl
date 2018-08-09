@@ -4,8 +4,8 @@ os:
   - linux
   - osx
 julia:
-  - 0.6
-  - nightly
+  - 0.7
+  - 1.0
 notifications:
     email: false
 addons:
@@ -17,8 +17,7 @@ addons:
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
     - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
-    - $TESTCMD -e 'Pkg.clone(pwd()); using BinDeps;
-          println(BinDeps.debug("Gtk"));
+    - $TESTCMD -e 'using Pkg; Pkg.clone(pwd());
           Pkg.build("Gtk");
           Pkg.test("Gtk"; coverage=true)'
 after_success:
@@ -27,5 +26,5 @@ after_success:
                 using Coverage;
                 Coveralls.submit(Coveralls.process_folder())'
     # update the documentation
-    - julia -e 'Pkg.add("Documenter"); Pkg.checkout("Documenter")'
+    - julia -e 'using Pkg; Pkg.add("Documenter"); Pkg.checkout("Documenter")'
     - $TESTCMD -e 'cd(Pkg.dir("Gtk")); ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs", "make.jl"))'

@@ -7,33 +7,33 @@
 #GtkStatusIcon — Display an icon in the system tray
 #GtkSpinner — Show a spinner animation
 
-immutable RGB
+struct RGB
     r::UInt8; g::UInt8; b::UInt8
     RGB(r, g, b) = new(r, g, b)
 end
 convert(::Type{RGB}, x::Unsigned) = RGB(UInt8(x), UInt8(x >> 8), UInt8(x >> 16))
-convert{U <: Unsigned}(::Type{U}, x::RGB) = convert(U, (x.r) | (x.g >> 8) | (x.b >> 16))
+convert(::Type{U}, x::RGB) where {U <: Unsigned} = convert(U, (x.r) | (x.g >> 8) | (x.b >> 16))
 
-immutable RGBA
+struct RGBA
     r::UInt8; g::UInt8; b::UInt8; a::UInt8
     RGBA(r, g, b) = new(r, g, b)
 end
 convert(::Type{RGBA}, x::Unsigned) = RGBA(UInt8(x), UInt8(x >> 8), UInt8(x >> 16), UInt8(x >> 24))
-convert{U <: Unsigned}(::Type{U}, x::RGBA) = convert(U, (x.r) | (x.g >> 8) | (x.b >> 16) | (x.a >> 24))
+convert(::Type{U}, x::RGBA) where {U <: Unsigned} = convert(U, (x.r) | (x.g >> 8) | (x.b >> 16) | (x.a >> 24))
 
 # Example constructors:
 #MatrixStrided(width = 10, height = 20)
 #MatrixStrided(p, width = 10, height = 20, rowstride = 30)
 #MatrixStrided(p, rowstride = 20, nbytes = 100)
 #MatrixStrided(p, width = 10, height = 20, rowstride = 30, nbytes = 100)
-type MatrixStrided{T} <: AbstractMatrix{T}
+mutable struct MatrixStrided{T} <: AbstractMatrix{T}
     # immutable, except that we need the GC root for p
     p::Ptr{T}
     nbytes::Int
     rowstride::Int
     width::Int
     height::Int
-    function (::Type{MatrixStrided{T}}){T}(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1)
+    function MatrixStrided{T}(p::Ptr = C_NULL; nbytes = -1, rowstride = -1, width = -1, height = -1) where T
         if width == -1
             @assert(rowstride > 0, "MatrixStrided rowstride must be > 0 if width not given")
             width = div(rowstride, sizeof(T))
@@ -72,26 +72,26 @@ type MatrixStrided{T} <: AbstractMatrix{T}
         a
     end
 end
-MatrixStrided{T}(p::Ptr{T}; kwargs...) = MatrixStrided{T}(p; kwargs...)
-MatrixStrided{T}(::Type{T}; kwargs...) = MatrixStrided{T}(; kwargs...)
-function copy{T}(a::MatrixStrided{T})
+MatrixStrided(p::Ptr{T}; kwargs...) where {T} = MatrixStrided{T}(p; kwargs...)
+MatrixStrided(::Type{T}; kwargs...) where {T} = MatrixStrided{T}(; kwargs...)
+function copy(a::MatrixStrided{T}) where T
     a2 = MatrixStrided{T}(a.nbytes, a.rowstride, a.width, a.height)
     unsafe_copy!(a2.p, a.p, a.nbytes)
     a2
 end
-function getindex{T}(a::MatrixStrided{T}, x::Integer, y::Integer)
+function getindex(a::MatrixStrided{T}, x::Integer, y::Integer) where T
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
     return unsafe_load(a.p + (x - 1) * sizeof(T) + (y - 1) * a.rowstride)
 end
-function getindex{T}(a::MatrixStrided{T}, x::Index, y::Index)
+function getindex(a::MatrixStrided{T}, x::Index, y::Index) where T
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
     z = Matrix{T}(length(x), length(y))
-    const rs = a.rowstride
-    const st = sizeof(T)
-    const p = a.p
-    const lenx = length(x)
+    rs = a.rowstride
+    st = sizeof(T)
+    p = a.p
+    lenx = length(x)
     for zj = 1:length(y)
         j = (y[zj]-1) * rs
         for zi = 1:lenx
@@ -101,21 +101,21 @@ function getindex{T}(a::MatrixStrided{T}, x::Index, y::Index)
     end
     return z
 end
-function setindex!{T}(a::MatrixStrided{T}, z, x::Integer, y::Integer)
+function setindex!(a::MatrixStrided{T}, z, x::Integer, y::Integer) where T
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
     unsafe_store!(a.p + (x - 1) * sizeof(T) + (y - 1) * a.rowstride, convert(T, z))
     a
 end
-function setindex!{T}(a::MatrixStrided{T}, z, x::Index, y::Index)
+function setindex!(a::MatrixStrided{T}, z, x::Index, y::Index) where T
     @assert(1 <= minimum(x) && maximum(x) <= width(a), "MatrixStrided: x index must be inbounds")
     @assert(1 <= minimum(y) && maximum(y) <= height(a), "MatrixStrided: y index must be inbounds")
-    const rs = a.rowstride
-    const st = sizeof(T)
-    const p = a.p
-    const lenx = length(x)
+    rs = a.rowstride
+    st = sizeof(T)
+    p = a.p
+    lenx = length(x)
     if !isa(z, AbstractMatrix)
-        const elem = convert(T, z)::T
+        elem = convert(T, z)::T
         for zj = 1:length(y)
             j = (y[zj]-1) * rs + p
             for zi = 1:lenx
@@ -135,14 +135,14 @@ function setindex!{T}(a::MatrixStrided{T}, z, x::Index, y::Index)
     end
     a
 end
-Base.fill!{T}(a::MatrixStrided{T}, z) = setindex!(a, convert(T, z), 1:width(a), 1:height(a))
+Base.fill!(a::MatrixStrided{T}, z) where {T} = setindex!(a, convert(T, z), 1:width(a), 1:height(a))
 width(a::MatrixStrided) = a.width
 height(a::MatrixStrided) = a.height
 size(a::MatrixStrided, i::Integer) = (i == 1 ? width(a) : (i == 2 ? height(a) : 1))
 size(a::MatrixStrided) = (width(a), height(a))
-eltype{T}(a::MatrixStrided{T}) = T
+eltype(a::MatrixStrided{T}) where {T} = T
 Base.ndims(::MatrixStrided) = 2
-convert{P <: Ptr}(::Type{P}, a::MatrixStrided) = convert(P, a.p)
+convert(::Type{P}, a::MatrixStrided) where {P <: Ptr} = convert(P, a.p)
 bstride(a::MatrixStrided, i) = (i == 1 ? sizeof(eltype(a)) : (i == 2 ? a.rowstride : 0))
 bstride(a, i) = stride(a, i) * sizeof(eltype(a))
 
@@ -187,13 +187,13 @@ function GdkPixbufLeaf(; stream = nothing, resource_path = nothing, filename = n
     elseif xpm_data !== nothing
         @assert(width == -1 && height == -1, "GdkPixbuf cannot set the width/height of a image from xpm_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data, libgdk_pixbuf), Ptr{GObject}, (Ptr{Ptr{Void}},), xpm_data)
+            pixbuf = ccall((:gdk_pixbuf_new_from_xpm_data, libgdk_pixbuf), Ptr{GObject}, (Ptr{Ptr{Nothing}},), xpm_data)
             return pixbuf !== C_NULL
         end
     elseif inline_data !== nothing
         @assert(width == -1 && height == -1, "GdkPixbuf cannot set the width/height of a image from inline_data")
         GError() do error_check
-            pixbuf = ccall((:gdk_pixbuf_new_from_inline, libgdk_pixbuf), Ptr{GObject}, (Cint, Ptr{Void}, Cint, Ptr{Ptr{GError}}), sizeof(inline_data), inline_data, true, error_check)
+            pixbuf = ccall((:gdk_pixbuf_new_from_inline, libgdk_pixbuf), Ptr{GObject}, (Cint, Ptr{Nothing}, Cint, Ptr{Ptr{GError}}), sizeof(inline_data), inline_data, true, error_check)
             return pixbuf !== C_NULL
         end
     elseif data !== nothing # RGB or RGBA array, packed however you wish
@@ -203,7 +203,7 @@ function GdkPixbufLeaf(; stream = nothing, resource_path = nothing, filename = n
         height = size(data, 2)
         ref_data, deref_data = GLib.gc_ref_closure(data)
         pixbuf = ccall((:gdk_pixbuf_new_from_data, libgdk_pixbuf), Ptr{GObject},
-            (Ptr{Void}, Cint, Cint, Cint, Cint, Cint, Cint, Ptr{Void}, Ptr{Void}),
+            (Ptr{Nothing}, Cint, Cint, Cint, Cint, Cint, Cint, Ptr{Nothing}, Ptr{Nothing}),
             data, 0, alpha, 8, width, height, bstride(data, 2),
             deref_data, ref_data)
     else
@@ -249,7 +249,7 @@ function eltype(img::GdkPixbuf)
 end
 function convert(::Type{MatrixStrided}, img::GdkPixbuf)
     MatrixStrided(
-        convert(Ptr{eltype(img)}, ccall((:gdk_pixbuf_get_pixels, libgdk_pixbuf), Ptr{Void}, (Ptr{GObject},), img)),
+        convert(Ptr{eltype(img)}, ccall((:gdk_pixbuf_get_pixels, libgdk_pixbuf), Ptr{Nothing}, (Ptr{GObject},), img)),
         width = width(img), height = height(img),
         rowstride = ccall((:gdk_pixbuf_get_rowstride, libgdk_pixbuf), Cint, (Ptr{GObject},), img))
 end
@@ -280,16 +280,16 @@ function GtkImageLeaf(; resource_path = nothing, filename = nothing, icon_name =
     end
     return GtkImageLeaf(img)
 end
-empty!(img::GtkImage) = ccall((:gtk_image_clear, libgtk), Void, (Ptr{GObject},), img)
+empty!(img::GtkImage) = ccall((:gtk_image_clear, libgtk), Nothing, (Ptr{GObject},), img)
 GdkPixbufLeaf(img::GtkImage) = GdkPixbufLeaf(ccall((:gtk_image_get_pixbuf, libgtk), Ptr{GObject}, (Ptr{GObject},), img))
 
 GtkProgressBarLeaf() = GtkProgressBarLeaf(ccall((:gtk_progress_bar_new, libgtk), Ptr{GObject}, ()))
-pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse, libgtk), Void, (Ptr{GObject},), progress)
+pulse(progress::GtkProgressBar) = ccall((:gtk_progress_bar_pulse, libgtk), Nothing, (Ptr{GObject},), progress)
 
 GtkSpinnerLeaf() = GtkSpinnerLeaf(ccall((:gtk_spinner_new, libgtk), Ptr{GObject}, ()))
 
-start(spinner::GtkSpinner) = ccall((:gtk_spinner_start, libgtk), Void, (Ptr{GObject},), spinner)
-stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop, libgtk), Void, (Ptr{GObject},), spinner)
+start(spinner::GtkSpinner) = ccall((:gtk_spinner_start, libgtk), Nothing, (Ptr{GObject},), spinner)
+stop(spinner::GtkSpinner) = ccall((:gtk_spinner_stop, libgtk), Nothing, (Ptr{GObject},), spinner)
 
 GtkStatusbarLeaf() = GtkStatusbarLeaf(ccall((:gtk_statusbar_new, libgtk), Ptr{GObject}, ()))
 context_id(status::GtkStatusbar, source) =

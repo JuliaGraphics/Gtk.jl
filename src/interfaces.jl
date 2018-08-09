@@ -22,17 +22,17 @@ if libgtk_version >= v"3"
     @Giface GtkScrollable Gtk.libgtk gtk_scrollable
     @Giface GtkStyleProvider Gtk.libgtk gtk_style_provider
 else
-    type GtkActionable end
+    mutable struct GtkActionable end
     GtkActionable(x...) = error("GtkActionable is not available until Gtk3")
-    type GtkAppChooser end
+    mutable struct GtkAppChooser end
     GtkAppChooser(x...) = error("GtkAppChooser is not available until Gtk3")
-    type GtkColorChooser end
+    mutable struct GtkColorChooser end
     GtkColorChooser(x...) = error("GtkColorChooser is not available until Gtk3")
-    type GtkFontChooser end
+    mutable struct GtkFontChooser end
     GtkFontChooser(x...) = error("GtkFontChooser is not available until Gtk3")
-    type GtkScrollable end
+    mutable struct GtkScrollable end
     GtkScrollable(x...) = error("GtkScrollable is not available until Gtk3")
-    type GtkStyleProvider end
+    mutable struct GtkStyleProvider end
     GtkStyleProvider(x...) = error("GtkStyleProvider is not available until Gtk3")
 end
 

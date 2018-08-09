@@ -1,9 +1,9 @@
 function push!(w::GtkContainer, child)
-    ccall((:gtk_container_add, libgtk), Void, (Ptr{GObject}, Ptr{GObject},), w, child)
+    ccall((:gtk_container_add, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject},), w, child)
     w
 end
 function delete!(w::GtkContainer, child::GtkWidget)
-    ccall((:gtk_container_remove, libgtk), Void, (Ptr{GObject}, Ptr{GObject},), w, child)
+    ccall((:gtk_container_remove, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject},), w, child)
     w
 end
 function empty!(w::GtkContainer)
@@ -45,7 +45,7 @@ function getindex(w::GtkBin, i::Integer)
     c::GtkWidget
 end
 
-immutable GtkNullContainer <: GtkContainer end
+struct GtkNullContainer <: GtkContainer end
 const GtkNullContainerLeaf = GtkNullContainer
 macro GtkNullContainer(args...)
     :( GtkNullContainer($(args...)) )

@@ -47,22 +47,22 @@ Note that this will only happen, if the size of the widget is limited using layo
 The entry widget allows the user to enter text. The entered text can be read and write using
 ```julia
 ent = GtkEntry()
-setproperty!(ent,:text,"My String")
-str = getproperty(ent,:text,String)
+set_gtk_property!(ent,:text,"My String")
+str = get_gtk_property(ent,:text,String)
 ```
-The maximum number of characters can be limited using `setproperty!(ent,:max_length,10)`.
+The maximum number of characters can be limited using `set_gtk_property!(ent,:max_length,10)`.
 
 Sometimes you might want to make the widget non-editable. This can be done by a call
 ```julia
 # using the accessor methods
 GAccessor.editable(GtkEditable(ent),false)
 # using the property system
-setproperty!(ent,:text,false)
+set_gtk_property!(ent,:text,false)
 ```
 If you want to use the entry to retrieve passwords you can hide the visibility of the entered text.
 This can be achieve by calling
 ```julia
-setproperty!(ent,:visibility,false)
+set_gtk_property!(ent,:visibility,false)
 ```
 To get notified by changes to the entry one can listen the "changed" event.
 

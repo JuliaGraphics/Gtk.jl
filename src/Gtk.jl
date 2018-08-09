@@ -1,5 +1,4 @@
 # julia Gtk interface
-__precompile__()
 module Gtk
 
 using Compat
@@ -8,23 +7,23 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-importall .GLib.CompatGLib
-import .GLib: setproperty!, getproperty, AbstractStringLike, bytestring
+import .GLib: set_gtk_property!, get_gtk_property, AbstractStringLike, bytestring
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
-    signal_emit
+    signal_emit, unsafe_convert
 
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
-             insert!, push!, append!, unshift!, shift!, pop!, splice!, delete!, deleteat!,
+             insert!, push!, append!, pushfirst!, shift!, pop!, splice!, delete!, deleteat!,
              select!, start, next, done, parent, isempty, empty!, first, last, in,
-             eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, colon
+             eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:)
 
 import Graphics
 import .Graphics: width, height, getgc
 
 using Cairo
 import Cairo: destroy
+using Serialization
 
 const Index{I<:Integer} = Union{I, AbstractVector{I}}
 
