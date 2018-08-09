@@ -35,11 +35,9 @@ else
 	alpha(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
 	depth_buffer(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
 	alpha(w::GtkGLArea) = gl_area_func_not_available() = gl_area_func_not_available()
-	depth_buffer(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
 	stencil_buffer(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
 	stencil_buffer(w::GtkGLArea) = gl_area_func_not_available()
 	auto_render(w::GtkGLArea, value::Bool) = gl_area_func_not_available()
-	stencil_buffer(w::GtkGLArea) = gl_area_func_not_available()
 	#TODO: gtk_gl_area_get_required_version
 
 end
