@@ -629,7 +629,7 @@ w = Window(tv, "List View")|>showall
 
 selmodel = G_.selection(tv)
 @test hasselection(selmodel) == false
-partialsort!(selmodel, Gtk.iter_from_index(ls, 1))
+select!(selmodel, Gtk.iter_from_index(ls, 1))
 @test hasselection(selmodel) == true
 iter = selected(selmodel)
 @test Gtk.index_from_iter(ls, iter) == 1
@@ -641,7 +641,7 @@ tmSorted=TreeModelSort(ls)
 G_.model(tv,tmSorted)
 G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
 it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
-partialsort!(selmodel, it)
+select!(selmodel, it)
 iter = selected(selmodel)
 @test TreeModel(tmSorted)[iter, 1] == 35
 
