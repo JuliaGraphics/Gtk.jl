@@ -295,7 +295,7 @@ end
 @testset "Button with custom icon (& Pixbuf)" begin
 icon = Matrix{Gtk.RGB}(undef, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
-icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
+icon[5:end-5, 3:end-3] .= Ref(Gtk.RGB(0,0,0xff))
 b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
 w = Window(b, "Icon button", 60, 40)
 showall(w)

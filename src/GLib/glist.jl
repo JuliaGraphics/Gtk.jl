@@ -48,19 +48,21 @@ empty!(li::Ptr{_LList}) = gc_unref(deref(li)) # delete an item in a glist
 empty!(li::Ptr{L}) where {L <: _LList} = empty!(convert(Ptr{supertype(L)}, li))
 
 ## Standard Iteration protocol
-start(list::LList{L}) where {L} = unsafe_convert(Ptr{L}, list)
-next(::LList, s::Ptr{T}) where {T} = (deref(s), unsafe_load(s).next) # return (value, state)
-done(::LList, s::Ptr) = (s == C_NULL)
+start_(list::LList{L}) where {L} = unsafe_convert(Ptr{L}, list)
+next_(::LList, s) = (deref(s), unsafe_load(s).next) # return (value, state)
+done_(::LList, s) = (s == C_NULL)
+iterate(list::LList, s=start_(list)) = done_(list, s) ? nothing : next_(list, s)
+
 
 const  LListPair{L} = Tuple{LList, Ptr{L}}
 function glist_iter(list::Ptr{L}, transfer_full::Bool = false) where L <: _LList
     # this function pairs every list element with the list head, to forestall garbage collection
     return (GList(list, transfer_full), list)
 end
-function next(::LList, s::LListPair{L}) where L <: _LList
+function next_(::LList, s::LListPair{L}) where L <: _LList
     return (deref(s[2]), (s[1], unsafe_load(s[2]).next))
 end
-done(::LList, s::LListPair{L}) where {L <: _LList} = done(s[1], s[2])
+done_(::LList, s::LListPair{L}) where {L <: _LList} = done_(s[1], s[2])
 
 ## Standard Array-like declarations
 show(io::IO, list::GList{L, T}) where {L, T} = print(io, "GList{$L => $T}(length = $(length(list)), transfer_full = $(list.transfer_full))")
@@ -124,10 +126,10 @@ end
 function empty!(list::GList{L}) where L <: _GSList
     if list.handle != C_NULL
         if list.transfer_full
-            s = start(list)
-            while !done(list, s)
+            s = start_(list)
+            while !done_(list, s)
                 empty!(s)
-                s = next(list, s)[2]
+                s = next_(list, s)[2]
             end
         end
         ccall((:g_slist_free, libglib), Nothing, (Ptr{L},), list)
@@ -138,10 +140,10 @@ end
 function empty!(list::GList{L}) where L <: _GList
     if list.handle != C_NULL
         if list.transfer_full
-            s = start(list)
-            while !done(list, s)
+            s = start_(list)
+            while !done_(list, s)
                 empty!(s)
-                s = next(list, s)[2]
+                s = next_(list, s)[2]
             end
         end
         ccall((:g_list_free, libglib), Nothing, (Ptr{L},), list)

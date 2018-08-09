@@ -493,11 +493,11 @@ TreeIterator(store::GtkTreeStore, iter = nothing) = TreeIterator(store, GtkTreeM
 Base.IteratorSize(::TreeIterator) = Base.SizeUnknown()
 
 ## iterator interface for depth first search
-function start(x::TreeIterator)
+function start_(x::TreeIterator)
     isa(x.iter, Nothing) ? nothing : mutable(copy(x.iter))
 end
 
-function done(x::TreeIterator, state)
+function done_(x::TreeIterator, state)
 
     iter = mutable(GtkTreeIter)
 
@@ -520,7 +520,7 @@ function done(x::TreeIterator, state)
 end
 
 
-function next(x::TreeIterator, state)
+function next_(x::TreeIterator, state)
     iter = mutable(GtkTreeIter)
 
     if isa(state, Nothing)      # special case root
@@ -548,7 +548,7 @@ function next(x::TreeIterator, state)
     error("next not found")
 end
 
-
+iterate(x::TreeIterator, state=start_(x)) = done_(x, state) ? nothing : next_(x, state)
 
 
 #TODO: Replace by accessor

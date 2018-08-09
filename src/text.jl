@@ -189,11 +189,9 @@ Base.:(>)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) > 0
 Base.:(>=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) >= 0
-start(iter::TI) = mutable(iter)
-function next(::TI, iter::Mutable{GtkTextIter})
-    (get_gtk_property(iter, :char)::Char, iter + 1)
-end
-done(::TI, iter) = get_gtk_property(iter, :is_end)::Bool
+start_(iter::TI) = mutable(iter)
+iterate(::TI, iter=start_(iter)) =
+   get_gtk_property(iter, :is_end, Bool) ? nothing : (get_gtk_property(iter, :char)::Char, iter + 1)
 Base.:+(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
 Base.:-(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
@@ -275,9 +273,10 @@ end
 show(io::IO, r::GtkTextRange) = print("GtkTextRange(\"", get_gtk_property(r, :text), "\")")
 first(r::GtkTextRange) = r.a
 last(r::GtkTextRange) = r.b
-start(r::GtkTextRange) = start(first(r))
-next(r::GtkTextRange, i) = next(i, i)
-done(r::GtkTextRange, i) = (i == last(r) || done(i, i))
+start_(r::GtkTextRange) = start(first(r))
+next_(r::GtkTextRange, i) = next(i, i)
+done_(r::GtkTextRange, i) = (i == last(r) || done(i, i))
+iterate(r::GtkTextRange, i=start_(r)) = done_(r, i) ? nothing : next_(r, i)
 get_gtk_property(text::GtkTextRange, key::AbstractString, outtype::Type = Any) = get_gtk_property(text, Symbol(key), outtype)
 function get_gtk_property(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     starttext = first(text)
@@ -310,9 +309,7 @@ in(x::TI, r::GtkTextRange) = Bool(ccall((:gtk_text_iter_in_range, libgtk), Cint,
 #TODO: tags, marks
 #TODO: clipboard, selection/cursor, user_action_groups
 
-start(text::GtkTextBuffer) = start(GtkTextIter(text))
-next(text::GtkTextBuffer, iter) = next(iter, iter)
-done(text::GtkTextBuffer, iter) = done(iter, iter)
+iterate(text::GtkTextBuffer, iter=start_(GtkTextIter(text))) = iterate(iter, iter)
 length(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_char_count, libgtk), Cint,
     (Ptr{GObject},), text)
 #get_line_count(text::GtkTextBuffer) = ccall((:gtk_text_buffer_get_line_count, libgtk), Cint, (Ptr{GObject},), text)

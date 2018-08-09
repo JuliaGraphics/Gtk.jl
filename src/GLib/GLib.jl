@@ -10,7 +10,7 @@ end
 end
 
 import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
-             start, next, done, eltype, isempty, endof, ndims, stride, strides,
+             iterate, start, next, done, eltype, isempty, endof, ndims, stride, strides,
              empty!, append!, reverse!, pushfirst!, pop!, shift!, push!, splice!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
              getindex, setindex!
@@ -24,7 +24,15 @@ export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export set_gtk_property!, get_gtk_property
 export GConnectFlags
-export @sigatom
+export @sigatom, curr_module, cfunction_
+
+curr_module() = ccall((:jl_get_current_module,:libjulia), Ref{Module}, ())
+
+cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
+@noinline function cfunction_(f, r, a)
+    @nospecialize(f, r, a)
+    return ccall((:jl_function_ptr,:libjulia), Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+end
 
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
@@ -53,8 +61,8 @@ macro g_type_delegate(eq)
     @assert isa(eq, Expr) && eq.head == :(=) && length(eq.args) == 2
     new = eq.args[1]
     real = eq.args[2]
-    newleaf = esc(Symbol(string(new, current_module().suffix)))
-    realleaf = esc(Symbol(string(real, current_module().suffix)))
+    newleaf = esc(Symbol(string(new, curr_module().suffix)))
+    realleaf = esc(Symbol(string(real, curr_module().suffix)))
     new = esc(new)
     macroreal = QuoteNode(Symbol(string('@', real)))
     quote

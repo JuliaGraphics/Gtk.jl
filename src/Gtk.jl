@@ -16,7 +16,7 @@ import .GLib:
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, pushfirst!, shift!, pop!, splice!, delete!, deleteat!,
              select!, start, next, done, parent, isempty, empty!, first, last, in,
-             eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:)
+             eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:), iterate
 
 import Graphics
 import .Graphics: width, height, getgc

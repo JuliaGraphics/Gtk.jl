@@ -87,9 +87,9 @@ function on_signal_motion(move_cb::Function, widget::GtkWidget,
     add_events(widget, mask)
     @assert Base.isstructtype(T)
     if isbitstype(T)
-        cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
+        cb = cfunction_(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
     else
-        cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))
+        cb = cfunction_(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))
     end
     closure = Gtk_signal_motion{T}(
         closure, cb,

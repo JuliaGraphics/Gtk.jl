@@ -8,7 +8,7 @@ end
 
 function signal_connect_generic(cb::Function, w::GObject, sig::AbstractStringLike,
         ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}  #TODO: assert that length(param_types) is correct
-    callback = cfunction(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
+    callback = cfunction_(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
     return ccall((:g_signal_connect_data, libgobject), Culong,
                  (Ptr{GObject}, Ptr{UInt8}, Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}, GEnum),

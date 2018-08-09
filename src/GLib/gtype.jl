@@ -96,7 +96,7 @@ let libs = Dict{AbstractString, Any}()
 global get_fn_ptr
 function get_fn_ptr(fnname, lib)
     if !isa(lib, AbstractString)
-        lib = Core.eval(current_module(), lib)
+        lib = Core.eval(curr_module(), lib)
     end
     libptr = get(libs, lib, C_NULL)::Ptr{Nothing}
     if libptr == C_NULL
@@ -116,11 +116,11 @@ function g_type(name::Symbol, lib, symname::Symbol)
         convert(GType, 0)
     end
 end
-g_type(name::Symbol, lib, symname::Expr) = Core.eval(current_module(), symname)
+g_type(name::Symbol, lib, symname::Expr) = Core.eval(curr_module(), symname)
 g_type(name::Expr, lib::Expr, symname::Expr) = info( (name,lib,symname) )
 
 function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
-    if isdefined(current_module(), iname)
+    if isdefined(curr_module(), iname)
         return nothing
     end
     parent = g_type_parent(gtyp)
@@ -149,7 +149,7 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
 end
 
 function get_itype_decl(iname::Symbol, gtyp::GType)
-    if isdefined(current_module(), iname)
+    if isdefined(curr_module(), iname)
         return nothing
     end
     if iname === :GObject
@@ -231,7 +231,7 @@ function get_type_decl(name, iname, gtyp, gtype_decl)
 end
 
 macro Gtype_decl(name, gtyp, gtype_decl)
-    get_type_decl(name, Symbol(string(name, current_module().suffix)), gtyp, gtype_decl)
+    get_type_decl(name, Symbol(string(name, curr_module().suffix)), gtyp, gtype_decl)
 end
 
 macro Gtype(iname, lib, symname)
@@ -245,7 +245,7 @@ macro Gtype(iname, lib, symname)
         error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
     gtype_decl = get_gtype_decl(iname, lib, symname)
-    name = Symbol(string(iname, current_module().suffix))
+    name = Symbol(string(iname, curr_module().suffix))
     get_type_decl(name, iname, gtyp, gtype_decl)
 end
 

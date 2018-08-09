@@ -105,7 +105,7 @@ function push!(grp::GtkRadioButtonGroup, label, active::Union{Bool, Nothing} = n
     push!(grp.handle, e)
     grp
 end
-function start(grp::GtkRadioButtonGroup)
+function start_(grp::GtkRadioButtonGroup)
     if isempty(grp)
         list = convert(Ptr{_GSList{GtkRadioButton}}, C_NULL)
     else
@@ -114,10 +114,9 @@ function start(grp::GtkRadioButtonGroup)
     end
     list
 end
-next(w::GtkRadioButtonGroup, s) = next(s, s)
-done(w::GtkRadioButtonGroup, s) = done(s, s)
-length(w::GtkRadioButtonGroup) = length(start(w))
-getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton, start(w)[i])
+iterate(w::GtkRadioButtonGroup, s=start_(w)) = iterate(s, s)
+length(w::GtkRadioButtonGroup) = length(start_(w))
+getindex!(w::GtkRadioButtonGroup, i::Integer) = convert(GtkRadioButton, start_(w)[i])
 isempty(grp::GtkRadioButtonGroup) = !isdefined(grp, :anchor)
 
 get_gtk_property(grp::GtkRadioButtonGroup, name::AbstractString) =  get_gtk_property(grp, Symbol(name))
@@ -166,4 +165,3 @@ function GtkVolumeButtonLeaf(value::Real) # 0 <= value <= 1
 end
 
 GtkFontButtonLeaf() = GtkFontButtonLeaf(ccall((:gtk_font_button_new, libgtk), Ptr{GObject}, ()))
-

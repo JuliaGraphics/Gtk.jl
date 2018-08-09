@@ -34,10 +34,12 @@ function push!(builder::GtkBuilder; buffer = nothing, filename = nothing, resour
     return builder
 end
 
-start(builder::GtkBuilder) = glist_iter(ccall((:gtk_builder_get_objects, libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), builder))
-next(w::GtkBuilder, list) = next(list[1], list)
-done(w::GtkBuilder, list) = done(list[1], list)
-length(builder::GtkBuilder) = length(start(builder)[1])
-getindex(builder::GtkBuilder, i::Integer) = convert(GtkWidget, start(builder)[1][i])::GtkWidget
+start_(builder::GtkBuilder) = glist_iter(ccall((:gtk_builder_get_objects, libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), builder))
+iterate(w::GtkBuilder, list=start_(builder)) =
+   iterate(list[1], list)
+
+
+length(builder::GtkBuilder) = length(start_(builder)[1])
+getindex(builder::GtkBuilder, i::Integer) = convert(GtkWidget, start_(builder)[1][i])::GtkWidget
 
 getindex(builder::GtkBuilder, widgetId::String) = GAccessor.object(builder, widgetId)
