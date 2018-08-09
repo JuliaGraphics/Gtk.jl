@@ -222,10 +222,6 @@ function get_type_decl(name, iname, gtyp, gtype_decl)
             w
         end
         gtype_wrappers[$(QuoteNode(iname))] = $ename
-        macro $einame(args...)
-            Base.depwarn(string("@", $einame, " is deprecated, use ", $einame, " instead."), :Gtk)
-            Expr(:call, $ename, map(esc, args)...)
-        end
         function $einame(args...; kwargs...)
             $ename(args...; kwargs...)
         end
