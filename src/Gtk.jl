@@ -68,7 +68,7 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-const ser_version = Base.Serializer.ser_version
+const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     fastgtkcache = joinpath(cachedir, "gtk$(libgtk_version.major)_julia_ser$(ser_version)")
     if isfile(fastgtkcache) && true

@@ -125,7 +125,7 @@ signal_handler_unblock(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_unblock, libgobject), Nothing, (Ptr{GObject}, Culong), w, handler_id)
 
 function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
-    i = isa(sig, AbstractString) ? search(sig, "::") : (0:-1)
+    i = isa(sig, AbstractString) ? something(findfirst("::", sig), 0:-1) : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i) + 1:end]
         sig = sig[1:first(i)-1]

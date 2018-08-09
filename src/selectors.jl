@@ -58,13 +58,13 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         if !isempty(pattern)
             name == nothing && (name = pattern)
             for p in split(pattern, SingleComma)
-                p = replace(p, ", , ", ", ")   # escape sequence for , is , ,
+                p = replace(p, ", , " => ", ")   # escape sequence for , is , ,
                 ccall((:gtk_file_filter_add_pattern, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), filt, p)
             end
         elseif !isempty(mimetype)
             name == nothing && (name = mimetype)
             for m in split(mimetype, SingleComma)
-                m = replace(m, ", , ", ", ")
+                m = replace(m, ", , " => ", ")
                 ccall((:gtk_file_filter_add_mime_type, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}), filt, m)
             end
         else

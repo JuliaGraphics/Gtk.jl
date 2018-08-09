@@ -2,7 +2,7 @@ using Gtk
 
 @testset "misc" begin
 
-const unhandled = convert(Cint, false)
+unhandled = convert(Cint, false)
 
 foo1 = @guarded (x,y) -> x+y
 bar1 = @guarded (x,y) -> x+y+k

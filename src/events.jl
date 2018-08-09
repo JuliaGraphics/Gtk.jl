@@ -58,7 +58,7 @@ function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gt
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
-        if isbits(T)
+        if isbitstype(T)
             ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T), p, eventp, closure.closure)
         else
             ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
@@ -86,7 +86,7 @@ function on_signal_motion(move_cb::Function, widget::GtkWidget,
     end
     add_events(widget, mask)
     @assert Base.isstructtype(T)
-    if isbits(T)
+    if isbitstype(T)
         cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
     else
         cb = cfunction(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))

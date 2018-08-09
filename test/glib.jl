@@ -15,10 +15,10 @@ wrap2 = convert(GObject, hnd)
 
 repr = Base.print_to_string(wrap) #should display properties
 @test endswith(repr,')')
-@test contains(repr,"name=\"\"")
-@test contains(repr,"visible=FALSE")
-@test contains(repr,"title=NULL")
-@test contains(repr,"type=GTK_WINDOW_TOPLEVEL")
+@test occursin("name=\"\"",repr)
+@test occursin("visible=FALSE",repr)
+@test occursin("title=NULL",repr)
+@test occursin("type=GTK_WINDOW_TOPLEVEL",repr)
 
 @test isa(convert(Gtk.GLib.GBoxedUnkown, Gtk.GLib.GBoxedUnkown(C_NULL)), Gtk.GLib.GBoxedUnkown)
 

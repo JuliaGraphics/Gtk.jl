@@ -19,7 +19,7 @@ mutable(x::Mutable) = x
 mutable(x::Type{T}) where {T} = MutableX{T}()
 
 function mutable(x::Array{T, N}, i = 1) where {T, N}
-    if isbits(T)
+    if isbitstype(T)
         MutableA{T, N}(x, i)
     else
         mutable(x[i])
