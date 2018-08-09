@@ -128,7 +128,7 @@ New GValue-to-Julia conversions can be implemented via the `Gtk.make_gvalue(pass
 - `with_id` specifies the type identifier. It must resolve to an Int, but can either be a variable, and Integer, or a tuple of the type name and library where the `_get_type` function can be called
 - `allow_reverse` specifies whether this entry should be used for auto-unpacking
 
-Note that this calls eval on its arguments in the current module, so if you want to use a symbol from Gtk (such as `Gtk.libgtk`, make sure you give the fully qualified name). You will also need to ensure the appropriate convert methods exist to translate from `pass_x` to `as_ctype` and back. `make_gvalue` does a few automatic transformations:
+Note that this calls Core.eval on its arguments in the current module, so if you want to use a symbol from Gtk (such as `Gtk.libgtk`, make sure you give the fully qualified name). You will also need to ensure the appropriate convert methods exist to translate from `pass_x` to `as_ctype` and back. `make_gvalue` does a few automatic transformations:
 
 - if the `to_gtype` is `:string` or `:static_string`, make_gvalue will insert calls to bytestring
 - if the `to_gtype` is `:pointer` or `:boxed`, make_gvalue will insert code (a call to `Gtk.mutable`) that converts from `Type` -> `Ptr{Type}` in the `setindex!` method. Providing a conversion from `Ptr{Type}` -> `Type` must be handled by the user.

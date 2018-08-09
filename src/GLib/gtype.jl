@@ -53,7 +53,7 @@ let jtypes = Expr(:block, :( g_type(::Type{Nothing}) = $(g_type_from_name(:void)
             push!(jtypes.args, :( g_type(::Type{T}) where {T <: $juliatype} = convert(GType, $(fundamental_ids[i])) ))
         end
     end
-    eval(jtypes)
+    Core.eval(GLib, jtypes)
 end
 
 G_TYPE_FROM_CLASS(w::Ptr{Nothing}) = unsafe_load(convert(Ptr{GType}, w))
@@ -96,7 +96,7 @@ let libs = Dict{AbstractString, Any}()
 global get_fn_ptr
 function get_fn_ptr(fnname, lib)
     if !isa(lib, AbstractString)
-        lib = eval(current_module(), lib)
+        lib = Core.eval(current_module(), lib)
     end
     libptr = get(libs, lib, C_NULL)::Ptr{Nothing}
     if libptr == C_NULL
@@ -116,7 +116,7 @@ function g_type(name::Symbol, lib, symname::Symbol)
         convert(GType, 0)
     end
 end
-g_type(name::Symbol, lib, symname::Expr) = eval(current_module(), symname)
+g_type(name::Symbol, lib, symname::Expr) = Core.eval(current_module(), symname)
 g_type(name::Expr, lib::Expr, symname::Expr) = info( (name,lib,symname) )
 
 function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)

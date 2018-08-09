@@ -74,7 +74,7 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)
-                eval(deserialize(cache))
+                Core.eval(deserialize(cache))
             end
         end
     else
