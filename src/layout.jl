@@ -205,7 +205,7 @@ end
 setindex!(layout::GtkLayout, child, i::Real, j::Real) = ccall((:gtk_layout_put, libgtk), Nothing,
     (Ptr{GObject}, Ptr{GObject}, Cint, Cint), layout, child, i, j)
 function size(layout::GtkLayout)
-    sz = Vector{Cuint}(2)
+    sz = Vector{Cuint}(undef, 2)
     ccall((:gtk_layout_get_size, libgtk), Nothing,
         (Ptr{GObject}, Ptr{Cuint}, Ptr{Cuint}), layout, pointer(sz, 1), pointer(sz, 2))
     (sz[1], sz[2])

@@ -18,11 +18,11 @@ end
     x+y+k
 end
 
-print_with_color(:green, """
+printstyled("""
 The following messages:
    WARNING: Error in @guarded callback
 are expected and a sign of normal operation.
-""")
+""", color=:green)
 
 @test foo1(3,5) == 8
 @test bar1(3,5) == nothing

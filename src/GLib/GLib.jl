@@ -15,7 +15,7 @@ import Base: convert, copy, show, showall, showcompact, size, length, getindex, 
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
              getindex, setindex!
 
-using Compat.Libdl
+using Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export GEnum, GError, GValue, gvalue, make_gvalue, g_type
