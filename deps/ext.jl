@@ -10,14 +10,14 @@ end
 const KERNEL = Base.Sys.KERNEL
 
 if gtk_version == 3
-    if !isdefined(current_module(), :libgtk)
+    if !isdefined(@__MODULE__, :libgtk)
         if KERNEL == :Windows
             const libgtk = "libgtk-3-0"
         else
             const libgtk = "libgtk-3"
         end
     end
-    if !isdefined(current_module(), :libgdk)
+    if !isdefined(@__MODULE__, :libgdk)
         if KERNEL == :Windows
             const libgdk = "libgdk-3-0"
         else
@@ -25,7 +25,7 @@ if gtk_version == 3
         end
     end
 elseif gtk_version == 2
-    if !isdefined(current_module(), :libgtk)
+    if !isdefined(@__MODULE__, :libgtk)
         if KERNEL == :Darwin
             const libgtk = "libgtk-quartz-2.0"
         elseif KERNEL == :Windows
@@ -45,14 +45,14 @@ else
     error("Unsupported Gtk version $gtk_version")
 end
 
-if !isdefined(current_module(), :libgdk_pixbuf)
+if !isdefined(@__MODULE__, :libgdk_pixbuf)
     if KERNEL == :Windows
         const libgdk_pixbuf = "libgdk_pixbuf-2.0-0"
     else
         const libgdk_pixbuf = "libgdk_pixbuf-2.0"
     end
 end
-if !isdefined(current_module(), :libgio)
+if !isdefined(@__MODULE__, :libgio)
     if KERNEL == :Windows
         const libgio = "libgio-2.0-0"
     else

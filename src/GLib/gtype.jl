@@ -181,6 +181,7 @@ end
 get_gtype_decl(name::Symbol, lib, symname::Expr) =
     :( GLib.g_type(::Type{T}) where {T <: $(esc(name))} = $(esc(symname)) )
 let handled = Set()
+global get_gtype_decl
 function get_gtype_decl(name::Symbol, lib, symname::Symbol)
     if !(name in handled)
         push!(handled, name)
