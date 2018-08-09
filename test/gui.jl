@@ -293,7 +293,7 @@ destroy(w)
 end
 
 @testset "Button with custom icon (& Pixbuf)" begin
-icon = Matrix{Gtk.RGB}(40, 20)
+icon = Matrix{Gtk.RGB}(undef, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] = Gtk.RGB(0,0,0xff)
 b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
@@ -334,7 +334,7 @@ destroy(w)
 r = RadioButtonGroup(choices,2)
 @test length(r) == 5
 @test sum([get_gtk_property(b,:active,Bool) for b in r]) == 1
-itms = Vector{Any}(length(r))
+itms = Vector{Any}(undef,length(r))
 for (i,e) in enumerate(r)
     itms[i] = try
             get_gtk_property(e,:label,AbstractString)
