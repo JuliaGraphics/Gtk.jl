@@ -68,7 +68,7 @@ macro guarded(ex...)
         ex = ex[1]
     end
     # do-block syntax
-    if ex.head == :call && length(ex.args) >= 2 && ex.args[2].head == :->
+    if ex.head == :do && length(ex.args) >= 2 && ex.args[2].head == :->
         newbody = _guarded(ex.args[2], retval)
         ret = deepcopy(ex)
         ret.args[2] = Expr(ret.args[2].head, ret.args[2].args[1], newbody)

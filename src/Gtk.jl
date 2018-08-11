@@ -18,7 +18,8 @@ import Base: convert, show, showall, run, size, resize!, length, getindex, setin
              select!, start, next, done, parent, isempty, empty!, first, last, in,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:), iterate
 
-import Graphics
+using Reexport
+@reexport using Graphics
 import .Graphics: width, height, getgc
 
 using Cairo

@@ -36,9 +36,9 @@ are expected and a sign of normal operation.
 c = GtkCanvas()
 win = GtkWindow(c)
 showall(win)
-# @guarded draw(c) do widget
-#     error("oops")
-# end
+@guarded draw(c) do widget
+    error("oops")
+end
 @test !isempty(c.mouse.ids)  # check storage of signal-handler ids (see GtkReactive)
 destroy(win)
 
