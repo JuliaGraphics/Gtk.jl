@@ -9,12 +9,12 @@ push!(hbox, ok)
 showall(win)</code></pre><p>We can address individual &quot;slots&quot; in this container:</p><pre><code class="language-julia">julia&gt; length(hbox)
 2
 
-julia&gt; getproperty(hbox[1], :label, String)
+julia&gt; get_gtk_property(hbox[1], :label, String)
 &quot;Cancel&quot;
 
-julia&gt; getproperty(hbox[2], :label, String)
-&quot;OK&quot;</code></pre><p>This layout may not be exactly what you&#39;d like. Perhaps you&#39;d like the <code>ok</code> button to fill the available space, and to insert some blank space between them:</p><pre><code class="language-julia">setproperty!(hbox,:expand,ok,true)
-setproperty!(hbox,:spacing,10)</code></pre><p>The first line sets the <code>expand</code> property of the <code>ok</code> button within the <code>hbox</code> container.</p><p>Note that these aren&#39;t evenly-sized, and that doesn&#39;t change if we set the <code>cancel</code> button&#39;s <code>expand</code> property to <code>true</code>. <code>ButtonBox</code> is created specifically for this purpose, so let&#39;s use it instead:</p><pre><code class="language-julia">destroy(hbox)
+julia&gt; get_gtk_property(hbox[2], :label, String)
+&quot;OK&quot;</code></pre><p>This layout may not be exactly what you&#39;d like. Perhaps you&#39;d like the <code>ok</code> button to fill the available space, and to insert some blank space between them:</p><pre><code class="language-julia">set_gtk_property!(hbox,:expand,ok,true)
+set_gtk_property!(hbox,:spacing,10)</code></pre><p>The first line sets the <code>expand</code> property of the <code>ok</code> button within the <code>hbox</code> container.</p><p>Note that these aren&#39;t evenly-sized, and that doesn&#39;t change if we set the <code>cancel</code> button&#39;s <code>expand</code> property to <code>true</code>. <code>ButtonBox</code> is created specifically for this purpose, so let&#39;s use it instead:</p><pre><code class="language-julia">destroy(hbox)
 ok = @Button(&quot;OK&quot;)
 cancel = @Button(&quot;Cancel&quot;)
 hbox = @ButtonBox(:h)
@@ -23,7 +23,7 @@ push!(hbox, cancel)
 push!(hbox, ok)</code></pre><p>Now we get this:</p><p><img src="doc/figures/twobuttons2.png" alt="window"/></p><p>which may be closer to what you had in mind.</p><h2><a class="nav-anchor" id="Grid-1" href="#Grid-1">Grid</a></h2><p>More generally, you can arrange items in a grid:</p><pre><code class="language-julia">win = Window(&quot;A new window&quot;)
 g = Grid()
 a = Entry()  # a widget for entering text
-setproperty!(a, :text, &quot;This is Gtk!&quot;)
+set_gtk_property!(a, :text, &quot;This is Gtk!&quot;)
 b = CheckButton(&quot;Check me!&quot;)
 c = Scale(false, 0:10)     # a slider
 
@@ -31,7 +31,7 @@ c = Scale(false, 0:10)     # a slider
 g[1,1] = a    # Cartesian coordinates, g[x,y]
 g[2,1] = b
 g[1:2,2] = c  # spans both columns
-setproperty!(g, :column_homogeneous, true)
-setproperty!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
+set_gtk_property!(g, :column_homogeneous, true)
+set_gtk_property!(g, :column_spacing, 15)  # introduce a 15-pixel gap between columns
 push!(win, g)
 showall(win)</code></pre><p>The <code>g[x,y] = obj</code> assigns the location to the indicated <code>x,y</code> positions in the grid (note that indexing is Cartesian rather than row/column; most graphics packages address the screen using Cartesian coordinates where 0,0 is in the upper left). A range is used to indicate a span of grid cells. By default, each row/column will use only as much space as required to contain the objects, but you can force them to be of the same size by setting properties like <code>column_homogeneous</code>.</p><footer><hr/><a class="previous" href="properties.html"><span class="direction">Previous</span><span class="title">Properties</span></a><a class="next" href="signals.html"><span class="direction">Next</span><span class="title">Signals and Callbacks</span></a></footer></article></body></html>
