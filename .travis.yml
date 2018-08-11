@@ -6,6 +6,11 @@ os:
 julia:
   - 0.7
   - 1.0
+# uncomment the following lines to allow failures on nightly julia
+# (tests will run but not make your overall status red)
+matrix:
+  allow_failures:
+  - julia: 1.0
 notifications:
     email: false
 addons:
