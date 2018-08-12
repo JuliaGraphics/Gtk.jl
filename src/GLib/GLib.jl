@@ -26,7 +26,9 @@ export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom, curr_module, cfunction_
 
-curr_module() = ccall((:jl_get_current_module,:libjulia), Ref{Module}, ())
+export curr_module
+
+curr_module() = @__MODULE__
 
 cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 @noinline function cfunction_(f, r, a)

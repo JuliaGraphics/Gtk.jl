@@ -13,6 +13,9 @@ import .GLib:
     signal_handler_block, signal_handler_unblock,
     signal_emit, unsafe_convert
 
+import .GLib: curr_module
+curr_module() = @__MODULE__
+
 import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, pushfirst!, shift!, pop!, splice!, delete!, deleteat!,
              select!, start, next, done, parent, isempty, empty!, first, last, in,
