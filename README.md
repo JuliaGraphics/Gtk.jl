@@ -1,6 +1,7 @@
 # Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
 
 [![Build Status](https://travis-ci.org/JuliaGraphics/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaGraphics/Gtk.jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/yup46w98wv672sag?svg=true)](https://ci.appveyor.com/project/tknopp/gtk-jl)
 [![Coverage Status](https://coveralls.io/repos/JuliaGraphics/Gtk.jl/badge.svg)](https://coveralls.io/r/JuliaGraphics/Gtk.jl)
 [![codecov.io](http://codecov.io/github/JuliaGraphics/Gtk.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaGraphics/Gtk.jl?branch=master)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://juliagraphics.github.io/Gtk.jl/latest)
