@@ -184,7 +184,7 @@ end
 
 deleteat!(listStore::GtkListStoreLeaf, index::Int) = delete!(listStore, iter_from_index(listStore, index))
 pop!(listStore::GtkListStoreLeaf) = deleteat!(listStore, length(listStore))
-shift!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
+popfirst!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
 
 
 isvalid(listStore::GtkListStore, iter::TRI) =

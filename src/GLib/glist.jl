@@ -76,7 +76,7 @@ size(list::LList) = (length(list),)
 isempty(list::LList{L}) where {L} = (unsafe_convert(Ptr{L}, list) == C_NULL)
 Base.IteratorSize(::Type{L}) where {L <: LList} = Base.HasLength()
 
-shift!(list::GList) = splice!(list, nth_first(list))
+popfirst!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
 deleteat!(list::GList, i::Integer) = deleteat!(list, nth(list, i))
 splice!(list::GList, item::Ptr) =

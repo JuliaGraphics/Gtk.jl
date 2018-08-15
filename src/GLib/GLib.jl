@@ -9,9 +9,9 @@ function include(x)
 end
 end
 
-import Base: convert, copy, show, showall, showcompact, size, length, getindex, setindex!, get,
-             iterate, start, next, done, eltype, isempty, endof, ndims, stride, strides,
-             empty!, append!, reverse!, pushfirst!, pop!, shift!, push!, splice!,
+import Base: convert, copy, show, size, length, getindex, setindex!, get,
+             iterate, eltype, isempty, ndims, stride, strides, popfirst!,
+             empty!, append!, reverse!, pushfirst!, pop!, push!, splice!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
              getindex, setindex!
 

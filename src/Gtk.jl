@@ -16,10 +16,16 @@ import .GLib:
 import .GLib: curr_module
 curr_module() = @__MODULE__
 
-import Base: convert, show, showall, run, size, resize!, length, getindex, setindex!,
-             insert!, push!, append!, pushfirst!, shift!, pop!, splice!, delete!, deleteat!,
-             select!, start, next, done, parent, isempty, empty!, first, last, in,
+import Base: convert, show, run, size, resize!, length, getindex, setindex!,
+             insert!, push!, append!, pushfirst!, pop!, splice!, delete!, deleteat!,
+             parent, isempty, empty!, first, last, in, popfirst!,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:), iterate
+
+if VERSION < v"1.0"
+  import Base: showall, select!, start
+else
+  export showall, select!, start
+end
 
 using Reexport
 @reexport using Graphics
