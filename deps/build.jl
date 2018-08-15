@@ -14,6 +14,8 @@ gdk = library_dependency("gdk", aliases = ["libgdk-3", "libgdk-3-0"], group = gr
 gdk_pixbuf = library_dependency("gdk_pixbuf", aliases = ["libgdk_pixbuf-2.0", "libgdk_pixbuf-2.0-0"], group = group)
 gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
 
+deps = [glib, gobject, gtk, gdk, gdk_pixbuf, gio]
+
 if Sys.islinux()
     provides(AptGet, "libgtk-3-dev", deps)
     provides(Yum, "gtk3", deps)
