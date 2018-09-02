@@ -42,10 +42,10 @@ Note that these aren't evenly-sized, and that doesn't change if we set the `canc
 
 ```julia
 destroy(hbox)
-ok = @Button("OK")
-cancel = @Button("Cancel")
-hbox = @ButtonBox(:h)
-push!(f, hbox)
+ok = GtkButton("OK")
+cancel = GtkButton("Cancel")
+hbox = GtkButtonBox(:h)
+push!(win, hbox)
 push!(hbox, cancel)
 push!(hbox, ok)
 ```
@@ -60,12 +60,12 @@ which may be closer to what you had in mind.
 
 More generally, you can arrange items in a grid:
 ```julia
-win = Window("A new window")
-g = Grid()
-a = Entry()  # a widget for entering text
+win = GtkWindow("A new window")
+g = GtkGrid()
+a = GtkEntry()  # a widget for entering text
 set_gtk_property!(a, :text, "This is Gtk!")
-b = CheckButton("Check me!")
-c = Scale(false, 0:10)     # a slider
+b = GtkCheckButton("Check me!")
+c = GtkScale(false, 0:10)     # a slider
 
 # Now let's place these graphical elements into the Grid:
 g[1,1] = a    # Cartesian coordinates, g[x,y]
