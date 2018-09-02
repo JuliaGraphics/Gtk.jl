@@ -8,8 +8,8 @@ to make something happen.
 
 Let's try a simple example:
 ```julia
-b = Button("Press me")
-win = Window(b, "Callbacks")
+b = GtkButton("Press me")
+win = GtkWindow(b, "Callbacks")
 showall(win)
 
 function button_clicked_callback(widget)
@@ -28,8 +28,8 @@ the `"clicked"` signal.
 Using Julia's `do` syntax, the exact same code could alternatively be
 written as
 ```julia
-b = Button("Press me")
-win = Window(b, "Callbacks")
+b = GtkButton("Press me")
+win = GtkWindow(b, "Callbacks")
 id = signal_connect(b, "clicked") do widget
      println(widget, " was clicked!")
 end
@@ -68,8 +68,8 @@ Alternatively, you can temporarily enable or disable individual handlers with `s
 The arguments of the callback depend on the signal type.
 For example, instead of using the `"clicked"` signal---for which the Julia handler should be defined with just a single argument---we could have used `"button-press-event"`:
 ```julia
-b = Button("Pick a mouse button")
-win = Window(b, "Callbacks")
+b = GtkButton("Pick a mouse button")
+win = GtkWindow(b, "Callbacks")
 id = signal_connect(b, "button-press-event") do widget, event
     println("You pressed button ", event.button)
 end
