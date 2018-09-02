@@ -22,7 +22,8 @@ GAccessor.markup(label,"""<b>My bold text</b>\n
                           <a href=\"http://www.gtk.org\"
                           title=\"Our website\">GTK+ website</a>""")
 ```
-The syntax for this markup text is borrowed from html and explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html)
+The syntax for this markup text is borrowed from html and explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html).
+
 A label can be made selectable using
 ```julia
 GAccessor.selectable(label,true)
@@ -57,7 +58,7 @@ Sometimes you might want to make the widget non-editable. This can be done by a 
 # using the accessor methods
 GAccessor.editable(GtkEditable(ent),false)
 # using the property system
-set_gtk_property!(ent,:text,false)
+set_gtk_property!(ent,:editable,false)
 ```
 If you want to use the entry to retrieve passwords you can hide the visibility of the entered text.
 This can be achieve by calling
