@@ -72,6 +72,11 @@ variables anymore but instead you can always use the builder object.
 !!! note
     If you are developing the code in a package you can get the package directory using the `Pkg.dir("MyPackage")`
     function. This allows you to put the files into the package directory and reference them in a relative manner.
+    
+!!! note
+    From Julia 1.0 on, `Pkg.dir()` is deprecated. Instead, you can use the `@__DIR__` macro. For instance, if your
+    glade file is located at `MyPackage/src/builder/myuifile.ui`, you can get the full path using
+    `uifile = joinpath(@__DIR__, "builder", "myuifile.ui")`.
 
 ## Callbacks
 
