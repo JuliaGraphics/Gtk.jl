@@ -200,8 +200,7 @@ signal_connect(ent, "changed") do widget
     showMe = true
 
     if length(searchText) > 0
-      showMe = showMe && contains(lowercase(ls[l,1]),lowercase(searchText)) # Julia 0.7
-      # showMe = showMe && occursin(lowercase(searchText), lowercase(ls[l,1])) # Julia 1.0
+      showMe = showMe && occursin(lowercase(searchText), lowercase(ls[l,1]))
     end
 
     ls[l,4] = showMe
