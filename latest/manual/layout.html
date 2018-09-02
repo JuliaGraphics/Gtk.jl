@@ -15,17 +15,17 @@ julia&gt; get_gtk_property(hbox[1], :label, String)
 julia&gt; get_gtk_property(hbox[2], :label, String)
 &quot;OK&quot;</code></pre><p>This layout may not be exactly what you&#39;d like. Perhaps you&#39;d like the <code>ok</code> button to fill the available space, and to insert some blank space between them:</p><pre><code class="language-julia">set_gtk_property!(hbox,:expand,ok,true)
 set_gtk_property!(hbox,:spacing,10)</code></pre><p>The first line sets the <code>expand</code> property of the <code>ok</code> button within the <code>hbox</code> container.</p><p>Note that these aren&#39;t evenly-sized, and that doesn&#39;t change if we set the <code>cancel</code> button&#39;s <code>expand</code> property to <code>true</code>. <code>ButtonBox</code> is created specifically for this purpose, so let&#39;s use it instead:</p><pre><code class="language-julia">destroy(hbox)
-ok = @Button(&quot;OK&quot;)
-cancel = @Button(&quot;Cancel&quot;)
-hbox = @ButtonBox(:h)
-push!(f, hbox)
+ok = GtkButton(&quot;OK&quot;)
+cancel = GtkButton(&quot;Cancel&quot;)
+hbox = GtkButtonBox(:h)
+push!(win, hbox)
 push!(hbox, cancel)
-push!(hbox, ok)</code></pre><p>Now we get this:</p><p><img src="doc/figures/twobuttons2.png" alt="window"/></p><p>which may be closer to what you had in mind.</p><h2><a class="nav-anchor" id="Grid-1" href="#Grid-1">Grid</a></h2><p>More generally, you can arrange items in a grid:</p><pre><code class="language-julia">win = Window(&quot;A new window&quot;)
-g = Grid()
-a = Entry()  # a widget for entering text
+push!(hbox, ok)</code></pre><p>Now we get this:</p><p><img src="doc/figures/twobuttons2.png" alt="window"/></p><p>which may be closer to what you had in mind.</p><h2><a class="nav-anchor" id="Grid-1" href="#Grid-1">Grid</a></h2><p>More generally, you can arrange items in a grid:</p><pre><code class="language-julia">win = GtkWindow(&quot;A new window&quot;)
+g = GtkGrid()
+a = GtkEntry()  # a widget for entering text
 set_gtk_property!(a, :text, &quot;This is Gtk!&quot;)
-b = CheckButton(&quot;Check me!&quot;)
-c = Scale(false, 0:10)     # a slider
+b = GtkCheckButton(&quot;Check me!&quot;)
+c = GtkScale(false, 0:10)     # a slider
 
 # Now let&#39;s place these graphical elements into the Grid:
 g[1,1] = a    # Cartesian coordinates, g[x,y]
