@@ -75,13 +75,13 @@ push!(tv, c1, c2, c3)
 ```
 Then we can display the tree view widget in a window
 ```julia
-win = Window(tv, "List View")
+win = GtkWindow(tv, "List View")
 showall(win)
 ```
 If you prefer that the columns are resizable by the user call
 ```julia
-for (i,c) in enumerate([c1,c2,c3])
-  GAccessor.resizable(c,true)
+for c in [c1, c2, c3]
+    GAccessor.resizable(c, true)
 end
 ```
 
@@ -96,10 +96,10 @@ for (i,c) in enumerate([c1,c2,c3])
 end
 ```
 If you now click on one of the column headers, the data will be sorted
-with respect to the selected column. You can even make the columns reordarable
+with respect to the selected column. You can even make the columns reorderable
 ```julia
-for (i,c) in enumerate([c1,c2,c3])
-  GAccessor.reordable(c,i-1)
+for (i,c) in enumerate([c1, c2, c3])
+    GAccessor.reorderable(c, i)
 end
 ```
 
@@ -200,7 +200,8 @@ signal_connect(ent, "changed") do widget
     showMe = true
 
     if length(searchText) > 0
-      showMe = showMe && contains(lowercase(ls[l,1]),lowercase(searchText))
+      showMe = showMe && contains(lowercase(ls[l,1]),lowercase(searchText)) # Julia 0.7
+      # showMe = showMe && occursin(lowercase(searchText), lowercase(ls[l,1])) # Julia 1.0
     end
 
     ls[l,4] = showMe
