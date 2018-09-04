@@ -36,7 +36,7 @@ if Sys.iswindows()
         yes = !isinteractive()) # don't prompt for unattended installs
 
     # compile the schemas
-    libdir = Pkg.dir("WinRPM","deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
+    libdir = joinpath(dirname(pathof(WinRPM)), "..", "deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
     run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
 end
 
