@@ -1,6 +1,4 @@
-importall Gtk
-using Gtk.@Window
-using Gtk.@GLArea
+using Gtk
 using Gtk.GConstants
 
 function resize_event(widget::Gtk.GtkGLArea, width::Int32, height::Int32)
@@ -27,7 +25,7 @@ function button_release_event(widget::Gtk.GtkGLArea, event::Gtk.GdkEventButton)
 	return true
 end
 
-area = @GLArea()
+area = Gtk.GLArea()
 add_events(area,
 			GConstants.GdkEventMask.SCROLL |
 			GConstants.GdkEventMask.BUTTON_PRESS |
@@ -40,7 +38,7 @@ signal_connect(motion_notify_event, area, "motion-notify-event")
 signal_connect(button_press_event, area, "button-press-event")
 signal_connect(button_release_event, area, "button-release-event")
 
-win = @Window("Hello Gtk.jl")
+win = Gtk.Window("Hello Gtk.jl")
 push!(win, area)
 showall(win)
 

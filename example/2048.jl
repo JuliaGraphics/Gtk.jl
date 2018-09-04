@@ -5,6 +5,7 @@ https://gaming.youtube.com/game/UCkIzbSwpjk5eRRNaZPxTy2w
 This example includes use of the Toolbar and Grid features of Gtk.jl.
 ========================================================================#
 
+using Gtk
 using Gtk.ShortNames
 
 @enum Direction2048 Right Left Up Down
@@ -87,7 +88,7 @@ function app2048(bsize)
     map(w->push!(toolbar,w),[newgame,undomove])
     grid = Grid()
     map(w -> push!(box, w),[toolbar, grid])
-    buttons = Array{Gtk.GtkButtonLeaf,2}(bsize, bsize)
+    buttons = Array{Gtk.GtkButtonLeaf,2}(undef, bsize, bsize)
     for i in 1:bsize, j in 1:bsize
         grid[i,j] = buttons[i,j] = Button()
         set_gtk_property!(buttons[i,j], :expand, true)
