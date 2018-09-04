@@ -11,13 +11,13 @@ julia&gt; ls[1,1] = &quot;Pete&quot;
 &quot;Pete&quot;</code></pre><h2><a class="nav-anchor" id="List-View-1" href="#List-View-1">List View</a></h2><p>Now we actually want to display our data. To this end we create a tree view object</p><pre><code class="language-julia">tv = GtkTreeView(GtkTreeModel(ls))</code></pre><p>Then we need specific renderers for each of the columns. Usually you will only need a text renderer, but in our example we want to display the boolean value using a checkbox.</p><pre><code class="language-julia">rTxt = GtkCellRendererText()
 rTog = GtkCellRendererToggle()</code></pre><p>Finally we create for each column a <code>TreeViewColumn</code> object</p><pre><code class="language-julia">c1 = GtkTreeViewColumn(&quot;Name&quot;, rTxt, Dict([(&quot;text&quot;,0)]))
 c2 = GtkTreeViewColumn(&quot;Age&quot;, rTxt, Dict([(&quot;text&quot;,1)]))
-c3 = GtkTreeViewColumn(&quot;Female&quot;, rTog, Dict([(&quot;active&quot;,2)]))</code></pre><p>We need to push these column description objects to the tree view</p><pre><code class="language-julia">push!(tv, c1, c2, c3)</code></pre><p>Then we can display the tree view widget in a window</p><pre><code class="language-julia">win = Window(tv, &quot;List View&quot;)
-showall(win)</code></pre><p>If you prefer that the columns are resizable by the user call</p><pre><code class="language-julia">for (i,c) in enumerate([c1,c2,c3])
-  GAccessor.resizable(c,true)
+c3 = GtkTreeViewColumn(&quot;Female&quot;, rTog, Dict([(&quot;active&quot;,2)]))</code></pre><p>We need to push these column description objects to the tree view</p><pre><code class="language-julia">push!(tv, c1, c2, c3)</code></pre><p>Then we can display the tree view widget in a window</p><pre><code class="language-julia">win = GtkWindow(tv, &quot;List View&quot;)
+showall(win)</code></pre><p>If you prefer that the columns are resizable by the user call</p><pre><code class="language-julia">for c in [c1, c2, c3]
+    GAccessor.resizable(c, true)
 end</code></pre><p><img src="../assets/listview1.jpg" alt="listview1"/></p><h2><a class="nav-anchor" id="Sorting-1" href="#Sorting-1">Sorting</a></h2><p>We next want to make the tree view sortable</p><pre><code class="language-julia">for (i,c) in enumerate([c1,c2,c3])
   GAccessor.sort_column_id(c,i-1)
-end</code></pre><p>If you now click on one of the column headers, the data will be sorted with respect to the selected column. You can even make the columns reordarable</p><pre><code class="language-julia">for (i,c) in enumerate([c1,c2,c3])
-  GAccessor.reordable(c,i-1)
+end</code></pre><p>If you now click on one of the column headers, the data will be sorted with respect to the selected column. You can even make the columns reorderable</p><pre><code class="language-julia">for (i,c) in enumerate([c1, c2, c3])
+    GAccessor.reorderable(c, i)
 end</code></pre><h2><a class="nav-anchor" id="Selection-1" href="#Selection-1">Selection</a></h2><p>Usually the interesting bit of a list will be the entry being selected. This is done using an additional <code>GtkTreeSelection</code> object that can be retrieved by</p><pre><code class="language-julia">selection = GAccessor.selection(tv)</code></pre><p>One either have single selection or multiple selections. We toggle this by calling</p><pre><code class="language-julia">selection = GAccessor.mode(selection,Gtk.GConstants.GtkSelectionMode.MULTIPLE)</code></pre><p>We will stick with single selection for now and want to know the index of the selected item</p><pre><code class="language-julia">julia&gt; ls[selected(selection),1]
 &quot;Pete&quot;</code></pre><p>Since it can happen that no item has been selected at all, it is a good idea to put this into an if statement</p><pre><code class="language-julia">if hasselection(selection)
   # do something with selected(selection)
@@ -68,7 +68,7 @@ signal_connect(ent, &quot;changed&quot;) do widget
     showMe = true
 
     if length(searchText) &gt; 0
-      showMe = showMe &amp;&amp; contains(lowercase(ls[l,1]),lowercase(searchText))
+      showMe = showMe &amp;&amp; occursin(lowercase(searchText), lowercase(ls[l,1]))
     end
 
     ls[l,4] = showMe
