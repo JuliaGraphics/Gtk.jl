@@ -22,7 +22,7 @@ if Sys.islinux()
 end
 
 if Sys.iswindows()
-    using Pkg, WinRPM
+    using WinRPM
     provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
     provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
 
