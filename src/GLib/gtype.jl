@@ -94,9 +94,9 @@ gtype_wrappers[:GObject] = GObjectLeaf
 
 let libs = Dict{AbstractString, Any}()
 global get_fn_ptr
-function get_fn_ptr(fnname, lib)
+function get_fn_ptr(fnname, lib, cm)
     if !isa(lib, AbstractString)
-        lib = Core.eval(curr_module(), lib)
+        lib = Core.eval(cm, lib)
     end
     libptr = get(libs, lib, C_NULL)::Ptr{Nothing}
     if libptr == C_NULL
@@ -105,22 +105,22 @@ function get_fn_ptr(fnname, lib)
     fnptr = dlsym_e(libptr, fnname)
 end
 end
-function g_type(name::Symbol, lib, symname::Symbol)
+function g_type(name::Symbol, lib, symname::Symbol, cm)
     if name in keys(gtype_wrappers)
-        return g_type(gtype_wrappers[name])
+        return g_type(gtype_wrappers[name], cm)
     end
-    fnptr = get_fn_ptr(string(symname, "_get_type"), lib)
+    fnptr = get_fn_ptr(string(symname, "_get_type"), lib, cm)
     if fnptr != C_NULL
         ccall(fnptr, GType, ())
     else
         convert(GType, 0)
     end
 end
-g_type(name::Symbol, lib, symname::Expr) = Core.eval(curr_module(), symname)
-g_type(name::Expr, lib::Expr, symname::Expr) = info( (name,lib,symname) )
+g_type(name::Symbol, lib, symname::Expr, cm) = Core.eval(cm, symname)
+g_type(name::Expr, lib::Expr, symname::Expr, cm) = info( (name,lib,symname) )
 
-function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
-    if isdefined(curr_module(), iname)
+function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl, cm)
+    if isdefined(cm, iname)
         return nothing
     end
     parent = g_type_parent(gtyp)
@@ -148,8 +148,8 @@ function get_interface_decl(iname::Symbol, gtyp::GType, gtyp_decl)
     end
 end
 
-function get_itype_decl(iname::Symbol, gtyp::GType)
-    if isdefined(curr_module(), iname)
+function get_itype_decl(iname::Symbol, gtyp::GType, cm)
+    if isdefined(cm, iname)
         return nothing
     end
     if iname === :GObject
@@ -165,7 +165,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType)
     parent = g_type_parent(gtyp)
     @assert parent != 0
     piname = g_type_name(parent)
-    piface_decl = get_itype_decl(piname, parent)
+    piface_decl = get_itype_decl(piname, parent, cm)
     quote
         if $(QuoteNode(iname)) in keys(gtype_abstracts)
             $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
@@ -192,14 +192,14 @@ function get_gtype_decl(name::Symbol, lib, symname::Symbol)
 end
 end #let
 
-function get_type_decl(name, iname, gtyp, gtype_decl)
+function get_type_decl(name, iname, gtyp, gtype_decl, cm)
     ename = esc(name)
     einame = esc(iname)
     quote
         if $(QuoteNode(iname)) in keys(gtype_wrappers)
             $einame = gtype_abstracts[$(QuoteNode(iname))]
         else
-            $(get_itype_decl(iname, gtyp))
+            $(get_itype_decl(iname, gtyp, cm))
         end
         mutable struct $ename <: $einame
             handle::Ptr{GObject}
@@ -231,11 +231,11 @@ function get_type_decl(name, iname, gtyp, gtype_decl)
 end
 
 macro Gtype_decl(name, gtyp, gtype_decl)
-    get_type_decl(name, Symbol(string(name, curr_module().suffix)), gtyp, gtype_decl)
+    get_type_decl(name, Symbol(string(name, __module__.suffix)), gtyp, gtype_decl, __module__)
 end
 
 macro Gtype(iname, lib, symname)
-    gtyp = g_type(iname, lib, symname)
+    gtyp = g_type(iname, lib, symname, __module__)
     if gtyp == 0
         return Expr(:call, :error, string("Could not find ", symname, " in ", lib,
             ". This is likely a issue with a missing Gtk.jl version check."))
@@ -245,8 +245,8 @@ macro Gtype(iname, lib, symname)
         error("GType is currently only implemented for G_TYPE_FLAG_CLASSED")
     end
     gtype_decl = get_gtype_decl(iname, lib, symname)
-    name = Symbol(string(iname, curr_module().suffix))
-    get_type_decl(name, iname, gtyp, gtype_decl)
+    name = Symbol(string(iname, __module__.suffix))
+    get_type_decl(name, iname, gtyp, gtype_decl, __module__)
 end
 
 macro Gabstract(iname, lib, symname)
@@ -256,18 +256,18 @@ macro Gabstract(iname, lib, symname)
     end
     @assert iname === g_type_name(gtyp)
     Expr(:block,
-        get_itype_decl(iname, gtyp),
+        get_itype_decl(iname, gtyp, __module__),
         get_gtype_decl(iname, lib, symname))
 end
 
 macro Giface(iname, lib, symname)
-    gtyp = g_type(iname, lib, symname)
+    gtyp = g_type(iname, lib, symname, __module__)
     if gtyp == 0
         return Expr(:call, :error, string("Could not find ", symname, " in ", lib, ". This is likely a issue with a missing Gtk.jl version check."))
     end
     @assert iname === g_type_name(gtyp)
     gtype_decl = get_gtype_decl(iname, lib, symname)
-    get_interface_decl(iname::Symbol, gtyp::GType, gtype_decl)
+    get_interface_decl(iname::Symbol, gtyp::GType, gtype_decl, __module__)
 end
 
 

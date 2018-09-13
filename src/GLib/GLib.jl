@@ -18,17 +18,14 @@ import Base: convert, copy, show, size, length, getindex, setindex!, get,
 using Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
-export GEnum, GError, GValue, gvalue, make_gvalue, g_type
+export GEnum, GError, GValue, gvalue, make_gvalue, @make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export set_gtk_property!, get_gtk_property
 export GConnectFlags
-export @sigatom, curr_module, cfunction_
+export @sigatom, cfunction_
 
-export curr_module
-
-curr_module() = @__MODULE__
 
 cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 @noinline function cfunction_(f, r, a)
@@ -63,8 +60,8 @@ macro g_type_delegate(eq)
     @assert isa(eq, Expr) && eq.head == :(=) && length(eq.args) == 2
     new = eq.args[1]
     real = eq.args[2]
-    newleaf = esc(Symbol(string(new, curr_module().suffix)))
-    realleaf = esc(Symbol(string(real, curr_module().suffix)))
+    newleaf = esc(Symbol(string(new, __module__.suffix)))
+    realleaf = esc(Symbol(string(real, __module__.suffix)))
     new = esc(new)
     macroreal = QuoteNode(Symbol(string('@', real)))
     quote

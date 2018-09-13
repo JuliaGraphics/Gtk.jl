@@ -1,5 +1,4 @@
-function _gtksubtype_constructors(name::Symbol)
-    cm = @__MODULE__ #curr_module()
+function _gtksubtype_constructors(name::Symbol, cm::Module)
     ename = Symbol(string(name, getfield(cm, :suffix)))
     typ = getfield(cm, ename)
     if GLib.g_isa(typ, GtkOrientable)
@@ -16,7 +15,7 @@ end
 macro gtktype_custom_symname_and_lib(name, symname, lib)
     esc(quote
         @Gtype $name $lib $symname
-        _gtksubtype_constructors($(QuoteNode(name)))
+        _gtksubtype_constructors($(QuoteNode(name)), $__module__)
     end)
 end
 
