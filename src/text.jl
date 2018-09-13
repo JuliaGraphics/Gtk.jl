@@ -75,7 +75,11 @@ function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GObject}), text, iter, mark)
     iter[]
 end
-show(io::IO, iter::GtkTextIter) = print("GtkTextIter(...)")
+
+show(io::IO, iter::GtkTextIter) = println("GtkTextIter($( get_gtk_property(iter,:offset,Int) ))")
+
+Base.cconvert(::Type{Ref{GtkTextIter}},x::GtkTextIter) = Ref(x)
+Base.cconvert(::Type{Ref{GtkTextIter}},x::Gtk.Mutable{GtkTextIter}) = Ref(x[])
 
 struct GtkTextRange <: AbstractRange{Char}
     a::MutableTypes.MutableX{GtkTextIter}
@@ -86,7 +90,6 @@ end
 #type GtkClipboard
 #TODO
 #end
-
 
 #####  GtkTextIter  #####
 #TODO: search
@@ -158,6 +161,7 @@ function get_gtk_property(text::TI, key::Symbol, outtype::Type = Any)
         false
     end)::outtype
 end
+
 set_gtk_property!(text::Mutable{GtkTextIter}, key::AbstractString, value) = set_gtk_property!(text, Symbol(key), value)
 function set_gtk_property!(text::Mutable{GtkTextIter}, key::Symbol, value)
     if     key === :offset
@@ -178,22 +182,26 @@ function set_gtk_property!(text::Mutable{GtkTextIter}, key::Symbol, value)
     end
     return text
 end
+
 Base.:(==)(lhs::TI, rhs::TI) = Bool(ccall((:gtk_text_iter_equal, libgtk),
-    Cint, (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)))
+    Cint, (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs))
 Base.:(!=)(lhs::TI, rhs::TI) = !(lhs == rhs)
 Base.:(<)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
-    (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) < 0
+    (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs) < 0
 Base.:(<=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
-    (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) <= 0
+    (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs) <= 0
 Base.:(>)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
-    (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) > 0
+    (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs) > 0
 Base.:(>=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
-    (Ptr{GtkTextIter}, Ptr{GtkTextIter}), mutable(lhs), mutable(rhs)) >= 0
+    (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs) >= 0
+
 start_(iter::TI) = mutable(iter)
 iterate(::TI, iter=start_(iter)) =
    get_gtk_property(iter, :is_end, Bool) ? nothing : (get_gtk_property(iter, :char)::Char, iter + 1)
+
 Base.:+(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
 Base.:-(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
+
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
     Bool(ccall((:gtk_text_iter_forward_chars, libgtk), Cint,
         (Ptr{GtkTextIter}, Cint), iter, count))
@@ -298,7 +306,7 @@ function get_gtk_property(text::GtkTextRange, key::Symbol, outtype::Type = Any)
 end
 function splice!(text::GtkTextBuffer, index::GtkTextRange)
     ccall((:gtk_text_buffer_delete, libgtk), Nothing,
-        (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}), text, first(index), last(index))
+        (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}), text, first(index), last(index))
     text
 end
 in(x::TI, r::GtkTextRange) = Bool(ccall((:gtk_text_iter_in_range, libgtk), Cint,
