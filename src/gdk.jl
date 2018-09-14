@@ -5,7 +5,7 @@ struct GdkRectangle <: GBoxed
     height::Int32
     GdkRectangle(x, y, w, h) = new(x, y, w, h)
 end
-make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle, :libgdk))
+@make_gvalue(GdkRectangle, Ptr{GdkRectangle}, :boxed, (:gdk_rectangle, :libgdk))
 convert(::Type{GdkRectangle}, rect::Ptr{GdkRectangle}) = unsafe_load(rect)
 
 struct GdkPoint
@@ -68,7 +68,7 @@ baremodule GdkKeySyms
 end
 
 abstract type GdkEvent <: GBoxed end
-make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event, :libgdk))
+@make_gvalue(GdkEvent, Ptr{GdkEvent}, :boxed, (:gdk_event, :libgdk))
 function convert(::Type{GdkEvent}, evt::Ptr{GdkEvent})
     e = unsafe_load(convert(Ptr{GdkEventAny}, evt))
     if     e.event_type == GdkEventType.KEY_PRESS ||

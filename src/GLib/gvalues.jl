@@ -48,14 +48,14 @@ getindex(v::GV, i::Int, ::Type{Nothing}) = nothing
 
 let handled = Set()
 global make_gvalue, getindex
-function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = true, fundamental::Bool = false)
+function make_gvalue(pass_x, as_ctype, to_gtype, with_id, cm::Module, allow_reverse::Bool = true, fundamental::Bool = false)
     with_id === :error && return
     if isa(with_id, Tuple)
         with_id = with_id::Tuple{Symbol, Any}
         with_id = :(ccall($(Expr(:tuple, Meta.quot(Symbol(string(with_id[1], "_get_type"))), with_id[2])), GType, ()))
     end
     if pass_x !== Union{} && !(pass_x in handled)
-        Core.eval(curr_module(), quote
+        Core.eval(cm, quote
             function Base.setindex!(v::GLib.GV, ::Type{T}) where T <: $pass_x
                 ccall((:g_value_init, GLib.libgobject), Nothing, (Ptr{GLib.GValue}, Csize_t), v, $with_id)
                 v
@@ -81,7 +81,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
     end
     if pass_x !== Union{} && !(pass_x in handled)
         push!(handled, pass_x)
-        Core.eval(curr_module(), quote
+        Core.eval(cm, quote
             function Base.getindex(v::GLib.GV, ::Type{T}) where T <: $pass_x
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
                 $(  if to_gtype == :string
@@ -94,7 +94,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
         end)
     end
     if fundamental || allow_reverse
-        fn = Core.eval(curr_module(), quote
+        fn = Core.eval(cm, quote
             function(v::GLib.GV)
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
                 $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
@@ -105,24 +105,28 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, allow_reverse::Bool = 
                 end)
             end
         end)
-        allow_reverse && pushfirst!(gvalue_types, [pass_x, Core.eval(curr_module(), :(() -> $with_id)), fn])
+        allow_reverse && pushfirst!(gvalue_types, [pass_x, Core.eval(cm, :(() -> $with_id)), fn])
         return fn
     end
     return nothing
 end
 end #let
 
-function make_gvalue_from_fundamental_type(i)
+macro make_gvalue(pass_x, as_ctype, to_gtype, with_id, opt...)
+    esc(:(make_gvalue($pass_x, $as_ctype, $to_gtype, $with_id, $__module__, $(opt...))))
+end
+
+function make_gvalue_from_fundamental_type(i,cm)
   (name, ctype, juliatype, g_value_fn) = fundamental_types[i]
-  return make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], false, true)
+  return make_gvalue(juliatype, ctype, g_value_fn, fundamental_ids[i], cm, false, true)
 end
 
 const gvalue_types = Any[]
-const fundamental_fns = tuple(Function[ make_gvalue_from_fundamental_type(i) for
+const fundamental_fns = tuple(Function[ make_gvalue_from_fundamental_type(i, @__MODULE__) for
                               i in 1:length(fundamental_types)]...)
-make_gvalue(Symbol, Ptr{UInt8}, :static_string, :(g_type(AbstractString)), false)
-make_gvalue(Type, GType, :gtype, (:g_gtype, :libgobject))
-make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
+@make_gvalue(Symbol, Ptr{UInt8}, :static_string, :(g_type(AbstractString)), false)
+@make_gvalue(Type, GType, :gtype, (:g_gtype, :libgobject))
+@make_gvalue(Ptr{GBoxed}, Ptr{GBoxed}, :gboxed, :(g_type(GBoxed)), false)
 
 function getindex(gv::GV, ::Type{Any})
     gtyp = unsafe_load(gv).g_type
