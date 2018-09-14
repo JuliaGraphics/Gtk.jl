@@ -60,6 +60,22 @@ if Sys.isapple()
     Homebrew.add("adwaita-icon-theme")
 end
 
+if Sys.islinux()
+    using BinaryProvider # requires BinaryProvider 0.3.0 or later
+
+    dependencies = [
+        "build_Zlib.v1.2.11.jl",
+    ]
+
+    for elem in dependencies
+        # it's a bit faster to run the build in an anonymous module instead of
+        # starting a new julia process
+        m = Module(:__anon__)
+        Core.include(m, (joinpath(@__DIR__, elem)))
+    end
+
+end
+
 @BinDeps.install Dict([
     (:glib, :libglib),
     (:gobject, :libgobject),
@@ -68,3 +84,31 @@ end
     (:gdk_pixbuf, :libgdk_pixbuf),
     (:gio, :libgio),
 ])
+
+if Sys.islinux()
+    # WARNING: This is nonstandard use of BinaryBuilder tools.
+    # We are insuring that BB-managed libs are loaded before the noncompliant
+    # ones.
+    function include_deps(name)
+        """
+        module $name
+            import Libdl
+            path = joinpath(@__DIR__, $(repr(string("deps_", name, ".jl"))))
+                isfile(path) || error("$name wasn't build correctly. Please run Pkg.build(\\\"Gtk\\\")")
+            include(path)
+            function __init__()
+                if Sys.islinux()
+                    check_deps()
+                end
+            end
+        end
+        """
+    end
+
+    open("deps.jl", "a") do io
+        for dep in (:zlib,)
+            println(io, include_deps(dep))
+        end
+        # normally one would define the check_deps wrapper here
+    end
+end

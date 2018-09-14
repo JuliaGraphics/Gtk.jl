@@ -2,6 +2,7 @@ julia 0.7
 Cairo 0.2.2
 Graphics 0.1
 BinDeps
+BinaryProvider 0.3.0
 Reexport
 @windows WinRPM
 @osx Homebrew
