@@ -4,7 +4,7 @@
 #GtkArrow — Displays an arrow
 #GtkCalendar — Displays a calendar and allows the user to select a date
 #GtkDrawingArea — A widget for custom user interface elements
-#GtkEventBox — A widget used to catch events for widgets which do not have their own window
+
 #GtkHandleBox — a widget for detachable window portions
 #GtkIMContextSimple — An input method context supporting table-based input methods
 #GtkIMMulticontext — An input method context supporting multiple, loadable input methods
@@ -13,4 +13,6 @@
 #GtkViewport — An adapter which makes widgets scrollable
 #GtkAccessible — Accessibility support for widgets
 
-
+#GtkEventBox — A widget used to catch events for widgets which do not have their own window
+Gtk.@gtktype GtkEventBox	
+GtkEventBoxLeaf() =  GtkEventBoxLeaf(ccall((:gtk_event_box_new ,libgtk), Ptr{GObject},	()))

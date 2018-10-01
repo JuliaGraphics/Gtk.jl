@@ -151,7 +151,8 @@ export
     GtkTextBufferLeaf,
     GtkToggleButtonLeaf,
     GtkToggleToolButtonLeaf,
-    GtkWindowLeaf
+    GtkWindowLeaf,
+    GtkEventBoxLeaf
 
 
 # Gtk3 objects
