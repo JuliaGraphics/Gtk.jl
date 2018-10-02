@@ -77,6 +77,7 @@ const TreeView = GtkTreeView
 const TreeViewColumn = GtkTreeViewColumn
 const VolumeButton = GtkVolumeButton
 const Window = GtkWindow
+const EventBox = GtkEventBox
 
 export G_, GObject,
     AboutDialog,
@@ -154,7 +155,8 @@ export G_, GObject,
     TreeView,
     TreeViewColumn,
     VolumeButton,
-    Window
+    Window,
+    EventBox
 
 const TypePlugin = GTypePlugin
 const Buildable = GtkBuildable

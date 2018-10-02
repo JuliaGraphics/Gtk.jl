@@ -369,20 +369,20 @@ end
 
 function apply_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
     ccall((:gtk_text_buffer_apply_tag_by_name, libgtk), Nothing,
-         (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
-         buffer, bytestring(name), mutable(itstart), mutable(itend))
+         (Ptr{GObject}, Ptr{UInt8}, Ref{GtkTextIter}, Ref{GtkTextIter}),
+         buffer, bytestring(name), itstart, itend)
 end
 
 function remove_tag(buffer::GtkTextBuffer, name::AbstractString, itstart::TI, itend::TI)
     ccall((:gtk_text_buffer_remove_tag_by_name, libgtk), Nothing,
-         (Ptr{GObject}, Ptr{UInt8}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
-         buffer, bytestring(name), mutable(itstart), mutable(itend))
+         (Ptr{GObject}, Ptr{UInt8}, Ref{GtkTextIter}, Ref{GtkTextIter}),
+         buffer, bytestring(name), itstart, itend)
 end
 
 function remove_all_tags(buffer::GtkTextBuffer, itstart::TI, itend::TI)
     ccall((:gtk_text_buffer_remove_all_tags, libgtk), Nothing,
-         (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
-         buffer, mutable(itstart), mutable(itend))
+         (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}),
+         buffer, itstart, itend)
 end
 
 #####  GtkTextView  #####
