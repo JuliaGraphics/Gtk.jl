@@ -22,6 +22,21 @@ repr = Base.print_to_string(wrap) #should display properties
 
 @test isa(convert(Gtk.GLib.GBoxedUnkown, Gtk.GLib.GBoxedUnkown(C_NULL)), Gtk.GLib.GBoxedUnkown)
 
+x=[1]
+function g_timeout_add_cb(user_data)
+    x = unsafe_pointer_to_objref(user_data)
+    x[1] = 2
+    Cint(false)
+end
+Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, x)
+sleep(10/1000)
+@test x[1] == 2
+
+x=[1]
+Gtk.GLib.g_idle_add(g_timeout_add_cb, x)
+sleep(10/1000)
+@test x[1] == 2
+
 end
 
 # TODO

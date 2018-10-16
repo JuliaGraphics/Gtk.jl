@@ -360,6 +360,24 @@ function __init__gmainloop__()
     nothing
 end
 
+function g_timeout_add(interval::Integer,cb::Function,user_data)
+    callback = @cfunction($cb,Cint,(Ptr{Cvoid},))
+    ref, deref = gc_ref_closure(user_data)
+    
+    return ccall((:g_timeout_add, libglib),Cint,
+        (UInt32, Ptr{Cvoid}, Ptr{Cvoid}),
+        UInt32(interval), callback, ref)
+end
+
+function g_idle_add(cb::Function,user_data)
+    callback = @cfunction($cb,Cint,(Ptr{Cvoid},))
+    ref, deref = gc_ref_closure(user_data)#not sure about that
+
+    return ccall((:g_idle_add, libglib),Cint,
+        (Ptr{Cvoid}, Ptr{Cvoid}),
+        callback, ref)
+end
+
 const exiting = Ref(false)
 function __init__()
     if isdefined(GLib, :__init__bindeps__)
