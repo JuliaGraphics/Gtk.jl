@@ -104,7 +104,6 @@ function on_signal_scroll(scroll_cb::Function, widget::GtkWidget, vargs...)
     signal_connect(scroll_cb, widget, "scroll-event", Cint, (Ptr{GdkEventScroll},), vargs...)
 end
 
-
 function reveal(c::GtkWidget, immediate::Bool = true)
     #region = ccall((:gdk_region_rectangle, libgdk), Ptr{Nothing}, (Ptr{GdkRectangle},), & allocation(c))
     #ccall((:gdk_window_invalidate_region, libgdk), Nothing, (Ptr{Nothing}, Ptr{Nothing}, Bool),
@@ -160,7 +159,7 @@ end
 
 function mouseup_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     event = unsafe_load(eventp)
-    if event.button == 1
+    if     event.button == 1
         this.button1release(this.widget, event)
     elseif event.button == 2
         this.button2release(this.widget, event)
@@ -188,7 +187,6 @@ function mousescroll_cb(ptr::Ptr, eventp::Ptr, this::MouseHandler)
     this.scroll(this.widget, event)
     Int32(false)
 end
-
 
 function push!(mh_evt::MHPair, func::Function)
     mh, evt = mh_evt

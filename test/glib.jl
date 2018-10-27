@@ -22,20 +22,29 @@ repr = Base.print_to_string(wrap) #should display properties
 
 @test isa(convert(Gtk.GLib.GBoxedUnkown, Gtk.GLib.GBoxedUnkown(C_NULL)), Gtk.GLib.GBoxedUnkown)
 
-x=[1]
 function g_timeout_add_cb(user_data)
-    x = unsafe_pointer_to_objref(user_data)
+    x = user_data
     x[1] = 2
     Cint(false)
 end
-Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, x)
-sleep(10/1000)
+
+global x=[1] #I'm getting ReadOnlyMemoryError in the test env without global
+Gtk.GLib.g_idle_add(g_timeout_add_cb, x)
+sleep(0.5)
 @test x[1] == 2
 
-x=[1]
-Gtk.GLib.g_idle_add(g_timeout_add_cb, x)
-sleep(10/1000)
+global x=[1]
+Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, x)
+sleep(0.5)
 @test x[1] == 2
+
+function test_g_timeout_add()#make sure it works in local scope
+    y=[1]
+    Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, y)
+    sleep(0.5)
+    y[1]
+end
+@test test_g_timeout_add() == 2
 
 end
 

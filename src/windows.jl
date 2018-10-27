@@ -112,3 +112,6 @@ function content_area(widget::GtkDialog)
 end
 
 #TODO: GtkSeparator — A separator widget
+
+# this could be in a new file, but needs to be defined after GConstants
+get_default_mod_mask() = ccall((:gtk_accelerator_get_default_mod_mask , libgtk),typeof(GConstants.GdkModifierType.CONTROL),())
