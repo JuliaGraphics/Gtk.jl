@@ -34,11 +34,14 @@ visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
 show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w); w)
 showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w); w)
+hide(w::GtkWidget) = (@sigatom ccall((:gtk_widget_hide , libgtk),Cvoid,(Ptr{GObject},),w); w)
+grab_focus(w::GtkWidget) = (@sigatom ccall((:gtk_widget_grab_focus , libgtk), Cvoid, (Ptr{GObject},), w); w)
 
 # TODO Use Pango type PangoFontDescription once it is wrapped
 modifyfont(w::GtkWidget, font_desc::Ptr{Nothing}) =
    ccall((:gtk_widget_modify_font, libgtk), Nothing, (Ptr{GObject}, Ptr{Nothing}), w, font_desc)
 
+   
 function get_gtk_property(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}) where T
     v = gvalue(T)
     ccall((:gtk_container_child_get_property, libgtk), Nothing,

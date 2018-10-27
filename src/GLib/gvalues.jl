@@ -186,6 +186,8 @@ struct FieldRef{T}
         isdefined(obj,field) && return getfield(obj,field)
         new{T}(obj, field)
     end
+    
+    FieldRef(obj::T,field::Symbol) where T = new{T}(obj,field)
 end
 
 getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T)

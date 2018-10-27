@@ -23,6 +23,12 @@ if libgtk_version >= v"3"     ### should work with v >= 2.4, but there is a bug 
         return widget
     end
 
+    function response(widget::GtkDialog, response_id::Integer)
+        ccall((:gtk_dialog_response, libgtk), Cvoid,
+           (Ptr{GObject}, Cint),
+           widget, response_id)
+    end
+
     #if VERSION >= v"0.4-"
     #GtkFileChooserDialogLeaf(title::AbstractString, parent::GtkContainer, action::Integer, button_text_response::= >...; kwargs...) =
     #    GtkFileChooserDialogLeaf(title::AbstractString, parent, action, button_text_response; kwargs...)

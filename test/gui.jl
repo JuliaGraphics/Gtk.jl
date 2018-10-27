@@ -85,6 +85,10 @@ visible(w,false)
 visible(w,true)
 @test visible(w) == true
 
+hide(w)
+show(w)
+grab_focus(w)
+
 destroy(w); yield()
 @test !get_gtk_property(w, :visible, Bool)
 w=WeakRef(w)

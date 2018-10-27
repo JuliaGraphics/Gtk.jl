@@ -1,8 +1,9 @@
 module GtkTestModule
 using Test, Gtk
 
-include("gui.jl")
 include("glib.jl")
+include("gui.jl")
 include("misc.jl")
+include("text.jl")
 
 end

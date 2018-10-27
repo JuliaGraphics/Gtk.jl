@@ -7,11 +7,12 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-import .GLib: set_gtk_property!, get_gtk_property, AbstractStringLike, bytestring
+import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef 
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
-    signal_emit, unsafe_convert
+    signal_emit, unsafe_convert,
+    AbstractStringLike, bytestring
 
 import Base: convert, show, run, size, resize!, length, getindex, setindex!,
              insert!, push!, append!, pushfirst!, pop!, splice!, delete!, deleteat!,

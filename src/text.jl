@@ -254,6 +254,9 @@ end
 #    gtk_text_iter_forward_find_char
 #    gtk_text_iter_forward_search
 
+buffer(iter::TI) = convert(GtkTextBuffer,
+    ccall((:gtk_text_iter_get_buffer, libgtk),Ptr{GtkTextBuffer},(Ref{GtkTextIter},),iter)
+)
 
 #####  GtkTextRange  #####
 
@@ -285,6 +288,13 @@ start_(r::GtkTextRange) = start(first(r))
 next_(r::GtkTextRange, i) = next(i, i)
 done_(r::GtkTextRange, i) = (i == last(r) || done(i, i))
 iterate(r::GtkTextRange, i=start_(r)) = done_(r, i) ? nothing : next_(r, i)
+
+# this enable the (its:ite).text[String] syntax
+function getproperty(obj::GtkTextRange, field::Symbol) 
+    isdefined(obj,field) && return getfield(obj,field)
+    FieldRef(obj, field)
+end
+
 get_gtk_property(text::GtkTextRange, key::AbstractString, outtype::Type = Any) = get_gtk_property(text, Symbol(key), outtype)
 function get_gtk_property(text::GtkTextRange, key::Symbol, outtype::Type = Any)
     starttext = first(text)
