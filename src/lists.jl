@@ -86,10 +86,10 @@ mutable struct GtkTreePath <: GBoxed
     handle::Ptr{GtkTreePath}
     function GtkTreePath(pathIn::Ptr{GtkTreePath}, own::Bool = false)
         x = new( own ? pathIn :
-            ccall((:gtk_tree_path_copy, Gtk.libgtk), Ptr{GtkTreePath}, (Ptr{GtkTreePath},), pathIn))
-        finalizer(x, x::GtkTreePath->begin
-                ccall((:gtk_tree_path_free, libgtk), Nothing, (Ptr{GtkTreePath},), x.handle)
-            end)
+            ccall((:gtk_tree_path_copy, Gtk.libgtk), Ptr{GtkTreePath}, (Ptr{GtkTreePath},), pathIn)
+        )
+        f = x::GtkTreePath -> ccall((:gtk_tree_path_free, libgtk), Nothing, (Ptr{GtkTreePath},), x.handle)
+        finalizer(f,x)
         x
     end
 end

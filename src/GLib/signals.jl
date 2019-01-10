@@ -362,10 +362,7 @@ end
 
 function g_timeout_add(interval::Integer, cb::Function, user_data::CT) where CT
 
-    #callback = @cfunction($cb, Cint, $(tuple(Ref{CT})) )
-
     callback = @cfunction($cb, Cint, (Ref{CT},) )
-
     ref, deref = gc_ref_closure(user_data)
     
     return ccall((:g_timeout_add_full, libglib), Cint,
