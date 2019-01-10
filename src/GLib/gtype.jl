@@ -468,7 +468,7 @@ function gc_unref(x::GObject)
     if ref != C_NULL && x !== unsafe_pointer_to_objref(ref)
         # We got called because we are no longer the default object for this handle, but we are still alive
         @warn("Duplicate Julia object creation detected for GObject")
-        deref = cfunction(gc_unref_weak, Nothing, (Ref{typeof(x)},))
+        deref = cfunction_(gc_unref_weak, Nothing, (Ref{typeof(x)},))
         ccall((:g_object_weak_ref, libgobject), Nothing, (Ptr{GObject}, Ptr{Nothing}, Any), x, deref, x)
     else
         ccall((:g_object_steal_qdata, libgobject), Any, (Ptr{GObject}, UInt32), x, jlref_quark::UInt32)

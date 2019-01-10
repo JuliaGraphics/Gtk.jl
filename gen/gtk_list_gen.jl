@@ -78,8 +78,10 @@ function gen_g_type_lists(gtk_h)
                             $ref_fn
                             x = new(ref)
                             $(if unref_fn !== nothing
-                                :(finalizer(x, (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Nothing,
-                                    (Ptr{Nothing},),x.handle)))
+                                :(finalizer(
+                                    (x::$typname)->ccall(($(QuoteNode(unref_fn)),$libname),Nothing,
+                                    (Ptr{Nothing},),x.handle), x)
+                                )
                             else
                                 nothing
                             end)
