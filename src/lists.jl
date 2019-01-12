@@ -717,6 +717,14 @@ function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     end
     ret, path
 end
+
+### GtkCellLayout
+function cells(cellLayout::GtkCellLayout)
+  cells = Gtk.GLib.GList(ccall((:gtk_cell_layout_get_cells, Gtk.libgtk),
+             Ptr{Gtk._GList{Gtk.GtkCellRenderer}}, (Ptr{GObject},), cellLayout))
+  return cells
+end
+
 ### To be done
 #
 #if libgtk_version >= v"3"

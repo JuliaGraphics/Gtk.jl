@@ -435,6 +435,9 @@ choices = ["Strawberry", "Vanilla", "Chocolate"]
 for c in choices
     push!(combo, c)
 end
+c = cells(CellLayout(combo))
+set_gtk_property!(c[1],"max_width_chars", 5)
+
 w = Window(combo, "ComboGtkBoxText")|>showall
 lsl = ListStoreLeaf(combo)
 @test length(lsl) == 3
@@ -623,7 +626,7 @@ its = GtkTextIter(b,1)
 ite = GtkTextIter(b,2)
 
 splice!(b,its:ite)
-@test b.text[String] == "est" 
+@test b.text[String] == "est"
 
 insert!(b,GtkTextIter(b,1),"t")
 @test b.text[String] == "test"
