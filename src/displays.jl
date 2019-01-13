@@ -16,7 +16,7 @@ convert(::Type{U}, x::RGB) where {U <: Unsigned} = convert(U, (x.r) | (x.g >> 8)
 
 struct RGBA
     r::UInt8; g::UInt8; b::UInt8; a::UInt8
-    RGBA(r, g, b) = new(r, g, b)
+    RGBA(r, g, b, a) = new(r, g, b, a)
 end
 convert(::Type{RGBA}, x::Unsigned) = RGBA(UInt8(x), UInt8(x >> 8), UInt8(x >> 16), UInt8(x >> 24))
 convert(::Type{U}, x::RGBA) where {U <: Unsigned} = convert(U, (x.r) | (x.g >> 8) | (x.b >> 16) | (x.a >> 24))
