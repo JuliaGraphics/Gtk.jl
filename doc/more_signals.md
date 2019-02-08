@@ -4,7 +4,7 @@ In addition to the ["simple"
 interface](../README.md#callbacks-and-signals), `signal_connect`
 supports an approach that allows your callback function to be directly
 compiled to machine code.  Not only is this more efficient, but it can
-occasionally be useful in avoiding problems (see issue #161).
+occasionally be useful in avoiding problems (see issue [#161](https://github.com/JuliaGraphics/Gtk.jl/issues/161)).
 
 This alternative syntax is as follows:
 ```

@@ -139,7 +139,7 @@ signal_connect(selection, "changed") do widget
 end
 ```
 Another useful signal is "row-activated" that will be triggered by a double click
-of the user.
+of the user. Since it involves handling additional arguments, currently you'll need to use the [explicit signal connect](../../../doc/more_signals.md) (see also Issue [#405](https://github.com/JuliaGraphics/Gtk.jl/issues/405)).
 
 !!! note
     getting multiple selections still not implemented.
