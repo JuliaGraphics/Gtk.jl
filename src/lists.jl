@@ -191,8 +191,10 @@ isvalid(listStore::GtkListStore, iter::TRI) =
     ccall((:gtk_list_store_iter_is_valid, libgtk), Cint,
          (Ptr{GObject}, Ref{GtkTreeIter}), listStore, iter) != 0
 
-length(listStore::GtkListStore) =
-    ccall((:gtk_tree_model_iter_n_children, libgtk), Cint, (Ptr{GObject}, Ptr{GtkTreeIter}), listStore, C_NULL)
+function length(listStore::GtkListStore)
+    _len = ccall((:gtk_tree_model_iter_n_children, libgtk), Cint, (Ptr{GObject}, Ptr{GtkTreeIter}), listStore, C_NULL)
+	return convert(Int, _len)
+end
 
 size(listStore::GtkListStore) = (length(listStore), ncolumns(GtkTreeModel(listStore)))
 
