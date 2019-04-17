@@ -852,4 +852,8 @@ destroy(w)
 
 end
 
+@testset "Tree" begin
+    include("tree.jl")
+end
+
 end  # testset gui

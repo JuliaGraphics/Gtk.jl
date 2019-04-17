@@ -255,15 +255,15 @@ function insert!(treeStore::GtkTreeStoreLeaf, piter::TRI, values; how::Symbol = 
     iter =  Gtk.mutable(GtkTreeIter)
     if how == :parent
         if where == :after
-            ccall((:gtk_tree_store_insert_after, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Ptr{Nothing}), treeStore, iter, piter, C_NULL)
+            ccall((:gtk_tree_store_insert_after, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ref{GtkTreeIter}, Ptr{Nothing}), treeStore, iter, piter, C_NULL)
         else
-            ccall((:gtk_tree_store_insert_before, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Ptr{Nothing}), treeStore, iter, piter, C_NULL)
+            ccall((:gtk_tree_store_insert_before, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ref{GtkTreeIter}, Ptr{Nothing}), treeStore, iter, piter, C_NULL)
         end
     else
         if where == :after
-            ccall((:gtk_tree_store_insert_after, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{Nothing}, Ref{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+            ccall((:gtk_tree_store_insert_after, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ref{Nothing}, Ref{GtkTreeIter}), treeStore, iter, C_NULL, piter)
         else
-            ccall((:gtk_tree_store_insert_before, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{Nothing}, Ref{GtkTreeIter}), treeStore, iter, C_NULL, piter)
+            ccall((:gtk_tree_store_insert_before, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{GtkTreeIter}, Ref{Nothing}, Ref{GtkTreeIter}), treeStore, iter, C_NULL, piter)
         end
     end
 
@@ -564,8 +564,8 @@ end
 #TODO: Replace by accessor (accessor is wrong)
 function path(treeModel::GtkTreeModel, iter::TRI)
   GtkTreePath( ccall((:gtk_tree_model_get_path, libgtk), Ptr{GtkTreePath},
-                            (Ptr{GObject}, Ptr{GtkTreeIter}),
-                            treeModel, mutable(iter)))
+                            (Ptr{GObject}, Ref{GtkTreeIter}),
+                            treeModel, iter ) )
 end
 
 depth(path::GtkTreePath) = ccall((:gtk_tree_path_get_depth, libgtk), Cint,
@@ -655,23 +655,19 @@ function selected_rows(selection::GtkTreeSelection)
 
     model = mutable(Ptr{GtkTreeModel})
 
-    paths = Gtk.GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, Gtk.libgtk),
-                                Ptr{Gtk._GList{Gtk.GtkTreePath}},
+    paths = GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, libgtk),
+                                Ptr{GLib._GList{GtkTreePath}},
                                 (Ptr{GObject}, Ptr{GtkTreeModel}),
                                 selection, model))
 
     iters = GtkTreeIter[]
     for path in paths
-        it = mutable(GtkTreeIter)
-        ret = ccall((:gtk_tree_model_get_iter, libgtk), Cint, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreePath}),
-                          model, it, path) != 0
-        ret && push!(iters, it[])
+        ret, it = iter(model, path)
+        ret && push!(iters, it)
     end
 
     iters
-
 end
-
 
 length(selection::GtkTreeSelection) =
     ccall((:gtk_tree_selection_count_selected_rows, libgtk), Cint, (Ptr{GObject},), selection)

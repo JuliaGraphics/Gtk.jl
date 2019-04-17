@@ -65,8 +65,9 @@ end
 done_(::LList, s::LListPair{L}) where {L <: _LList} = done_(s[1], s[2])
 
 ## Standard Array-like declarations
+show(io::IO, ::MIME"text/plain", list::GList{L, T}) where {L, T} = show(io, list)
 show(io::IO, list::GList{L, T}) where {L, T} = print(io, "GList{$L => $T}(length = $(length(list)), transfer_full = $(list.transfer_full))")
-# show{L, T}(io::IO, list::Type{GList{L, T}}) = print(io, "GList{$L => $T}")
+
 unsafe_convert(::Type{Ptr{L}}, list::GList) where {L <: _LList} = list.handle
 endof(list::LList) = length(list)
 ndims(list::LList) = 1
@@ -79,8 +80,13 @@ Base.IteratorSize(::Type{L}) where {L <: LList} = Base.HasLength()
 popfirst!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
 deleteat!(list::GList, i::Integer) = deleteat!(list, nth(list, i))
-splice!(list::GList, item::Ptr) =
-    (x = deref(item); deleteat!(list, item); x)
+
+function splice!(list::GList, item::Ptr) 
+    x = deref(item)
+    deleteat!(list, item)
+    x
+end
+
 setindex!(list::GList, x, i::Real) = setindex!(list, x, nth(list, i))
 
 ## More Array-like declarations, this time involving ccall
