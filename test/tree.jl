@@ -1,4 +1,4 @@
-using Gtk, Test
+#using Gtk, Test
 
 window = GtkWindow("GtkTree", 300, 100)
 boxtop = GtkBox(:v) # vertical box, basic structure
@@ -75,13 +75,5 @@ select!(selection, iter)
 
 @test length(selection) == 1
 
-#iters = Gtk.selected_rows(selection)
-
-mmodel = Gtk.mutable(Ptr{GtkTreeModel})
-
-ptr = ccall((:gtk_tree_selection_get_selected_rows, Gtk.libgtk),
-Ptr{Gtk._GList{Gtk.GtkTreePath}},
-(Ptr{GObject}, Ptr{GtkTreeModel}),
-selection, mmodel)
-
-# paths = Gtk.GLib.GList(ptr);
+# this crashes
+# iters = Gtk.selected_rows(selection)

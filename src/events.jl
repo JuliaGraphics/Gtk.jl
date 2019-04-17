@@ -198,14 +198,13 @@ end
 function pop!(mh_evt::MHPair)
     mh, evt = mh_evt
     idx = findlast(x -> (x[1] == evt), mh.stack)
-    if idx != 0
+    if idx != nothing
         _, func = mh.stack[idx]
         setfield!(mh, evt, func)
         deleteat!(mh.stack, idx)
     end
     mh
 end
-
 
 function waitforsignal(widget,signal)
   c = Condition()
