@@ -37,6 +37,11 @@ macro GtkCanvas(args...)
     :( GtkCanvas($(map(esc, args)...)) )
 end
 
+function init_cairo_context(widget::GtkCanvas)
+    widget.back = cairo_surface_for(widget)
+    widget.backcc = CairoContext(widget.back)
+end
+
 function notify_realize(::Ptr{GObject}, widget::GtkCanvas)
     widget.is_realized = true
     widget.is_sized && notify_resize(
@@ -55,8 +60,7 @@ end
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     widget.is_sized = true
     if widget.is_realized
-        widget.back = cairo_surface_for(widget)
-        widget.backcc = CairoContext(widget.back)
+        init_cairo_context(c)
         if isa(widget.resize, Function)
             widget.resize(widget)
         end
@@ -115,11 +119,15 @@ function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanv
 end
 
 function getgc(c::GtkCanvas)
-    show(c) # necessary since c.backcc might not be initialized
+    if !isdefined(c,:backcc) # necessary since c.backcc might not be initialized
+      init_cairo_context(c)
+    end
     return c.backcc
 end
 
 function cairo_surface(c::GtkCanvas)
-    show(c) # necessary since c.back might not be initialized
+    if !isdefined(c,:back) # necessary since c.back might not be initialized
+      init_cairo_context(c)
+    end
     return c.back
 end
