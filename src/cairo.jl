@@ -60,7 +60,7 @@ end
 function notify_resize(::Ptr{GObject}, size::Ptr{GdkRectangle}, widget::GtkCanvas)
     widget.is_sized = true
     if widget.is_realized
-        init_cairo_context(c)
+        init_cairo_context(widget)
         if isa(widget.resize, Function)
             widget.resize(widget)
         end
