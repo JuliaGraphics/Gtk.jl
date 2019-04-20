@@ -114,5 +114,12 @@ function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanv
     Int32(false) # propagate the event further
 end
 
-getgc(c::GtkCanvas) = c.backcc
-cairo_surface(c::GtkCanvas) = c.back
+function getgc(c::GtkCanvas)
+    show(c) # necessary since c.backcc might not be initialized
+    return c.backcc
+end
+
+function cairo_surface(c::GtkCanvas)
+    show(c) # necessary since c.back might not be initialized
+    return c.back
+end
