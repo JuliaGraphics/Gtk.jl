@@ -119,15 +119,15 @@ function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanv
 end
 
 function getgc(c::GtkCanvas)
-    if !isdefined(c,:backcc) # necessary since c.backcc might not be initialized
-      init_cairo_context(c)
+    if !isdefined(c,:backcc)
+      @error "GtkCanvas not yet initialized."
     end
     return c.backcc
 end
 
 function cairo_surface(c::GtkCanvas)
-    if !isdefined(c,:back) # necessary since c.back might not be initialized
-      init_cairo_context(c)
+    if !isdefined(c,:back)
+      @error "GtkCanvas not yet initialized."
     end
     return c.back
 end
