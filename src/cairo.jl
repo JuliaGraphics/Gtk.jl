@@ -120,14 +120,14 @@ end
 
 function getgc(c::GtkCanvas)
     if !isdefined(c,:backcc)
-      @error "GtkCanvas not yet initialized."
+      error("GtkCanvas not yet initialized.")
     end
     return c.backcc
 end
 
 function cairo_surface(c::GtkCanvas)
     if !isdefined(c,:back)
-      @error "GtkCanvas not yet initialized."
+      error("GtkCanvas not yet initialized.")
     end
     return c.back
 end
