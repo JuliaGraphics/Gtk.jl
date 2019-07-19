@@ -42,11 +42,11 @@ insert!(cb::GtkComboBoxText, i::Integer, text::AbstractString) =
     (ccall((:gtk_combo_box_text_insert_text, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, bytestring(text)); cb)
 
 if libgtk_version >= v"3"
-    push!(cb::GtkComboBoxText, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
+    push!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_append, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
-    pushfirst!(cb::GtkComboBoxText, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
+    pushfirst!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
-    insert!(cb::GtkComboBoxText, i::Integer, id::Tuple{AbstractString, Symbol}, text::AbstractString) =
+    insert!(cb::GtkComboBoxText, i::Integer, id::Union{AbstractString, Symbol}, text::AbstractString) =
         (ccall((:gtk_combo_box_text_insert, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
 
     empty!(cb::GtkComboBoxText) =
