@@ -46,6 +46,25 @@ function test_g_timeout_add()#make sure it works in local scope
 end
 @test test_g_timeout_add() == 2
 
+const y = Ref{Int}(1)
+Gtk.GLib.g_idle_add() do
+  y[] = 2
+  return false # only call once
+end
+sleep(0.5)
+@test y[] == 2
+
+y[] = 1 # reset
+Gtk.GLib.g_idle_add() do
+  y[] = 2
+  return false # only call once
+end
+sleep(0.5)
+@test y[] == 2
+
+
+
+
 end
 
 # TODO
