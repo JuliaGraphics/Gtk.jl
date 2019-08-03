@@ -22,29 +22,58 @@ repr = Base.print_to_string(wrap) #should display properties
 
 @test isa(convert(Gtk.GLib.GBoxedUnkown, Gtk.GLib.GBoxedUnkown(C_NULL)), Gtk.GLib.GBoxedUnkown)
 
-function g_timeout_add_cb(user_data)
-    x = user_data
-    x[1] = 2
-    Cint(false)
+x = Ref{Int}(1)
+
+function g_timeout_add_cb()
+    x[] = 2
+    false
 end
 
-global x=[1] #I'm getting ReadOnlyMemoryError in the test env without global
+Gtk.GLib.g_idle_add(g_timeout_add_cb)
+sleep(0.5)
+@test x[] == 2
+
+x[] = 1 #reset
+Gtk.GLib.g_timeout_add(g_timeout_add_cb, 1)
+sleep(0.5)
+@test x[] == 2
+
+# do syntax
+
+x[] = 1 #reset
+Gtk.GLib.g_idle_add() do
+  x[] = 2
+  return false # only call once
+end
+sleep(0.5)
+@test x[] == 2
+
+x[] = 1 #reset
+Gtk.GLib.g_timeout_add(1) do
+  x[] = 2
+  return false # only call once
+end
+sleep(0.5)
+@test x[] == 2
+
+# deprecated
+
+function g_timeout_add_cb(user_data)
+    user_data[] = 2
+    false
+end
+
+x[] = 1 #reset
 Gtk.GLib.g_idle_add(g_timeout_add_cb, x)
 sleep(0.5)
-@test x[1] == 2
+@test x[] == 2
 
-global x=[1]
-Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, x)
+x[] = 1 #reset
+Gtk.GLib.g_timeout_add(1, g_timeout_add_cb, x)
 sleep(0.5)
-@test x[1] == 2
+@test x[] == 2
 
-function test_g_timeout_add()#make sure it works in local scope
-    y=[1]
-    Gtk.GLib.g_timeout_add(1,g_timeout_add_cb, y)
-    sleep(0.5)
-    y[1]
-end
-@test test_g_timeout_add() == 2
+
 
 end
 

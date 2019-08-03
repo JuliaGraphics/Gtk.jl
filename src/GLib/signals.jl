@@ -360,25 +360,26 @@ function __init__gmainloop__()
     nothing
 end
 
-function g_timeout_add(interval::Integer, cb::Function, user_data::CT) where CT
-
-    callback = @cfunction($cb, Cint, (Ref{CT},) )
-    ref, deref = gc_ref_closure(user_data)
-    
-    return ccall((:g_timeout_add_full, libglib), Cint,
-        (Cint, UInt32, Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}),
+_g_callback(cb::Function) = Cint(cb())
+function g_timeout_add(cb::Function, interval::Integer)
+    callback = @cfunction(_g_callback, Cint, (Ref{Function},))
+    ref, deref = gc_ref_closure(cb)
+    return ccall((:g_timeout_add_full, libglib),Cint,
+        (Cint, UInt32, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
         0, UInt32(interval), callback, ref, deref)
 end
 
-function g_idle_add(cb::Function, user_data::CT) where CT
+@deprecate g_timeout_add(interval, cb, user_data) g_timeout_add(() -> cb(user_data), interval)
 
-    callback = @cfunction($cb, Cint, (Ref{CT},) )
-    ref, deref = gc_ref_closure(user_data)
-
+function g_idle_add(cb::Function)
+    callback = @cfunction(_g_callback, Cint, (Ref{Function},))
+    ref, deref = gc_ref_closure(cb)
     return ccall((:g_idle_add_full , libglib),Cint,
-        (Cint, Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}),
+        (Cint, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
         0, callback, ref, deref)
 end
+
+@deprecate g_idle_add(cb, user_data)  g_idle_add(() -> cb(user_data))
 
 const exiting = Ref(false)
 function __init__()
