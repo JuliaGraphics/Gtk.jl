@@ -23,7 +23,7 @@ show(c)
 ```
 This `draw` function will get called each time the window gets resized or otherwise needs to refresh its display.
 
-![canvas](doc/figures/canvas.png)
+![canvas](../doc/figures/canvas.png)
 
 See Julia's standard-library documentation for more information on graphics.
 
@@ -32,7 +32,7 @@ this happens, you have to quit julia and start a fresh session. To
 avoid this problem, the `@guarded` macro wraps your code in a
 `try/catch` block and prevents the corruption. It is especially useful
 when initially writing and debugging code. See [further
-discussion](doc/more_signals.md) about when `@guarded` is relevant.
+discussion](../doc/more_signals.md) about when `@guarded` is relevant.
 
 Finally, `Canvas`es have a field called `mouse` that allows you to
 easily write callbacks for mouse events:
@@ -52,4 +52,3 @@ Resizing the window will make them go away; they were drawn on the
 canvas, but they weren't added to the `draw` function.
 
 Note the use of the `@guarded` macro here, too.
-

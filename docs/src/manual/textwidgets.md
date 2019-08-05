@@ -19,7 +19,7 @@ Furthermore, a label has limited support for adding formatted text. This is done
 using the `markup` function:
 ```julia
 GAccessor.markup(label,"""<b>My bold text</b>\n
-                          <a href=\"http://www.gtk.org\"
+                          <a href=\"https://www.gtk.org\"
                           title=\"Our website\">GTK+ website</a>""")
 ```
 The syntax for this markup text is borrowed from html and explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html).
@@ -77,5 +77,3 @@ with a button to clear the entry.
 !!! note
     Currently `GtkSearchEntry` is not fully wrapped in Gtk.jl but if you add it using Glade, it can
     be used as an alternative to the ``GtkEntry`
-
-

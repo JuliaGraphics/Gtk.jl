@@ -52,7 +52,7 @@ push!(hbox, ok)
 
 Now we get this:
 
-![window](doc/figures/twobuttons2.png)
+![window](../doc/figures/twobuttons.png)
 
 which may be closer to what you had in mind.
 
