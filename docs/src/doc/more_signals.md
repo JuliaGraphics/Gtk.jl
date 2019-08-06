@@ -1,7 +1,7 @@
 ### More about signals and signal-handlers
 
-In addition to the ["simple"
-interface](../README.md#callbacks-and-signals), `signal_connect`
+In addition to the "simple"
+interface, `signal_connect`
 supports an approach that allows your callback function to be directly
 compiled to machine code.  Not only is this more efficient, but it can
 occasionally be useful in avoiding problems (see issue #161).
@@ -17,8 +17,8 @@ where:
   arguments and return type should match the GTK+ documentation for
   the widget and signal ([see
   examples](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed)).
-  **In contrast with the [simpler
-  interface](../README.md#callbacks-and-signals), when writing these
+  **In contrast with the simpler
+  interface, when writing these
   callbacks you must include the `user_data` argument**.  See examples below.
 - `widget` is the widget that will send the signal
 - `signalname` is a string or symbol identifying the signal, e.g.,
@@ -92,7 +92,7 @@ and then use the reported type in `parameter_type_tuple`.
 The "simple" callback interface includes protections against
 corrupting Gtk state from errors, but this `@cfunction`-based approach
 does not. Consequently, you may wish to use `@guarded` when writing
-these functions. ([Canvas](../README.md#canvases) draw functions and
+these functions. ([Canvas](../manual/canvas.md) draw functions and
 mouse event-handling are called through this interface, which is why
 you should use `@guarded` there.) For functions that should return a
 value, you can specify the value to be returned on error as the first

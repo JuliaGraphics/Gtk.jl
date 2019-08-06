@@ -42,7 +42,7 @@ win = Gtk.Window("Hello Gtk.jl")
 push!(win, area)
 showall(win)
 
-# http://stackoverflow.com/a/33571506/1500988
+# https://stackoverflow.com/a/33571506/1500988
 signal_connect(win, :destroy) do widget
     Gtk.gtk_quit()
 end

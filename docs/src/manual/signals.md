@@ -82,7 +82,7 @@ keep in mind that you can always address other variables from inside your functi
 id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate, drawfunction, ...), b, "button-press-event")
 ```
 
-In some situations you may want or need to use an [approach that is more analogous to julia's `@cfunction` callback syntax](doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
+In some situations you may want or need to use an [approach that is more analogous to julia's `@cfunction` callback syntax](../doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
 
 Warning: it is essential to avoid task switching inside Gtk callbacks,
 as this corrupts the Gtk C-stack. For example, use `@async print` or queue a message for yourself.

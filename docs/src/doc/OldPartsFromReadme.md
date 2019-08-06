@@ -14,7 +14,7 @@ If you check your window, you won't see anything. That's because the frame has n
     showall(win)
 ```
 
-![window](doc/figures/frame.png)
+![window](figures/frame.png)
 
 Note the `showall`, which is required to get the display to update with your changes. In some of the examples below, we'll omit this step, but you should call `showall` any time you want to see the window in its current state.
 
@@ -25,7 +25,7 @@ Let's add a button:
     showall(win)
 ```
 
-![window](doc/figures/okbutton.png)
+![window](figures/okbutton.png)
 
 We can remove our `ok` button from the frame:
 ```jl
@@ -83,7 +83,7 @@ This is because a `Scale` contains another more basic type, `Adjustment`, respon
     set_gtk_property!(adj,:value,7)
     win = @Window(sc,"Scale") |> showall
 ```
-![scale](doc/figures/scale.png)
+![scale](figures/scale.png)
 
 
 
@@ -120,7 +120,7 @@ Finally, let's place our file item inside another type of menu, the `MenuBar`:
     win = @Window(mb, "Menus", 200, 40)
     showall(mb)
 ```
-![menu](doc/figures/menu.png)
+![menu](figures/menu.png)
 
 #### Popup menus
 
@@ -150,4 +150,4 @@ We can create a canvas that, when right clicked, reveals a context menu:
     end
     showall(win)
 ```
-![popupmenu](doc/figures/popup.png)
+![popupmenu](figures/popup.png)
