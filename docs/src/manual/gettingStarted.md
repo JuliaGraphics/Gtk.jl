@@ -18,7 +18,7 @@ push!(win,b)
 ```
 Finally, `showall(win)` will render the entire application on the screen.
 
-Note that if you run the above example and only a blank window renders, see the `Common Issues` section [here](https://juliagraphics.github.io/Gtk.jl/latest/index.html). 
+Note that if you run the above example and only a blank window renders, see the `Common Issues` section [here](../index.md#common-issues). 
 
 ## Extended Example
 
