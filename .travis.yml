@@ -2,32 +2,44 @@ language: julia
 sudo: required
 os:
   - linux
-  - osx
+  #- osx
 julia:
   - 0.7
   - 1.0
+  - nightly
 # uncomment the following lines to allow failures on nightly julia
 # (tests will run but not make your overall status red)
 matrix:
   allow_failures:
-  - julia: 1.0
+    - julia: nightly
 notifications:
-    email: false
+  email: false
+git:
+  depth: 99999999
 addons:
-    apt:
-        packages:
-            - xvfb
-            - xauth
-            - libgtk-3-dev
+  apt:
+    packages:
+      - xvfb
+      - xauth
+      - libgtk-3-dev
 script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
-    - $TESTCMD -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
+  - $TESTCMD -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
 after_success:
-    - julia -e 'cd(Pkg.dir("Gtk"));
-                Pkg.add("Coverage");
-                using Coverage;
-                Coveralls.submit(Coveralls.process_folder())'
-    # update the documentation
-    - julia -e 'using Pkg; ps=Pkg.PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps)'
-    - $TESTCMD -e 'using Pkg; cd(Pkg.dir("Gtk")); ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg;
+              import Gtk;
+              cd(joinpath(dirname(pathof(Gtk))));
+              Pkg.add("Coverage");
+              using Coverage;
+              Coveralls.submit(Coveralls.process_folder())'
+  # update the documentation
+  - julia -e 'using Pkg;
+              ps=Pkg.PackageSpec(name="Documenter", version="0.19");
+              Pkg.add(ps);
+              Pkg.pin(ps)'
+  - $TESTCMD -e 'using Pkg;
+                 import Gtk;
+                 cd(joinpath(dirname(pathof(Gtk))));
+                 ENV["DOCUMENTER_DEBUG"] = "true";
+                 include(joinpath("docs", "make.jl"))'
