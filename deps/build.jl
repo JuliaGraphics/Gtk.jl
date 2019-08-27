@@ -6,6 +6,7 @@ const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__
 
 # These are the two binary objects we care about
 products = Product[
+    LibraryProduct(prefix, ["libz"], :libz),
     LibraryProduct(prefix, ["libglib"], :glib),
     LibraryProduct(prefix, ["libgobject"], :gobject),
     LibraryProduct(prefix, ["libgtk"], :gtk),
@@ -15,6 +16,7 @@ products = Product[
 ]
 
 dependencies = [
+    "https://github.com/bicycle1885/ZlibBuilder/releases/download/v1.0.4/build_Zlib.v1.2.11.jl",
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Glib-v2.59.0%2B0/build_Glib.v2.59.0.jl",
 
 ]
