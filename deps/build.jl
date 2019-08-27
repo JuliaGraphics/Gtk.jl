@@ -1,70 +1,51 @@
-using BinDeps, Compat
+using BinaryProvider # requires BinaryProvider 0.3.0 or later
 
-@BinDeps.setup
+# Parse some basic command-line arguments
+const verbose = "--verbose" in ARGS
+const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
 
-group = library_group("gtk")
+# These are the two binary objects we care about
+products = Product[
+    LibraryProduct(prefix, ["libavcodec","avcodec"], :glib),
+    LibraryProduct(prefix, ["libavformat","avformat"], :gobject),
+    LibraryProduct(prefix, ["libavutil","avutil"], :gtk),
+    LibraryProduct(prefix, ["libswscale","swscale"], :gdk),
+    LibraryProduct(prefix, ["libavfilter","avfilter"], :gdk_pixbuf),
+    LibraryProduct(prefix, ["libgio"], :gio),
+]
 
-glib = library_dependency("glib", aliases = ["libglib-2.0", "libglib-2.0-0"], group = group)
-gobject = library_dependency("gobject", aliases = ["libgobject-2.0", "libgobject-2.0-0"], group = group)
-gtk = library_dependency("gtk", aliases = ["libgtk-3", "libgtk-3-0"], group = group)
-gdk = library_dependency("gdk", aliases = ["libgdk-3", "libgdk-3-0"], group = group)
-# for gtk2 use these two lines instead of the previous two
-#gtk = library_dependency("gtk", aliases = ["libgtk-quartz-2.0", "libgtk-win32-2.0-0", "libgtk-x11-2.0"], group = group)
-#gdk = library_dependency("gdk", aliases = ["libgdk-quartz-2.0", "libgdk-win32-2.0-0", "libgdk-x11-2.0"], group = group)
-gdk_pixbuf = library_dependency("gdk_pixbuf", aliases = ["libgdk_pixbuf-2.0", "libgdk_pixbuf-2.0-0"], group = group)
-gio = library_dependency("gio", aliases = ["libgio-2.0", "libgio-2.0-0"], group = group)
+dependencies = [
+    "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Bzip2-v1.0.6-2/build_Bzip2.v1.0.6.jl",
 
-deps = [glib, gobject, gtk, gdk, gdk_pixbuf, gio]
+    "https://github.com/ianshmean/ZlibBuilder/releases/download/v1.2.11/build_Zlib.v1.2.11.jl",
+    "https://github.com/SimonDanisch/FDKBuilder/releases/download/0.1.6/build_libfdk.v0.1.6.jl",
+    "https://github.com/SimonDanisch/FribidiBuilder/releases/download/0.14.0/build_fribidi.v0.14.0.jl",
+    "https://github.com/JuliaGraphics/FreeTypeBuilder/releases/download/v2.9.1-4/build_FreeType2.v2.10.0.jl",
+    "https://github.com/JuliaIO/LibassBuilder/releases/download/v0.14.0-2/build_libass.v0.14.0.jl",
 
-if Sys.islinux()
-    provides(AptGet, "libgtk-3-dev", deps)
-    provides(Yum, "gtk3", deps)
+    "https://github.com/JuliaIO/LAMEBuilder/releases/download/v3.100.0-2/build_liblame.v3.100.0.jl",
+
+    "https://github.com/JuliaIO/OggBuilder/releases/download/v1.3.3-7/build_Ogg.v1.3.3.jl",
+    "https://github.com/JuliaIO/LibVorbisBuilder/releases/download/v1.3.6-2/build_libvorbis.v1.3.6.jl",
+
+    "https://github.com/JuliaIO/LibVPXBuilder/releases/download/v1.8.0/build_LibVPX.v1.8.0.jl",
+    "https://github.com/JuliaIO/x264Builder/releases/download/v2019.5.25-static/build_x264Builder.v2019.5.25.jl",
+    "https://github.com/JuliaIO/x265Builder/releases/download/v3.0.0-static/build_x265Builder.v3.0.0.jl",
+
+    "https://github.com/JuliaIO/FFMPEGBuilder/releases/download/v4.1.0/build_FFMPEG.v4.1.0.jl"
+]
+
+
+for dependency in dependencies
+    file = joinpath(@__DIR__, basename(dependency))
+    isfile(file) || download(dependency, file)
+    # it's a bit faster to run the build in an anonymous module instead of
+    # starting a new julia process
+
+    # Build the dependencies
+    Mod = @eval module Anon end
+    Mod.include(file)
 end
 
-if Sys.iswindows()
-    using WinRPM
-    provides(WinRPM.RPM,"libgtk-3-0", [gtk,gdk,gdk_pixbuf,glib,gio], os = :Windows)
-    provides(WinRPM.RPM,"libgobject-2_0-0", [gobject], os = :Windows)
-
-    # install some other quasi-required packages
-    WinRPM.install([
-        "glib2-tools","gtk3-tools","gtk2-tools",
-        "pango-tools","gdk-pixbuf-query-loaders",
-        "hicolor-icon-theme","tango-icon-theme",
-        "gnome-icon-theme","gnome-icon-theme-extras",
-        "gnome-icon-theme-symbolic",];
-        yes = !isinteractive()) # don't prompt for unattended installs
-
-    # compile the schemas
-    libdir = joinpath(dirname(pathof(WinRPM)), "..", "deps","usr","$(Sys.ARCH)-w64-mingw32","sys-root","mingw","bin")
-    run(`$libdir/glib-compile-schemas $libdir/../share/glib-2.0/schemas`)
-end
-
-if Sys.isapple()
-    using Homebrew
-    provides(Homebrew.HB, "gtk+3", [gtk, gdk, gobject], os = :Darwin, onload =
-        """
-        function __init__bindeps__()
-            if "XDG_DATA_DIRS" in keys(ENV)
-                ENV["XDG_DATA_DIRS"] *= ":" * joinpath("$(Homebrew.brew_prefix)", "share")
-            else
-                ENV["XDG_DATA_DIRS"] = joinpath("$(Homebrew.brew_prefix)", "share")
-            end
-	    ENV["GDK_PIXBUF_MODULEDIR"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders")
-	    ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
-	    run(`$(joinpath("$(Homebrew.brew_prefix)", "bin/gdk-pixbuf-query-loaders")) --update-cache`)
-        end
-        """)
-    provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
-    provides(Homebrew.HB, "gdk-pixbuf", gdk_pixbuf, os = :Darwin)
-    Homebrew.add("adwaita-icon-theme")
-end
-
-@BinDeps.install Dict([
-    (:glib, :libglib),
-    (:gobject, :libgobject),
-    (:gtk, :libgtk),
-    (:gdk, :libgdk),
-    (:gdk_pixbuf, :libgdk_pixbuf),
-    (:gio, :libgio),
-])
+# Finally, write out a deps.jl file
+write_deps_file(joinpath(@__DIR__, "deps.jl"), products)
