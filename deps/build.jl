@@ -10,7 +10,7 @@ products = Product[
     LibraryProduct(prefix, ["libglib"], :libglib),
     LibraryProduct(prefix, ["libgobject"], :gobject),
     LibraryProduct(prefix, ["libgio"], :gio),
-    
+    # Gets to here!
     LibraryProduct(prefix, ["libgtk"], :gtk),
     LibraryProduct(prefix, ["libgdk"], :gdk),
     LibraryProduct(prefix, ["libgdk_pixbuf"], :gdk_pixbuf),
@@ -18,8 +18,19 @@ products = Product[
 ]
 
 dependencies = [
+    # We need zlib
     "https://github.com/bicycle1885/ZlibBuilder/releases/download/v1.0.4/build_Zlib.v1.2.11.jl",
+    # We need libffi
+    "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Libffi-v3.2.1-0/build_Libffi.v3.2.1.jl",
+    # We need gettext
+    "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Gettext-v0.19.8-0/build_Gettext.v0.19.8.jl",
+    # We need pcre
+    "https://github.com/JuliaPackaging/Yggdrasil/releases/download/PCRE-v8.42-2/build_PCRE.v8.42.0.jl",
+    # We need iconv
+    "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Libiconv-v1.15-0/build_Libiconv.v1.15.0.jl",
+    # We need Glib
     "https://github.com/JuliaPackaging/Yggdrasil/releases/download/Glib-v2.59.0%2B0/build_Glib.v2.59.0.jl",
+
 
 ]
 
