@@ -3,11 +3,18 @@ module Gtk
 
 using Compat
 
+# Load in `deps.jl`, complaining if it does not exist
+const depsjl_path = joinpath(@__DIR__, "..", "deps", "deps.jl")
+if !isfile(depsjl_path)
+    println("Deps path: $depsjl_path")
+    error("Gtk not installed properly, run `] build Gtk`, restart Julia and try again")
+end
+
 const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef 
+import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,
@@ -39,7 +46,6 @@ export GAccessor
 include("basic_exports.jl")
 include("long_exports.jl")
 include("long_leaf_exports.jl")
-include(joinpath("..", "deps", "ext.jl"))
 
 if gtk_version == 3
   global const libgtk_version = VersionNumber(
