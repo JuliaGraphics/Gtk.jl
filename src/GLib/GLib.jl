@@ -1,7 +1,5 @@
 module GLib
 
-using Compat
-
 if false
 function include(x)
     println("including $x")

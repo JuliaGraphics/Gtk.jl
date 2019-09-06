@@ -1,6 +1,5 @@
 import Gtk
 import Gtk.GLib: g_type, g_type_from_name, g_isa, GObject, get_fn_ptr
-importall Gtk.GLib.Compat
 import Clang, Clang.cindex
 
 function gen_g_type_lists(gtk_h)

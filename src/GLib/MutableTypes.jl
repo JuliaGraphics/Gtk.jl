@@ -1,5 +1,4 @@
 module MutableTypes
-using Compat
 export mutable, Mutable, deref
 
 abstract type Mutable{T} end
