@@ -6,11 +6,19 @@ os:
 julia:
   - 0.7
   - 1.0
+  - 1.2
+  - nightly
+
+matrix:
+  include:
+    - os: osx
+      osx_img: xcode9.2   # build on macOS 10.12, since there are Homebrew issues for Cairo for later versions
+
 # uncomment the following lines to allow failures on nightly julia
 # (tests will run but not make your overall status red)
 matrix:
   allow_failures:
-  - julia: 1.0
+  - julia: nightly
 notifications:
     email: false
 addons:
