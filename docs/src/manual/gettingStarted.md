@@ -18,6 +18,8 @@ push!(win,b)
 ```
 Finally, `showall(win)` will render the entire application on the screen.
 
+Note that if you run the above example and only a blank window renders, see the `Common Issues` section [here](../index.md#common-issues). 
+
 ## Extended Example
 
 We will now extend the example to let the button actually do something. To this end we first define a callback function that will be executed when the user clicks the button. Our callback function is supposed to change the window title of the application

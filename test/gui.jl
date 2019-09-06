@@ -2,7 +2,6 @@
 
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
-using Compat
 
 ## for FileFilter
 # This is just for testing, and be careful of garbage collection while using this
@@ -792,13 +791,13 @@ signal_emit(c, "button-press-event", Bool, press2)
 pop!((c.mouse,:button1press))
 signal_emit(c, "button-press-event", Bool, press1)
 signal_emit(c, "button-press-event", Bool, press2)
-str = Compat.String(take!(io))
+str = String(take!(io))
 @test str == "cb1_1\ncb2_1\ncb1_2\ncb2_1\ncb1_2\ncb2_2\ncb1_1\ncb2_2\n"
 
 c.mouse.scroll = (widget,event) -> println(io, "scrolling")
 scroll = Gtk.GdkEventScroll(Gtk.GdkEventType.SCROLL, Gtk.gdk_window(c), Int8(0), UInt32(0), 0.0, 0.0, UInt32(0), Gtk.GdkScrollDirection.UP, convert(Ptr{Float64},C_NULL), 0.0, 0.0, 0.0, 0.0)
 signal_emit(c, "scroll-event", Bool, scroll)
-str = Compat.String(take!(io))
+str = String(take!(io))
 @test str == "scrolling\n"
 
 destroy(w)

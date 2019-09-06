@@ -1,13 +1,11 @@
 # julia Gtk interface
 module Gtk
 
-using Compat
-
 const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef 
+import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock,

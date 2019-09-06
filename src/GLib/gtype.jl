@@ -399,7 +399,6 @@ end
 
 function delref(@nospecialize(x))
     # internal helper function
-    # for v0.4 compat, this is toplevel function
     exiting[] && return # unnecessary to cleanup if we are about to die anyways
     if gc_preserve_glib_lock[] || g_yielded[]
         push!(await_finalize, x)
@@ -410,7 +409,6 @@ function delref(@nospecialize(x))
 end
 function addref(@nospecialize(x))
     # internal helper function
-    # for v0.4 compat, this is toplevel function
     ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
     finalizer(delref, x)
     delete!(gc_preserve_glib, x) # in v0.2, the WeakRef assignment below wouldn't update the key

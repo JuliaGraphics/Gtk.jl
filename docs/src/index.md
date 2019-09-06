@@ -30,3 +30,14 @@ Gtk is precompilable by normal mechanisms. For further reduction of startup time
 ## Attribution
 
 Gtk logo is made by Andreas Nilsson [[GFDL](https://www.gnu.org/copyleft/fdl.html) or [CC-BY-SA-3.0](https://creativecommons.org/licenses/by-sa/3.0/)], via Wikimedia Commons
+
+## Common Issues
+
+If you are running Gtk on MacOS Mojave, it's likely that when you try one of te examples, a blank window will render. In order to fix this, you can run the following commands which will downgrade your version of `glib` to the compatible version for `Gtk.jl`
+
+Command to run: 
+```julia
+using Homebrew
+Homebrew.brew(`unlink glib`)
+Homebrew.brew(`install https://raw.githubusercontent.com/Homebrew/homebrew-core/b27a055812fe620e0d3dbe67f2a424ed3a846ecf/Formula/glib.rb`)
+```
