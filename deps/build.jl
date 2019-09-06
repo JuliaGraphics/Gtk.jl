@@ -1,4 +1,4 @@
-using BinDeps, Compat
+using BinDeps
 
 @BinDeps.setup
 
@@ -50,9 +50,9 @@ if Sys.isapple()
             else
                 ENV["XDG_DATA_DIRS"] = joinpath("$(Homebrew.brew_prefix)", "share")
             end
-	    ENV["GDK_PIXBUF_MODULEDIR"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders")
-	    ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
-	    run(`$(joinpath("$(Homebrew.brew_prefix)", "bin/gdk-pixbuf-query-loaders")) --update-cache`)
+        ENV["GDK_PIXBUF_MODULEDIR"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders")
+        ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath("$(Homebrew.brew_prefix)", "lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
+        run(`$(joinpath("$(Homebrew.brew_prefix)", "bin/gdk-pixbuf-query-loaders")) --update-cache`)
         end
         """)
     provides(Homebrew.HB, "glib", [glib, gio], os = :Darwin)
