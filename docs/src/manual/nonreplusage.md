@@ -16,4 +16,16 @@ if !isinteractive()
 end
 ```
 
-By waiting on a `Condition`, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit).
+By waiting on a `Condition`, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit). This can be shortened by using the function waitforsignal:
+
+
+
+```julia
+win = Window("gtkwait")
+
+# Put your GUI code here
+
+if !isinteractive()
+    waitforsignal(win,:destroy)
+end
+```
