@@ -14,6 +14,7 @@ matrix:
   allow_failures:
     - julia: nightly
     - os: osx
+    - stage: "Documentation" # This shouldn't be necessary
 notifications:
   email: false
 git:
