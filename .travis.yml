@@ -24,6 +24,8 @@ addons:
       - xvfb
       - xauth
       - libgtk-3-dev
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 jobs:
   include:
     - stage: "Documentation"
