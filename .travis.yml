@@ -2,7 +2,7 @@ language: julia
 sudo: required
 os:
   - linux
-  #- osx
+  - osx
 julia:
   #- 0.7
   - 1.0
@@ -23,10 +23,6 @@ addons:
       - xvfb
       - xauth
       - libgtk-3-dev
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
-  - $TESTCMD -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
 jobs:
   include:
     - stage: "Documentation"
@@ -36,20 +32,3 @@ jobs:
         - julia --project=docs/ -e 'import Pkg; Pkg.instantiate(); Pkg.develop(Pkg.PackageSpec(path=pwd()))'
         - julia --project=docs/ docs/make.jl
       after_success: skip
-after_success:
-  - julia -e 'using Pkg;
-              import Gtk;
-              cd(joinpath(dirname(pathof(Gtk))));
-              Pkg.add("Coverage");
-              using Coverage;
-              Coveralls.submit(Coveralls.process_folder())'
-  # update the documentation
-  - julia -e 'using Pkg;
-              ps=Pkg.PackageSpec(name="Documenter");
-              Pkg.add(ps);
-              Pkg.pin(ps)'
-  - $TESTCMD -e 'using Pkg;
-                 import Gtk;
-                 cd(joinpath(dirname(pathof(Gtk))));
-                 ENV["DOCUMENTER_DEBUG"] = "true";
-                 include(joinpath("docs", "make.jl"))'
