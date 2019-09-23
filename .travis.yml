@@ -1,4 +1,5 @@
 language: julia
+coveralls: true
 sudo: required
 os:
   - linux
