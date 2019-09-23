@@ -2,12 +2,12 @@ language: julia
 sudo: required
 os:
   - linux
-  - osx
+  #- osx
 julia:
-  - 0.7
+  #- 0.7
   - 1.0
-  - 1.2
-  - nightly
+  #- 1.2
+  #- nightly
 # (tests will run but not make your overall status red)
 matrix:
   allow_failures:
