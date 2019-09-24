@@ -74,12 +74,12 @@ place_cursor(b, it2)
 @test b.cursor_position[Int] == get_gtk_property(it2, :offset)
 
 # search 
-(found, its, ite) = search(b, "line1", :backward)
+(found, its, ite) = Gtk.search(b, "line1", :backward)
 @test found == true
 @test (its:ite).text[String] == "line1"
 
 place_cursor(b, ite)
-(found, its, ite) = search(b, "line2", :forward)
+(found, its, ite) = Gtk.search(b, "line2", :forward)
 @test found == true
 @test (its:ite).text[String] == "line2"
 
