@@ -183,14 +183,14 @@ struct FieldRef{T}
     field::Symbol
 
     global function getproperty(obj::T, field::Symbol) where {T <: GObject}
-        isdefined(obj,field) && return getfield(obj,field)
+        isdefined(obj, field) && return getfield(obj, field)
         new{T}(obj, field)
     end
     
-    FieldRef(obj::T,field::Symbol) where T = new{T}(obj,field)
+    FieldRef(obj::T, field::Symbol) where T = new{T}(obj, field)
 end
 
-getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj,f.field,T)
+getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj, f.field,T)
 
 function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
     isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)

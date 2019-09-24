@@ -44,6 +44,14 @@ it2 = GtkTextIter(b, 2)
 it2 -= 1
 @test mutable(it1) == it2
 
+# getproperty
+@test it1.offset[Int] == 0 #Gtk indices are zero based
+@test it2.offset[Int] == 0
+
+it1 = mutable(it1)
+it1.offset[Int] = 1
+@test it1.offset[Int] == 1
+
 # skip
 skip(it2, 1, :line)
 @test get_gtk_property(it2, :line) == 1

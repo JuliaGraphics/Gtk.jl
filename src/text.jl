@@ -78,6 +78,11 @@ function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
     iter[]
 end
 
+function getproperty(obj::TI, field::Symbol)
+    isdefined(obj,field) && return getfield(obj,field)
+    FieldRef(obj, field)
+end
+
 show(io::IO, iter::GtkTextIter) = println("GtkTextIter($( get_gtk_property(iter,:offset,Int) ))")
 
 buffer(iter::TI) = convert(GtkTextBuffer,
