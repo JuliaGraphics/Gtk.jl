@@ -530,6 +530,7 @@ end
 
 """
     select_range(buffer::GtkTextBuffer, ins::TI, bound::TI)
+    select_range(buffer::GtkTextBuffer, range::GtkTextRange)
 
 Select the text in `buffer` accorind to GtkTextIter `ins` and `bound`.
 
@@ -538,6 +539,7 @@ Implements `gtk_text_buffer_select_range`.
 function select_range(buffer::GtkTextBuffer, ins::TI, bound::TI)
     ccall((:gtk_text_buffer_select_range, libgtk), Cvoid, (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}), buffer, ins, bound)
 end
+select_range(buffer::GtkTextBuffer, range::GtkTextRange) = select_range(buffer, range.a, range.b) 
 
 """
     place_cursor(buffer::GtkTextBuffer, it::GtkTextIter)
