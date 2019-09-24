@@ -53,6 +53,11 @@ zero(::Type{GtkTextIter}) = GtkTextIter()
 copy(ti::GtkTextIter) = ti
 copy(ti::Mutable{GtkTextIter}) = mutable(ti[])
 
+"""
+    GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
+
+Creates a `GtkTextIter` with offset `char_offset` (one-based index).
+"""
 function GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
     iter = mutable(GtkTextIter)
     ccall((:gtk_text_buffer_get_iter_at_offset, libgtk), Nothing,
@@ -85,9 +90,21 @@ end
 
 show(io::IO, iter::GtkTextIter) = println("GtkTextIter($( get_gtk_property(iter,:offset,Int) ))")
 
+
+"""
+    buffer(iter::Union{Mutable{GtkTextIter}, GtkTextIter})
+
+Returns the buffer associated with `iter`.
+"""
 buffer(iter::TI) = convert(GtkTextBuffer,
     ccall((:gtk_text_iter_get_buffer, libgtk),Ptr{GtkTextBuffer},(Ref{GtkTextIter},),iter)
 )
+
+"""
+    char_offset(iter::Union{Mutable{GtkTextIter}, GtkTextIter})
+
+Returns the offset of `iter` (one-based index).
+"""
 char_offset(iter::TI) = get_gtk_property(iter, :offset)+1
 
 Base.cconvert(::Type{Ref{GtkTextIter}}, it::GtkTextIter) = Ref(it)
@@ -575,6 +592,18 @@ function remove_all_tags(buffer::GtkTextBuffer, itstart::TI, itend::TI)
          (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}),
          buffer, itstart, itend)
 end
+
+"""
+    create_mark(buffer::GtkTextBuffer, mark_name, it::TI, left_gravity::Bool)
+    create_mark(buffer::GtkTextBuffer, it::TI)
+
+Impements `gtk_text_buffer_create_mark`.
+"""
+create_mark(buffer::GtkTextBuffer, mark_name, it::TI, left_gravity::Bool)  = 
+    GtkTextMarkLeaf(ccall((:gtk_text_buffer_create_mark, libgtk), Ptr{GObject},
+    (Ptr{Gtk.GObject}, Ptr{UInt8}, Ref{GtkTextIter}, Cint), buffer, mark_name, it, left_gravity))
+
+create_mark(buffer::GtkTextBuffer, it::TI)  = create_mark(buffer, C_NULL, it, false)
 
 #####  GtkTextView  #####
 #TODO: scrolling/views, child overlays

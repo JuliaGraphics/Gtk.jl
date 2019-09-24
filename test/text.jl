@@ -52,6 +52,8 @@ it1 = mutable(it1)
 it1.offset[Int] = 1
 @test it1.offset[Int] == 1
 
+create_mark(b,it)
+
 # skip
 skip(it2, 1, :line)
 @test get_gtk_property(it2, :line) == 1

@@ -64,16 +64,14 @@ function g_timeout_add_cb(user_data)
 end
 
 x[] = 1 #reset
-Gtk.GLib.g_idle_add(g_timeout_add_cb, x)
+Gtk.GLib.g_idle_add(()->g_timeout_add_cb(x))
 sleep(0.5)
 @test x[] == 2
 
 x[] = 1 #reset
-Gtk.GLib.g_timeout_add(1, g_timeout_add_cb, x)
+Gtk.GLib.g_timeout_add(()->g_timeout_add_cb(x), 1)
 sleep(0.5)
 @test x[] == 2
-
-
 
 end
 
