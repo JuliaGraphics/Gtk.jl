@@ -10,7 +10,8 @@ export new, width, height, #minsize, maxsize
     keyval, prev, up, down, popup,
     convert_iter_to_child_iter, convert_child_iter_to_iter,
     pulse,
-    buffer, cells
+    buffer, cells, search, place_cursor, select_range, selection_bounds,
+    create_mark
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 

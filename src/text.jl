@@ -47,10 +47,17 @@ struct GtkTextIter
   dummy14::Ptr{Nothing}
   GtkTextIter() = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
+
 const TI = Union{Mutable{GtkTextIter}, GtkTextIter}
 zero(::Type{GtkTextIter}) = GtkTextIter()
 copy(ti::GtkTextIter) = ti
 copy(ti::Mutable{GtkTextIter}) = mutable(ti[])
+
+"""
+    GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
+
+Creates a `GtkTextIter` with offset `char_offset` (one-based index).
+"""
 function GtkTextIter(text::GtkTextBuffer, char_offset::Integer)
     iter = mutable(GtkTextIter)
     ccall((:gtk_text_buffer_get_iter_at_offset, libgtk), Nothing,
@@ -76,10 +83,33 @@ function GtkTextIter(text::GtkTextBuffer, mark::GtkTextMark)
     iter[]
 end
 
+function getproperty(obj::TI, field::Symbol)
+    isdefined(obj,field) && return getfield(obj,field)
+    FieldRef(obj, field)
+end
+
 show(io::IO, iter::GtkTextIter) = println("GtkTextIter($( get_gtk_property(iter,:offset,Int) ))")
 
-Base.cconvert(::Type{Ref{GtkTextIter}},x::GtkTextIter) = Ref(x)
-Base.cconvert(::Type{Ref{GtkTextIter}},x::Gtk.Mutable{GtkTextIter}) = Ref(x[])
+
+"""
+    buffer(iter::Union{Mutable{GtkTextIter}, GtkTextIter})
+
+Returns the buffer associated with `iter`.
+"""
+buffer(iter::TI) = convert(GtkTextBuffer,
+    ccall((:gtk_text_iter_get_buffer, libgtk),Ptr{GtkTextBuffer},(Ref{GtkTextIter},),iter)
+)
+
+"""
+    char_offset(iter::Union{Mutable{GtkTextIter}, GtkTextIter})
+
+Returns the offset of `iter` (one-based index).
+"""
+char_offset(iter::TI) = get_gtk_property(iter, :offset)+1
+
+Base.cconvert(::Type{Ref{GtkTextIter}}, it::GtkTextIter) = Ref(it)
+Base.cconvert(::Type{Ref{GtkTextIter}}, it::Gtk.Mutable{GtkTextIter}) = Ref(it[])
+Base.convert(::Type{GtkTextIter}, it::Mutable{GtkTextIter}) = GtkTextIter(buffer(it), char_offset(it))#there's a -1 in the constructor
 
 struct GtkTextRange <: AbstractRange{Char}
     a::MutableTypes.MutableX{GtkTextIter}
@@ -202,9 +232,76 @@ iterate(::TI, iter=start_(iter)) =
 Base.:+(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, count); iter)
 Base.:-(iter::TI, count::Integer) = (iter = mutable(copy(iter)); skip(iter, -count); iter)
 
+"""
+    skip(iter::Mutable{GtkTextIter}, count::Integer)
+
+Moves `iter` `count` characters. Returns a Bool indicating if the move was 
+successful.
+"""
 Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
     Bool(ccall((:gtk_text_iter_forward_chars, libgtk), Cint,
         (Ptr{GtkTextIter}, Cint), iter, count))
+
+"""
+    skip(iter::Mutable{GtkTextIter}, what::Symbol)
+
+Moves `iter` according to the operation specified by `what`.
+Operations are :
+
+* :forward_line (gtk_text_iter_forward_line)
+* :backward_line (gtk_text_iter_backward_line)
+* :forward_to_line_end (gtk_text_iter_forward_to_line_end)
+* :backward_word_start (gtk_text_iter_forward_word_end)
+* :forward_word_end (gtk_text_iter_backward_word_start)
+* :backward_sentence_start (gtk_text_iter_backward_sentence_start)
+* :forward_sentence_end (gtk_text_iter_forward_sentence_end)
+"""
+function Base.skip(iter::Mutable{GtkTextIter}, what::Symbol) 
+    if     what === :backward_line
+        Bool(ccall((:gtk_text_iter_backward_line, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :forward_line
+        Bool(ccall((:gtk_text_iter_forward_line, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :forward_to_line_end
+        Bool(ccall((:gtk_text_iter_forward_to_line_end, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :forward_word_end
+        Bool(ccall((:gtk_text_iter_forward_word_end, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :backward_word_start
+        Bool(ccall((:gtk_text_iter_backward_word_start, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :backward_sentence_start
+        Bool(ccall((:gtk_text_iter_backward_sentence_start, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    elseif what === :forward_sentence_end
+        Bool(ccall((:gtk_text_iter_forward_sentence_end, libgtk), Cint,
+            (Ptr{GtkTextIter},), iter))
+    else
+        @warn "GtkTextIter doesn't have iterator of type $what"
+        false
+    end::Bool
+
+end
+
+"""
+    skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
+
+Moves `iter` according to the operation specified by `what` and
+`count`.
+Operations are :
+
+* :chars (gtk_text_iter_forward_chars)
+* :lines (gtk_text_iter_forward_lines)
+* :words (gtk_text_iter_forward_word_ends)
+* :word_cursor_positions (gtk_text_iter_forward_cursor_positions)
+* :sentences (gtk_text_iter_forward_sentence_ends)
+* :visible_words (gtk_text_iter_forward_visible_word_ends)
+* :visible_cursor_positions (gtk_text_iter_forward_visible_cursor_positions)
+* :visible_lines (gtk_text_iter_forward_visible_lines)
+* :line_ends (gtk_text_iter_forward_visible_lines)
+"""
 function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
     if     what === :char || what === :chars
         Bool(ccall((:gtk_text_iter_forward_chars, libgtk), Cint,
@@ -252,11 +349,73 @@ function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
 end
 #    gtk_text_iter_forward_to_tag_toggle
 #    gtk_text_iter_forward_find_char
-#    gtk_text_iter_forward_search
 
-buffer(iter::TI) = convert(GtkTextBuffer,
-    ccall((:gtk_text_iter_get_buffer, libgtk),Ptr{GtkTextBuffer},(Ref{GtkTextIter},),iter)
-)
+
+"""
+    forward_search(iter::Mutable{GtkTextIter}, 
+        str::AbstractString, start::Mutable{GtkTextIter},
+        stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
+
+    Implements `gtk_text_iter_forward_search`.
+"""
+function forward_search(iter::Mutable{GtkTextIter}, 
+    str::AbstractString, start::Mutable{GtkTextIter},
+    stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
+
+    Bool(ccall((:gtk_text_iter_forward_search, libgtk),
+        Cint,
+        (Ptr{GtkTextIter}, Ptr{UInt8}, Cint, Ptr{GtkTextIter}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+        iter, string(str), flag, start, stop, limit
+    ))
+end
+
+"""
+    backward_search(iter::Mutable{GtkTextIter}, 
+        str::AbstractString, start::Mutable{GtkTextIter},
+        stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
+
+    Implements `gtk_text_iter_backward_search`.
+"""
+function backward_search(iter::Mutable{GtkTextIter}, 
+    str::AbstractString, start::Mutable{GtkTextIter},
+    stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
+
+    Bool(ccall((:gtk_text_iter_backward_search, libgtk),
+        Cint,
+        (Ptr{GtkTextIter}, Ptr{UInt8}, Cint, Ptr{GtkTextIter}, Ptr{GtkTextIter}, Ptr{GtkTextIter}),
+        iter, string(str), flag, start, stop, limit
+    ))
+end
+
+"""
+    search(buffer::GtkTextBuffer, str::AbstractString, direction = :forward,
+        flag = GtkTextSearchFlags.GTK_TEXT_SEARCH_TEXT_ONLY)
+
+Search text `str` in buffer in `direction` :forward or :backward starting from
+the cursor position in the buffer. 
+
+Returns a tuple `(found, start, stop)` where `found` indicates whether the search
+was successful and `start` and `stop` are GtkTextIters containing the location of the match.
+"""
+function search(buffer::GtkTextBuffer, str::AbstractString, direction = :forward,
+    flag = GtkTextSearchFlags.GTK_TEXT_SEARCH_TEXT_ONLY)
+
+    start = mutable(GtkTextIter(buffer))
+    stop  = mutable(GtkTextIter(buffer))
+    iter  = mutable(GtkTextIter(buffer, buffer.cursor_position[Int]))
+
+    if direction == :forward
+        limit = mutable(GtkTextIter(buffer, length(buffer)+1))
+        found = forward_search( iter, str, start, stop, limit, flag)
+    elseif direction == :backward
+        limit = mutable(GtkTextIter(buffer, 1))
+        found = backward_search(iter, str, start, stop, limit, flag)
+    else
+        error("Search direction must be :forward or :backward.")
+    end
+
+    return (found, start, stop)
+end
 
 #####  GtkTextRange  #####
 
@@ -352,6 +511,47 @@ function splice!(text::GtkTextBuffer)
     text
 end
 
+"""
+    selection_bounds(buffer::GtkTextBuffer)
+
+Returns a tuple `(selected, start, stop)` indicating if text is selected
+in the `buffer`, and if so sets the GtkTextIter `start` and `stop` to point to 
+the selected text. 
+
+Implements `gtk_text_buffer_get_selection_bounds`.
+"""
+function selection_bounds(buffer::GtkTextBuffer)
+    start = mutable(GtkTextIter(buffer))
+    stop  = mutable(GtkTextIter(buffer))
+    selected = Bool(ccall((:gtk_text_buffer_get_selection_bounds,libgtk), Cint,
+        (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{GtkTextIter}), buffer, start, stop))
+    return (selected, start, stop)
+end
+
+"""
+    select_range(buffer::GtkTextBuffer, ins::TI, bound::TI)
+    select_range(buffer::GtkTextBuffer, range::GtkTextRange)
+
+Select the text in `buffer` accorind to GtkTextIter `ins` and `bound`.
+
+Implements `gtk_text_buffer_select_range`.
+"""
+function select_range(buffer::GtkTextBuffer, ins::TI, bound::TI)
+    ccall((:gtk_text_buffer_select_range, libgtk), Cvoid, (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}), buffer, ins, bound)
+end
+select_range(buffer::GtkTextBuffer, range::GtkTextRange) = select_range(buffer, range.a, range.b) 
+
+"""
+    place_cursor(buffer::GtkTextBuffer, it::GtkTextIter)
+    place_cursor(buffer::GtkTextBuffer, pos::Int)
+
+Place the cursor at indicated position. 
+"""
+place_cursor(buffer::GtkTextBuffer, it::GtkTextIter)  = 
+    ccall((:gtk_text_buffer_place_cursor, libgtk), Cvoid, (Ptr{GObject}, Ref{GtkTextIter}), buffer, it)
+place_cursor(buffer::GtkTextBuffer, pos::Int) = place_cursor(buffer, GtkTextIter(buffer, pos))
+place_cursor(buffer::GtkTextBuffer, it::Mutable{GtkTextIter}) = place_cursor(buffer, convert(GtkTextIter,it))
+
 begin_user_action(buffer::GtkTextBuffer) =
   ccall((:gtk_text_buffer_begin_user_action, libgtk), Nothing, (Ptr{GObject},), buffer)
 
@@ -394,6 +594,18 @@ function remove_all_tags(buffer::GtkTextBuffer, itstart::TI, itend::TI)
          (Ptr{GObject}, Ref{GtkTextIter}, Ref{GtkTextIter}),
          buffer, itstart, itend)
 end
+
+"""
+    create_mark(buffer::GtkTextBuffer, mark_name, it::TI, left_gravity::Bool)
+    create_mark(buffer::GtkTextBuffer, it::TI)
+
+Impements `gtk_text_buffer_create_mark`.
+"""
+create_mark(buffer::GtkTextBuffer, mark_name, it::TI, left_gravity::Bool)  = 
+    GtkTextMarkLeaf(ccall((:gtk_text_buffer_create_mark, libgtk), Ptr{GObject},
+    (Ptr{Gtk.GObject}, Ptr{UInt8}, Ref{GtkTextIter}, Cint), buffer, mark_name, it, left_gravity))
+
+create_mark(buffer::GtkTextBuffer, it::TI)  = create_mark(buffer, C_NULL, it, false)
 
 #####  GtkTextView  #####
 #TODO: scrolling/views, child overlays
