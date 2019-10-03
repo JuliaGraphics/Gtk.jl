@@ -1,6 +1,27 @@
 # julia Gtk interface
 module Gtk
 
+# Import binary definitions
+using GTK3_jll
+using Glib_jll
+using gdk_pixbuf_jll
+const libgdk = libgdk3
+const libgtk = libgtk3
+
+
+function __init__()
+    # Set up environment variables so that gdk-pixbuf can find its loaders
+    if get(ENV, "GDK_PIXBUF_MODULEDIR", "") == ""
+        ENV["GDK_PIXBUF_MODULEDIR"] = joinpath(
+            dirname(gdk_pixbuf_jll.libgdkpixbuf_path),
+            "gdk-pixbuf-2.0",
+            "2.10.0",
+            "loaders",
+        )
+    end
+end
+
+
 const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
@@ -17,11 +38,7 @@ import Base: convert, show, run, size, resize!, length, getindex, setindex!,
              parent, isempty, empty!, first, last, in, popfirst!,
              eltype, copy, isvalid, string, sigatomic_begin, sigatomic_end, (:), iterate
 
-if VERSION < v"1.0"
-  import Base: showall, select!, start
-else
-  export showall, select!, start
-end
+export showall, select!, start
 
 using Reexport
 @reexport using Graphics

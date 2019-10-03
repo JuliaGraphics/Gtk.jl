@@ -111,7 +111,7 @@ end
 @gtktype GtkAboutDialog
 @gtktype GtkMessageDialog
 @Gtype GApplication libgio g_application
-@Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
+@Gtype GdkPixbuf libgdkpixbuf gdk_pixbuf
 #TODO: @gtktype GtkScaleButton
 
 @gtktype GtkApplication
