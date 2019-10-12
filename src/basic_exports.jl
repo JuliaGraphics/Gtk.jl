@@ -32,7 +32,7 @@ export add_events, signal_emit,
 # Gdk info and manipulation
 export screen_size
 
-export @guarded, @sigatom
+export @guarded, @sigatom, @idle_add
 
 # Tk-compatibility (reference of potentially missing functionality):
 #export Frame, Labelframe, Notebook, Panedwindow

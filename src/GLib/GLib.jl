@@ -20,7 +20,7 @@ export GEnum, GError, GValue, gvalue, make_gvalue, @make_gvalue, g_type
 export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
-export g_timeout_add, g_idle_add
+export g_timeout_add, g_idle_add, @idle_add
 export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom, cfunction_
