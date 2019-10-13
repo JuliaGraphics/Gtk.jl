@@ -1,7 +1,7 @@
 using Documenter, Gtk
 
 makedocs(
-    format = Documenter.HTML(),
+    format = :html,
     modules = [Gtk],
     sitename = "Gtk.jl",
     authors = "...",
@@ -27,7 +27,4 @@ makedocs(
 )
 
 deploydocs(repo   = "github.com/JuliaGraphics/Gtk.jl.git",
-           #julia  = "0.7",
-           target = "build",
-           deps   = nothing,
-           make   = nothing)
+           target = "build")

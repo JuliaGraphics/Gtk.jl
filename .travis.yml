@@ -1,8 +1,9 @@
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
 sudo: required
 os:
   - linux
-  #- osx
+  - osx
 julia:
   - 0.7
   - 1.0
@@ -13,6 +14,8 @@ julia:
 matrix:
   allow_failures:
     - julia: nightly
+    - os: osx
+    - stage: "Documentation" # This shouldn't be necessary
 notifications:
   email: false
 git:
@@ -27,20 +30,17 @@ script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
   - $TESTCMD -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
+
+## uncomment following lines to deploy documentation
+jobs:
+   include:
+     - stage: Documentation
+       julia: 1.2
+       os: linux
+       script:
+         - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
+         - xvfb-run julia --project=docs docs/make.jl
+       after_success: skip
+
 after_success:
-  - julia -e 'using Pkg;
-              import Gtk;
-              cd(joinpath(dirname(pathof(Gtk))));
-              Pkg.add("Coverage");
-              using Coverage;
-              Coveralls.submit(Coveralls.process_folder())'
-  # update the documentation
-  - julia -e 'using Pkg;
-              ps=Pkg.PackageSpec(name="Documenter", version="0.19");
-              Pkg.add(ps);
-              Pkg.pin(ps)'
-  - $TESTCMD -e 'using Pkg;
-                 import Gtk;
-                 cd(joinpath(dirname(pathof(Gtk))));
-                 ENV["DOCUMENTER_DEBUG"] = "true";
-                 include(joinpath("docs", "make.jl"))'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
