@@ -4,14 +4,13 @@ Installation should be automatic on all platforms supported by Julia.
 However, in case of trouble, these notes may help you diagnose or fix the problem.
 
 Prior to using this library, you must install a semi-recent version of `libgtk` on your computer.
-While this interface currently defaults to using `Gtk+-3`, it can be configured by editing `Gtk/deps/ext.jl` and changing the integer valued `gtk_version` variable to `2`.
 
 ### Windows
 
 The necessary libraries will be downloaded and installed automatically when you run `Pkg.add("Gtk")`.
 
 
-In case you run into some problem with the automatic installation, you can install manually 
+In case you run into some problem with the automatic installation, you can install manually
 using `WinRPM.jl`:
 
      Pkg.add("WinRPM")

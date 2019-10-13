@@ -5,36 +5,35 @@ import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChoose
 
 ## for FileFilter
 # This is just for testing, and be careful of garbage collection while using this
-if  Gtk.libgtk_version >= v"3"
-    struct GtkFileFilterInfo
-    contains::Cint
-    filename::Ptr{Int8}
-    uri::Ptr{Int8}
-    display_name::Ptr{Int8}
-    mime_type::Ptr{Int8}
-    end
-    GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
-    GtkFileFilterInfo(
-        ( (isa(filename, AbstractString) ? Gtk.GtkFileFilterFlags.FILENAME : 0) |
-        (isa(uri, AbstractString) ? Gtk.GtkFileFilterFlags.URI : 0) |
-        (isa(display_name, AbstractString) ? Gtk.GtkFileFilterFlags.DISPLAY_NAME : 0) |
-        (isa(mime_type, AbstractString) ? Gtk.GtkFileFilterFlags.MIME_TYPE : 0) ),
-        isa(filename, AbstractString) ? pointer(filename) : C_NULL,
-        isa(uri, AbstractString) ? pointer(uri) : C_NULL,
-        isa(display_name, AbstractString) ? pointer(display_name) : C_NULL,
-        isa(mime_type, AbstractString) ? pointer(mime_type) : C_NULL)
-
-    function name(filter::FileFilter)
-    nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
-    (nameptr == C_NULL) ? nothing : unsafe_string(nameptr)
-    end
-
-    needed(filter::FileFilter) =
-    ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
-    import Base.filter
-    filter(filt::FileFilter, info::GtkFileFilterInfo) =
-    ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
+struct GtkFileFilterInfo
+contains::Cint
+filename::Ptr{Int8}
+uri::Ptr{Int8}
+display_name::Ptr{Int8}
+mime_type::Ptr{Int8}
 end
+GtkFileFilterInfo(; filename = nothing, uri = nothing, display_name = nothing, mime_type = nothing) =
+GtkFileFilterInfo(
+    ( (isa(filename, AbstractString) ? Gtk.GtkFileFilterFlags.FILENAME : 0) |
+    (isa(uri, AbstractString) ? Gtk.GtkFileFilterFlags.URI : 0) |
+    (isa(display_name, AbstractString) ? Gtk.GtkFileFilterFlags.DISPLAY_NAME : 0) |
+    (isa(mime_type, AbstractString) ? Gtk.GtkFileFilterFlags.MIME_TYPE : 0) ),
+    isa(filename, AbstractString) ? pointer(filename) : C_NULL,
+    isa(uri, AbstractString) ? pointer(uri) : C_NULL,
+    isa(display_name, AbstractString) ? pointer(display_name) : C_NULL,
+    isa(mime_type, AbstractString) ? pointer(mime_type) : C_NULL)
+
+function name(filter::FileFilter)
+nameptr = ccall((:gtk_file_filter_get_name, Gtk.libgtk), Ptr{Cchar}, (Ptr{GObject}, ), filter)
+(nameptr == C_NULL) ? nothing : unsafe_string(nameptr)
+end
+
+needed(filter::FileFilter) =
+ccall((:gtk_file_filter_get_needed, Gtk.libgtk), Cint, (Ptr{GObject}, ), filter)
+import Base.filter
+filter(filt::FileFilter, info::GtkFileFilterInfo) =
+ccall((:gtk_file_filter_filter, Gtk.libgtk), UInt8, (Ptr{GObject}, Ref{GtkFileFilterInfo}), filt, info) != 0
+
 
 # for subtyping from GObject
 mutable struct MyWindow <: Window
@@ -234,20 +233,7 @@ showall(w)
 destroy(w)
 end
 
-@testset "Table" begin
-if libgtk_version < v"3"
-    grid = Table(3,3)
-    w = Window(grid, "Grid", 400, 400)
-    grid[2,2] = Button("2,2")
-    grid[2,3] = Button("2,3")
-    grid[1,1] = "grid"
-    showall(w)
-    destroy(w)
-end
-end
-
 @testset "Grid" begin
-if libgtk_version >= v"3"
     grid = Grid()
     w = Window(grid, "Grid", 400, 400)
     grid[2,2] = Button("2,2")
@@ -257,7 +243,6 @@ if libgtk_version >= v"3"
     libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
     showall(w)
     destroy(w)
-end
 end
 
 
@@ -440,10 +425,9 @@ set_gtk_property!(c[1],"max_width_chars", 5)
 w = Window(combo, "ComboGtkBoxText")|>showall
 lsl = ListStoreLeaf(combo)
 @test length(lsl) == 3
-if libgtk_version >= v"3"
-    empty!(combo)
-    @test length(lsl) == 0
-end
+empty!(combo)
+@test length(lsl) == 0
+
 destroy(w)
 
 combo = ComboBoxText(true)
@@ -611,12 +595,10 @@ end
 #destroy(w)
 
 @testset "Selectors" begin
-if libgtk_version >= v"3"   ### should work with v >= 2.4, but there is a bug for v < 3
     dlg = FileChooserDialog("Select file", Null(), GtkFileChooserAction.OPEN,
                             (("_Cancel", GtkResponseType.CANCEL),
                              ("_Open", GtkResponseType.ACCEPT)))
     destroy(dlg)
-end
 end
 
 @testset "List view" begin
@@ -691,7 +673,6 @@ destroy(w)
 end
 
 @testset "FileFilter" begin
-if libgtk_version >= v"3"
 emptyfilter = FileFilter()
 @test name(emptyfilter) == nothing
 
@@ -724,7 +705,6 @@ csvfilter4 = FileFilter(; pattern="*.csv", mimetype="text/csv")
 @test name(csvfilter4) == "*.csv"
 @test needed(csvfilter4) & Gtk.GtkFileFilterFlags.MIME_TYPE == 0
 @test filter(csvfilter4, csvfileinfo)
-end
 end
 
 # Canvas mouse callback stack operations
@@ -769,7 +749,6 @@ end
 # CSS
 
 @testset "CssProviderLeaf(filename=\"...\")" begin
-if libgtk_version >= v"3"
     style_file = joinpath(dirname(@__FILE__), "style_test.css")
 
     l = Label("I am some large blue text!")
@@ -787,7 +766,6 @@ if libgtk_version >= v"3"
     ### add css tests here
 
     destroy(w)
-end
 end
 
 @testset "Subtyping from GObject" begin

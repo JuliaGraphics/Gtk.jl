@@ -28,13 +28,11 @@ GtkToggleButtonLeaf(title::AbstractString) =
     GtkToggleButtonLeaf(ccall((:gtk_toggle_button_new_with_mnemonic, libgtk), Ptr{GObject},
         (Ptr{UInt8},), bytestring(title)))
 
-if libgtk_version >= v"3"
-    GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new, libgtk), Ptr{GObject}, ()))
-    function GtkSwitchLeaf(active::Bool)
-        b = GtkSwitchLeaf()
-        ccall((:gtk_switch_set_active, libgtk), Nothing, (Ptr{GObject}, Cint), b, active)
-        b
-    end
+GtkSwitchLeaf() = GtkSwitchLeaf(ccall((:gtk_switch_new, libgtk), Ptr{GObject}, ()))
+function GtkSwitchLeaf(active::Bool)
+    b = GtkSwitchLeaf()
+    ccall((:gtk_switch_set_active, libgtk), Nothing, (Ptr{GObject}, Cint), b, active)
+    b
 end
 
 GtkRadioButtonLeaf(group::Ptr{Nothing} = C_NULL) =

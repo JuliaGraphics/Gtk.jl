@@ -20,11 +20,7 @@ mutable struct GtkCanvas <: GtkDrawingArea # NOT an @GType
         signal_connect(notify_realize, widget, "realize", Nothing, ())
         signal_connect(notify_unrealize, widget, "unrealize", Nothing, ())
         on_signal_resize(notify_resize, widget)
-        if libgtk_version >= v"3"
-            signal_connect(canvas_on_draw_event, widget, "draw", Cint, (Ptr{Nothing},))
-        else
-            signal_connect(canvas_on_expose_event, widget, "expose-event", Cint, (Ptr{Nothing},))
-        end
+        signal_connect(canvas_on_draw_event, widget, "draw", Cint, (Ptr{Nothing},))
         push!(ids, on_signal_button_press(mousedown_cb, widget, false, widget.mouse))
         push!(ids, on_signal_button_release(mouseup_cb, widget, false, widget.mouse))
         push!(ids, on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse))

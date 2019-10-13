@@ -39,17 +39,10 @@ include("long_exports.jl")
 include("long_leaf_exports.jl")
 include(joinpath("..", "deps", "ext.jl"))
 
-if gtk_version == 3
-  global const libgtk_version = VersionNumber(
+global const libgtk_version = VersionNumber(
       ccall((:gtk_get_major_version, libgtk), Cint, ()),
       ccall((:gtk_get_minor_version, libgtk), Cint, ()),
       ccall((:gtk_get_micro_version, libgtk), Cint, ()))
-else
-  global const libgtk_version = VersionNumber(
-      unsafe_load(cglobal((:gtk_major_version, libgtk), Cuint)),
-      unsafe_load(cglobal((:gtk_minor_version, libgtk), Cuint)),
-      unsafe_load(cglobal((:gtk_micro_version, libgtk), Cuint)))
-end
 
 include("gdk.jl")
 include("interfaces.jl")

@@ -17,15 +17,10 @@ function allocation(widget::Gtk.GtkWidget)
     ccall((:gtk_widget_get_allocation, libgtk), Nothing, (Ptr{GObject}, Ptr{GdkRectangle}), widget, allocation_)
     return allocation_[1]
 end
-if libgtk_version >= v"3"
-    width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width, libgtk), Cint, (Ptr{GObject},), w)
-    height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height, libgtk), Cint, (Ptr{GObject},), w)
-    size(w::GtkWidget) = (width(w), height(w))
-else
-    width(w::GtkWidget) = allocation(w).width
-    height(w::GtkWidget) = allocation(w).height
-    size(w::GtkWidget) = (a = allocation(w); (a.width, a.height))
-end
+width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width, libgtk), Cint, (Ptr{GObject},), w)
+height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height, libgtk), Cint, (Ptr{GObject},), w)
+size(w::GtkWidget) = (width(w), height(w))
+
 gdk_window(w::GtkWidget) = ccall((:gtk_widget_get_window, libgtk), Ptr{Nothing}, (Ptr{GObject},), w)
 screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 
