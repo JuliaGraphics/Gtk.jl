@@ -29,19 +29,19 @@ function g_timeout_add_cb()
     false
 end
 
-Gtk.GLib.g_idle_add(g_timeout_add_cb)
+g_idle_add(g_timeout_add_cb)
 sleep(0.5)
 @test x[] == 2
 
 x[] = 1 #reset
-Gtk.GLib.g_timeout_add(g_timeout_add_cb, 1)
+g_timeout_add(g_timeout_add_cb, 1)
 sleep(0.5)
 @test x[] == 2
 
 # do syntax
 
 x[] = 1 #reset
-Gtk.GLib.g_idle_add() do
+g_idle_add() do
   x[] = 2
   return false # only call once
 end
@@ -49,9 +49,18 @@ sleep(0.5)
 @test x[] == 2
 
 x[] = 1 #reset
-Gtk.GLib.g_timeout_add(1) do
+g_timeout_add(1) do
   x[] = 2
   return false # only call once
+end
+sleep(0.5)
+@test x[] == 2
+
+# macro syntax
+
+x[] = 1 #reset
+@idle_add begin
+  x[] = 2
 end
 sleep(0.5)
 @test x[] == 2
@@ -64,12 +73,12 @@ function g_timeout_add_cb(user_data)
 end
 
 x[] = 1 #reset
-Gtk.GLib.g_idle_add(()->g_timeout_add_cb(x))
+g_idle_add(()->g_timeout_add_cb(x))
 sleep(0.5)
 @test x[] == 2
 
 x[] = 1 #reset
-Gtk.GLib.g_timeout_add(()->g_timeout_add_cb(x), 1)
+g_timeout_add(()->g_timeout_add_cb(x), 1)
 sleep(0.5)
 @test x[] == 2
 

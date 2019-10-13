@@ -381,6 +381,16 @@ end
 
 @deprecate g_idle_add(cb, user_data)  g_idle_add(() -> cb(user_data))
 
+# Shortcut for g_idle_add
+macro idle_add(ex)
+    quote
+    g_idle_add() do
+        $(esc(ex))
+        return false
+      end
+    end
+end
+
 const exiting = Ref(false)
 function __init__()
     if isdefined(GLib, :__init__bindeps__)

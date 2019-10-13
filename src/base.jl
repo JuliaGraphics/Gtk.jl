@@ -41,7 +41,7 @@ grab_focus(w::GtkWidget) = (@sigatom ccall((:gtk_widget_grab_focus , libgtk), Cv
 modifyfont(w::GtkWidget, font_desc::Ptr{Nothing}) =
    ccall((:gtk_widget_modify_font, libgtk), Nothing, (Ptr{GObject}, Ptr{Nothing}), w, font_desc)
 
-   
+
 function get_gtk_property(w::GtkContainer, name::AbstractStringLike, child::GtkWidget, ::Type{T}) where T
     v = gvalue(T)
     ccall((:gtk_container_child_get_property, libgtk), Nothing,
@@ -99,6 +99,8 @@ function _guarded(ex, retval)
         end
     end
 end
+
+
 
 
 @deprecate getindex(w::GtkContainer, child::GtkWidget, name::AbstractStringLike, T::Type) get_gtk_property(w, name, child, T)
