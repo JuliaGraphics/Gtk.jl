@@ -1,7 +1,7 @@
 using Documenter, Gtk
 
 makedocs(
-    format = :html,
+    format = Documenter.HTML(),
     modules = [Gtk],
     sitename = "Gtk.jl",
     authors = "...",
