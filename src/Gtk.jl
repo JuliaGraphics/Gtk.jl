@@ -9,19 +9,6 @@ const libgdk = libgdk3
 const libgtk = libgtk3
 
 
-function __init__()
-    # Set up environment variables so that gdk-pixbuf can find its loaders
-    if get(ENV, "GDK_PIXBUF_MODULEDIR", "") == ""
-        ENV["GDK_PIXBUF_MODULEDIR"] = joinpath(
-            dirname(gdk_pixbuf_jll.libgdkpixbuf_path),
-            "gdk-pixbuf-2.0",
-            "2.10.0",
-            "loaders",
-        )
-    end
-end
-
-
 const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
@@ -83,6 +70,30 @@ include("toolbar.jl")
 include("theme.jl")
 include("gio.jl")
 include("application.jl")
+
+function __init__()
+    # Set up environment variables so that gdk-pixbuf can find its loaders
+    if get(ENV, "GDK_PIXBUF_MODULEDIR", "") == ""
+        ENV["GDK_PIXBUF_MODULEDIR"] = joinpath(
+            dirname(gdk_pixbuf_jll.libgdkpixbuf_path),
+            "gdk-pixbuf-2.0",
+            "2.10.0",
+            "loaders",
+        )
+    end
+
+    GError() do error_check
+        ccall((:gtk_init_with_args, libgtk), Bool,
+            (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{GError}),
+            C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
+    end
+
+    # if g_main_depth > 0, a glib main-loop is already running,
+    # so we don't need to start a new one
+    if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
+        global gtk_main_task = schedule(Task(gtk_main))
+    end
+end
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
