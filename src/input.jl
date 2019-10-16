@@ -15,19 +15,9 @@ GtkEntryCompletionLeaf() = GtkEntryCompletionLeaf(ccall((:gtk_entry_completion_n
 complete(completion::GtkEntryCompletion) =
     ccall((:gtk_entry_completion_complete, libgtk), Nothing, (Ptr{GObject},), completion)
 
-if libgtk_version >= v"3"
-    GtkScaleLeaf(vertical::Bool, min, max, step) = GtkScaleLeaf(ccall((:gtk_scale_new_with_range, libgtk), Ptr{GObject},
-            (Cint, Cdouble, Cdouble, Cdouble), vertical, min, max, step))
-else
-    GtkScaleLeaf(vertical::Bool, min, max, step) = GtkScaleLeaf(
-        if vertical
-            ccall((:gtk_vscale_new_with_range, libgtk), Ptr{GObject},
-                (Cdouble, Cdouble, Cdouble), min, max, step)
-        else
-            ccall((:gtk_hscale_new_with_range, libgtk), Ptr{GObject},
-                (Cdouble, Cdouble, Cdouble), min, max, step)
-        end)
-end
+GtkScaleLeaf(vertical::Bool, min, max, step) = GtkScaleLeaf(ccall((:gtk_scale_new_with_range, libgtk), Ptr{GObject},
+        (Cint, Cdouble, Cdouble, Cdouble), vertical, min, max, step))
+
 GtkScaleLeaf(vertical::Bool, scale::AbstractRange) = GtkScaleLeaf(vertical, minimum(scale), maximum(scale), step(scale))
 function push!(scale::GtkScale, value, position::Symbol, markup::AbstractString)
     ccall((:gtk_scale_add_mark, libgtk), Nothing,

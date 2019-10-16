@@ -114,57 +114,17 @@ end
 @Gtype GdkPixbuf libgdk_pixbuf gdk_pixbuf
 #TODO: @gtktype GtkScaleButton
 
-if libgtk_version >= v"3"
-    @gtktype GtkApplication
-    @gtktype GtkApplicationWindow
-    @gtktype GtkSwitch
-    @gtktype GtkGrid
-    @gtktype GtkOverlay # this is a GtkBin, although it behaves more like a container
-    @gtktype GtkCellArea
-    @gtktype GtkCellAreaBox
-    @gtktype GtkCellAreaContext
-    @gtktype GtkCssProvider
-    @gtktype GtkStyleContext
+@gtktype GtkApplication
+@gtktype GtkApplicationWindow
+@gtktype GtkSwitch
+@gtktype GtkGrid
+@gtktype GtkOverlay # this is a GtkBin, although it behaves more like a container
+@gtktype GtkCellArea
+@gtktype GtkCellAreaBox
+@gtktype GtkCellAreaContext
+@gtktype GtkCssProvider
+@gtktype GtkStyleContext
 
-else
-    mutable struct GtkApplication end
-    GtkApplicationLeaf(x...) = error("GtkApplication is not available until Gtk3.0")
-    macro GtkApplication(args...)
-        :( GtkApplicationLeaf($(args...)) )
-    end
-
-    mutable struct GtkApplicationWindow end
-    GtkApplicationWindowLeaf(x...) = error("GtkApplicationWindow is not available until Gtk3.0")
-    macro GtkApplicationWindow(args...)
-        :( GtkApplicationWindowLeaf($(args...)) )
-    end
-
-    @g_type_delegate GtkSwitch = GtkToggleButton
-
-    mutable struct GtkGrid end
-    GtkGridLeaf(x...) = error("GtkGrid is not available until Gtk3.0")
-    macro GtkGrid(args...)
-        :( GtkGridLeaf($(args...)) )
-    end
-
-    mutable struct GtkOverlay end
-    GtkOverlayLeaf(x...) = error("GtkOverlay is not available until Gtk3.2")
-    macro GtkOverlay(args...)
-        :( GtkOverlayLeaf($(args...)) )
-    end
-
-    mutable struct GtkCssProvider end
-    GtkCssProviderLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
-    macro GtkCssProvider(args...)
-        :( GtkCssProviderLeaf($(args...)) )
-    end
-
-    mutable struct GtkStyleContext end
-    GtkStyleContextLeaf(x...) = error("GtkStyleContext is not available until Gtk3.0")
-    macro GtkStyleContext(args...)
-        :( GtkStyleContextLeaf($(args...)) )
-    end
-end
 
 if libgtk_version >= v"3.16.0"
 @gtktype_custom_symname GtkGLArea gtk_gl_area

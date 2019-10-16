@@ -21,55 +21,54 @@
 
 rangestep(r::AbstractRange) = step(r)
 rangestep(::Integer) = 1
-if libgtk_version >= v"3"
-    ### GtkGrid was introduced in Gtk3 (replaces GtkTable)
-    GtkGridLeaf() = GtkGridLeaf(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
-    function getindex(grid::GtkGrid, i::Integer, j::Integer)
-        x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GObject}, (Ptr{GObject}, Cint, Cint), grid, i-1, j-1)
-        x == C_NULL && error("tried to get non - existent child at [$i $j]")
-        return convert(GtkWidget, x)
-    end
+### GtkGrid was introduced in Gtk3 (replaces GtkTable)
+GtkGridLeaf() = GtkGridLeaf(ccall((:gtk_grid_new, libgtk), Ptr{GObject}, ()))
 
-    function setindex!(grid::GtkGrid, child, i::Union{T, AbstractRange{T}}, j::Union{R, AbstractRange{R}}) where {T <: Integer, R <: Integer}
-        (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-        ccall((:gtk_grid_attach, libgtk), Nothing,
-            (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
-    end
-    #TODO:
-    # function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child::Array, j::Union{T, Range{T}}, i::Union{R, Range1{R}})
-    #    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
-    #    ccall((:gtk_grid_attach, libgtk), Nothing,
-    #        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
-    # end
+function getindex(grid::GtkGrid, i::Integer, j::Integer)
+    x = ccall((:gtk_grid_get_child_at, libgtk), Ptr{GObject}, (Ptr{GObject}, Cint, Cint), grid, i-1, j-1)
+    x == C_NULL && error("tried to get non - existent child at [$i $j]")
+    return convert(GtkWidget, x)
+end
 
-    function insert!(grid::GtkGrid, i::Integer, side::Symbol)
-        if side == :left
-            ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
-        elseif side == :right
-            ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-        elseif side == :top
-            ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
-        elseif side == :bottom
-            ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-        else
-            error(string("invalid GtkPositionType ", s))
-        end
-    end
+function setindex!(grid::GtkGrid, child, i::Union{T, AbstractRange{T}}, j::Union{R, AbstractRange{R}}) where {T <: Integer, R <: Integer}
+    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
+    ccall((:gtk_grid_attach, libgtk), Nothing,
+        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
+end
+#TODO:
+# function setindex!{T <: Integer, R <: Integer}(grid::GtkGrid, child::Array, j::Union{T, Range{T}}, i::Union{R, Range1{R}})
+#    (rangestep(i) == 1 && rangestep(j) == 1) || throw(ArgumentError("cannot layout grid with range-step != 1"))
+#    ccall((:gtk_grid_attach, libgtk), Nothing,
+#        (Ptr{GObject}, Ptr{GObject}, Cint, Cint, Cint, Cint), grid, child, first(i)-1, first(j)-1, length(i), length(j))
+# end
 
-    function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
-        if side == :row
-            ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-        elseif side == :col
-            ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-        else
-            error(string("invalid GtkPositionType ", s))
-        end
+function insert!(grid::GtkGrid, i::Integer, side::Symbol)
+    if side == :left
+        ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
+    elseif side == :right
+        ccall((:gtk_grid_insert_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+    elseif side == :top
+        ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i - 1)
+    elseif side == :bottom
+        ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+    else
+        error(string("invalid GtkPositionType ", s))
     end
+end
 
-    function insert!(grid::GtkGrid, sibling, side::Symbol)
-        ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
+function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
+    if side == :row
+        ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+    elseif side == :col
+        ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+    else
+        error(string("invalid GtkPositionType ", s))
     end
+end
+
+function insert!(grid::GtkGrid, sibling, side::Symbol)
+    ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
 end
 
 if libgtk_version >= v"3.16.0"
@@ -112,57 +111,24 @@ GtkAspectFrameLeaf(label, xalign, yalign) = # % of available space, 0 <= a <= 1.
         (Ptr{UInt8}, Cfloat, Cfloat, Cfloat, Cint), bytestring(label), xalign, yalign, 1., true))
 
 ### GtkBox
-if libgtk_version >= v"3"
-    GtkBoxLeaf(vertical::Bool, spacing = 0) =
-        GtkBoxLeaf(ccall((:gtk_box_new, libgtk), Ptr{GObject},
-            (Cint, Cint), vertical, spacing))
-else
-    GtkBoxLeaf(vertical::Bool, spacing = 0) =
-        GtkBoxLeaf(
-            if vertical
-                ccall((:gtk_vbox_new, libgtk), Ptr{GObject},
-                    (Cint, Cint), false, spacing)
-            else
-                ccall((:gtk_hbox_new, libgtk), Ptr{GObject},
-                    (Cint, Cint), false, spacing)
-            end
-            )
-end
+GtkBoxLeaf(vertical::Bool, spacing = 0) =
+    GtkBoxLeaf(ccall((:gtk_box_new, libgtk), Ptr{GObject},
+        (Cint, Cint), vertical, spacing))
+
 
 ### GtkButtonBox
-if libgtk_version >= v"3"
-    GtkButtonBoxLeaf(vertical::Bool) =
-        GtkButtonBoxLeaf(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
-            (Cint,), vertical))
-else
-     GtkButtonBoxLeaf(vertical::Bool) =
-        GtkButtonBoxLeaf(
-            if vertical
-                ccall((:gtk_vbutton_box_new, libgtk), Ptr{GObject}, ())
-            else
-                ccall((:gtk_hbutton_box_new, libgtk), Ptr{GObject}, ())
-            end
-            )
-end
+GtkButtonBoxLeaf(vertical::Bool) =
+    GtkButtonBoxLeaf(ccall((:gtk_button_box_new, libgtk), Ptr{GObject},
+        (Cint,), vertical))
 
 ### GtkFixed
 # this is a bad option, so I'm leaving it out
 
 ### GtkPaned
-if libgtk_version >= v"3"
-    GtkPanedLeaf(vertical::Bool, spacing = 0) =
-        GtkPanedLeaf(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
-            (Cint, Cint), vertical, spacing))
-else
-    GtkPanedLeaf(vertical::Bool) =
-        GtkPanedLeaf(
-            if vertical
-                ccall((:gtk_vpaned_new, libgtk), Ptr{GObject}, ())
-            else
-                ccall((:gtk_hpaned_new, libgtk), Ptr{GObject}, ())
-            end
-            )
-end
+GtkPanedLeaf(vertical::Bool, spacing = 0) =
+    GtkPanedLeaf(ccall((:gtk_paned_new, libgtk), Ptr{GObject},
+        (Cint, Cint), vertical, spacing))
+
 function getindex(pane::GtkPaned, i::Integer)
     if i == 1
         x = ccall((:gtk_paned_get_child1, libgtk), Ptr{GObject}, (Ptr{GObject},), pane)
@@ -248,11 +214,9 @@ pagenumber(w::GtkNotebook, child::GtkWidget) =
     ccall((:gtk_notebook_page_num, libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
 
 ### GtkOverlay
-if libgtk_version >= v"3"
-    GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
-    GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
-    function push!(w::GtkOverlay, x::GtkWidget)
-        ccall((:gtk_overlay_add_overlay, libgtk), Cint,
-            (Ptr{GObject}, Ptr{GObject}), w, x)
-    end
+GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
+GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
+function push!(w::GtkOverlay, x::GtkWidget)
+    ccall((:gtk_overlay_add_overlay, libgtk), Cint,
+        (Ptr{GObject}, Ptr{GObject}), w, x)
 end

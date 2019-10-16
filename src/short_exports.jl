@@ -189,50 +189,36 @@ export
     TreeModel,
     TreeSortable
 
-# Gtk 3
-if Gtk.libgtk_version >= v"3"
-    #objects
-    const Grid = GtkGrid
-    const GLArea = GtkGLArea
-    export Grid, GLArea
-    #interfaces
-    const Actionable = GtkActionable
-    const AppChooser = GtkAppChooser
-    const ColorChooser = GtkColorChooser
-    const FontChooser = GtkFontChooser
-    const Scrollable = GtkScrollable
-    const StyleProvider = GtkStyleProvider
-    export
-        Actionable,
-        AppChooser,
-        ColorChooser,
-        FontChooser,
-        Scrollable,
-        StyleProvider
-    #boxes
-    const CssSection = GtkCssSection
-    const Gradient = GtkGradient
-    const SelectionData = GtkSelectionData
-    const SymbolicColor = GtkSymbolicColor
-    const WidgetPath = GtkWidgetPath
-    export
-        CssSection,
-        Gradient,
-        SelectionData,
-        SymbolicColor,
-        WidgetPath
-end
-
-# Gtk 2
-if v"2" <= Gtk.libgtk_version < v"3"
-    #objects
-    const Table = GtkTable
-    const Alignment = GtkAlignment
-    export Table, Aligment
-    #interfaces
-    const Activatable = GtkActivatable
-    export Activatable
-end
+#objects
+const Grid = GtkGrid
+const GLArea = GtkGLArea
+export Grid, GLArea
+#interfaces
+const Actionable = GtkActionable
+const AppChooser = GtkAppChooser
+const ColorChooser = GtkColorChooser
+const FontChooser = GtkFontChooser
+const Scrollable = GtkScrollable
+const StyleProvider = GtkStyleProvider
+export
+    Actionable,
+    AppChooser,
+    ColorChooser,
+    FontChooser,
+    Scrollable,
+    StyleProvider
+#boxes
+const CssSection = GtkCssSection
+const Gradient = GtkGradient
+const SelectionData = GtkSelectionData
+const SymbolicColor = GtkSymbolicColor
+const WidgetPath = GtkWidgetPath
+export
+    CssSection,
+    Gradient,
+    SelectionData,
+    SymbolicColor,
+    WidgetPath
 
 const Closure = GClosure
 const PixbufFormat = GdkPixbufFormat

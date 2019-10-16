@@ -41,17 +41,16 @@ pushfirst!(cb::GtkComboBoxText, text::AbstractString) =
 insert!(cb::GtkComboBoxText, i::Integer, text::AbstractString) =
     (ccall((:gtk_combo_box_text_insert_text, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}), cb, i - 1, bytestring(text)); cb)
 
-if libgtk_version >= v"3"
-    push!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
-        (ccall((:gtk_combo_box_text_append, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
-    pushfirst!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
-        (ccall((:gtk_combo_box_text_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
-    insert!(cb::GtkComboBoxText, i::Integer, id::Union{AbstractString, Symbol}, text::AbstractString) =
-        (ccall((:gtk_combo_box_text_insert, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
+push!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
+    (ccall((:gtk_combo_box_text_append, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
+pushfirst!(cb::GtkComboBoxText, id::Union{AbstractString, Symbol}, text::AbstractString) =
+    (ccall((:gtk_combo_box_text_prepend, libgtk), Nothing, (Ptr{GObject}, Ptr{UInt8}, Ptr{UInt8}), cb, id, bytestring(text)); cb)
+insert!(cb::GtkComboBoxText, i::Integer, id::Union{AbstractString, Symbol}, text::AbstractString) =
+    (ccall((:gtk_combo_box_text_insert, libgtk), Nothing, (Ptr{GObject}, Cint, Ptr{UInt8}, Ptr{UInt8}), cb, i - 1, id, bytestring(text)); cb)
 
-    empty!(cb::GtkComboBoxText) =
-        (ccall((:gtk_combo_box_text_remove_all, libgtk), Nothing, (Ptr{GObject},), cb); cb)
-end
+empty!(cb::GtkComboBoxText) =
+    (ccall((:gtk_combo_box_text_remove_all, libgtk), Nothing, (Ptr{GObject},), cb); cb)
+
 
 delete!(cb::GtkComboBoxText, i::Integer) =
     (ccall((:gtk_combo_box_text_remove, libgtk), Nothing, (Ptr{GObject}, Cint), cb, i - 1); cb)
@@ -725,11 +724,8 @@ end
 
 ### To be done
 #
-#if libgtk_version >= v"3"
-#    GtkCellArea
-#    GtkCellAreaBox
-#    GtkCellAreaContext
-#end
-#
+#GtkCellArea
+#GtkCellAreaBox
+#GtkCellAreaContext
 #GtkCellView
 #GtkIconView

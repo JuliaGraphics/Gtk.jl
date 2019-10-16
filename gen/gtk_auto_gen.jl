@@ -23,7 +23,7 @@ gtk_libpaths = ("/opt/local", "/usr/lib")
 
 toplevels = Any[]
 cppargs = []
-let gtk_version = Gtk.gtk_version
+let gtk_version = 3
     header = gtk_libdir = ""
     for pth in gtk_libpaths
          header = joinpath(pth,"..","include","gtk-$gtk_version.0","gtk","gtk.h")
