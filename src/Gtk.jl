@@ -2,7 +2,7 @@
 module Gtk
 
 # Import binary definitions
-using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, gdk_pixbuf_jll
+using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
