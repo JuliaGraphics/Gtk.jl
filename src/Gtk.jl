@@ -2,9 +2,8 @@
 module Gtk
 
 # Import binary definitions
-using GTK3_jll
-using Glib_jll
-using gdk_pixbuf_jll
+using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, gdk_pixbuf_jll
+using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
 
@@ -72,15 +71,43 @@ include("gio.jl")
 include("application.jl")
 
 function __init__()
-    # Set up environment variables so that gdk-pixbuf can find its loaders
-    if get(ENV, "GDK_PIXBUF_MODULEDIR", "") == ""
-        ENV["GDK_PIXBUF_MODULEDIR"] = joinpath(
-            dirname(gdk_pixbuf_jll.libgdkpixbuf_path),
-            "gdk-pixbuf-2.0",
-            "2.10.0",
-            "loaders",
+    # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
+    ENV["XDG_DATA_DIRS"] = join(filter(x -> x != nothing, [
+        dirname(adwaita_icon_theme_jll.icons_dir),
+        joinpath(dirname(GTK3_jll.libgdk3_path), "..", "share"),
+        get(ENV, "XDG_DATA_DIRS", nothing),
+    ]), ":")
+
+    # Next, ensure that gdk-pixbuf has its loaders.cache file; we generate a
+    # MutableArtifacts.toml file that maps in a loaders.cache we dynamically
+    # generate by running `gdk-pixbuf-query-loaders:`
+    mutable_artifacts_toml = joinpath(dirname(@__DIR__), "MutableArtifacts.toml")
+    loaders_cache_name = "gdk-pixbuf-loaders-cache"
+    loaders_cache_hash = artifact_hash(loaders_cache_name, mutable_artifacts_toml)
+    if loaders_cache_hash === nothing
+        # Run gdk-pixbuf-query-loaders, capture output, 
+        loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
+            withenv("GDK_PIXBUF_MODULEDIR" => gdk_pixbuf_loaders_dir) do
+                return String(read(`$gpql`))
+            end
+        end
+
+        # Write cache out to file in new artifact
+        loaders_cache_hash = create_artifact() do art_dir
+            open(joinpath(art_dir, "loaders.cache"), "w") do io
+                write(io, loader_cache_contents)
+            end
+        end
+        bind_artifact!(mutable_artifacts_toml,
+            loaders_cache_name,
+            loaders_cache_hash;
+            force=true
         )
     end
+
+    # Point gdk to our cached loaders
+    ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
+    ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
 
     GError() do error_check
         ccall((:gtk_init_with_args, libgtk), Bool,
