@@ -2,7 +2,7 @@
 module Gtk
 
 # Import binary definitions
-using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll
+using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
@@ -73,7 +73,8 @@ include("application.jl")
 function __init__()
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
     ENV["XDG_DATA_DIRS"] = join(filter(x -> x != nothing, [
-        dirname(adwaita_icon_theme_jll.icons_dir),
+        dirname(adwaita_icons_dir),
+        dirname(hicolor_icons_dir),
         joinpath(dirname(GTK3_jll.libgdk3_path), "..", "share"),
         get(ENV, "XDG_DATA_DIRS", nothing),
     ]), ":")

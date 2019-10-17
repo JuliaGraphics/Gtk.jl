@@ -16,6 +16,7 @@ Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 adwaita_icon_theme_jll = "b437f822-2cd6-5e08-a15c-8bac984d38ee"
 gdk_pixbuf_jll = "da03df04-f53b-5353-a52f-6a8b0620ced0"
+hicolor_icon_theme_jll = "059c91fe-1bad-52ad-bddd-f7b78713c282"
 
 [compat]
 Cairo = "≥ 0.7"
