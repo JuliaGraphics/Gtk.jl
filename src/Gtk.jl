@@ -77,7 +77,7 @@ function __init__()
         dirname(hicolor_icons_dir),
         joinpath(dirname(GTK3_jll.libgdk3_path), "..", "share"),
         get(ENV, "XDG_DATA_DIRS", nothing),
-    ]), ":")
+    ]), Sys.iswindows() ? ";" : ":")
 
     # Next, ensure that gdk-pixbuf has its loaders.cache file; we generate a
     # MutableArtifacts.toml file that maps in a loaders.cache we dynamically
