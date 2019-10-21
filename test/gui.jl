@@ -51,8 +51,10 @@ end
 @testset "gui" begin
 
 wdth, hght = screen_size()
-@test wdth > 0 && hght > 0
-
+if !Sys.iswindows()
+    @test wdth > 0 && hght > 0
+end
+    
 @testset "Window" begin
 w = Window("Window", 400, 300) |> showall
 if !Sys.iswindows()
