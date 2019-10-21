@@ -62,9 +62,9 @@ if !Sys.iswindows()
     @test width(w) == 400
     @test height(w) == 300
     @test size(w) == (400, 300)
+    wdth, hght = screen_size(w)
+    @test wdth > 0 && hght > 0
 end
-wdth, hght = screen_size(w)
-@test wdth > 0 && hght > 0
 G_.gravity(w,10) #GRAVITY_STATIC
 sleep(0.1)
 ## Check Window positions
