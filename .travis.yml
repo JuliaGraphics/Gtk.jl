@@ -27,6 +27,7 @@ addons:
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi
+  - $TESTCMD -e 'using Pkg; pkg"add https://github.com/staticfloat/Cairo.jl#sf/jll_packages"'
   - $TESTCMD -e 'using Pkg; Pkg.build(); Pkg.test(coverage=true)'
 
 ## uncomment following lines to deploy documentation

@@ -29,6 +29,7 @@ install:
 
 build_script:
   - echo "%JL_BUILD_SCRIPT%"
+  - C:\julia\bin\julia -e "import Pkg; pkg\"add https://github.com/staticfloat/Cairo.jl#sf/jll_packages\""
   - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
 
 test_script:
