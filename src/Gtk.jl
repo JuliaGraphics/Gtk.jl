@@ -40,7 +40,6 @@ export GAccessor
 include("basic_exports.jl")
 include("long_exports.jl")
 include("long_leaf_exports.jl")
-include(joinpath("..", "deps", "ext.jl"))
 
 global const libgtk_version = VersionNumber(
       ccall((:gtk_get_major_version, libgtk), Cint, ()),
