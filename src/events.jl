@@ -12,7 +12,10 @@ function __init__()
             (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{GError}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
-
+    
+    if Sys.iswindows()
+        @warn "You are using Gtk on Windows which is currently buggy. Expect your REPL/IDE and anything depending on task switches become sluggish."
+    end
     # if g_main_depth > 0, a glib main-loop is already running,
     # so we don't need to start a new one
     if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
