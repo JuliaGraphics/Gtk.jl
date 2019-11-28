@@ -6,24 +6,6 @@ function gtk_quit()
     ccall((:gtk_main_quit, libgtk), Nothing, ())
 end
 
-function __init__()
-    GError() do error_check
-        ccall((:gtk_init_with_args, libgtk), Bool,
-            (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{GError}),
-            C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
-    end
-    
-    if Sys.iswindows()
-        @warn "You are using Gtk on Windows which is currently buggy. Expect your REPL/IDE and anything depending on task switches become sluggish."
-    end
-    # if g_main_depth > 0, a glib main-loop is already running,
-    # so we don't need to start a new one
-    if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
-        global gtk_main_task = schedule(Task(gtk_main))
-    end
-end
-
-
 add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, libgtk), Nothing, (Ptr{GObject}, GEnum), widget, mask)
 
 # widget[:event] = function(ptr, obj)

@@ -1,4 +1,4 @@
-import Cairo._jl_libcairo
+using Cairo_jll
 
 # GtkCanvas is the plain Gtk drawing canvas built on Cairo.
 mutable struct GtkCanvas <: GtkDrawingArea # NOT an @GType
@@ -99,18 +99,18 @@ function cairo_surface_for(widget::GtkCanvas)
 end
 
 function canvas_on_draw_event(::Ptr{GObject}, cc::Ptr{Nothing}, widget::GtkCanvas) # cc is a Cairo context
-    ccall((:cairo_set_source_surface, _jl_libcairo), Nothing,
+    ccall((:cairo_set_source_surface, libcairo), Nothing,
         (Ptr{Nothing}, Ptr{Nothing}, Float64, Float64), cc, widget.back.ptr, 0, 0)
-    ccall((:cairo_paint, _jl_libcairo), Nothing, (Ptr{Nothing},), cc)
+    ccall((:cairo_paint, libcairo), Nothing, (Ptr{Nothing},), cc)
     Int32(false) # propagate the event further
 end
 
 function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanvas) # e is a GdkEventExpose
     cc = ccall((:gdk_cairo_create, libgdk), Ptr{Nothing}, (Ptr{Nothing},), gdk_window(widget))
-    ccall((:cairo_set_source_surface, _jl_libcairo), Nothing,
+    ccall((:cairo_set_source_surface, libcairo), Nothing,
         (Ptr{Nothing}, Ptr{Nothing}, Float64, Float64), cc, widget.back.ptr, 0, 0)
-    ccall((:cairo_paint, _jl_libcairo), Nothing, (Ptr{Nothing},), cc)
-    ccall((:cairo_destroy, _jl_libcairo), Nothing, (Ptr{Nothing},), cc)
+    ccall((:cairo_paint, libcairo), Nothing, (Ptr{Nothing},), cc)
+    ccall((:cairo_destroy, libcairo), Nothing, (Ptr{Nothing},), cc)
     Int32(false) # propagate the event further
 end
 

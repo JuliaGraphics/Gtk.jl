@@ -1,8 +1,6 @@
 environment:
   matrix:
-  - julia_version: 0.7
-  - julia_version: 1.0
-  - julia_version: 1.2
+  - julia_version: 1.3
   - julia_version: nightly
 
 platform:
@@ -31,6 +29,7 @@ install:
 
 build_script:
   - echo "%JL_BUILD_SCRIPT%"
+  - C:\julia\bin\julia -e "using Pkg; pkg\"add https://github.com/staticfloat/Cairo.jl#sf/jll_packages\""
   - C:\julia\bin\julia -e "%JL_BUILD_SCRIPT%"
 
 test_script:

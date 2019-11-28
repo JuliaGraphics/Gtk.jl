@@ -41,9 +41,9 @@ mutable struct GdkPixbufFormat <: GBoxed
     handle::Ptr{GdkPixbufFormat}
     function GdkPixbufFormat(ref::Ptr{GdkPixbufFormat}, own::Bool = false)
         x = new( own ? ref :
-            ccall((:gdk_pixbuf_format_copy, Gtk.libgdk_pixbuf), Nothing, (Ptr{GdkPixbufFormat},), ref))
+            ccall((:gdk_pixbuf_format_copy, Gtk.libgdkpixbuf), Nothing, (Ptr{GdkPixbufFormat},), ref))
         finalizer(x, x::GdkPixbufFormat->begin
-                    ccall((:gdk_pixbuf_format_free, Gtk.libgdk_pixbuf), Nothing, (Ptr{GdkPixbufFormat},), x.handle)
+                    ccall((:gdk_pixbuf_format_free, Gtk.libgdkpixbuf), Nothing, (Ptr{GdkPixbufFormat},), x.handle)
                 end)
         path
     end
