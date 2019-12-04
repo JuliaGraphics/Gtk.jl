@@ -124,6 +124,15 @@ signal_handler_block(w::GObject, handler_id::Culong) =
 signal_handler_unblock(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_unblock, libgobject), Nothing, (Ptr{GObject}, Culong), w, handler_id)
 
+"""
+    tf = signal_handler_is_connected(widget, id)
+
+Return `true`/`false` depending on whether `widget` has a connected signal handler with
+the given `id`.
+"""
+signal_handler_is_connected(w::GObject, handler_id::Culong) =
+    ccall((:g_signal_handler_is_connected, libgobject), Cint, (Ptr{GObject}, Culong), w, handler_id) == 1
+
 function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
     i = isa(sig, AbstractString) ? something(findfirst("::", sig), 0:-1) : (0:-1)
     if !isempty(i)

@@ -54,7 +54,7 @@ wdth, hght = screen_size()
 if !Sys.iswindows()
     @test wdth > 0 && hght > 0
 end
-    
+
 @testset "Window" begin
 w = Window("Window", 400, 300) |> showall
 if !Sys.iswindows()
@@ -265,6 +265,7 @@ counter = 0
 id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
+@test signal_handler_is_connected(b, id)
 # For testing callbacks
 click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 

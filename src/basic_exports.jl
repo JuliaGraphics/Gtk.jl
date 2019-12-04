@@ -21,7 +21,7 @@ export response
 
 # GLib-imported event handling
 export signal_connect, signal_handler_disconnect,
-    signal_handler_block, signal_handler_unblock,
+    signal_handler_block, signal_handler_unblock, signal_handler_is_connected,
     signal_emit, g_timeout_add, g_idle_add
 
 # Gtk-specific event handling
