@@ -54,7 +54,7 @@ wdth, hght = screen_size()
 if !Sys.iswindows()
     @test wdth > 0 && hght > 0
 end
-    
+
 @testset "Window" begin
 w = Window("Window", 400, 300) |> showall
 if !Sys.iswindows()
@@ -530,6 +530,24 @@ c.draw = function(_)
 end
 draw(c)
 destroy(w)
+end
+
+@testset "SetCoordinates" begin
+    win = Window() |> (cnvs = Canvas(300, 280))
+    draw(cnvs) do c
+        set_coordinates(getgc(c), BoundingBox(0, 1, 0, 1))
+    end
+    Gtk.showall(win)
+    sleep(0.5)
+    mtrx = Gtk.Cairo.get_matrix(getgc(cnvs))
+    if get(ENV, "CI", nothing) === nothing || !Sys.islinux()
+        @test mtrx.xx == 300
+        @test mtrx.yy == 280
+    else
+        @test_broken mtrx.xx == 300
+        @test_broken mtrx.yy == 280
+    end
+    @test mtrx.xy == mtrx.yx == mtrx.x0 == mtrx.y0 == 0
 end
 
 @testset "Menus" begin
