@@ -15,7 +15,7 @@ using .GLib.MutableTypes
 import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef
 import .GLib:
     signal_connect, signal_handler_disconnect,
-    signal_handler_block, signal_handler_unblock,
+    signal_handler_block, signal_handler_unblock, signal_handler_is_connected,
     signal_emit, unsafe_convert,
     AbstractStringLike, bytestring
 
@@ -85,7 +85,7 @@ function __init__()
     loaders_cache_name = "gdk-pixbuf-loaders-cache"
     loaders_cache_hash = artifact_hash(loaders_cache_name, mutable_artifacts_toml)
     if loaders_cache_hash === nothing
-        # Run gdk-pixbuf-query-loaders, capture output, 
+        # Run gdk-pixbuf-query-loaders, capture output,
         loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
             withenv("GDK_PIXBUF_MODULEDIR" => gdk_pixbuf_loaders_dir) do
                 return String(read(`$gpql`))
@@ -149,7 +149,7 @@ module ShortNames
     using ..Gtk
     import ..GLib:
         signal_connect, signal_handler_disconnect,
-        signal_handler_block, signal_handler_unblock,
+        signal_handler_block, signal_handler_unblock, signal_handler_is_connected,
         signal_emit
     import ..GLib.@g_type_delegate
     import ..Gtk: suffix

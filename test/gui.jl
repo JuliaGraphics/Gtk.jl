@@ -265,6 +265,7 @@ counter = 0
 id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
+@test signal_handler_is_connected(b, id)
 # For testing callbacks
 click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 
