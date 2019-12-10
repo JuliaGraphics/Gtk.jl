@@ -144,6 +144,9 @@ using .GConstants
 include("windows.jl")
 include("gl_area.jl")
 
+include("precompile.jl")
+_precompile_()
+
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
     using ..Gtk
