@@ -70,6 +70,9 @@ include("gio.jl")
 include("application.jl")
 
 function __init__()
+    if Sys.iswindows()
+        @warn "You are using Gtk on Windows which is currently buggy. Expect your REPL/IDE and anything depending on task switches become sluggish."
+    end
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
     ENV["XDG_DATA_DIRS"] = join(filter(x -> x != nothing, [
         dirname(adwaita_icons_dir),
