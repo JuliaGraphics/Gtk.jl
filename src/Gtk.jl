@@ -2,7 +2,7 @@
 module Gtk
 
 # Import binary definitions
-using GTK3_jll, Glib_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
+using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
@@ -111,6 +111,14 @@ function __init__()
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
     ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
+
+    if Sys.islinux() || Sys.isfreebsd()
+        # Needed by xkbcommon:
+        # https://xkbcommon.org/doc/current/group__include-path.html.  Related
+        # to issue https://github.com/JuliaGraphics/Gtk.jl/issues/469
+        ENV["XKB_CONFIG_ROOT"] = joinpath(Xorg_xkeyboard_config_jll.artifact_dir,
+                                          "share", "X11", "xkb")
+    end
 
     GError() do error_check
         ccall((:gtk_init_with_args, libgtk), Bool,
