@@ -32,7 +32,7 @@ export @sigatom, cfunction_
 cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 @noinline function cfunction_(f, r, a)
     @nospecialize(f, r, a)
-    return ccall((:jl_function_ptr,:libjulia), Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+    return ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
 end
 
 # local function, handles Symbol and makes UTF8-strings easier
