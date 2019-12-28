@@ -1,0 +1,12 @@
+docs:
+  - "docs/**/*"
+
+CI:
+  - "**/*.yml"
+  - ".github/workflows/**/*"
+
+testing:
+  - "test/*"
+  
+source:
+  - "src/**/*"
