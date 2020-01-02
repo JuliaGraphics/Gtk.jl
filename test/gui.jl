@@ -541,7 +541,7 @@ end
     Gtk.showall(win)
     sleep(0.5)
     mtrx = Gtk.Cairo.get_matrix(getgc(cnvs))
-    if get(ENV, "CI", nothing) === nothing || !Sys.islinux()
+    if get(ENV, "JULIA_PKGEVAL", "") == "true" || get(ENV, "CI", nothing) === nothing || !Sys.islinux()
         @test mtrx.xx == 300
         @test mtrx.yy == 280
     else
