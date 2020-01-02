@@ -1,4 +1,4 @@
-# Julia interface to `Gtk+ 2` and `Gtk+ 3` GUI library
+# Julia interface to `Gtk+ 3` GUI library
 
 [![Build Status](https://travis-ci.org/JuliaGraphics/Gtk.jl.svg?branch=master)](https://travis-ci.org/JuliaGraphics/Gtk.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/yup46w98wv672sag?svg=true)](https://ci.appveyor.com/project/tknopp/gtk-jl)
