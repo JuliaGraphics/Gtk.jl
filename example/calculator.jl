@@ -1,5 +1,7 @@
-using Gtk
+# Simple calculator application that utilises Gtk.jl
+# created by Nand Vinchhi for GCI 2019
 
+using Gtk
 
 win = GtkWindow("Calculator")
 
