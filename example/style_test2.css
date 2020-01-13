@@ -1,0 +1,15 @@
+button#b1 {
+	font: 17px Sans;
+	color: White;
+	background: Blue;
+	border-width: 0px;
+	border-radius: 4px;
+}
+
+button#b2 {
+	font: 17px Sans;
+	color: White;
+	background: Red;
+	border-width: 0px;
+	border-radius: 4px;
+}
