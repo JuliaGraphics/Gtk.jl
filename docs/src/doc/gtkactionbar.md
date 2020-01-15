@@ -23,22 +23,22 @@ gtk_action_bar_set_center_widget () <br>
 Sets the center widget for the GtkActionBar.<br><br>
 
 ### Child Properties
-GtkPackType     pack-type      Read / Write<br>
-gint    position	Read / Write
+GtkPackType   -  pack-type   -   Read / Write<br>
+gint  -   position  -	Read / Write
 
 #### Types and Values
-struct	GtkActionBar
+struct	GtkActionBar<br><br>
 
-“pack-type”                GtkPackType
-A GtkPackType indicating whether the child is packed with reference to the start or end of the parent.
-Flags: Read / Write
-Default value: GTK_PACK_START
+“pack-type”         -       GtkPackType<br>
+A GtkPackType indicating whether the child is packed with reference to the start or end of the parent.<br>
+Flags: Read / Write<br>
+Default value: GTK_PACK_START<br><br>
 
-“position”                 gint
-The index of the child in the parent.
-Flags: Read / Write
-Allowed values: >= -1
-Default value: 0
+“position”        -         gint<br>
+The index of the child in the parent.<br>
+Flags: Read / Write<br>
+Allowed values: >= -1<br>
+Default value: 0<br>
 
 #### Object Hierarchy
 
