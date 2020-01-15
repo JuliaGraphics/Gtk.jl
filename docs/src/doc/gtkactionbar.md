@@ -1,5 +1,3 @@
-#GtkActionBar
-
 ## Overview
 A full width bar for presenting contextual actions
 
@@ -9,11 +7,20 @@ It allows placing children at the start or the end. In addition, it contains an 
 
 
 ### Functions
-gtk_action_bar_new () - Creates a new GtkActionBar widget.
-gtk_action_bar_pack_start () - Adds child to action_bar , packed with reference to the start of the action_bar .
-gtk_action_bar_pack_end () - Adds child to action_bar , packed with reference to the end of the action_bar .
-gtk_action_bar_get_center_widget () - Retrieves the center bar widget of the bar.
-gtk_action_bar_set_center_widget () - Sets the center widget for the GtkActionBar.
+gtk_action_bar_new () <br>
+Creates a new GtkActionBar widget <br><br>
+
+gtk_action_bar_pack_start () <br>
+Adds child to action_bar, packed with reference to the start of the action_bar <br><br>
+
+gtk_action_bar_pack_end () <br>
+Adds child to action_bar, packed with reference to the end of the action_bar <br><br>
+
+gtk_action_bar_get_center_widget () <br>
+Retrieves the center bar widget of the bar.<br><br>
+
+gtk_action_bar_set_center_widget () <br>
+Sets the center widget for the GtkActionBar.<br><br>
 
 ### Child Properties
 GtkPackType	pack-type	Read / Write
