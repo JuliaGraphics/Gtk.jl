@@ -23,8 +23,8 @@ gtk_action_bar_set_center_widget () <br>
 Sets the center widget for the GtkActionBar.<br><br>
 
 ### Child Properties
-GtkPackType	pack-type	Read / Write
-gint	position	Read / Write
+GtkPackType     pack-type      Read / Write<br>
+gint    position	Read / Write
 
 #### Types and Values
 struct	GtkActionBar
