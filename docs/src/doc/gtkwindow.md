@@ -70,6 +70,8 @@ enum -	GtkWindowPosition<br>
     .  .  .  .  .  .  +- GtkShortcutsWindow
                         
 #### Examples
+
+##### Basic window
 using Gtk<br>
 
 win = GtkWindow("New title")<br>
@@ -83,7 +85,7 @@ showall(win)<br>
 
 ![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/window.png)
 
-
+##### Using window with properties
 using Gtk<br>
 
 win = GtkWindowLeaf(title= "My own title", margin=0)<br>
