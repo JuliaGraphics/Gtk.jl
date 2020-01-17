@@ -43,17 +43,17 @@ gchar * -	decoration-button-layout -	Read<br>
 gint -	decoration-resize-handle -	Read / Write<br>
 
 #### Signals
-void -	activate-default -	Action
-void -	activate-focus -	Action
-gboolean -	enable-debugging -	Action
-void -	keys-changed -	Run First
-void -	set-focus -	Run Last
+void -	activate-default -	Action<br>
+void -	activate-focus -	Action<br>
+gboolean -	enable-debugging -	Action<br>
+void -	keys-changed -	Run First<br>
+void -	set-focus -	Run Last<br>
 
 #### Types and Values
 GtkWindow<br>
-struct -	GtkWindowClass
-enum -	GtkWindowType
-enum -	GtkWindowPosition
+struct -	GtkWindowClass<br>
+enum -	GtkWindowType<br>
+enum -	GtkWindowPosition<br>
 
 #### Object Hierarchy
     +- GObject
@@ -70,25 +70,25 @@ enum -	GtkWindowPosition
     .  .  .  .  .  .  +- GtkShortcutsWindow
                         
 #### Examples
-using Gtk
+using Gtk<br>
 
-win = GtkWindow("New title")
-hbox = GtkBox(:h)
-push!(win, hbox)
-cancel = GtkButton("Cancel")
-ok = GtkButton("OK")
-push!(hbox, cancel)
-push!(hbox, ok)
-showall(win)
+win = GtkWindow("New title")<br>
+hbox = GtkBox(:h)<br>
+push!(win, hbox)<br>
+cancel = GtkButton("Cancel")<br>
+ok = GtkButton("OK")<br>
+push!(hbox, cancel)<br>
+push!(hbox, ok)<br>
+showall(win)<br>
 
 ![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/window.png)
 
 
-using Gtk
+using Gtk<br>
 
-win = GtkWindowLeaf(title= "My own title", margin=0)
-b = GtkButton("Click Me")
-push!(win,b)
-showall(win)
+win = GtkWindowLeaf(title= "My own title", margin=0)<br>
+b = GtkButton("Click Me")<br>
+push!(win,b)<br>
+showall(win)<br>
 
 ![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/windowproperties.png)
