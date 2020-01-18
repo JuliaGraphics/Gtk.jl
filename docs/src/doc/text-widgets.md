@@ -73,6 +73,7 @@ A special variant of the entry that can be used as a search box is GtkSearchEntr
 >
 >showall(win)
 
+![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/gtklabel.png)
 
 #### GAccessor.text
 >using Gtk
@@ -83,6 +84,8 @@ A special variant of the entry that can be used as a search box is GtkSearchEntr
 >push!(win,label)
 >
 >showall(win)
+
+![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/GAccessor.text.png)
 
 #### markup function
 >using Gtk
@@ -96,6 +99,8 @@ A special variant of the entry that can be used as a search box is GtkSearchEntr
 >
 >showall(win)
 
+![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/markup%20function.png)
+
 #### Automatic line wrapping
 >using Gtk
 >
@@ -107,6 +112,8 @@ A special variant of the entry that can be used as a search box is GtkSearchEntr
 >
 >showall(win)
 
+![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/automatic%20line%20wrapping.png)
+
 ### GtkEntry
 >using Gtk
 >
@@ -117,3 +124,5 @@ A special variant of the entry that can be used as a search box is GtkSearchEntr
 >push!(win,ent)
 >
 >showall(win)
+
+![alt text](https://github.com/mikolajhojda/Gtk.jl/blob/master/docs/src/assets/gtkentry.png)
