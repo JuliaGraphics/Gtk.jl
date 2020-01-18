@@ -62,3 +62,58 @@ TODO: setting progress and setting icons in entry
 
 ## Search Entry
 A special variant of the entry that can be used as a search box is GtkSearchEntry. It is equipped with a button to clear the entry.
+
+## Examples
+### GtkLabel
+>using Gtk
+>
+>win = GtkWindow("My First Gtk.jl Program", 400, 200)<br>
+>label = GtkLabel("Hello World")<br>
+>push!(win,label)<br>
+>
+>showall(win)
+
+
+#### GAccessor.text
+>using Gtk
+>
+>win = GtkWindow("My First Gtk.jl Program", 400, 200)<br>
+>label = GtkLabel("Hello World")<br>
+>GAccessor.text(label,"My other text")<br>
+>push!(win,label)
+>
+>showall(win)
+
+#### markup function
+>using Gtk
+>
+>win = GtkWindow("My First Gtk.jl Program", 400, 200)<br>
+>label = GtkLabel("Hello World")<br>
+>GAccessor.markup(label,"""<b>My bold text</b>\n<br>
+>                          <a href=\"https://www.gtk.org\"<br>
+>                         title=\"Our website\">GTK+ website</a>""")<br>
+>push!(win,label)
+>
+>showall(win)
+
+#### Automatic line wrapping
+>using Gtk
+>
+>win = GtkWindow("My First Gtk.jl Program", 400, 200)<br>
+>label = GtkLabel("Hello World")<br>
+>GAccessor.text(label,repeat("Very long text! ",20))<br>
+>GAccessor.line_wrap(label,true)<br>
+>push!(win,label)
+>
+>showall(win)
+
+### GtkEntry
+>using Gtk
+>
+>win = GtkWindow("My First Gtk.jl Program", 400, 200)<br>
+>ent = GtkEntry()<br>
+>set_gtk_property!(ent,:text,"My String")<br>
+>str = get_gtk_property(ent,:text,String)<br>
+>push!(win,ent)
+>
+>showall(win)
