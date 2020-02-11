@@ -52,7 +52,9 @@ it1 = mutable(it1)
 it1.offset[Int] = 1
 @test it1.offset[Int] == 1
 
-create_mark(b,it)
+mark = create_mark(b, it)
+scroll_to(v, mark, 0, true, 0.0, 0.15)
+scroll_to(v, it, 0, true, 0.0, 0.15)
 
 # skip
 skip(it2, 1, :line)
