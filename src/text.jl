@@ -652,6 +652,30 @@ function splice!(text::GtkTextView)
     text
 end
 
+"""
+    scroll_to(view::GtkTextView, mark::GtkTextMark, within_margin::Real,
+                   use_align::Bool, xalign::Real, yalign::Real) 
+
+    scroll_to(view::GtkTextView, iter::TI, within_margin::Real,
+              use_align::Bool, xalign::Real, yalign::Real) 
+
+Implements `gtk_text_view_scroll_to_mark` and `gtk_text_view_scroll_to_iter`.
+"""
+function scroll_to(view::GtkTextView, mark::GtkTextMark, within_margin::Real,
+                   use_align::Bool, xalign::Real, yalign::Real) 
+    
+    ccall((:gtk_text_view_scroll_to_mark, libgtk), Nothing,
+    (Ptr{GObject}, Ptr{GObject}, Cdouble, Cint, Cdouble, Cdouble), 
+    view, mark, within_margin, use_align, xalign, yalign)
+end
+
+function scroll_to(view::GtkTextView, iter::TI, within_margin::Real,
+                   use_align::Bool, xalign::Real, yalign::Real) 
+    
+    ccall((:gtk_text_view_scroll_to_iter, libgtk), Nothing,
+    (Ptr{GObject}, Ptr{GtkTextIter}, Cdouble, Cint, Cdouble, Cdouble), 
+    view, iter, within_margin, use_align, xalign, yalign)
+end
 
 ####  GtkTextMark  ####
 
