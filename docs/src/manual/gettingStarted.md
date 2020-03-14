@@ -1,6 +1,6 @@
 # Getting Started
 
-We start this tutorial with a very simple example that creats an empty window of size 400x200 pixels
+We start this tutorial with a very simple example that creates an empty window of size 400x200 pixels
 and adds a button to it
 ```julia
 using Gtk
