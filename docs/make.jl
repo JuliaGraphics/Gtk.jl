@@ -23,8 +23,12 @@ makedocs(
                      "manual/nonreplusage.md",
                      "manual/packages.md"
                     ],
+        "Reference" => "doc/reference.md",
     ],
 )
 
-deploydocs(repo   = "github.com/JuliaGraphics/Gtk.jl.git",
-           target = "build")
+deploydocs(
+    repo   = "github.com/JuliaGraphics/Gtk.jl.git",
+    target = "build",
+    push_preview = true
+)
