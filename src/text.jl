@@ -215,7 +215,6 @@ end
 
 Base.:(==)(lhs::TI, rhs::TI) = Bool(ccall((:gtk_text_iter_equal, libgtk),
     Cint, (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs))
-Base.:(!=)(lhs::TI, rhs::TI) = !(lhs == rhs)
 Base.:(<)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
     (Ref{GtkTextIter}, Ref{GtkTextIter}), lhs, rhs) < 0
 Base.:(<=)(lhs::TI, rhs::TI) = ccall((:gtk_text_iter_compare, libgtk), Cint,
