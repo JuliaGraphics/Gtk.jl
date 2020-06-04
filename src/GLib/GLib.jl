@@ -30,9 +30,11 @@ export @sigatom, cfunction_
 
 
 cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
-@noinline function cfunction_(f, r, a)
-    @nospecialize(f, r, a)
-    return ccall((:jl_function_ptr,:libjulia), Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+
+@generated function cfunction_(f, R::Type{rt}, A::Type{at}) where {rt, at<:Tuple}
+    quote
+        @cfunction($(Expr(:$,:f)), $rt, ($(at.parameters...),))
+    end
 end
 
 # local function, handles Symbol and makes UTF8-strings easier
