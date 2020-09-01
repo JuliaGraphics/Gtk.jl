@@ -1,4 +1,9 @@
 module MutableTypes
+
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 1
+end
+
 export mutable, Mutable, deref
 
 abstract type Mutable{T} end
