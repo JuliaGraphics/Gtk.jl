@@ -1,5 +1,9 @@
 module GLib
 
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 1
+end
+
 # Import `libgobject` and whatnot
 using Glib_jll
 

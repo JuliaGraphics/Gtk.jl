@@ -1,6 +1,10 @@
 # julia Gtk interface
 module Gtk
 
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 1
+end
+
 # Import binary definitions
 using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
 using Pkg.Artifacts
@@ -107,12 +111,12 @@ function __init__()
             force=true
         )
     end
-    
+
     if Sys.iswindows()
       # needed on windows for correct window decorations (issue 355)
       ENV["GTK_CSD"] = 0
     end
-    
+
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
     ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
