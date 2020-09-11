@@ -297,7 +297,7 @@ function uv_prepare(src::Ptr{Nothing}, timeout::Ptr{Cint})
     else
         ccall(:uv_update_time, Nothing, (Ptr{Nothing},), evt)
         tmout_ms = ccall(:uv_backend_timeout, Cint, (Ptr{Nothing},), evt)
-        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 5000
+        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 10 : 5000
         if tmout_ms < 0 || tmout_ms > tmout_min
             tmout_ms = tmout_min
         end
