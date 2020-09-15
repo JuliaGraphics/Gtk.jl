@@ -16,9 +16,9 @@ if !isinteractive()
 end
 ```
 
-By waiting on a `Condition`, you force Julia to keep running. However, when the window is closed, then the program can continue (which in this case would simply be to exit). This can be shortened by using the function waitforsignal:
+By waiting on a `Condition`, Julia will keep running. This pattern allows for multiple events to trigger the condition, such as a button press, or one of many windows to be closed. Program flow will resume at `wait` line, after which it would terminate in this example.
 
-
+In the common case we simply wish to wait for a single window to be closed, this can be shortened by using `waitforsignal`:
 
 ```julia
 win = Window("gtkwait")
