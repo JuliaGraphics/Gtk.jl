@@ -76,7 +76,9 @@ export GObject,
     GtkToggleToolButton,
     GtkTreeIter,
     GtkWindow,
-    GtkEventBox
+    GtkEventBox,
+    GtkColorChooserDialog,
+    GtkColorButton
 
 # Gtk interfaces
 export GTypePlugin,

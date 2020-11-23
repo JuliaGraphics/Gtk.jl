@@ -110,6 +110,8 @@ end
 @gtktype GtkScrolledWindow
 @gtktype GtkAboutDialog
 @gtktype GtkMessageDialog
+@gtktype GtkColorChooserDialog
+@gtktype GtkColorButton
 @Gtype GApplication libgio g_application
 @Gtype GdkPixbuf libgdkpixbuf gdk_pixbuf
 #TODO: @gtktype GtkScaleButton

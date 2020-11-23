@@ -74,7 +74,9 @@ export
     @GtkTextBuffer,
     @GtkToggleButton,
     @GtkToggleToolButton,
-    @GtkWindow
+    @GtkWindow,
+    @GtkColorChooserDialog,
+    @GtkColorButton
 
 # Gtk objects
 export
@@ -152,7 +154,9 @@ export
     GtkToggleButtonLeaf,
     GtkToggleToolButtonLeaf,
     GtkWindowLeaf,
-    GtkEventBoxLeaf
+    GtkEventBoxLeaf,
+    GtkColorChooserDialogLeaf,
+    GtkColorButtonLeaf
 
 
 # Gtk3 objects
