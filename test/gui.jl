@@ -416,6 +416,13 @@ w = Window(b, "VolumeButton", 50, 50)|>showall
 destroy(w)
 end
 
+@testset "ColorButton" begin
+b = ColorButton(Gtk.GdkRGBA(0, 0.8, 1.0, 0.3))
+w = Window(b, "ColorButton", 50, 50)|>showall
+GAccessor.rgba(ColorChooser(b), GLib.mutable(Gtk.GdkRGBA(0, 0, 0, 0)))
+destroy(w)
+end
+
 @testset "combobox" begin
 combo = ComboBoxText()
 choices = ["Strawberry", "Vanilla", "Chocolate"]
@@ -615,11 +622,16 @@ end
 #@test get_value(tr)[1] == choices[2]
 #destroy(w)
 
-@testset "Selectors" begin
+@testset "File Chooser" begin
     dlg = FileChooserDialog("Select file", Null(), GtkFileChooserAction.OPEN,
                             (("_Cancel", GtkResponseType.CANCEL),
                              ("_Open", GtkResponseType.ACCEPT)))
     destroy(dlg)
+end
+
+@testset "Color Chooser" begin
+dlg = ColorChooserDialog("Select color", Null())
+destroy(dlg)
 end
 
 @testset "List view" begin

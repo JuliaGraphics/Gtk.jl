@@ -15,6 +15,16 @@ struct GdkPoint
 end
 # GdkPoint is not a GBoxed type
 
+struct GdkRGBA
+	r::Cdouble
+	g::Cdouble
+	b::Cdouble
+    a::Cdouble
+    GdkRGBA(r, g, b, a) = new(r, g, b, a)
+end
+@make_gvalue(GdkRGBA, Ptr{GdkRGBA}, :boxed, (:gdk_rgba,:libgdk))
+convert(::Type{GdkRGBA}, rgba::Ptr{GdkRGBA}) = unsafe_load(rgba)
+
 baremodule GdkKeySyms
     const VoidSymbol = 0xffffff
     const BackSpace = 0xff08
