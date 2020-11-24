@@ -699,6 +699,17 @@ function push!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
     end
     treeView
 end
+function insert!(treeView::GtkTreeView, index::Integer, treeColumn::GtkTreeViewColumn)
+    ccall((:gtk_tree_view_insert_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), treeView, treeColumn, index - 1)
+    treeView
+end
+function delete!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
+    for col in treeColumns
+        ccall((:gtk_tree_view_remove_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), treeView, col)
+    end
+    treeView
+end
+
 
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)

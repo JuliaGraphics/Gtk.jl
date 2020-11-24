@@ -634,6 +634,8 @@ c1=TreeViewColumn("A", r1, Dict([("text",0)]))
 c2=TreeViewColumn("B", r2, Dict([("active",1)]))
 push!(tv,c1)
 push!(tv,c2)
+delete!(tv, c1)
+insert!(tv, 1, c1)
 w = Window(tv, "List View")|>showall
 
 ## selection
