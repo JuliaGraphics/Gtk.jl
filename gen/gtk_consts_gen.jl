@@ -3,11 +3,11 @@ function gen_consts(body, gtk_h)
     exports = Expr(:export)
     push!(body.args,exports)
 
-    tdecls = cindex.search(gtk_h, cindex.TypedefDecl)
+    tdecls = search(gtk_h, Clang.CXCursor_TypedefDecl)
     for tdecl in tdecls
-        ctype = cindex.getCanonicalType(cindex.getCursorType(tdecl))
-        if isa(ctype,cindex.Enum)
-            name = cindex.spelling(tdecl)
+        ctype = canonical(type(tdecl))
+        if isa(ctype, Enum)
+            name = spelling(tdecl)
             m = match(r"^(G\w+)$", name)
             if m === nothing
                 continue
@@ -16,13 +16,13 @@ function gen_consts(body, gtk_h)
             push!(exports.args, name)
             consts = Expr(:block)
             push!(body.args, Expr(:toplevel, Expr(:module, false, name, consts)))
-            children = cindex.children(cindex.getTypeDeclaration(ctype))
+            children = children(typedecl(ctype))
             mask = true
-            c1 = cindex.spelling(children[1])
+            c1 = spelling(children[1])
             splitc1 = split(c1,'_')
             prefix = length(splitc1)
             for child in children
-                c2 = cindex.spelling(child)
+                c2 = spelling(child)
                 if !endswith(c2,"_MASK")
                     mask = false
                 end
@@ -44,7 +44,7 @@ function gen_consts(body, gtk_h)
                 lprefix += length(splitc1[i])+1
             end
             for child in children
-                decl = cindex.spelling(child)
+                decl = spelling(child)
                 if mask
                     shortdecl = decl[lprefix:end-5]
                 else
@@ -63,13 +63,13 @@ function gen_consts(body, gtk_h)
             count += 1
         end
     end
-    mdecls = cindex.search(gtk_h, cindex.MacroDefinition)
+    mdecls = search(gtk_h, Clang.CXCursor_MacroDefinition)
     for mdecl in mdecls
-        name = cindex.spelling(mdecl)
+        name = spelling(mdecl)
         if occursin(r"^G\w*[A-Za-z]$", name)
-            tokens = cindex.tokenize(mdecl)
-            if length(tokens) == 3 && isa(tokens[2], cindex.Literal)
-                tok2 = Clang.wrap_c.handle_macro_exprn(tokens, 2)[1]
+            tokens = tokenize(mdecl)
+            if length(tokens) == 3 && isa(tokens[2], Literal)
+                tok2 = Clang.handle_macro_exprn(tokens, 2)[1]
                 tok2 = replace(tok2, "\$", "\\\$")
                 push!(body.args, Expr(:const, Expr(:(=), Symbol(name), Meta.parse(tok2))))
             else

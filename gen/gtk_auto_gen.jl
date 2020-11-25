@@ -1,6 +1,6 @@
 #!/usr/bin/env julia
 
-import Clang, Clang.cindex
+using Clang
 include("gtk_list_gen.jl")
 include("gtk_get_set_gen.jl")
 include("gtk_consts_gen.jl")
@@ -37,10 +37,10 @@ let gtk_version = 3
     if args[end] == '\n'
         args = args[1:end-1]
     end
-    args = ASCIIString[split(args,' ')...,cppargs...]
+    args = ascii.([split(args,' '); cppargs])
     global gtk_h, gtk_macro_h
     cd(Sys.BINDIR) do
-        gtk_h = cindex.parse_header(header, diagnostics=true, args=args, flags=0x41)
+        gtk_h = parse_header(header, args=args, flags=0x41) |> getcursor
     end
     gboxpath = "gbox$(gtk_version)"
     gconstspath = "gconsts$(gtk_version)"
