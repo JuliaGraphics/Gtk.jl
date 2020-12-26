@@ -6,7 +6,7 @@ function gen_g_type_lists(gtk_h)
     replacelist = Dict{Symbol,Symbol}(
         :GVariant => :nothing,
         :GType => :g_gtype,
-        )
+    )
     tdecls = search(gtk_h, Clang.CXCursor_TypedefDecl)
     leafs = Tuple{Symbol,Expr}[]
     ifaces = Tuple{Symbol,Expr}[]
@@ -20,6 +20,7 @@ function gen_g_type_lists(gtk_h)
         else
             isptr = false
         end
+
         sdecl = typedecl(canonical(ty))
         isa(sdecl, CLStructDecl) || continue
         typname = spelling(tdecl)
@@ -29,13 +30,14 @@ function gen_g_type_lists(gtk_h)
         typname = Symbol(typname)
         header_file = filename(tdecl)
         libname = get(gtklibname,basename(splitdir(header_file)[1]),nothing)
-        libname == nothing && continue
+        libname === nothing && continue
         if typname in keys(replacelist)
             symname = replacelist[typname]
             symname == :nothing && continue
         else
             symname = Symbol(join([lowercase(s) for s in split(string(typname), r"(?=[A-Z])")],"_"))
         end
+
         gtyp = g_type(typname, libname, symname, Gtk)
         if gtyp == 0
             gtyp = g_type_from_name(typname)

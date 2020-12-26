@@ -2,11 +2,11 @@ function gen_consts(body, gtk_h)
     count = 0
     exports = Expr(:export)
     push!(body.args,exports)
-
+    
     tdecls = search(gtk_h, Clang.CXCursor_TypedefDecl)
     for tdecl in tdecls
         ctype = canonical(type(tdecl))
-        if isa(ctype, Enum)
+        if isa(ctype, CLEnum)
             name = spelling(tdecl)
             m = match(r"^(G\w+)$", name)
             if m === nothing
@@ -16,7 +16,7 @@ function gen_consts(body, gtk_h)
             push!(exports.args, name)
             consts = Expr(:block)
             push!(body.args, Expr(:toplevel, Expr(:module, false, name, consts)))
-            children = children(typedecl(ctype))
+            children = Clang.children(typedecl(ctype))
             mask = true
             c1 = spelling(children[1])
             splitc1 = split(c1,'_')
@@ -50,7 +50,7 @@ function gen_consts(body, gtk_h)
                 else
                     shortdecl = decl[lprefix:end]
                 end
-                jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
+                jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), value(child))))
                 if occursin(r"^[A-Za-z]", shortdecl)
                     push!(consts.args, Expr(:const, Expr(:(=), Symbol(shortdecl), jldecl)))
                 else
