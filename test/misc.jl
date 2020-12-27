@@ -18,19 +18,13 @@ end
     x+y+k
 end
 
-printstyled("""
-The following messages:
-   WARNING: Error in @guarded callback
-are expected and a sign of normal operation.
-""", color=:green)
-
 @test foo1(3,5) == 8
-@test bar1(3,5) == nothing
+@test @test_logs (:warn, "Error in @guarded callback") bar1(3,5) == nothing
 @test foo2(3,5) == 8
-@test bar2(3,5) == nothing
+@test @test_logs (:warn, "Error in @guarded callback") bar2(3,5) == nothing
 @test foo3(3,5) == 8
-@test bar3(3,5) == nothing
-@test bar4(3,5) == unhandled
+@test @test_logs (:warn, "Error in @guarded callback") bar3(3,5) == nothing
+@test @test_logs (:warn, "Error in @guarded callback") bar4(3,5) == unhandled
 
 # Do-block syntax
 c = GtkCanvas()

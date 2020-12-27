@@ -3,7 +3,7 @@ function GtkCssProviderLeaf(; data = nothing, filename = nothing)
     source_count = (data !== nothing) + (filename !== nothing)
     @assert(source_count <= 1,
         "GtkCssProvider must have at most one data or filename argument")
-    provider = GtkCssProviderLeaf(ccall((:gtk_css_provider_get_default, libgtk), Ptr{GObject}, ()))
+    provider = GtkCssProviderLeaf(ccall((:gtk_css_provider_new, libgtk), Ptr{GObject}, ()))
     if data !== nothing
         GError() do error_check
           ccall((:gtk_css_provider_load_from_data, libgtk), Bool,

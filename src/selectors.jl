@@ -178,3 +178,21 @@ function save_dialog_native(title::AbstractString, parent = GtkNullContainer(), 
     GLib.gc_unref(dlg) #destroy(dlg)
     return selection
 end
+
+function GtkColorChooserDialogLeaf(title::AbstractString, parent::GtkContainer; kwargs...)
+    return GtkColorChooserDialogLeaf(ccall((:gtk_color_chooser_dialog_new, libgtk), Ptr{GObject},
+            (Ptr{UInt8}, Ptr{GObject}),
+            title, parent); kwargs...)
+end
+
+function color_chooser_dialog(title::AbstractString, parent = GtkNullContainer(); kwargs...)
+    dlg = GtkColorChooserDialog(title, parent; kwargs...)
+    response = run(dlg)
+    if response == GConstants.GtkResponseType.OK
+        selection = GAccessor.rgba(dlg)
+    else
+        selection = nothing
+    end
+    destroy(dlg)
+    return selection
+end

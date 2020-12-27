@@ -163,3 +163,7 @@ function GtkVolumeButtonLeaf(value::Real) # 0 <= value <= 1
 end
 
 GtkFontButtonLeaf() = GtkFontButtonLeaf(ccall((:gtk_font_button_new, libgtk), Ptr{GObject}, ()))
+
+GtkColorButtonLeaf() = GtkColorButtonLeaf(ccall((:gtk_color_button_new, libgtk), Ptr{GObject}, ()))
+GtkColorButtonLeaf(color::GdkRGBA) = GtkColorButtonLeaf(ccall((:gtk_color_button_new_with_rgba, libgtk), Ptr{GObject},
+    (Ref{GdkRGBA},), color))

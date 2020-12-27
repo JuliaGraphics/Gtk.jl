@@ -416,6 +416,13 @@ w = Window(b, "VolumeButton", 50, 50)|>showall
 destroy(w)
 end
 
+@testset "ColorButton" begin
+b = ColorButton(Gtk.GdkRGBA(0, 0.8, 1.0, 0.3))
+w = Window(b, "ColorButton", 50, 50)|>showall
+GAccessor.rgba(ColorChooser(b), GLib.mutable(Gtk.GdkRGBA(0, 0, 0, 0)))
+destroy(w)
+end
+
 @testset "combobox" begin
 combo = ComboBoxText()
 choices = ["Strawberry", "Vanilla", "Chocolate"]
@@ -541,13 +548,8 @@ end
     Gtk.showall(win)
     sleep(0.5)
     mtrx = Gtk.Cairo.get_matrix(getgc(cnvs))
-    if get(ENV, "JULIA_PKGEVAL", "") == "true" || get(ENV, "CI", nothing) === nothing || !Sys.islinux()
-        @test mtrx.xx == 300
-        @test mtrx.yy == 280
-    else
-        @test_broken mtrx.xx == 300
-        @test_broken mtrx.yy == 280
-    end
+    @test mtrx.xx == 300
+    @test mtrx.yy == 280
     @test mtrx.xy == mtrx.yx == mtrx.x0 == mtrx.y0 == 0
 end
 
@@ -615,11 +617,16 @@ end
 #@test get_value(tr)[1] == choices[2]
 #destroy(w)
 
-@testset "Selectors" begin
+@testset "File Chooser" begin
     dlg = FileChooserDialog("Select file", Null(), GtkFileChooserAction.OPEN,
                             (("_Cancel", GtkResponseType.CANCEL),
                              ("_Open", GtkResponseType.ACCEPT)))
     destroy(dlg)
+end
+
+@testset "Color Chooser" begin
+dlg = ColorChooserDialog("Select color", Null())
+destroy(dlg)
 end
 
 @testset "List view" begin
@@ -634,6 +641,8 @@ c1=TreeViewColumn("A", r1, Dict([("text",0)]))
 c2=TreeViewColumn("B", r2, Dict([("active",1)]))
 push!(tv,c1)
 push!(tv,c2)
+delete!(tv, c1)
+insert!(tv, 1, c1)
 w = Window(tv, "List View")|>showall
 
 ## selection
