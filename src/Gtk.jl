@@ -109,11 +109,6 @@ function __init__()
         )
     end
 
-    if Sys.iswindows()
-      # needed on windows for correct window decorations (issue 355)
-      ENV["GTK_CSD"] = 0
-    end
-
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
     ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
