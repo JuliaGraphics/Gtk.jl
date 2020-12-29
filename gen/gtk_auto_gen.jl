@@ -1,43 +1,47 @@
-#!/usr/bin/env julia
-
 using Clang
-using GTK3_jll, GTK3_jll.Glib_jll, GTK3_jll.gdk_pixbuf_jll
-using Serialization
+using GTK3_jll
+import Serialization
 
 include("gtk_list_gen.jl")
 include("gtk_get_set_gen.jl")
 include("gtk_consts_gen.jl")
 
 function without_linenums!(ex::Expr)
-    linenums_filter(x,ex) = true
-    linenums_filter(x::LineNumberNode,ex) = false
-    linenums_filter(x::Expr,ex) = x.head !== :line
-    linenums_filter(x::Nothing,ex) = ex.head !== :block
-    filter!((x)->linenums_filter(x,ex), ex.args)
-    for arg in ex.args
-        if isa(arg,Expr)
-            without_linenums!(arg)
-        end
-    end
-    ex
+	linenums_filter(x,ex) = true
+	linenums_filter(x::LineNumberNode,ex) = false
+	linenums_filter(x::Expr,ex) = x.head !== :line
+	linenums_filter(x::Nothing,ex) = ex.head !== :block
+	filter!((x)->linenums_filter(x,ex), ex.args)
+	for arg in ex.args
+		if isa(arg,Expr)
+			without_linenums!(arg)
+		end
+	end
+	ex
 end
 
+# If there is an error about missing some std headers, e.g. fatal error: 'time.h' file not found,
+# set this to `stdlib/include/on/your/specific/platform` (see https://github.com/JuliaInterop/Clang.jl)
+const STD_INCLUDE = ""
 
 const LIBGTK3_INCLUDE = joinpath(dirname(GTK3_jll.libgtk3_path), "..", "include", "gtk-3.0", "gtk") |> normpath
-const DEPENDENCIES = vcat([readdir(joinpath(dep, "..", "include");join=true) for dep in vcat(GTK3_jll.PATH_list, dirname(Glib_jll.libglib_path))]...) .|> normpath
+const SOURCES = vcat(GTK3_jll.PATH_list, GTK3_jll.LIBPATH_list)
+const DEPENDENCIES = vcat([readdir(dep; join=true) for dep in joinpath.(SOURCES, "..", "include") if isdir(dep)]...) .|> normpath
+# glibconfig.h
+const ADDITIONAL = vcat([joinpath.(readdir(dep; join=true), "include") for dep in joinpath.(SOURCES, "..", "lib") if isdir(dep)]...) .|> normpath
 const gtk_h = joinpath(LIBGTK3_INCLUDE, "gtk.h")
 
 toplevels = Any[]
 let gtk_version = 3
-    global trans_unit, root_cursor
+   global trans_unit, root_cursor
 	# parse headers
 	cd(Sys.BINDIR) do
 		global trans_unit = parse_header(gtk_h,
-			args=["-I", joinpath(LIBGTK3_INCLUDE, "..")],
-			includes=vcat(LIBGTK3_INCLUDE, CLANG_INCLUDE, DEPENDENCIES),
+			args=["-I", joinpath(LIBGTK3_INCLUDE, ".."), "-I$(STD_INCLUDE)"],
+			includes=vcat(LIBGTK3_INCLUDE, CLANG_INCLUDE, DEPENDENCIES, ADDITIONAL),
 			flags=0x41)
 	end
-
+	
 	root_cursor = getcursor(trans_unit)
 
 	gboxpath = "gbox$(gtk_version)"
@@ -52,37 +56,37 @@ let gtk_version = 3
 	end
 	 
 	body = Expr(:block,
-		Expr(:import, :., :., :Gtk),
-		Expr(:import, :., :., :Gtk, :GObject),
-    )
+		Meta.parse("import ..Gtk"),
+		Meta.parse("import ..Gtk.GObject"),
+   )
     
-    gbox = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
+   gbox = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
 	count_fcns = gen_get_set(body, root_cursor)
 	println("Generated $gboxpath with $count_fcns function definitions")
-    without_linenums!(gbox)
+   without_linenums!(gbox)
     
-    body = Expr(:block)
-    gconsts = Expr(:toplevel,Expr(:module, true, :GConstants, body))
+   body = Expr(:block)
+   gconsts = Expr(:toplevel,Expr(:module, true, :GConstants, body))
 	count_consts = gen_consts(body, root_cursor)
 	println("Generated $gconstspath with $count_consts constants")
 	without_linenums!(gconsts)
     
-	open(joinpath(splitdir(@__FILE__)[1], gboxpath), "w") do cache
+	open(joinpath(dirname(@__FILE__), gboxpath), "w") do cache
 		Base.println(cache,"quote")
 		Base.show_unquoted(cache, gbox)
 		println(cache)
 		Base.println(cache,"end")
-    end
-	open(joinpath(splitdir(@__FILE__)[1], gconstspath), "w") do cache
+   end
+	open(joinpath(dirname(@__FILE__), gconstspath), "w") do cache
 		Base.println(cache,"quote")
 		Base.show_unquoted(cache, gconsts)
 		println(cache)
 		Base.println(cache,"end")
-    end
+   end
 	ser_version = Serialization.ser_version
-	open(joinpath(splitdir(@__FILE__)[1], "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
-		serialize(cache, gbox)
-		serialize(cache, gconsts)
+	open(joinpath(dirname(@__FILE__), "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
+		Serialization.serialize(cache, gbox)
+		Serialization.serialize(cache, gconsts)
 	end
 	push!(toplevels, (gbox, gconsts, g_types, gtk_h))
 end

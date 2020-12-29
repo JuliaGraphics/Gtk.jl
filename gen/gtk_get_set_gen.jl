@@ -124,8 +124,8 @@ const GtkBoxedMap = Set{Symbol}([
     :GtkWidgetPath,
     ])
 cl_to_jl = Dict(
-    CLVoid         => :Nothing,
-    CLBool         => :Bool,
+    CLVoid             => :Nothing,
+    CLBool             => :Bool,
     CLChar_U           => :UInt8,
     CLUChar            => :Cuchar,
     CLChar16           => :UInt16,
@@ -138,7 +138,7 @@ cl_to_jl = Dict(
     CLSChar            => :UInt8,
     CLWChar            => :Char,
     CLShort            => :Int16,
-    CLInt          => :Cint,
+    CLInt              => :Cint,
     CLLong             => :Clong,
     CLLongLong         => :Clonglong,
     CLFloat            => :Cfloat,
@@ -155,6 +155,7 @@ c_typdef_to_jl = Dict{String,Any}(
     "GError"                => :(Gtk.GError),
     "GdkRectangle"          => :(Gtk.GdkRectangle),
     "GdkPoint"              => :(Gtk.GdkPoint),
+    "GdkRGBA"               => :(Gtk.GdkRGBA),
     "GdkEventAny"           => :(Gtk.GdkEventAny),
     "GdkEventButton"        => :(Gtk.GdkEventButton),
     "GdkEventScroll"        => :(Gtk.GdkEventScroll),
@@ -267,13 +268,13 @@ function is_gbool(ctype)
 end
 
 function gen_get_set(body, gtk_h)
-    fdecls = search(gtk_h, Clang.CXCursor_FunctionDecl)
+    fdecls = Clang.search(gtk_h, Clang.CXCursor_FunctionDecl)
     exports = Set{Symbol}([:default_icon_list, :position])
     export_stmt = Expr(:export)
     push!(body.args,export_stmt)
     count = 0
     for fdecl in fdecls
-        fargs = search(fdecl, Clang.CXCursor_ParmDecl)
+        fargs = Clang.search(fdecl, Clang.CXCursor_ParmDecl)
         if length(fargs) < 1
             continue
         end
@@ -292,7 +293,7 @@ function gen_get_set(body, gtk_h)
         method_name = Symbol(m.captures[2])
         header_file = filename(fdecl)
         libname = gtklibname[basename(splitdir(header_file)[1])]
-        if libname == nothing
+        if libname === nothing
             continue
         end
         rettype = g_type_to_jl(return_type(fdecl))

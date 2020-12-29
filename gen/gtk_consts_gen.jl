@@ -3,7 +3,7 @@ function gen_consts(body, gtk_h)
     exports = Expr(:export)
     push!(body.args,exports)
     
-    tdecls = search(gtk_h, Clang.CXCursor_TypedefDecl)
+    tdecls = Clang.search(gtk_h, Clang.CXCursor_TypedefDecl)
     for tdecl in tdecls
         ctype = canonical(type(tdecl))
         if isa(ctype, CLEnum)
@@ -63,14 +63,15 @@ function gen_consts(body, gtk_h)
             count += 1
         end
     end
-    mdecls = search(gtk_h, Clang.CXCursor_MacroDefinition)
+
+    mdecls = Clang.search(gtk_h, Clang.CXCursor_MacroDefinition)
     for mdecl in mdecls
         name = spelling(mdecl)
         if occursin(r"^G\w*[A-Za-z]$", name)
             tokens = tokenize(mdecl)
-            if length(tokens) == 3 && isa(tokens[2], Literal)
+            if length(tokens) == 2 && isa(tokens[2], Literal)
                 tok2 = Clang.handle_macro_exprn(tokens, 2)[1]
-                tok2 = replace(tok2, "\$", "\\\$")
+                tok2 = replace(tok2, "\$"=>"\\\$")
                 push!(body.args, Expr(:const, Expr(:(=), Symbol(name), Meta.parse(tok2))))
             else
                 #println("Skipping: ", name, " = ", [tokens...])

@@ -1,13 +1,12 @@
 import Gtk
 import Gtk.GLib: g_type, g_type_from_name, g_isa, GObject, get_fn_ptr
-import Clang
 
 function gen_g_type_lists(gtk_h)
     replacelist = Dict{Symbol,Symbol}(
         :GVariant => :nothing,
         :GType => :g_gtype,
     )
-    tdecls = search(gtk_h, Clang.CXCursor_TypedefDecl)
+    tdecls = Clang.search(gtk_h, Clang.CXCursor_TypedefDecl)
     leafs = Tuple{Symbol,Expr}[]
     ifaces = Tuple{Symbol,Expr}[]
     boxes = Tuple{Symbol,Expr}[]
