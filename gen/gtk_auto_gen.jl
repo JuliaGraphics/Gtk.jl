@@ -33,7 +33,7 @@ const gtk_h = joinpath(LIBGTK3_INCLUDE, "gtk.h")
 
 toplevels = Any[]
 let gtk_version = 3
-   global trans_unit, root_cursor
+	global trans_unit, root_cursor
 	# parse headers
 	cd(Sys.BINDIR) do
 		global trans_unit = parse_header(gtk_h,
@@ -43,48 +43,48 @@ let gtk_version = 3
 	end
 	
 	root_cursor = getcursor(trans_unit)
-
+	
 	gboxpath = "gbox$(gtk_version)"
 	gconstspath = "gconsts$(gtk_version)"
 	cachepath = "gtk$(gtk_version)"
-
+	
 	g_types = gen_g_type_lists(root_cursor)
 	for z in g_types
 		for (s, ex) in z
 			without_linenums!(ex)
 		end
 	end
-	 
+	
 	body = Expr(:block,
-		Meta.parse("import ..Gtk"),
-		Meta.parse("import ..Gtk.GObject"),
-   )
-    
-   gbox = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
+	Meta.parse("import ..Gtk"),
+	Meta.parse("import ..Gtk.GObject"),
+	)
+	
+	gbox = Expr(:toplevel,Expr(:module, true, :GAccessor, body))
 	count_fcns = gen_get_set(body, root_cursor)
 	println("Generated $gboxpath with $count_fcns function definitions")
-   without_linenums!(gbox)
-    
-   body = Expr(:block)
-   gconsts = Expr(:toplevel,Expr(:module, true, :GConstants, body))
+	without_linenums!(gbox)
+	
+	body = Expr(:block)
+	gconsts = Expr(:toplevel,Expr(:module, true, :GConstants, body))
 	count_consts = gen_consts(body, root_cursor)
 	println("Generated $gconstspath with $count_consts constants")
 	without_linenums!(gconsts)
-    
-	open(joinpath(dirname(@__FILE__), gboxpath), "w") do cache
+	
+	open(joinpath(@__DIR__, gboxpath), "w") do cache
 		Base.println(cache,"quote")
 		Base.show_unquoted(cache, gbox)
 		println(cache)
 		Base.println(cache,"end")
-   end
-	open(joinpath(dirname(@__FILE__), gconstspath), "w") do cache
+	end
+	open(joinpath(@__DIR__, gconstspath), "w") do cache
 		Base.println(cache,"quote")
 		Base.show_unquoted(cache, gconsts)
 		println(cache)
 		Base.println(cache,"end")
-   end
+	end
 	ser_version = Serialization.ser_version
-	open(joinpath(dirname(@__FILE__), "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
+	open(joinpath(@__DIR__, "$(cachepath)_julia_ser$(ser_version)"), "w") do cache
 		Serialization.serialize(cache, gbox)
 		Serialization.serialize(cache, gconsts)
 	end

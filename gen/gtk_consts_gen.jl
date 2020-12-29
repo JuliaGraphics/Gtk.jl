@@ -63,7 +63,7 @@ function gen_consts(body, gtk_h)
             count += 1
         end
     end
-
+    
     mdecls = Clang.search(gtk_h, Clang.CXCursor_MacroDefinition)
     for mdecl in mdecls
         name = spelling(mdecl)
