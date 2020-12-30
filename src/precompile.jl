@@ -16,4 +16,9 @@ function _precompile_()
     precompile(Tuple{typeof(signal_connect),Function,GtkComboBoxTextLeaf,Symbol})
     precompile(Tuple{typeof(setindex!),Dict{Union{WeakRef, GObject},Bool},Bool,GtkTextBufferLeaf})
     precompile(Tuple{typeof(notify_realize),Ptr{GObject},GtkCanvas})
+    precompile(Tuple{typeof(mouseup_cb),Ptr{GObject},Ptr{GdkEventButton},MouseHandler})   # time: 0.026400313
+    precompile(Tuple{typeof(toplevel),GtkCanvas})   # time: 0.023317223
+    precompile(Tuple{typeof(notify_motion),Ptr{GObject},Ptr{GdkEventMotion},Gtk_signal_motion{MouseHandler}})   # time: 0.001248276
+    precompile(Tuple{typeof(canvas_on_draw_event),Ptr{GObject},Ptr{Nothing},GtkCanvas})   # time: 0.001126875
+    precompile(Tuple{typeof(mousedown_cb),Ptr{GObject},Ptr{GdkEventButton},MouseHandler})   # time: 0.001090291
 end

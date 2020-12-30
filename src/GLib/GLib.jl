@@ -78,4 +78,9 @@ macro g_type_delegate(eq)
     end
 end
 
+if Base.VERSION >= v"1.4.2"
+    precompile(Tuple{typeof(addref),Any})   # time: 0.003988418
+    precompile(Tuple{typeof(gc_ref),Any})   # time: 0.002649791
+end
+
 end
