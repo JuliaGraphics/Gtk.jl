@@ -75,11 +75,11 @@ include("application.jl")
 
 function __init__()
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
-    ENV["XDG_DATA_DIRS"] = join(filter(x -> x != nothing, [
+    ENV["XDG_DATA_DIRS"] = join(filter(x -> x !== nothing, [
         dirname(adwaita_icons_dir),
         dirname(hicolor_icons_dir),
-        joinpath(dirname(GTK3_jll.libgdk3_path), "..", "share"),
-        get(ENV, "XDG_DATA_DIRS", nothing),
+        joinpath(dirname(GTK3_jll.libgdk3_path::String), "..", "share"),
+        get(ENV, "XDG_DATA_DIRS", nothing)::Union{String,Nothing},
     ]), Sys.iswindows() ? ";" : ":")
 
     # Next, ensure that gdk-pixbuf has its loaders.cache file; we generate a
@@ -117,7 +117,7 @@ function __init__()
         # Needed by xkbcommon:
         # https://xkbcommon.org/doc/current/group__include-path.html.  Related
         # to issue https://github.com/JuliaGraphics/Gtk.jl/issues/469
-        ENV["XKB_CONFIG_ROOT"] = joinpath(Xorg_xkeyboard_config_jll.artifact_dir,
+        ENV["XKB_CONFIG_ROOT"] = joinpath(Xorg_xkeyboard_config_jll.artifact_dir::String,
                                           "share", "X11", "xkb")
     end
 
@@ -156,8 +156,10 @@ using .GConstants
 include("windows.jl")
 include("gl_area.jl")
 
-include("precompile.jl")
-_precompile_()
+if Base.VERSION >= v"1.4.2"
+    include("precompile.jl")
+    _precompile_()
+end
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames
