@@ -9,6 +9,7 @@ w = GtkWindow()
 b = GtkTextBuffer()
 b.text[String] = "test"
 v = GtkTextView(b)
+@test v[:buffer, GtkTextBuffer] == b
 
 push!(w, v)
 showall(w)
@@ -21,7 +22,7 @@ ite = GtkTextIter(b, 2)
 @test (its:ite).text[String] == "t"
 
 splice!(b, its:ite)
-@test b.text[String] == "est" 
+@test b.text[String] == "est"
 
 insert!(b, GtkTextIter(b, 1), "t")
 @test b.text[String] == "test"
@@ -75,7 +76,7 @@ place_cursor(b, it2)
 @test get_gtk_property(it2, :is_cursor_position) == true
 @test b.cursor_position[Int] == get_gtk_property(it2, :offset)
 
-# search 
+# search
 (found, its, ite) = Gtk.search(b, "line1", :backward)
 @test found == true
 @test (its:ite).text[String] == "line1"
