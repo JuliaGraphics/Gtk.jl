@@ -268,6 +268,16 @@ function is_gbool(ctype)
     true
 end
 
+function isduplicatedef(expr, name, arg1ty, argcount)
+    if expr.head == :function
+        fargs = expr.args[1].args
+        return fargs[1] == name &&
+            fargs[2].args[2] == arg1ty && 
+            length(fargs[2:end]) == argcount
+    end
+    false
+end
+
 function gen_get_set(body, gtk_h)
     fdecls = Clang.search(gtk_h, Clang.CXCursor_FunctionDecl)
     exports = Set{Symbol}([:default_icon_list, :position])
@@ -354,13 +364,17 @@ function gen_get_set(body, gtk_h)
                 push!(fargnames, argnames[i])
             end
             fbody.args[end] = Expr(:return,fbody.args[end])
-            push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), fargnames...), fbody))
+            if !any(ex -> isduplicatedef(ex, method_name, arg1ty, length(fargnames)+1), body.args)
+                push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), fargnames...), fbody))
+            end
         elseif m.captures[1] == "set"
             fbody = Expr(:block,
                 :( ccall(($(QuoteNode(Symbol(spell))),$libname),$rettype,($(argtypes...),),$(argnames...)) ),
                 Expr(:return, argnames[1])
             )
-            push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), argnames[2:end]...), fbody))
+            if !any(ex -> isduplicatedef(ex, method_name, arg1ty, length(argnames)), body.args)
+                push!(body.args, Expr(:function, Expr(:call, method_name, Expr(:(::),argnames[1],arg1ty), argnames[2:end]...), fbody))
+            end
         else
             @assert false
         end
