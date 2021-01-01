@@ -1,3 +1,12 @@
+const PLATFORM_SPECIFIC = Dict{String, Any}(
+    "G_DIR_SEPARATOR"           => :(Sys.iswindows() ? '\\' : '/'),
+    "G_DIR_SEPARATOR_S"         => :(Sys.iswindows() ? "\\" : "/"),
+    "G_SEARCHPATH_SEPARATOR"    => :(Sys.iswindows() ? ';' : ':'),
+    "G_SEARCHPATH_SEPARATOR_S"  => :(Sys.iswindows() ? ";" :  ":"),
+    "G_MODULE_SUFFIX"           => :(Sys.iswindows() ? "dll" : "so"), #For "most" Unices and Linux this is "so".
+    "G_PID_FORMAT"              => :(Sys.iswindows() ? "p" : "i"), #Incorrectly stated as only "i" in Glib reference.
+)
+
 function gen_consts(body, gtk_h)
     count = 0
     exports = Expr(:export)
@@ -68,6 +77,10 @@ function gen_consts(body, gtk_h)
     for mdecl in mdecls
         name = spelling(mdecl)
         if occursin(r"^G\w*[A-Za-z]$", name)
+            if haskey(PLATFORM_SPECIFIC, name)
+                push!(body.args, Expr(:const, Expr(:(=), Symbol(name), PLATFORM_SPECIFIC[name])))
+                continue
+            end
             tokens = tokenize(mdecl)
             if length(tokens) == 2 && isa(tokens[2], Literal)
                 tok2 = Clang.handle_macro_exprn(tokens, 2)[1]

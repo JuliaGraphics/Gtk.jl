@@ -162,6 +162,7 @@ c_typdef_to_jl = Dict{String,Any}(
     "GdkEventKey"           => :(Gtk.GdkEventKey),
     "GdkEventMotion"        => :(Gtk.GdkEventMotion),
     "GdkEventCrossing"      => :(Gtk.GdkEventCrossing),
+    "GtkRequisition"        => :(Gtk.GtkRequisition),
     "GtkTextIter"           => :(Gtk.GtkTextIter),
     "GtkTreeIter"           => :(Gtk.GtkTreeIter),
     "GList"                 => :(Gtk._GList{Nothing}),
@@ -329,7 +330,7 @@ function gen_get_set(body, gtk_h)
                 if i > last_inarg
                     atype = pointee_type(atype)
                     T = g_type_to_jl(atype)
-                    if T !== :Nothing && T !== :Nothing && T != :(Gtk.GObject)
+                    if T !== :Nothing && T != :(Gtk.GObject)
                         retval = argnames[i]
                         pushfirst!(fbody.args, :( $retval = Gtk.mutable($T) ))
                         retval = :( $retval[] )
