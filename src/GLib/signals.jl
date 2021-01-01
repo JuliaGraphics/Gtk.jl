@@ -52,10 +52,9 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
                          param_values::Ptr{GValue}, invocation_hint::Ptr{Nothing}, marshal_data::Ptr{Nothing})
     @assert sizeof_gclosure > 0
     closure_env = convert(Ptr{Any}, closuref + sizeof_gclosure)
-    cb = unsafe_load(closure_env, 1)
+    cb = unsafe_load(closure_env, 1)::Function
     gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int}, closure_env),  2))
     params = Vector{Any}(undef, n_param_values)
-    local retval = nothing
     g_siginterruptible(cb) do
         if gtk_calling_convention
             # compatibility mode, if we must
