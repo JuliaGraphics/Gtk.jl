@@ -24,7 +24,7 @@ end
 # set this to `stdlib/include/on/your/specific/platform` (see https://github.com/JuliaInterop/Clang.jl)
 const STD_INCLUDE = ""
 
-const LIBGTK3_INCLUDE = joinpath(dirname(GTK3_jll.libgtk3_path), "..", "include", "gtk-3.0", "gtk") |> normpath
+const LIBGTK3_INCLUDE = joinpath(GTK3_jll.artifact_dir, "include", "gtk-3.0", "gtk")
 const SOURCES = vcat(GTK3_jll.PATH_list, GTK3_jll.LIBPATH_list)
 const DEPENDENCIES = vcat([readdir(dep; join=true) for dep in joinpath.(SOURCES, "..", "include") if isdir(dep)]...) .|> normpath
 # glibconfig.h
