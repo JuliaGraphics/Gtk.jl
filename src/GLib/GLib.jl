@@ -33,7 +33,7 @@ export GConnectFlags
 export @sigatom, cfunction_
 
 
-cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
+cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 
 @generated function cfunction_(f, R::Type{rt}, A::Type{at}) where {rt, at<:Tuple}
     quote
