@@ -1,6 +1,6 @@
 const PLATFORM_SPECIFIC = Dict{String, Any}(
-    "G_DIR_SEPARATOR"           => :(Sys.iswindows() ? '\\' : '/'),
-    "G_DIR_SEPARATOR_S"         => :(Sys.iswindows() ? "\\" : "/"),
+    "G_DIR_SEPARATOR"           => :(Base.Filesystem.path_separator[1]),
+    "G_DIR_SEPARATOR_S"         => :(Base.Filesystem.path_separator),
     "G_SEARCHPATH_SEPARATOR"    => :(Sys.iswindows() ? ';' : ':'),
     "G_SEARCHPATH_SEPARATOR_S"  => :(Sys.iswindows() ? ";" :  ":"),
     "G_MODULE_SUFFIX"           => :(Sys.iswindows() ? "dll" : "so"), #For "most" Unices and Linux this is "so".
