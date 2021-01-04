@@ -16,19 +16,19 @@ add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, li
 #end
 
 
-function on_signal_resize(resize_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_resize(@nospecialize(resize_cb::Function), widget::GtkWidget, vargs...)
     signal_connect(resize_cb, widget, "size-allocate", Nothing, (Ptr{GdkRectangle},), vargs...)
 end
 
-function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
+function on_signal_destroy(@nospecialize(destroy_cb::Function), widget::GObject, vargs...)
     signal_connect(destroy_cb, widget, "destroy", Nothing, (), vargs...)
 end
 
-function on_signal_button_press(press_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_button_press(@nospecialize(press_cb::Function), widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_PRESS)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
-function on_signal_button_release(release_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_button_release(@nospecialize(release_cb::Function), widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_RELEASE)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
