@@ -107,7 +107,7 @@ end
 end
 function g_type(name::Symbol, lib, symname::Symbol, cm)
     if name in keys(gtype_wrappers)
-        return g_type(gtype_wrappers[name], cm)
+        return g_type(gtype_wrappers[name])
     end
     fnptr = get_fn_ptr(string(symname, "_get_type"), lib, cm)
     if fnptr != C_NULL

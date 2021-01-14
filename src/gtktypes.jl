@@ -127,6 +127,11 @@ end
 @gtktype GtkCssProvider
 @gtktype GtkStyleContext
 
+struct GtkRequisition
+    width::Int32
+    height::Int32
+    GtkRequisition(width, height) = new(width, height)
+end
 
 if libgtk_version >= v"3.16.0"
 @gtktype_custom_symname GtkGLArea gtk_gl_area

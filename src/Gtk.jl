@@ -10,6 +10,7 @@ using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_ico
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
+const libgdk_pixbuf = libgdkpixbuf
 
 
 const suffix = :Leaf
@@ -140,7 +141,7 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     if isfile(fastgtkcache) && true
         open(fastgtkcache) do cache
             while !eof(cache)
-                Core.eval(deserialize(cache))
+                Core.eval(Gtk, deserialize(cache))
             end
         end
     else
