@@ -17,10 +17,10 @@ mutable struct GtkCanvas <: GtkDrawingArea # NOT an @GType
         ids = Vector{Culong}(undef, 0)
         widget = new(da, false, false, MouseHandler(ids), nothing, nothing)
         widget.mouse.widget = widget
-        signal_connect(notify_realize, widget, "realize", Nothing, ())
-        signal_connect(notify_unrealize, widget, "unrealize", Nothing, ())
+        signal_connect(Base.inferencebarrier(notify_realize), widget, "realize", Nothing, ())
+        signal_connect(Base.inferencebarrier(notify_unrealize), widget, "unrealize", Nothing, ())
         on_signal_resize(notify_resize, widget)
-        signal_connect(canvas_on_draw_event, widget, "draw", Cint, (Ptr{Nothing},))
+        signal_connect(Base.inferencebarrier(canvas_on_draw_event), widget, "draw", Cint, (Ptr{Nothing},))
         push!(ids, on_signal_button_press(mousedown_cb, widget, false, widget.mouse))
         push!(ids, on_signal_button_release(mouseup_cb, widget, false, widget.mouse))
         push!(ids, on_signal_motion(mousemove_cb, widget, 0, 0, false, widget.mouse))

@@ -1,12 +1,12 @@
 # id = VERSION >= v"0.4-"get, :event, Nothing, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike,
+function signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike,
         ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}
     signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
 end
 
-function signal_connect_generic(cb::Function, w::GObject, sig::AbstractStringLike,
+function signal_connect_generic(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike,
         ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}  #TODO: assert that length(param_types) is correct
     callback = cfunction_(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
@@ -23,10 +23,10 @@ end
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool = false)
+function signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike, after::Bool = false)
     _signal_connect(cb, w, sig, after, false, nothing, nothing)
 end
-function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
+function _signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
     @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object, libgobject), Ptr{Nothing}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int + GLib.WORD_SIZE * 2, w)
     closure_env = convert(Ptr{Ptr{Nothing}}, closuref + sizeof_gclosure)
@@ -39,7 +39,7 @@ function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, afte
     else
         unsafe_store!(convert(Ptr{Int}, closure_env), 0, 2)
     end
-    ref_cb, deref_cb = gc_ref_closure(cb)
+    ref_cb, deref_cb = invoke(gc_ref_closure, Tuple{Function}, cb)
     unsafe_store!(closure_env, ref_cb, 1)
     ccall((:g_closure_add_invalidate_notifier, libgobject), Nothing,
         (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}), closuref, ref_cb, deref_cb)
@@ -102,7 +102,7 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
     return nothing
 end
 
-function blame(cb)
+function blame(@nospecialize(cb))
     warn("Executing ", cb, ":")
 end
 
@@ -132,7 +132,7 @@ the given `id`.
 signal_handler_is_connected(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_is_connected, libgobject), Cint, (Ptr{GObject}, Culong), w, handler_id) == 1
 
-function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
+function signal_emit(w::GObject, sig::AbstractStringLike, ::Type{RT}, args...) where RT
     i = isa(sig, AbstractString) ? something(findfirst("::", sig), 0:-1) : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i) + 1:end]
@@ -202,7 +202,7 @@ macro sigatom(f)
     end
 end
 
-function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), but this function never throws
+function g_siginterruptible(f::Base.Callable, @nospecialize(cb)) # calls f (which may throw), but this function never throws
     global g_sigatom_flag, g_stack
     prev = g_sigatom_flag[]
     @assert xor(prev, (current_task() !== g_stack))
