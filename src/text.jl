@@ -689,6 +689,69 @@ function scroll_to(view::GtkTextView, iter::TI, within_margin::Real,
     view, iter, within_margin, use_align, xalign, yalign)
 end
 
+
+"""
+    buffer_to_window_coords(view::GtkTextView, buffer_x::Integer, buffer_y::Integer, wintype::Integer = 0)
+
+Implements `gtk_text_view_buffer_to_window_coords`.
+"""
+function buffer_to_window_coords(view::GtkTextView, buffer_x::Integer, buffer_y::Integer, wintype::Integer = 0)
+	window_x, window_y = Gtk.mutable(Cint), Gtk.mutable(Cint)
+	ccall(
+        (:gtk_text_view_buffer_to_window_coords, libgtk), Cvoid,
+        (Ptr{Gtk.GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}), 
+        view, Int32(wintype), buffer_x, buffer_y, window_x, window_y
+    )
+	return (window_x[], window_y[])
+end
+
+"""
+    window_to_buffer_coords(view::Gtk.GtkTextView, window_x::Integer, window_y::Integer, wintype::Integer = 2)
+
+Implements `gtk_text_view_window_to_buffer_coords`.
+"""
+function window_to_buffer_coords(view::GtkTextView, window_x::Integer, window_y::Integer, wintype::Integer = 2)
+    buffer_x, buffer_y = Gtk.mutable(Cint), Gtk.mutable(Cint)
+    ccall(
+        (:gtk_text_view_window_to_buffer_coords, libgtk), Cvoid,
+        (Ptr{GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}), 
+        view, Int32(wintype), window_x, window_y, buffer_x, buffer_y
+    )
+    return (buffer_x[],buffer_y[])
+end
+
+"""
+    text_iter_at_position(view::GtkTextView, x::Integer, y::Integer)
+
+Implements `gtk_text_view_get_iter_at_position`.
+"""
+function text_iter_at_position(view::GtkTextView, x::Integer, y::Integer)
+    buffer = view.buffer[GtkTextBuffer]
+    iter = mutable(GtkTextIter(buffer))
+    text_iter_at_position(view, iter, C_NULL, Int32(x), Int32(y))
+    return GtkTextIter(buffer, char_offset(iter))
+end
+
+text_iter_at_position(view::GtkTextView, iter::Mutable{GtkTextIter}, trailing, x::Int32, y::Int32) = ccall(
+    (:gtk_text_view_get_iter_at_position, libgtk), Cvoid,
+    (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{Cint}, Cint, Cint),
+    view, iter, trailing, x, y
+)
+
+function cursor_locations(view::GtkTextView)
+    weak = Gtk.mutable(GdkRectangle)
+    strong = Gtk.mutable(GdkRectangle)
+    buffer = view.buffer[GtkTextBuffer]
+    iter = mutable(GtkTextIter(buffer, buffer.cursor_position[Int])) 
+
+    ccall(
+        (:gtk_text_view_get_cursor_locations, libgtk), Cvoid,
+        (Ptr{GObject}, Ptr{GtkTextIter}, Ptr{Gtk.GdkRectangle}, Ptr{GdkRectangle}),
+        view, iter, strong, weak
+    )
+    return (iter, strong[], weak[])
+end
+
 ####  GtkTextMark  ####
 
 visible(w::GtkTextMark) =
