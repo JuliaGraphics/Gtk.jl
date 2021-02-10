@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>- · Gtk.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="Gtk.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Gtk.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Manual</span><ul><li><a class="tocitem" href="../../manual/gettingStarted/">Getting Started</a></li><li><a class="tocitem" href="../../manual/properties/">Properties</a></li><li><a class="tocitem" href="../../manual/layout/">Layout</a></li><li><a class="tocitem" href="../../manual/signals/">Signals and Callbacks</a></li><li><a class="tocitem" href="../../manual/builder/">Builder and Glade</a></li><li><a class="tocitem" href="../../manual/textwidgets/">Text Widgets</a></li><li><a class="tocitem" href="../../manual/combobox/">Combobox</a></li><li><a class="tocitem" href="../../manual/listtreeview/">List and Tree Widgets</a></li><li><a class="tocitem" href="../../manual/filedialogs/">Dialogs</a></li><li><a class="tocitem" href="../../manual/keyevents/">Key Events</a></li><li><a class="tocitem" href="../../manual/canvas/">Drawing on Canvas</a></li><li><a class="tocitem" href="../../manual/customWidgets/">Custom/Composed Widgets</a></li><li><a class="tocitem" href="../../manual/async/">Asynchronous UI</a></li><li><a class="tocitem" href="../../manual/nonreplusage/">Non REPL Usage</a></li><li><a class="tocitem" href="../../manual/packages/">High-Level Packages</a></li></ul></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>-</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>-</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaGraphics/Gtk.jl/blob/master/docs/src/doc/overview.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h2 id="Overview-1"><a class="docs-heading-anchor" href="#Overview-1">Overview</a><a class="docs-heading-anchor-permalink" href="#Overview-1" title="Permalink"></a></h2><p>This Gtk wrapper attempts to expose all of the power of the Gtk library in a simple, uniform interface. The structure and names employed should be easily familiar to anyone browsing the Gtk documentation or example code, or anyone who has prior experience with Gtk.</p><p>It is always safe to alter the properties of a Gtk object defined in Gtk.jl outside of calling the functions provided therein, such as through another program language, or direct ccall&#39;s.</p><h3 id="Referring-to-Gtk.Objects-1"><a class="docs-heading-anchor" href="#Referring-to-Gtk.Objects-1">Referring to Gtk.Objects</a><a class="docs-heading-anchor-permalink" href="#Referring-to-Gtk.Objects-1" title="Permalink"></a></h3><p>Gtk object can be referenced by their Gtk names (which almost always have a name like <code>GtkWindow</code>), or their &quot;short name&quot; (which is generally just the Gtk name without the &quot;Gtk&quot;, for example, <code>Window</code>). You can call <code>using Gtk</code> to import the regular names, or <code>using Gtk.ShortNames</code> to import the shorter names. You can also call <code>import Gtk</code>, and then access either the regular or short names (e.g. <code>Gtk.Window</code> or <code>Gtk.GtkWindow</code>).</p><p>The concrete types are the Gtk object name with a suffix of <code>Leaf</code> appended (to remind the user that this is a &quot;leaf&quot; in the Julia type-tree). For example, to refer to the concrete <code>GtkWindow</code> type, the user would write <code>Gtk.GtkWindowLeaf</code>.</p><h3 id="Constructing-a-Gtk.@Object-1"><a class="docs-heading-anchor" href="#Constructing-a-Gtk.@Object-1">Constructing a Gtk.@Object</a><a class="docs-heading-anchor-permalink" href="#Constructing-a-Gtk.@Object-1" title="Permalink"></a></h3><p>Gtk object constructors (by convention), are the name of the Gtk object (interface) name, with a suffix of <code>Leaf</code> appended. For example, to construct a new window, the user would invoke <code>Gtk.WindowLeaf()</code>.</p><p>Alternatively, the user can use the macro form of the widget name to construct a new <code>GObject</code>, as shown in the example below.</p><p>All object constructors accept keyword arguments to set object properties. These arguments are forwarded to the corresponding <code>set_gtk_property!</code> method (see below).</p><pre><code class="language-none">w = @GtkWindow(title=&quot;Hello World&quot;)</code></pre><h3 id="Objects-are-containers-for-their-[child_elements...]-1"><a class="docs-heading-anchor" href="#Objects-are-containers-for-their-[child_elements...]-1">Objects are containers for their [child_elements...]</a><a class="docs-heading-anchor-permalink" href="#Objects-are-containers-for-their-[child_elements...]-1" title="Permalink"></a></h3><p>All objects in Gtk are intended to behave uniformly. This means that all objects will try to act as container objects for whatever they &#39;contain&#39;. Indexing into an object (by number), or iterating the object will return a list of its contents or child objects. This also means that constructors are called with information on the elements that they contain. For example, when you create a button, you can specify either the embedded text or another widget!</p><pre><code class="language-none">Gtk.@Button(&quot;This is a button&quot;)
+Gtk.@Button(Gtk.@Label(&quot;Click me&quot;))</code></pre><p>On the flip side, you can assign child widgets to indices, or <code>push!</code> them onto the list of child widgets, for any object which derives from a <code>GtkContainer</code>. Of special note is the anti-object <code>GtkNullContainer</code> or simply <code>Null</code>. This is not actually a <code>GObject</code>. However, it can be used to prevent the creation of a default container, and it has the special behavior that it will remove any object added to it from its existing parent (although standard operations like <code>splice!</code> and <code>delete!</code> also exist, and are typically preferable for readability).</p><p>The optimal pattern for creating objects generally depends upon the usage. However, you may find the following pattern useful for creating layout hierarchies:</p><pre><code class="language-none">w=Gtk.@Window() |&gt;
+    (f=Gtk.@Box(:h) |&gt;
+        (b=Gtk.@Button(&quot;1&quot;)) |&gt;
+        (c=Gtk.@Button(&quot;2&quot;)) |&gt;
+        (f2=Gtk.@Box(:v) |&gt;
+            Gtk.@Label(&quot;3&quot;) |&gt;
+            Gtk.@Label(&quot;4&quot;))) |&gt;
+    showall</code></pre><h3 id="Objects-have-get*gtk*property(obj,-:prop,-types)-and-set*gtk*property!(obj,-:prop,-value)-1"><a class="docs-heading-anchor" href="#Objects-have-get*gtk*property(obj,-:prop,-types)-and-set*gtk*property!(obj,-:prop,-value)-1">Objects have get<em>gtk</em>property(obj, :prop, types) and set<em>gtk</em>property!(obj, :prop, value)</a><a class="docs-heading-anchor-permalink" href="#Objects-have-get*gtk*property(obj,-:prop,-types)-and-set*gtk*property!(obj,-:prop,-value)-1" title="Permalink"></a></h3><pre><code class="language-none"> &gt; warning: this API uses 0-based indexing</code></pre><p>The properties of any object can be accessed by via the <code>get_gtk_property</code> and <code>set_gtk_property!</code> methods. Displaying a <code>GtkObject</code> at the REPL-prompt will show you all of the properties that can be set on the object. Or you can view the <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html">Gtk documentation</a> online. Indexing is typically done using a symbol, but you can also use a string. In property names, you can replace <code>-</code> with <code>_</code> as shown below.</p><p>When retrieving a property, you must specify the output type. Specifying the input type when setting a property is strictly optional.</p><p>Some Examples:</p><pre><code class="language-none">w = @GtkWindow(&quot;Title&quot;)
+show(STDOUT, w) # without the STDOUT parameter, show(w) would
+                # make the window visible on the screen, instead
+                # of printing the information in the REPL
+get_gtk_property(w,:title,String)
+set_gtk_property!(w,:title,&quot;New title&quot;)
+set_gtk_property!(w,:urgency_hint,Bool,true)</code></pre><h3 id="Objects-can-signal-events-1"><a class="docs-heading-anchor" href="#Objects-can-signal-events-1">Objects can signal events</a><a class="docs-heading-anchor-permalink" href="#Objects-can-signal-events-1" title="Permalink"></a></h3><p>There are two entry points to the API for handling signals: Simple and robust OR fast and precise.</p><p>You can remove signal handlers by their id using <code>signal_handler_disconnect</code> or temporarily block them by id using <code>signal_handler_block</code> and <code>signal_handler_unblock</code></p><h4 id="Easy-Event-Handlers-1"><a class="docs-heading-anchor" href="#Easy-Event-Handlers-1">Easy Event Handlers</a><a class="docs-heading-anchor-permalink" href="#Easy-Event-Handlers-1" title="Permalink"></a></h4><p>Upon entry to the signal handler, Julia will unpack the arguments it received into native types:</p><pre><code class="language-none">id = signal_connect(widget, :event) do obj, args...
+    println(&quot;That tickles: $args&quot;)
+    nothing
+end</code></pre><p>See section on <a href="#new-gvalue-julia-auto-conversions">Extending Gtk&#39;s Functionality with new GValue&lt;-&gt;Julia auto-conversions</a> at the end of this document for details on the auto-unpacking implementation.</p><h4 id="Fast-Event-Handlers-1"><a class="docs-heading-anchor" href="#Fast-Event-Handlers-1">Fast Event Handlers</a><a class="docs-heading-anchor-permalink" href="#Fast-Event-Handlers-1" title="Permalink"></a></h4><p>If you want pre-optimized event handlers, you will need to specify the interface types when creating the signal handlers. (There are a few <code>on_signal_</code> convenience functions which do this, often in conjunction with setting other flags needed for the signal handler to function). You will often find it necessary to refer to the Gtk documentation for the signals API for Gtk callbacks:</p><ul><li>Gtk+ 2<ul><li><a href="https://developer.gnome.org/gtk2/stable/GObject.html#GObject-destroy">Gtk2 Object Closures</a></li><li><a href="https://developer.gnome.org/gtk2/stable/GtkWidget.html#GtkWidget-accel-closures-changed">Gtk2 Widget Closures</a></li></ul></li><li>Gtk+ 3<ul><li><a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed">Gtk3 Widget Closures</a></li></ul></li></ul><p>Note that the ArgType argument only specifies the type for the middle arguments. The type of the first and last arguments are determined automatically.</p><p>Example:</p><pre><code class="language-none">function on_signal_event(ptr, args, widget)
+    println(&quot;That tickles&quot;)
+    nothing
+end
+id = signal_connect(widget, :event, Nothing, (ArgType,))
+## OR
+id = signal_connect(widget, :event, Nothing, (ArgType,)) do ptr, args, obj
+    println(&quot;That tickles&quot;)
+    nothing
+end</code></pre><h3 id="Events-can-be-emitted-1"><a class="docs-heading-anchor" href="#Events-can-be-emitted-1">Events can be emitted</a><a class="docs-heading-anchor-permalink" href="#Events-can-be-emitted-1" title="Permalink"></a></h3><p>In addition to listening for events, you can trigger your own:</p><pre><code class="language-none">#syntax: signal_emit(w::GObject, sig::Union{String,Symbol}, RT::Type, args...)
+signal_emit(widget, :event, Nothing, 42)</code></pre><p>Note: the return type and argument types do not need to match the spec. However, the length of the args list MUST exactly match the length of the ArgType&#39;s list.</p><h3 id="Objects-have-get-and-set-accessor-methods-1"><a class="docs-heading-anchor" href="#Objects-have-get-and-set-accessor-methods-1">Objects have get and set accessor methods</a><a class="docs-heading-anchor-permalink" href="#Objects-have-get-and-set-accessor-methods-1" title="Permalink"></a></h3><pre><code class="language-none">&gt; warning: this API has not been completely finalized
+&gt; warning: this API uses 0-based indexing
+&gt; note: this API will likely be exposed in a later version as ``Window[:title] = &quot;My Title&quot;``, ``Window[:title,String]``</code></pre><p><span>$Gtk._$</span> (not exported), <span>$Gtk.G_$</span> (exported by <code>Gtk.ShortNames</code>), and <span>$Gtk.GAccessor$</span> (exported by Gtk) all refer to the same module: a collection of auto-generated method stubs for calling get/set methods on the <code>GObject</code>&#39;s. The difference between a get and set method is based upon the number of arguments.</p><p>Example usage:</p><pre><code class="language-none">bytestring(Gtk._.title(WindowLeaf(&quot;my title&quot;)))
+G_.title(WindowLeaf(&quot;my title&quot;), &quot;my new title&quot;)
+GAccessor.size(WindowLeaf(&quot;what size?&quot;))</code></pre><p>Note that because these are auto-generated, you will often need to do your own gc-management at the interface. For example, the string returned by title must not be freed or modified. Since the code auto-generator cannot know this, it simply returns the raw pointer.</p><h3 id="Constants-1"><a class="docs-heading-anchor" href="#Constants-1">Constants</a><a class="docs-heading-anchor-permalink" href="#Constants-1" title="Permalink"></a></h3><p>Interaction with Gtk sometimes requires constants, which are bundled into the <code>Gtk.GConstants</code> module. <code>GConstants</code> in turn contains modules corresponding to each Gtk <code>enum</code> type. For example, constants corresponding to the <a href="https://developer.gnome.org/gdk3/stable/gdk3-Events.html#GdkEventMask">GdkEventMask</a> are in <code>Gtk.GConstants.GdkEventMask</code>. Each constant can be referred to by its full Gtk name or by a shortened name, for example <code>GDK_KEY_PRESS_MASK</code> can also be used as <code>KEY_PRESS</code>. The rule for generating the shortened name is that any prefix common to the entire <code>enum</code> is stripped off, as well as any trailing <code>_MASK</code> if that ending is common to all elements in the enum.</p><h2 id="Gtk-Object-Tree-1"><a class="docs-heading-anchor" href="#Gtk-Object-Tree-1">Gtk Object Tree</a><a class="docs-heading-anchor-permalink" href="#Gtk-Object-Tree-1" title="Permalink"></a></h2><pre><code class="language-none">+- Any
+.  +- AbstractArray = AbstractArray{GValue,1}
+.  .  +- MatrixStrided = MatrixStrided{T}
+.  .  +- Ranges = Ranges{T}
+.  .  .  +- GtkTextRange
+.  +- GError
+.  +- GObject
+.  .  +- GObjectLeaf{Name}
+.  .  +- GdkPixbuf
+.  .  +- GtkStatusIcon
+.  .  +- GtkTextBuffer
+.  .  +- GtkTextMark
+.  .  +- GtkTextTag
+.  .  +- GtkWidget
+.  .  .  +- GtkCanvas
+.  .  .  +- GtkComboBoxText
+.  .  .  +- GtkContainer
+.  .  .  .  +- GtkBin
+.  .  .  .  .  +- GtkAlignment
+.  .  .  .  .  +- GtkAspectFrame
+.  .  .  .  .  +- GtkButton
+.  .  .  .  .  +- GtkCheckButton
+.  .  .  .  .  +- GtkExpander
+.  .  .  .  .  +- GtkFrame
+.  .  .  .  .  +- GtkLinkButton
+.  .  .  .  .  +- GtkRadioButton
+.  .  .  .  .  +- GtkToggleButton
+.  .  .  .  .  +- GtkVolumeButton
+.  .  .  .  .  +- GtkWindow
+.  .  .  .  .  .  +- GtkDialog
+.  .  .  .  .  .  .  +- GtkFileChooserDialog
+.  .  .  .  +- GtkBox
+.  .  .  .  .  +- GtkButtonBox
+.  .  .  .  .  +- GtkStatusbar
+.  .  .  .  +- GtkGrid
+.  .  .  .  +- GtkLayout
+.  .  .  .  +- GtkNotebook
+.  .  .  .  +- GtkNullContainer
+.  .  .  .  +- GtkOverlay
+.  .  .  .  +- GtkPaned
+.  .  .  .  +- GtkRadioButtonGroup
+.  .  .  .  +- GtkTable
+.  .  .  +- GtkEntry
+.  .  .  +- GtkImage
+.  .  .  +- GtkLabel
+.  .  .  +- GtkProgressBar
+.  .  .  +- GtkScale
+.  .  .  +- GtkSpinButton
+.  .  .  +- GtkSpinner
+.  .  .  +- GtkSwitch
+.  .  .  +- GtkTextView
+.  .  +- GtkNativeDialog
+.  .  .  +- GtkFileChooserNative
+.  +- GParamSpec
+.  +- GSList{T}
+.  +- GValue
+.  +- GdkEvent
+.  .  +- GdkEventAny
+.  .  +- GdkEventButton
+.  .  +- GdkEventCrossing
+.  .  +- GdkEventKey
+.  .  +- GdkEventMotion
+.  .  +- GdkEventScroll
+.  +- GdkPoint
+.  +- GdkRectangle
+.  +- GtkTextIter
+.  +- MouseHandler
+.  +- RGB
+.  +- RGBA</code></pre></article></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 10 February 2021 18:07">Wednesday 10 February 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
