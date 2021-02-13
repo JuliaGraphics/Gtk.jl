@@ -52,7 +52,6 @@ jobs:
             ${{ runner.os }}-test-
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
-          steps:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - uses: julia-actions/julia-runtest@v1
