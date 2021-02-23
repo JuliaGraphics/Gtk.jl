@@ -337,8 +337,8 @@ for (i,e) in enumerate(r)
 end
 @test setdiff(choices, itms) == [choices[4],]
 @test setdiff(itms, choices) == ["choice four",]
-@test get_gtk_property(get_gtk_property(r,:active),:label,AbstractString) == choices[2]
 w = Window(r,"RadioGroup")|>showall
+@test get_gtk_property(get_gtk_property(r,:active),:label,AbstractString) == choices[2]
 destroy(w)
 end
 
