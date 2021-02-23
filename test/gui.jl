@@ -325,6 +325,7 @@ showall(w)
 destroy(w)
 
 r = RadioButtonGroup(choices,2)
+sleep(0.1)
 @test length(r) == 5
 @test sum([get_gtk_property(b,:active,Bool) for b in r]) == 1
 itms = Vector{Any}(undef,length(r))
