@@ -70,6 +70,7 @@ end
 GtkRadioButtonGroup() = GtkRadioButtonGroup(GtkBoxLeaf(true))
 function GtkRadioButtonGroup(elem::Vector, active::Int = 1)
     grp = GtkRadioButtonGroup()
+    yield()
     for (i, e) in enumerate(elem)
         push!(grp, e, i == active)
     end
