@@ -12,6 +12,7 @@ if !isinteractive()
     signal_connect(win, :destroy) do widget
         notify(c)
     end
+    @async Gtk.gtk_main()
     wait(c)
 end
 ```
@@ -26,6 +27,7 @@ win = Window("gtkwait")
 # Put your GUI code here
 
 if !isinteractive()
+    @async Gtk.gtk_main()
     waitforsignal(win,:destroy)
 end
 ```
