@@ -8,11 +8,13 @@ if !isinteractive()
     signal_connect(win, :destroy) do widget
         notify(c)
     end
+    @async Gtk.gtk_main()
     wait(c)
 end</code></pre><p>By waiting on a <code>Condition</code>, Julia will keep running. This pattern allows for multiple events to trigger the condition, such as a button press, or one of many windows to be closed. Program flow will resume at <code>wait</code> line, after which it would terminate in this example.</p><p>In the common case we simply wish to wait for a single window to be closed, this can be shortened by using <code>waitforsignal</code>:</p><pre><code class="language-julia">win = Window(&quot;gtkwait&quot;)
 
 # Put your GUI code here
 
 if !isinteractive()
+    @async Gtk.gtk_main()
     waitforsignal(win,:destroy)
-end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../async/">« Asynchronous UI</a><a class="docs-footer-nextpage" href="../packages/">High-Level Packages »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 13 February 2021 09:34">Saturday 13 February 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../async/">« Asynchronous UI</a><a class="docs-footer-nextpage" href="../packages/">High-Level Packages »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 8 March 2021 20:00">Monday 8 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
