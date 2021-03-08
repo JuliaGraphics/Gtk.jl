@@ -80,6 +80,6 @@ jobs:
             ${{ runner.os }}-
       - uses: julia-actions/julia-docdeploy@v1
         with:
-          prefix: xvfb-run
+          prefix: xvfb-run --auto-servernum
         env:
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
