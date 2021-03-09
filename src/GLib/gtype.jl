@@ -378,7 +378,7 @@ gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Nothing, (Ptr{G
 const gc_preserve_glib = Dict{Union{WeakRef, GObject}, Bool}() # glib objects
 const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
 const topfinalizer = Ref(true) # keep recursion to a minimum by only iterating from the top
-const await_finalize = Any[]
+const await_finalize = Set{Any}()
 
 Base.isequal(x::GObject, w::WeakRef) = x === w.value   # cuts the number of MethodInstances from O(N^2) to O(N)
 
@@ -424,12 +424,20 @@ function gobject_ref(x::T) where T <: GObject
     gc_preserve_glib_lock[] = true
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
-        # we haven't seen this before, setup the metadata
-        deref = @cfunction(gc_unref, Nothing, (Ref{T},))
-        ccall((:g_object_set_qdata_full, libgobject), Nothing,
-            (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
-            deref) # add a circular reference to the Julia object in the GObject
-        addref(Ref{GObject}(x)[])
+        if ccall((:g_object_get_qdata, libgobject), Ptr{Cvoid},
+                 (Ptr{GObject}, UInt32), x, jlref_quark::UInt32) != C_NULL
+            # have set up metadata for this before, but its weakref has been cleared. restore the ref.
+            delete!(await_finalize, x)
+            finalizer(delref, x)
+            gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
+        else
+            # we haven't seen this before, setup the metadata
+            deref = @cfunction(gc_unref, Nothing, (Ref{T},))
+            ccall((:g_object_set_qdata_full, libgobject), Nothing,
+                  (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
+                  deref) # add a circular reference to the Julia object in the GObject
+            addref(Ref{GObject}(x)[])
+        end
     elseif strong
         # oops, we previously deleted the link, but now it's back
         addref(Ref{GObject}(x)[])
