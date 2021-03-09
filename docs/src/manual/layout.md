@@ -48,6 +48,7 @@ hbox = GtkButtonBox(:h)
 push!(win, hbox)
 push!(hbox, cancel)
 push!(hbox, ok)
+showall(win)
 ```
 
 Now we get this:
