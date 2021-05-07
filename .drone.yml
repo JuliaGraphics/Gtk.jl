@@ -20,7 +20,7 @@ trigger:
 
 ---
 kind: pipeline
-name: linux - arm64 - Julia 1.5
+name: linux - arm64 - Julia 1.6
 
 platform:
   os: linux
@@ -28,7 +28,7 @@ platform:
 
 steps:
 - name: build
-  image: julia:1.5
+  image: julia:1.6
   commands:
   - apt-get update
   - apt-get install -y xvfb xauth
