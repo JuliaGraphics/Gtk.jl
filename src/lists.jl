@@ -443,13 +443,14 @@ function iter_n_children(treeModel::GtkTreeModel, iter::TRI)
     ret
 end
 
-
 ## update iter pointing to nth child n in 1:nchildren)
+## As a special case, if parent is NULL, then the n-th root node is set
 ## return boolean
-function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI, n::Int)
+function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, parent_iter::Union{TRI, Nothing}, n::Int)
+    parent_iter = isnothing(parent_iter) ? C_NULL : mutable(parent_iter)
     ret = ccall((:gtk_tree_model_iter_nth_child, libgtk), Cint,
           (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Cint),
-          treeModel, iter, mutable(piter), n - 1) # 0-based
+          treeModel, iter, parent_iter, n - 1) # 0-based
     ret != 0
 end
 
@@ -699,10 +700,12 @@ function push!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
     end
     treeView
 end
+
 function insert!(treeView::GtkTreeView, index::Integer, treeColumn::GtkTreeViewColumn)
     ccall((:gtk_tree_view_insert_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), treeView, treeColumn, index - 1)
     treeView
 end
+
 function delete!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
     for col in treeColumns
         ccall((:gtk_tree_view_remove_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), treeView, col)
@@ -710,6 +713,31 @@ function delete!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
     treeView
 end
 
+function expand_to_path(tree_view::GtkTreeView, path::GtkTreePath)
+    return ccall(
+        (:gtk_tree_view_expand_to_path, libgtk), Cvoid,
+        (Ptr{GObject}, Ptr{GtkTreePath}), tree_view, path
+    )
+end
+
+function treepath(path::AbstractString)
+    ptr = ccall(
+        (:gtk_tree_path_new_from_string, libgtk), Ptr{GtkTreePath},
+        (Ptr{UInt8},), bytestring(path)
+    )
+    return ptr == C_NULL ? GtkTreePath() : convert(GtkTreePath, ptr)
+end
+
+# There's a method wrapped in GAccessor but tries to convert to a GtkTreeModel, which
+# is an interface in Gtk
+function model(tree_view::GtkTreeView)
+    return convert(GtkTreeStore, ccall(
+        (:gtk_tree_view_get_model, Gtk.libgtk),
+        Ptr{Gtk.GObject},
+        (Ptr{Gtk.GObject},),
+        tree_view)
+    )
+end
 
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
@@ -721,7 +749,7 @@ function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     if ret
         path = GtkTreePath(pathPtr[], true)
     else
-      path = GtkTreePath()
+        path = GtkTreePath()
     end
     ret, path
 end

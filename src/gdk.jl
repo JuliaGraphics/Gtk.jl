@@ -196,3 +196,13 @@ function screen_size(screen::Ptr{Nothing})
     return (ccall((:gdk_screen_get_width, libgdk), Cint, (Ptr{Nothing},), screen),
             ccall((:gdk_screen_get_height, libgdk), Cint, (Ptr{Nothing},), screen))
 end
+
+function get_origin(window)
+    window_x, window_y = mutable(Cint), mutable(Cint)
+	ccall(
+        (:gdk_window_get_origin, libgdk), Cint,
+        (Ptr{GObject}, Ptr{Cint}, Ptr{Cint}),
+        window, window_x, window_y
+    )
+	return (window_x[], window_y[])
+end
