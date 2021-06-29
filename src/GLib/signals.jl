@@ -328,8 +328,8 @@ function uv_check(src::Ptr{Nothing})
         return Int32(ex <= now)
     end
 end
-function uv_dispatch(src::Ptr{Nothing}, callback::Ptr{Nothing}, data::T) where T
-    return ccall(callback, Cint, (T,), data)
+function uv_dispatch(src::Ptr{Nothing}, callback::Ptr{Nothing}, data)
+    return ccall(callback, Cint, (UInt,), data)
 end
 
 sizeof_gclosure = 0
