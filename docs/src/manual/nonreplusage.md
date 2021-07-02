@@ -28,6 +28,6 @@ win = Window("gtkwait")
 
 if !isinteractive()
     @async Gtk.gtk_main()
-    waitforsignal(win,:destroy)
+    Gtk.waitforsignal(win,:destroy)
 end
 ```
