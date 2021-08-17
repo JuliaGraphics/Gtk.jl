@@ -1,7 +1,9 @@
 using Documenter, Gtk
 
 makedocs(
-    format = Documenter.HTML(),
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true"
+    ),
     modules = [Gtk],
     sitename = "Gtk.jl",
     authors = "...",
