@@ -51,9 +51,18 @@ insert!(cb::GtkComboBoxText, i::Integer, id::Union{AbstractString, Symbol}, text
 empty!(cb::GtkComboBoxText) =
     (ccall((:gtk_combo_box_text_remove_all, libgtk), Nothing, (Ptr{GObject},), cb); cb)
 
-
 delete!(cb::GtkComboBoxText, i::Integer) =
     (ccall((:gtk_combo_box_text_remove, libgtk), Nothing, (Ptr{GObject}, Cint), cb, i - 1); cb)
+
+function setactiveindex!(cb::GtkComboBoxText, i::Integer)
+    i < 0 && throw(ArgumentError("index must be non-negative; got $i"))
+    ccall((:gtk_combo_box_set_active, libgtk), Nothing, (Ptr{GObject}, Cint), cb, i - 1)
+end
+getactiveindex(cb::GtkComboBoxText) = ccall((:gtk_combo_box_get_active, libgtk), Cint, (Ptr{GObject},), cb) + 1
+function getactivetext(cb::GtkComboBoxText)
+    getactiveindex(cb) == 0 && return nothing
+    return unsafe_string(ccall((:gtk_combo_box_text_get_active_text, libgtk), Cstring, (Ptr{GObject},), cb))
+end
 
 struct GtkTreeIter
     stamp::Cint

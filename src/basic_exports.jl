@@ -11,7 +11,7 @@ export new, width, height, #minsize, maxsize
     convert_iter_to_child_iter, convert_child_iter_to_iter,
     pulse,
     buffer, cells, search, place_cursor, select_range, selection_bounds,
-    create_mark, scroll_to
+    create_mark, scroll_to, setactiveindex!, getactiveindex, getactivetext
     #property, margin, padding, align
     #raise, focus, destroy, enabled
 
