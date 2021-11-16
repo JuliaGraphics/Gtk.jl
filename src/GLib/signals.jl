@@ -103,7 +103,7 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
 end
 
 function blame(@nospecialize(cb))
-    @warn("Executing ", cb, ":")
+    @warn "Executing " cb=":"
 end
 
 # Signals API for the cb pointer
