@@ -187,7 +187,7 @@ function get_gtk_property(text::TI, key::Symbol, outtype::Type = Any)
     elseif key === :pixbuf
         convert(GdkPixbuf, ccall((:gtk_text_iter_get_char, libgtk), Ptr{GdkPixbuf}, (Ptr{GtkTextIter},), text))
     else
-        warn("GtkTextIter doesn't have attribute with key $key")
+        @warn("GtkTextIter doesn't have attribute with key $key")
         false
     end)::outtype
 end
@@ -207,7 +207,7 @@ function set_gtk_property!(text::Mutable{GtkTextIter}, key::Symbol, value)
     elseif key === :visible_line_offset
         ccall((:gtk_text_iter_set_visible_line_offset, libgtk), Cint, (Ptr{GtkTextIter}, Cint), text, value)
     else
-        warn("GtkTextIter doesn't have attribute with key $key")
+        @warn("GtkTextIter doesn't have attribute with key $key")
         false
     end
     return text
@@ -342,7 +342,7 @@ function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
 #        ccall((:gtk_text_iter_set_offset, libgtk), Nothing, (Ptr{Nothing}, Cint), iter, 0)
 #        true
     else
-        warn("GtkTextIter doesn't have iterator of type $what")
+        @warn("GtkTextIter doesn't have iterator of type $what")
         false
     end::Bool
 end
