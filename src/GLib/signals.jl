@@ -142,7 +142,8 @@ function signal_emit(w::GObject, sig::AbstractStringLike, ::Type{RT}, args...) w
     end
     signal_id = ccall((:g_signal_lookup, libgobject), Cuint, (Ptr{UInt8}, Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
     return_value = RT === Nothing ? C_NULL : gvalue(RT)
-    ccall((:g_signal_emitv, libgobject), Nothing, (Ptr{GValue}, Cuint, UInt32, Ptr{GValue}), gvalues(w, args...), signal_id, detail, return_value)
+    gvals = gvalues(w, args...)
+    GC.@preserve gvals return_value ccall((:g_signal_emitv, libgobject), Nothing, (Ptr{GValue}, Cuint, UInt32, Ptr{GValue}), gvals, signal_id, detail, return_value)
     RT === Nothing ? nothing : return_value[RT]
 end
 
