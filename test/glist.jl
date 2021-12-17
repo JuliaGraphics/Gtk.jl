@@ -42,7 +42,6 @@ end
 @test g[2]==string(2)
 
 @test length(g)==10
-@test g[begin]==string(1)
 @test g[end]==string(10)
 
 for (i,item) = enumerate(g)
@@ -95,7 +94,6 @@ end
 @test g[2]==string(2)
 
 @test length(g)==10
-@test g[begin]==string(1)
 @test g[end]==string(10)
 
 for (i,item) = enumerate(g)
@@ -151,7 +149,6 @@ end
 @test g[2]==2
 
 @test length(g)==10
-@test g[begin]==1
 @test g[end]==10
 
 for (i,item) = enumerate(g)
@@ -184,7 +181,6 @@ end
 @test g[2]==2
 
 @test length(g)==10
-@test g[begin]==1
 @test g[end]==10
 
 for (i,item) = enumerate(g)
