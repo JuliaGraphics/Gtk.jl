@@ -32,6 +32,7 @@ mutable struct GList{L <: _LList, T} <: AbstractVector{T}
     end
 end
 GList(list::Type{T}) where {T} = GList(convert(Ptr{_GList{T}}, C_NULL), true)
+GSList(list::Type{T}) where {T} = GList(convert(Ptr{_GSList{T}}, C_NULL), true)
 GList(list::Ptr{L}, transfer_full::Bool = false) where {L <: _LList} = GList{L, eltype(L)}(list, transfer_full)
 
 const  LList{L <: _LList} = Union{Ptr{L}, GList{L}}
@@ -69,13 +70,8 @@ show(io::IO, ::MIME"text/plain", list::GList{L, T}) where {L, T} = show(io, list
 show(io::IO, list::GList{L, T}) where {L, T} = print(io, "GList{$L => $T}(length = $(length(list)), transfer_full = $(list.transfer_full))")
 
 unsafe_convert(::Type{Ptr{L}}, list::GList) where {L <: _LList} = list.handle
-endof(list::LList) = length(list)
-ndims(list::LList) = 1
-strides(list::LList) = (1,)
-stride(list::LList, k::Integer) = (k > 1 ? length(list) : 1)
 size(list::LList) = (length(list),)
 isempty(list::LList{L}) where {L} = (unsafe_convert(Ptr{L}, list) == C_NULL)
-Base.IteratorSize(::Type{L}) where {L <: LList} = Base.HasLength()
 
 popfirst!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
@@ -253,7 +249,7 @@ deref_to(::Type{P}, x::Ptr) where {P <: Ptr} = x
 empty!(li::Ptr{_LList{P}}) where {P <: Ptr} = nothing
 
 ### Store numbers directly inside the pointer bits (assuming convert(N, x) exists)
-ref_to(::Type{N}, x) where {N <: Number} = x
+ref_to(::Type{N}, x) where {N <: Number} = Ptr{N}(x)
 deref_to(::Type{N}, x::Ptr) where {N <: Number} = x
 empty!(li::Ptr{_LList{N}}) where {N <: Number} = nothing
 
@@ -270,7 +266,7 @@ function ref_to(::Type{S}, x) where S <: String
     s = bytestring(x)
     l = sizeof(s)
     p = convert(Ptr{UInt8}, g_malloc(l + 1))
-    unsafe_copy!(p, convert(Ptr{UInt8}, pointer(s)), l)
+    unsafe_copyto!(p, convert(Ptr{UInt8}, pointer(s)), l)
     unsafe_store!(p, '\0', l + 1)
     return p
 end
