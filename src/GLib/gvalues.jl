@@ -170,6 +170,17 @@ function get_gtk_property(w::GObject, name::String, ::Type{T}) where T
     return val
 end
 
+get_gtk_property(w::GObject, name::AbstractString) = get_gtk_property(w, String(name)::String)
+get_gtk_property(w::GObject, name::Symbol) = get_gtk_property(w, String(name))
+function get_gtk_property(w::GObject, name::String)
+    v = mutable(GValue())
+    ccall((:g_object_get_property, libgobject), Nothing,
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, v)
+    val = v[Any]
+    ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), v)
+    return val
+end
+
 set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
 set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, String(name)::String, value)
 set_gtk_property!(w::GObject, name::Symbol, value) = set_gtk_property!(w::GObject, String(name), value)
@@ -178,6 +189,27 @@ function set_gtk_property!(w::GObject, name::String, value)
         (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, gvalue(value))
 
     w
+end
+
+function gtk_propertynames(w::GObject)
+    n = Ref{Cuint}()
+    props = ccall((:g_object_class_list_properties, libgobject), Ptr{Ptr{GParamSpec}},
+        (Ptr{Nothing}, Ptr{Cuint}), G_OBJECT_GET_CLASS(w), n)
+    names=Symbol[]
+    for i = 1:n[]
+        param = unsafe_load(unsafe_load(props, i))
+        name=Symbol(replace(bytestring(param.name),"-"=>"_"))
+        push!(names,name)
+    end
+    g_free(props)
+    names
+end
+
+propertynames(w::GObject) = append!(gtk_propertynames(w),fieldnames(typeof(w)))
+
+function setproperty!(w::GObject, name::Symbol, val)
+    in(name, fieldnames(typeof(w))) && return setfield!(w, name, val)
+    set_gtk_property!(w,name,val)
 end
 
 struct FieldRef{T}
@@ -193,6 +225,7 @@ struct FieldRef{T}
 end
 
 getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj, f.field,T)
+getindex(f::FieldRef) where {T} = get_gtk_property(f.obj, f.field)
 
 function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
     isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)
@@ -237,6 +270,7 @@ function show(io::IO, w::GObject)
             end
         end
     end
+    g_free(props)
     print(io, ')')
     ccall((:g_value_unset, libgobject), Ptr{Nothing}, (Ptr{GValue},), v)
 end

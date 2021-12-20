@@ -32,7 +32,7 @@ push!(wscroll, tv)
 push!(boxtop, wscroll)
 push!(window, boxtop)
 
-wscroll.height_request[Int] = 300
+wscroll.height_request = 300
 
 showall(window);
 

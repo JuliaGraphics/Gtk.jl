@@ -465,7 +465,7 @@ function gc_unref_weak(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
     # note: this may be called multiple times by GLib
-    x.handle = C_NULL
+    x.handle = Ptr{GObject}(C_NULL)
     gc_preserve_glib_lock[] = true
     delete!(gc_preserve_glib, x)
     gc_preserve_glib_lock[] = false

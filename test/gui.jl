@@ -85,6 +85,9 @@ visible(w,false)
 visible(w,true)
 @test visible(w) == true
 
+set_gtk_property!(w, :height_request, Int16, 201)
+@test get_gtk_property(w, :height_request, Int) == 201
+
 hide(w)
 show(w)
 grab_focus(w)
@@ -98,10 +101,19 @@ end
 
 @testset "get/set property" begin
     w = Window("Window", 400, 300) |> showall
+    @test in(:title, Gtk.GLib.gtk_propertynames(w))
+    @test in(:title, propertynames(w))
+    @test in(:handle, propertynames(w))
     @test w.title[String] == "Window"
+    @test w.title[] == "Window"
+    @test w.visible[]
     @test w.visible[Bool]
-    w.visible[Bool] = false
-    @test w.visible[Bool] == false
+    w.visible = false
+    @test w.visible[] == false
+    w.visible[Bool] = true
+    @test w.visible[Bool] == true
+    w.height_request[Int16] = 202
+    @test w.height_request[] == 202
     destroy(w)
 end
 
@@ -810,9 +822,15 @@ w.testfield = "setproperty!"
 @test w.testfield == "setproperty!"
 
 @test w.title[String] == "MyWindow"
-w.title[String] = "setindex!"
-@test w.title[String] == "setindex!"
+w.title = "setindex!"
+@test w.title[] == "setindex!"
+
+w.title[String] = "setindex! 2"
+@test w.title[String] == "setindex! 2"
 @test typeof(w.title) <: Gtk.GLib.FieldRef
+
+w.title = "setindex! 3"
+@test w.title[] == "setindex! 3"
 
 destroy(w)
 

@@ -18,7 +18,7 @@ import Base: convert, copy, show, size, length, getindex, setindex!, get,
              iterate, eltype, isempty, ndims, stride, strides, popfirst!,
              empty!, append!, reverse!, pushfirst!, pop!, push!, splice!, insert!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
-             getindex, setindex!
+             getindex, setindex!, setproperty!, propertynames
 
 using Libdl
 
