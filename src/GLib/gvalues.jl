@@ -174,11 +174,17 @@ get_gtk_property(w::GObject, name::AbstractString) = get_gtk_property(w, String(
 get_gtk_property(w::GObject, name::Symbol) = get_gtk_property(w, String(name))
 function get_gtk_property(w::GObject, name::String)
     v = mutable(GValue())
-    ccall((:g_object_get_property, libgobject), Nothing,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, v)
-    val = v[Any]
-    ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), v)
-    return val
+    p = ccall((:g_object_class_find_property, libgobject), Ptr{GParamSpec}, (Ptr{Nothing}, Ptr{UInt8}), G_OBJECT_GET_CLASS(w), name)
+    if p!=C_NULL
+        param = unsafe_load(p)
+        ccall((:g_value_init, libgobject), Nothing, (Ptr{GValue}, Csize_t), v, param.value_type)
+        ccall((:g_object_get_property, libgobject), Nothing,
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, v)
+        val = v[Any]
+        ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), v)
+        return val
+    end
+    error("No property by that name")
 end
 
 set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
