@@ -54,6 +54,13 @@ for (i,item) = enumerate(g2)
     @test string(i)==item
 end
 
+@test popfirst!(g2)==string(1)
+@test length(g2)==9
+@test pop!(g2)==string(10)
+@test length(g2)==8
+
+@test length(g)==10
+
 insert!(g,8,string(25))
 @test length(g)==11
 @test g[8]==string(25)
@@ -73,6 +80,11 @@ reverse!(g)
 
 g[2]="test"
 @test g[2]=="test"
+
+g3=copy(g)
+
+append!(g2,g3)
+@test length(g2)==20
 
 empty!(g)
 @test isempty(g)
@@ -106,6 +118,13 @@ for (i,item) = enumerate(g2)
     @test string(i)==item
 end
 
+@test popfirst!(g2)==string(1)
+@test length(g2)==9
+@test pop!(g2)==string(10)
+@test length(g2)==8
+
+@test length(g)==10
+
 insert!(g,8,string(25))
 @test length(g)==11
 @test g[8]==string(25)
@@ -125,6 +144,11 @@ reverse!(g)
 
 g[2]="test"
 @test g[2]=="test"
+
+g3=copy(g)
+
+append!(g2,g3)
+@test length(g2)==20
 
 empty!(g)
 @test isempty(g)
@@ -197,5 +221,7 @@ empty!(g)
 @test isempty(g)
 
 end
+
+GC.gc()
 
 end

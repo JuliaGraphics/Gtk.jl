@@ -77,7 +77,7 @@ popfirst!(list::GList) = splice!(list, nth_first(list))
 pop!(list::GList) = splice!(list, nth_last(list))
 deleteat!(list::GList, i::Integer) = deleteat!(list, nth(list, i))
 
-function splice!(list::GList, item::Ptr) 
+function splice!(list::GList, item::Ptr)
     x = deref(item)
     deleteat!(list, item)
     x
@@ -93,8 +93,7 @@ length(list::LList{L}) where {L <: _GList} = Int(ccall((:g_list_length, libglib)
 copy(list::GList{L}) where {L <: _GSList} = typeof(list)(ccall((:g_slist_copy, libglib), Ptr{L}, (Ptr{L},), list), false)
 copy(list::GList{L}) where {L <: _GList} = typeof(list)(ccall((:g_list_copy, libglib), Ptr{L}, (Ptr{L},), list), false)
 check_undefref(p::Ptr) = (p == C_NULL ? error(UndefRefError()) : p)
-nth_first(list::LList{L}) where {L <: _GSList} =
-    check_undefref(ccall((:g_slist_first, libglib), Ptr{L}, (Ptr{L},), list))
+nth_first(list::LList{L}) where {L <: _GSList} = unsafe_convert(Ptr{L}, list)
 nth_first(list::LList{L}) where {L <: _GList} =
     check_undefref(ccall((:g_list_first, libglib), Ptr{L}, (Ptr{L},), list))
 nth_last(list::LList{L}) where {L <: _GSList} =
@@ -154,13 +153,15 @@ function empty!(list::GList{L}) where L <: _GList
     return list
 end
 function append!(l1::GList{L}, l2::GList{L}) where L <: _GSList
-    (l1.transfer_full & l2.transfer_full) && error("cannot combine two lists with transfer_full = true")
+    (l1.transfer_full | l2.transfer_full) && error("cannot combine lists with transfer_full = true")
     l1.handle = ccall((:g_slist_concat, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), l1, l2)
+    l2.handle = C_NULL
     return l1
 end
 function append!(l1::GList{L}, l2::GList{L}) where L <: _GList
-    (l1.transfer_full & l2.transfer_full) && error("cannot combine two lists with transfer_full = true")
+    (l1.transfer_full | l2.transfer_full) && error("cannot combine lists with transfer_full = true")
     l1.handle = ccall((:g_list_concat, libglib), Ptr{L}, (Ptr{L}, Ptr{L}), l1, l2)
+    l2.handle = C_NULL
     return l1
 end
 function reverse!(list::GList{L}) where L <: _GSList
@@ -261,14 +262,26 @@ empty!(li::Ptr{_GSList{Ptr{N}}}) where {N <: Number} = g_free(unsafe_load(li).da
 empty!(li::Ptr{_GList{Ptr{N}}}) where {N <: Number} = g_free(unsafe_load(li).data)
 
 ### Store (byte)strings as pointers
-deref_to(::Type{S}, p::Ptr) where {S <: String} = bytestring(convert(Ptr{UInt8}, p))
+function deref_to(::Type{S}, p::Ptr) where {S <: String}
+    p==C_NULL && return ""
+    bytestring(convert(Ptr{UInt8}, p))
+end
 function ref_to(::Type{S}, x) where S <: String
     s = bytestring(x)
-    l = sizeof(s)
-    p = convert(Ptr{UInt8}, g_malloc(l + 1))
-    unsafe_copyto!(p, convert(Ptr{UInt8}, pointer(s)), l)
-    unsafe_store!(p, '\0', l + 1)
+    p = ccall((:g_strdup, libglib), Ptr{UInt8}, (Cstring,), s)
     return p
 end
-empty!(li::Ptr{_GSList{S}}) where {S <: String} = g_free(unsafe_load(li).data)
-empty!(li::Ptr{_GList{S}}) where {S <: String} = g_free(unsafe_load(li).data)
+
+function empty!(li::Ptr{_GSList{S}}) where {S <: String}
+    gl=unsafe_load(li)
+    g_free(gl.data)
+    gl = _GSList{S}(C_NULL, gl.next) # set to NULL to prevent Julia from trying to access this while finalizing
+    unsafe_store!(li, gl)
+end
+
+function empty!(li::Ptr{_GList{S}}) where {S <: String}
+    gl=unsafe_load(li)
+    g_free(gl.data)
+    gl = _GList{S}(C_NULL, gl.next, gl.prev) # set to NULL to prevent Julia from trying to access this while finalizing
+    unsafe_store!(li, gl)
+end
