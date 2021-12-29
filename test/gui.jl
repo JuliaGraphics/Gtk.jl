@@ -128,18 +128,26 @@ end
 w = Window(
     Frame(),
     "Frame", 400, 400)
+widgets=[f for f in w] # test iteration over GtkBin
+@test length(widgets)==1
 showall(w)
 destroy(w)
 end
 
 @testset "Initially Hidden Canvas" begin
 nb = Notebook()
+@test hasparent(nb)==false
 vbox = Gtk.GtkBox(:v)
 c = Canvas()
 push!(nb, vbox, "A")
 push!(nb, c, "B")
+insert!(nb, 2, Label("Something in the middle"), "A*")
+pushfirst!(nb, Label("Something at the beginning"), "First")
+splice!(nb, 3)
 w = Window("TestDataViewer",600,600)
+@test pagenumber(nb,c)==3
 push!(w,nb)
+@test parent(nb)==w
 showall(w)
 destroy(w)
 end
@@ -175,8 +183,21 @@ pw2 = Paned(:v)
 push!(w, pw)
 push!(pw, Button("one"))
 push!(pw, pw2)
-push!(pw2,Button("two"))
-push!(pw2,Button("three"))
+@test pw[2]==pw2
+pw2[1]=Button("two")
+pw2[2,true,false]=Button("three")
+showall(w)
+destroy(w)
+end
+
+@testset "Layout" begin
+w = Window("Layout", 400, 400)
+l = Layout(600,600)
+push!(w,l)
+l[300,300]=Button("Button")
+s=size(l)
+@test width(l)==600
+@test height(l)==600
 showall(w)
 destroy(w)
 end
@@ -224,8 +245,7 @@ bb = ButtonBox(:h)
 w = Window(bb, "ButtonBox")
 cancel = Button("Cancel")
 ok = Button("OK")
-push!(bb, cancel)
-push!(bb, ok)
+append!(bb, [cancel,ok])
 
 # Expander
 delete!(w, bb)
@@ -238,12 +258,18 @@ end
 @testset "Grid" begin
     grid = Grid()
     w = Window(grid, "Grid", 400, 400)
-    grid[2,2] = Button("2,2")
+    b=Button("2,2")
+    grid[2,2] = b
+    @test grid[2,2] == b
     grid[2,3] = Button("2,3")
     grid[1,1] = "grid"
+    grid[3,1:3] = Button("Tall button")
     insert!(grid,1,:top)
+    insert!(grid,3,:bottom)
+    insert!(grid,grid[1,2],:right)
     libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
     showall(w)
+    empty!(grid)
     destroy(w)
 end
 
@@ -289,7 +315,12 @@ end
 icon = Matrix{Gtk.RGB}(undef, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] .= Ref(Gtk.RGB(0,0,0xff))
-b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
+pb=Pixbuf(data=icon, has_alpha=false)
+@test eltype(pb) == Gtk.RGB
+@test size(pb) == (40, 20)
+@test pb[1,1].g==0xff
+pb[10,10]=Gtk.RGB(0,0,0)
+b = Button(Image(pb))
 w = Window(b, "Icon button", 60, 40)
 showall(w)
 destroy(w)
@@ -699,6 +730,8 @@ push!(toolbar,tb1)
 pushfirst!(toolbar,tb2)
 push!(toolbar,tb3)
 push!(toolbar,SeparatorToolItem(), ToggleToolButton("gtk-open"), MenuToolButton("gtk-new"))
+@test toolbar[0]==tb2  # FIXME: uses zero based indexing
+@test length(toolbar)==6
 G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = Window(toolbar, "Toolbar")|>showall
 destroy(w)
@@ -773,7 +806,9 @@ destroy(w)
 end
 
 @testset "overlay" begin
-o = Overlay()
+c = Canvas()
+o = Overlay(c)
+push!(o,Button("Button"))
 w = Window(o, "overlay")|>showall
 destroy(w)
 end

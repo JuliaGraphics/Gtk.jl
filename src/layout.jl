@@ -68,7 +68,8 @@ function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
 end
 
 function insert!(grid::GtkGrid, sibling, side::Symbol)
-    ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
+    pos=getfield(GtkPositionType,Symbol(uppercase(string(side))))
+    ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, pos)
 end
 
 if libgtk_version >= v"3.16.0"
@@ -211,11 +212,11 @@ function splice!(w::GtkNotebook, i::Integer)
 end
 
 pagenumber(w::GtkNotebook, child::GtkWidget) =
-    ccall((:gtk_notebook_page_num, libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
+    ccall((:gtk_notebook_page_num, libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child) + 1
 
 ### GtkOverlay
 GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
-GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
+GtkOverlayLeaf(w::GtkWidget) = invoke(push!, Tuple{GtkContainer,Any}, GtkOverlayLeaf(), w)
 function push!(w::GtkOverlay, x::GtkWidget)
     ccall((:gtk_overlay_add_overlay, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}), w, x)
