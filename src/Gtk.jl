@@ -97,8 +97,9 @@ function __init__()
         # Copy loaders into a directory
         loaders_dir_hash = create_artifact() do art_dir
             loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
-            for loader in vcat(readdir(gdk_pixbuf_loaders_dir,join=true),libpixbufloader_svg)
-                cp(loader, joinpath(loaders_dir,basename(loader)))
+            gdk_pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
+            for loader in vcat(gdk_pixbuf_loaders, libpixbufloader_svg)
+                cp(loader, joinpath(loaders_dir, basename(loader)))
             end
         end
 
