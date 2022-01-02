@@ -7,6 +7,8 @@ end
 
 # Import binary definitions
 using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
+using Librsvg_jll
+using JLLWrappers
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
@@ -87,15 +89,23 @@ function __init__()
     # MutableArtifacts.toml file that maps in a loaders.cache we dynamically
     # generate by running `gdk-pixbuf-query-loaders:`
     mutable_artifacts_toml = joinpath(dirname(@__DIR__), "MutableArtifacts.toml")
+    loaders_dir_name = "gdk-pixbuf-loaders-dir"
+    loaders_dir_hash = artifact_hash(loaders_dir_name, mutable_artifacts_toml)
     loaders_cache_name = "gdk-pixbuf-loaders-cache"
     loaders_cache_hash = artifact_hash(loaders_cache_name, mutable_artifacts_toml)
     if loaders_cache_hash === nothing
-        # Run gdk-pixbuf-query-loaders, capture output,
-        loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
-            withenv("GDK_PIXBUF_MODULEDIR" => gdk_pixbuf_loaders_dir) do
-                return String(read(`$gpql`))
+        # Copy loaders into a directory
+        loaders_dir_hash = create_artifact() do art_dir
+            loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
+            for loader in vcat(readdir(gdk_pixbuf_loaders_dir,join=true),libpixbufloader_svg)
+                cp(loader, joinpath(loaders_dir,basename(loader)))
             end
         end
+
+        loaders_dir = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
+        # Run gdk-pixbuf-query-loaders, capture output,
+        loader_cache_contents = readchomp(addenv(gdk_pixbuf_query_loaders(),
+            JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[], "GDK_PIXBUF_MODULEDIR"=>loaders_dir))
 
         # Write cache out to file in new artifact
         loaders_cache_hash = create_artifact() do art_dir
@@ -108,11 +118,16 @@ function __init__()
             loaders_cache_hash;
             force=true
         )
+        bind_artifact!(mutable_artifacts_toml,
+            loaders_dir_name,
+            loaders_dir_hash;
+            force=true
+        )
     end
 
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
-    ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
+    ENV["GDK_PIXBUF_MODULEDIR"] = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
 
     if Sys.islinux() || Sys.isfreebsd()
         # Needed by xkbcommon:
