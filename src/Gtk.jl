@@ -105,8 +105,11 @@ function __init__()
 
         loaders_dir = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
         # Run gdk-pixbuf-query-loaders, capture output,
-        loader_cache_contents = readchomp(addenv(gdk_pixbuf_query_loaders(),
-            JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[], "GDK_PIXBUF_MODULEDIR"=>loaders_dir))
+        loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
+            withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[]) do
+                return String(readchomp(`$gpql`))
+            end
+        end
 
         # Write cache out to file in new artifact
         loaders_cache_hash = create_artifact() do art_dir
