@@ -29,24 +29,24 @@ visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
 
 const SHOWN_WIDGETS = WeakKeyDict()
-function show(w::GtkWidget)
-    idle(false)
-    @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w)
-    SHOWN_WIDGETS[w] = nothing
-    signal_connect(w, :destroy) do w
-        delete!(SHOWN_WIDGETS, w)
-        isempty(SHOWN_WIDGETS) && idle(true)
+function handle_auto_idle(w::GtkWidget)
+    if AUTO_IDLE[]
+        idle(false)
+        SHOWN_WIDGETS[w] = nothing
+        signal_connect(w, :destroy) do w
+            delete!(SHOWN_WIDGETS, w)
+            isempty(SHOWN_WIDGETS) && idle(true)
+        end
     end
+end
+function show(w::GtkWidget)
+    handle_auto_idle(w)
+    @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w)
     w
 end
 function showall(w::GtkWidget)
-    idle(false)
+    handle_auto_idle(w)
     @sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w)
-    SHOWN_WIDGETS[w] = nothing
-    signal_connect(w, :destroy) do w
-        delete!(SHOWN_WIDGETS, w)
-        isempty(SHOWN_WIDGETS) && idle(true)
-    end
     w
 end
 

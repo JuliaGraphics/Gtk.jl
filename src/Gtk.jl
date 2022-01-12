@@ -134,8 +134,11 @@ function __init__()
         global gtk_main_task = schedule(Task(gtk_main))
     end
 
-    idle(get(ENV, "GTK_START_IDLE", "true") == "true")
+    AUTO_IDLE[] = get(ENV, "GTK_AUTO_IDLE", "true") == "true"
+    idle(AUTO_IDLE[])
 end
+
+const AUTO_IDLE = Ref{Bool}(true)
 
 """
     Gtk.idle(b::Bool = true)
