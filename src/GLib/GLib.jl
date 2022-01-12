@@ -32,6 +32,7 @@ export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom, cfunction_
 
+const IDLE = Ref{Bool}(true)
 
 cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 

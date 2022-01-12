@@ -288,7 +288,9 @@ function uv_prepare(src::Ptr{Nothing}, timeout::Ptr{Cint})
     global expiration, uv_pollfd
     local tmout_ms::Cint
     evt = Base.eventloop()
-    if !_isempty_workqueue()
+    if IDLE[]
+        return Int32(1)
+    elseif !_isempty_workqueue()
         tmout_ms = 0
     elseif !uv_loop_alive(evt)
         tmout_ms = -1
@@ -316,7 +318,7 @@ end
 function uv_check(src::Ptr{Nothing})
     global expiration
     ex = expiration::UInt64
-    if !_isempty_workqueue()
+    if !_isempty_workqueue() || IDLE[]
         return Int32(1)
     elseif !uv_loop_alive(Base.eventloop())
         return Int32(0)

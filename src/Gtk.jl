@@ -135,6 +135,24 @@ function __init__()
     end
 end
 
+"""
+    Gtk.idle(b::Bool = true)
+
+Set whether Gtk's event loop should be idle.
+"""
+function idle(b::Bool)
+    GLib.IDLE[] = b
+end
+
+"""
+    Gtk.isidle()::Bool
+
+Check whether Gtk's event loop is idle.
+"""
+function isidle()
+    GLib.IDLE[]
+end
+
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
     fastgtkcache = joinpath(cachedir, "gtk$(libgtk_version.major)_julia_ser$(ser_version)")
