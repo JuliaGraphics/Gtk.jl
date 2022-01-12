@@ -133,6 +133,8 @@ function __init__()
     if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
         global gtk_main_task = schedule(Task(gtk_main))
     end
+
+    idle(get(ENV, "GTK_START_IDLE", "true") == "true")
 end
 
 """
