@@ -27,8 +27,8 @@ screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr{GObject},), w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
-show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w); w)
-showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w); w)
+show(w::GtkWidget) = (idle(false); @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w); w)
+showall(w::GtkWidget) = (idle(false); @sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w); w)
 hide(w::GtkWidget) = (@sigatom ccall((:gtk_widget_hide , libgtk),Cvoid,(Ptr{GObject},),w); w)
 grab_focus(w::GtkWidget) = (@sigatom ccall((:gtk_widget_grab_focus , libgtk), Cvoid, (Ptr{GObject},), w); w)
 
