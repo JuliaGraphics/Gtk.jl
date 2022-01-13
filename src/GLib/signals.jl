@@ -288,9 +288,7 @@ function uv_prepare(src::Ptr{Nothing}, timeout::Ptr{Cint})
     global expiration, uv_pollfd
     local tmout_ms::Cint
     evt = Base.eventloop()
-    if IDLE[]
-        return Int32(1)
-    elseif !_isempty_workqueue()
+    if !_isempty_workqueue()
         tmout_ms = 0
     elseif !uv_loop_alive(evt)
         tmout_ms = -1
@@ -318,7 +316,7 @@ end
 function uv_check(src::Ptr{Nothing})
     global expiration
     ex = expiration::UInt64
-    if !_isempty_workqueue() || IDLE[]
+    if !_isempty_workqueue()
         return Int32(1)
     elseif !uv_loop_alive(Base.eventloop())
         return Int32(0)
@@ -383,6 +381,7 @@ end
 @deprecate g_timeout_add(interval, cb, user_data) g_timeout_add(() -> cb(user_data), interval)
 
 function g_idle_add(cb::Function)
+    gtk_eventloop_f[](true)
     callback = @cfunction(_g_callback, Cint, (Ref{Function},))
     ref, deref = gc_ref_closure(cb)
     return ccall((:g_idle_add_full , libglib),Cint,

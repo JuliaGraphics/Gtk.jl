@@ -28,14 +28,14 @@ screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr{GObject},), w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
 
-const SHOWN_WIDGETS = WeakKeyDict()
+const shown_widgets = WeakKeyDict()
 function handle_auto_idle(w::GtkWidget)
-    if AUTO_IDLE[]
-        idle(false)
-        SHOWN_WIDGETS[w] = nothing
+    if auto_idle[]
+        enable_eventloop(true)
+        shown_widgets[w] = nothing
         signal_connect(w, :destroy) do w
-            delete!(SHOWN_WIDGETS, w)
-            isempty(SHOWN_WIDGETS) && idle(true)
+            delete!(shown_widgets, w)
+            isempty(shown_widgets) && enable_eventloop(false)
         end
     end
 end

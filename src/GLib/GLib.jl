@@ -32,7 +32,6 @@ export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom, cfunction_
 
-const IDLE = Ref{Bool}(true)
 
 cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 
@@ -41,6 +40,8 @@ cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
         @cfunction($(Expr(:$,:f)), $rt, ($(at.parameters...),))
     end
 end
+
+const gtk_eventloop_f = Ref{Function}()
 
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
