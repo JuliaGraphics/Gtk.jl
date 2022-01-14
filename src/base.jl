@@ -31,11 +31,13 @@ visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, li
 const shown_widgets = WeakKeyDict()
 function handle_auto_idle(w::GtkWidget)
     if auto_idle[]
-        enable_eventloop(true)
-        shown_widgets[w] = nothing
-        signal_connect(w, :destroy) do w
-            delete!(shown_widgets, w)
-            isempty(shown_widgets) && enable_eventloop(false)
+        signal_connect(w, :realize) do w
+            enable_eventloop(true)
+            shown_widgets[w] = nothing
+            signal_connect(w, :destroy) do w
+                delete!(shown_widgets, w)
+                isempty(shown_widgets) && enable_eventloop(false)
+            end
         end
     end
 end
