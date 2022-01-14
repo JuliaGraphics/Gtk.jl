@@ -17,9 +17,9 @@ end
 
 resize!(win::GtkWindow, w::Integer, h::Integer) = ccall((:gtk_window_resize, libgtk), Nothing, (Ptr{GObject}, Int32, Int32), win, w, h)
 
-present(win::GtkWindow) = ccall((:gtk_window_present, libgtk), Nothing, (Ptr{GObject},), win)
+present(win::GtkWindow) = (handle_auto_idle(win); ccall((:gtk_window_present, libgtk), Nothing, (Ptr{GObject},), win))
 
-fullscreen(win::GtkWindow) = ccall((:gtk_window_fullscreen, libgtk), Nothing, (Ptr{GObject},), win)
+fullscreen(win::GtkWindow) = (handle_auto_idle(win); ccall((:gtk_window_fullscreen, libgtk), Nothing, (Ptr{GObject},), win))
 unfullscreen(win::GtkWindow) = ccall((:gtk_window_unfullscreen, libgtk), Nothing, (Ptr{GObject},), win)
 
 maximize(win::GtkWindow) = ccall((:gtk_window_maximize, libgtk), Nothing, (Ptr{GObject},), win)

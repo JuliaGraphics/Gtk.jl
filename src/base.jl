@@ -27,8 +27,31 @@ screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr{GObject},), w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
-show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w); w)
-showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w); w)
+
+const shown_widgets = WeakKeyDict()
+function handle_auto_idle(w::GtkWidget)
+    if auto_idle[]
+        signal_connect(w, :realize) do w
+            enable_eventloop(true)
+            shown_widgets[w] = nothing
+            signal_connect(w, :destroy) do w
+                delete!(shown_widgets, w)
+                isempty(shown_widgets) && enable_eventloop(false)
+            end
+        end
+    end
+end
+function show(w::GtkWidget)
+    handle_auto_idle(w)
+    @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w)
+    w
+end
+function showall(w::GtkWidget)
+    handle_auto_idle(w)
+    @sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w)
+    w
+end
+
 hide(w::GtkWidget) = (@sigatom ccall((:gtk_widget_hide , libgtk),Cvoid,(Ptr{GObject},),w); w)
 grab_focus(w::GtkWidget) = (@sigatom ccall((:gtk_widget_grab_focus , libgtk), Cvoid, (Ptr{GObject},), w); w)
 

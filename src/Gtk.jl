@@ -128,12 +128,49 @@ function __init__()
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 
-    # if g_main_depth > 0, a glib main-loop is already running,
-    # so we don't need to start a new one
-    if ccall((:g_main_depth, GLib.libglib), Cint, ()) == 0
-        global gtk_main_task = schedule(Task(gtk_main))
+    # if g_main_depth > 0, a glib main-loop is already running.
+    # unfortunately this call does not reliably reflect the state after the
+    # loop has been stopped or restarted, so only use it once at the start
+    gtk_main_running[] = ccall((:g_main_depth, GLib.libglib), Cint, ()) > 0
+
+    # Given GLib provides `g_idle_add` to specify what happens during idle, this allows
+    # that call to also start the eventloop
+    GLib.gtk_eventloop_f[] = enable_eventloop
+
+    auto_idle[] = get(ENV, "GTK_AUTO_IDLE", "true") == "true"
+
+    # by default, defer starting the event loop until either `show`, `showall`, or `g_idle_add` is called
+    enable_eventloop(!auto_idle[])
+end
+
+const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
+const gtk_main_running = Ref{Bool}(false)
+
+"""
+    Gtk.enable_eventloop(b::Bool = true)
+
+Set whether Gtk's event loop is running.
+"""
+function enable_eventloop(b::Bool = true)
+    if b
+        if !is_eventloop_running()
+            global gtk_main_task = schedule(Task(gtk_main))
+            gtk_main_running[] = true
+        end
+    else
+        if is_eventloop_running()
+            gtk_quit()
+            gtk_main_running[] = false
+        end
     end
 end
+
+"""
+    Gtk.is_eventloop_running()::Bool
+
+Check whether Gtk's event loop is running.
+"""
+is_eventloop_running() = gtk_main_running[]
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
