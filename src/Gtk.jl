@@ -98,7 +98,7 @@ function __init__()
         loaders_dir_hash = create_artifact() do art_dir
             loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
             gdk_pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
-            for loader in vcat(gdk_pixbuf_loaders, libpixbufloader_svg)
+            for loader in vcat(gdk_pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
                 cp(loader, joinpath(loaders_dir, basename(loader)))
             end
         end
@@ -107,7 +107,6 @@ function __init__()
         # Pkg removes "execute" permissions on Windows
         if Sys.iswindows()
             chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
-            sleep(0.5) # pause also seems to be necessary (sometimes) in windows
         end
         # Run gdk-pixbuf-query-loaders, capture output,
         loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
