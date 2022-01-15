@@ -104,6 +104,11 @@ function __init__()
         end
 
         loaders_dir = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
+        # Pkg removes "execute" permissions on Windows
+        if Sys.iswindows()
+            chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
+            sleep(0.5) # pause also seems to be necessary (sometimes) in windows
+        end
         # Run gdk-pixbuf-query-loaders, capture output,
         loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
             withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[]) do
