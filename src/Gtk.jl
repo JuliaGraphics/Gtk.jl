@@ -98,7 +98,7 @@ function __init__()
         loaders_dir_hash = create_artifact() do art_dir
             loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
             pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
-            isdefined(Librsvg_jll,:libpixbufloader_svg) && push!(pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
+            Librsvg_jll.is_available() && push!(pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
             cp.(pixbuf_loaders, joinpath.(loaders_dir, basename.(pixbuf_loaders)))
         end
 
