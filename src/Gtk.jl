@@ -97,17 +97,14 @@ function __init__()
         # Copy loaders into a directory
         loaders_dir_hash = create_artifact() do art_dir
             loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
-            gdk_pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
-            for loader in vcat(gdk_pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
-                cp(loader, joinpath(loaders_dir, basename(loader)))
-            end
+            pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
+            isdefined(Librsvg_jll,:libpixbufloader_svg) && push!(pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
+            cp.(pixbuf_loaders, joinpath.(loaders_dir, basename.(pixbuf_loaders)))
         end
 
         loaders_dir = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
         # Pkg removes "execute" permissions on Windows
-        if Sys.iswindows()
-            chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
-        end
+        Sys.iswindows() && chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
         # Run gdk-pixbuf-query-loaders, capture output,
         loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
             withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[]) do
