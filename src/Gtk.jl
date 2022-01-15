@@ -107,7 +107,8 @@ function __init__()
         Sys.iswindows() && chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
         # Run gdk-pixbuf-query-loaders, capture output,
         loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
-            withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[]) do
+            libpath = Librsvg_jll.is_available() ? Librsvg_jll.LIBPATH[] : ""
+            withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>libpath) do
                 return String(readchomp(`$gpql`))
             end
         end
