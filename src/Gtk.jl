@@ -193,6 +193,7 @@ using .GConstants
 
 include("windows.jl")
 include("gl_area.jl")
+include("shortcuts.jl")
 
 if Base.VERSION >= v"1.4.2"
     include("precompile.jl")

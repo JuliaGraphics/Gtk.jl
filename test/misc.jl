@@ -38,4 +38,18 @@ destroy(win)
 
 @test isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
 
+# Shortcuts
+
+@test Shortcut("c").keyval == keyval("c")
+@test Shortcut("c",GConstants.GdkModifierType.CONTROL).state == GConstants.GdkModifierType.CONTROL
+
+win = GtkWindow()
+event = Gtk.GdkEventKey(GdkEventType.KEY_PRESS, Gtk.gdk_window(win),
+            Int8(0), UInt32(0), UInt32(0), Gtk.GdkKeySyms.Return, UInt32(0),
+            convert(Ptr{UInt8},C_NULL), UInt16(13), UInt8(0), UInt32(0) )
+
+@test doing(Shortcut(Gtk.GdkKeySyms.Return),event) == true
+@test doing(Shortcut(Gtk.GdkKeySyms.Return,Gtk.PrimaryModifier),event) == false
+destroy(win)
+
 end
