@@ -46,6 +46,14 @@ function show(w::GtkWidget)
     @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w)
     w
 end
+
+"""
+    showall(w::Gtk.GtkWidget)
+Recursively show a widget, and any child widgets (if the widget is a container).
+
+This function overrides the `visible` property in all widgets in the hierarchy. Widgets can be
+protected from `showall` by setting the `no_show_all` property on the object to `true`.
+"""
 function showall(w::GtkWidget)
     handle_auto_idle(w)
     @sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w)
