@@ -145,22 +145,31 @@ end
 
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
 const gtk_main_running = Ref{Bool}(false)
-
+const quit_task = Ref{Task}()
+const enable_eventloop_lock = Base.ReentrantLock()
 """
     Gtk.enable_eventloop(b::Bool = true)
 
 Set whether Gtk's event loop is running.
 """
 function enable_eventloop(b::Bool = true)
-    if b
-        if !is_eventloop_running()
-            global gtk_main_task = schedule(Task(gtk_main))
-            gtk_main_running[] = true
-        end
-    else
-        if is_eventloop_running()
-            gtk_quit()
-            gtk_main_running[] = false
+    lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
+        isassigned(quit_task) && wait(quit_task[]) # prevents starting while the async is still stopping
+        if b
+            if !is_eventloop_running()
+                global gtk_main_task = schedule(Task(gtk_main))
+                gtk_main_running[] = true
+            end
+        else
+            if is_eventloop_running()
+                # @async and short sleep is needer on MacOS at least, otherwise
+                # the window doesn't always finish closing before the eventloop stops.
+                quit_task[] = @async begin
+                    sleep(0.2)
+                    gtk_quit()
+                    gtk_main_running[] = false
+                end
+            end
         end
     end
 end

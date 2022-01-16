@@ -34,11 +34,12 @@ function handle_auto_idle(w::GtkWidget)
         signal_connect(w, :realize) do w
             enable_eventloop(true)
             shown_widgets[w] = nothing
-            signal_connect(w, :destroy) do w
+            signal_connect(w, :destroy, #= after =# true) do w
                 delete!(shown_widgets, w)
                 isempty(shown_widgets) && enable_eventloop(false)
             end
         end
+        @static Sys.iswindows() && yield() # issue #610
     end
 end
 function show(w::GtkWidget)
