@@ -91,11 +91,11 @@ function __init__()
     mutable_artifacts_toml = joinpath(dirname(@__DIR__), "MutableArtifacts.toml")
     loaders_cache_name = "gdk-pixbuf-loaders-cache"
     loaders_cache_hash = artifact_hash(loaders_cache_name, mutable_artifacts_toml)
+    loaders_dir_name = "gdk-pixbuf-loaders-dir"
+    loaders_dir_hash = artifact_hash(loaders_dir_name, mutable_artifacts_toml)
+
     if loaders_cache_hash === nothing
         if Librsvg_jll.is_available()
-            loaders_dir_name = "gdk-pixbuf-loaders-dir"
-            loaders_dir_hash = artifact_hash(loaders_dir_name, mutable_artifacts_toml)
-
             # Copy loaders into a directory
             loaders_dir_hash = create_artifact() do art_dir
                 loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
@@ -126,8 +126,6 @@ function __init__()
                     return String(read(`$gpql`))
                 end
             end
-
-
         end
         # Write cache out to file in new artifact
         loaders_cache_hash = create_artifact() do art_dir
@@ -144,7 +142,7 @@ function __init__()
 
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
-    ENV["GDK_PIXBUF_MODULEDIR"] = Librsvg_jll.is_available() ?
+    ENV["GDK_PIXBUF_MODULEDIR"] = Librsvg_jll.is_available() && loaders_dir_hash !== nothing ?
                                     joinpath(artifact_path(loaders_dir_hash), "loaders_dir") :
                                     gdk_pixbuf_loaders_dir
 
