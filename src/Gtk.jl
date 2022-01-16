@@ -159,8 +159,13 @@ function enable_eventloop(b::Bool = true)
         end
     else
         if is_eventloop_running()
-            gtk_quit()
-            gtk_main_running[] = false
+            # @async and short sleep is needer on MacOS at least, otherwise
+            # the window doesn't always finish closing before the eventloop stops.
+            @async begin
+                sleep(0.2)
+                gtk_quit()
+                gtk_main_running[] = false
+            end
         end
     end
 end
