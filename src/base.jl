@@ -39,6 +39,7 @@ function handle_auto_idle(w::GtkWidget)
                 isempty(shown_widgets) && enable_eventloop(false)
             end
         end
+        Sys.iswindows() && yield() # issue #610
     end
 end
 function show(w::GtkWidget)
