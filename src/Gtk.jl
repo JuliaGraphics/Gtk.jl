@@ -185,7 +185,7 @@ Set whether Gtk's event loop is running.
 """
 function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
-        isassigned(quit_task) && wait(quit_task[]) # prevents starting while the async is still stopping
+        wait_eventloop_stopping() # prevents starting while the async is still stopping
         if b
             if !is_eventloop_running()
                 global gtk_main_task = schedule(Task(gtk_main))
@@ -229,6 +229,16 @@ end
 Check whether Gtk's event loop is running.
 """
 is_eventloop_running() = gtk_main_running[]
+
+"""
+    Gtk.wait_eventloop_stopping()
+
+If the eventloop is stopping, wait.
+"""
+function wait_eventloop_stopping()
+    isassigned(quit_task) && wait(quit_task[])
+    return
+end
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
