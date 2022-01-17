@@ -152,7 +152,7 @@ const enable_eventloop_lock = Base.ReentrantLock()
 
 Set whether Gtk's event loop is running.
 """
-function enable_eventloop(b::Bool = true)
+function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
         isassigned(quit_task) && wait(quit_task[]) # prevents starting while the async is still stopping
         if b
@@ -169,8 +169,26 @@ function enable_eventloop(b::Bool = true)
                     gtk_quit()
                     gtk_main_running[] = false
                 end
+                wait_stopped && wait(quit_task[])
             end
         end
+    end
+end
+
+"""
+    Gtk.pause_eventloop(f; force = false)
+
+Pauses the eventloop around a function. Restores the state of the eventloop after
+pausing. Respects whether Gtk.jl is configured to allow auto-stopping of the
+eventloop, unless `force = true`.
+"""
+function pause_eventloop(f; force = false)
+    was_running = is_eventloop_running()
+    (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
+    try
+        f()
+    finally
+        (force || auto_idle[]) && enable_eventloop(was_running)
     end
 end
 
