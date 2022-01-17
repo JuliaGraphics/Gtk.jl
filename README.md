@@ -8,7 +8,7 @@
 
 GUI building, using the Gtk library: [https://www.gtk.org/](https://www.gtk.org/)
 
-Complete Gtk documentation is available at https://www.gtk.org/docs/
+Complete Gtk documentation is available at [https://www.gtk.org/docs](https://www.gtk.org/docs)
 
 Documentation of this package can be found
 [here](https://juliagraphics.github.io/Gtk.jl/latest/).
