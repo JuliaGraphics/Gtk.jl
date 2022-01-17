@@ -7,6 +7,8 @@ end
 
 # Import binary definitions
 using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
+using Librsvg_jll
+using JLLWrappers
 using Pkg.Artifacts
 const libgdk = libgdk3
 const libgtk = libgtk3
@@ -89,14 +91,41 @@ function __init__()
     mutable_artifacts_toml = joinpath(dirname(@__DIR__), "MutableArtifacts.toml")
     loaders_cache_name = "gdk-pixbuf-loaders-cache"
     loaders_cache_hash = artifact_hash(loaders_cache_name, mutable_artifacts_toml)
+    loaders_dir_name = "gdk-pixbuf-loaders-dir"
+    loaders_dir_hash = artifact_hash(loaders_dir_name, mutable_artifacts_toml)
+
     if loaders_cache_hash === nothing
-        # Run gdk-pixbuf-query-loaders, capture output,
-        loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
-            withenv("GDK_PIXBUF_MODULEDIR" => gdk_pixbuf_loaders_dir) do
-                return String(read(`$gpql`))
+        if Librsvg_jll.is_available()
+            # Copy loaders into a directory
+            loaders_dir_hash = create_artifact() do art_dir
+                loaders_dir = mkdir(joinpath(art_dir,"loaders_dir"))
+                pixbuf_loaders = joinpath.(gdk_pixbuf_loaders_dir, readdir(gdk_pixbuf_loaders_dir))
+                push!(pixbuf_loaders, Librsvg_jll.libpixbufloader_svg)
+                cp.(pixbuf_loaders, joinpath.(loaders_dir, basename.(pixbuf_loaders)))
+            end
+
+            loaders_dir = joinpath(artifact_path(loaders_dir_hash), "loaders_dir")
+            # Pkg removes "execute" permissions on Windows
+            Sys.iswindows() && chmod(artifact_path(loaders_dir_hash), 0o755; recursive=true)
+            # Run gdk-pixbuf-query-loaders, capture output
+            loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
+                withenv("GDK_PIXBUF_MODULEDIR"=>loaders_dir, JLLWrappers.LIBPATH_env=>Librsvg_jll.LIBPATH[]) do
+                    return String(readchomp(`$gpql`))
+                end
+            end
+
+            bind_artifact!(mutable_artifacts_toml,
+                loaders_dir_name,
+                loaders_dir_hash;
+                force=true
+            )
+        else  # just use the gdk_pixbuf directory
+            loader_cache_contents = gdk_pixbuf_query_loaders() do gpql
+                withenv("GDK_PIXBUF_MODULEDIR" => gdk_pixbuf_loaders_dir) do
+                    return String(read(`$gpql`))
+                end
             end
         end
-
         # Write cache out to file in new artifact
         loaders_cache_hash = create_artifact() do art_dir
             open(joinpath(art_dir, "loaders.cache"), "w") do io
@@ -112,7 +141,9 @@ function __init__()
 
     # Point gdk to our cached loaders
     ENV["GDK_PIXBUF_MODULE_FILE"] = joinpath(artifact_path(loaders_cache_hash), "loaders.cache")
-    ENV["GDK_PIXBUF_MODULEDIR"] = gdk_pixbuf_loaders_dir
+    ENV["GDK_PIXBUF_MODULEDIR"] = Librsvg_jll.is_available() && loaders_dir_hash !== nothing ?
+                                    joinpath(artifact_path(loaders_dir_hash), "loaders_dir") :
+                                    gdk_pixbuf_loaders_dir
 
     if Sys.islinux() || Sys.isfreebsd()
         # Needed by xkbcommon:
