@@ -189,7 +189,7 @@ end
 main_depth() = ccall((:g_main_depth, Gtk.GLib.libglib), Cint, ())
 
 function recursive_quit_main()
-    gtk_quit()
+    gtk_main_quit()
     if main_depth() > 1
         @idle_add begin
             recursive_quit_main()

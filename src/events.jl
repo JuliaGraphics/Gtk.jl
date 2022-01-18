@@ -2,9 +2,11 @@ gtk_main() = GLib.g_sigatom() do
     ccall((:gtk_main, libgtk), Nothing, ())
 end
 
-function gtk_quit()
+function gtk_main_quit()
     ccall((:gtk_main_quit, libgtk), Nothing, ())
 end
+
+const gtk_quit = gtk_main_quit # deprecated
 
 add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, libgtk), Nothing, (Ptr{GObject}, GEnum), widget, mask)
 
