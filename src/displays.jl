@@ -306,8 +306,8 @@ slice!(status::GtkStatusbar, context, message_id) =
     ccall((:gtk_statusbar_remove, libgtk), Ptr{GObject}, (Ptr{GObject}, Cuint, Cuint),
         status, context_id(status, context), message_id)
 empty!(status::GtkStatusbar, context) =
-    ccall((:gtk_statusbar_remove_all, libgtk), Ptr{GObject}, (Ptr{GObject}, Cuint, Cuint),
-        status, context_id(status, context), context_id(context))
+    ccall((:gtk_statusbar_remove_all, libgtk), Ptr{GObject}, (Ptr{GObject}, Cuint),
+        status, context_id(status, context))
 
 #GtkInfoBarLeaf() = GtkInfoBarLeaf(ccall((:gtk_info_bar_new, libgtk), Ptr{GObject}, ())
 

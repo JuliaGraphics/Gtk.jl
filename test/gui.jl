@@ -48,6 +48,9 @@ mutable struct MyWindow <: Window
     end
 end
 
+# For testing callbacks
+click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
+
 @testset "gui" begin
 
 wdth, hght = screen_size()
@@ -84,6 +87,9 @@ visible(w,false)
 @test visible(w) == false
 visible(w,true)
 @test visible(w) == true
+
+gw = Gtk.gdk_window(w)
+ox, oy = Gtk.get_origin(gw)
 
 hide(w)
 show(w)
@@ -292,8 +298,6 @@ id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
 @test signal_handler_is_connected(b, id)
-# For testing callbacks
-click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 
 @test counter == 0
 click(b)
@@ -320,10 +324,29 @@ pb=Pixbuf(data=icon, has_alpha=false)
 @test size(pb) == (40, 20)
 @test pb[1,1].g==0xff
 pb[10,10]=Gtk.RGB(0,0,0)
-b = Button(Image(pb))
-w = Window(b, "Icon button", 60, 40)
+pb[20:30,1:5]=Gtk.RGB(0xff,0,0)
+w = Window(Button(Image(pb)), "Icon button", 60, 40)
 showall(w)
+pb2=copy(pb)
+@test size(pb2,2) == size(pb)[2]
+pb3=Gtk.slice(pb2,11:20,11:20)
+@test size(pb3) == (10,10)
 destroy(w)
+end
+
+@testset "Transparent pixbuf" begin
+icon = Matrix{Gtk.RGBA}(undef, 40, 20)
+fill!(icon, Gtk.RGBA(0,0xff,0, 0xff))
+icon[5:end-5, 3:end-3] .= Ref(Gtk.RGBA(0,0,0xff,0x80))
+pb=Pixbuf(data=icon, has_alpha=true)
+@test eltype(pb) == Gtk.RGBA
+end
+
+@testset "Icon theme" begin
+img = Image(; icon_name = "document-open", size=:BUTTON)
+icon_theme = Gtk.icon_theme_get_default()
+pb=Gtk.icon_theme_load_icon_for_scale(icon_theme, "document-open", 60, 60, Gtk.GConstants.GtkIconLookupFlags.GTK_ICON_LOOKUP_NO_SVG)
+@test isa(pb,GdkPixbuf)
 end
 
 @testset "checkbox" begin
@@ -475,6 +498,9 @@ combo = ComboBoxText(true)
 for c in choices
     push!(combo, c)
 end
+pushfirst!(combo, "Rocky road")
+insert!(combo, 3, "Pistachio")
+delete!(combo, 3)
 w = Window(combo, "ComboBoxText with entry")|>showall
 destroy(w)
 end
@@ -503,16 +529,18 @@ pb = ProgressBar()
 w = Window(pb, "Progress bar")|>showall
 set_gtk_property!(pb,:fraction,0.7)
 @test get_gtk_property(pb,:fraction,Float64) == 0.7
+pulse(pb)
 destroy(w)
 end
 
 @testset "spinner" begin
 s = Spinner()
 w = Window(s, "Spinner")|>showall
-set_gtk_property!(s,:active,true)
+start(s)
 @test get_gtk_property(s,:active,Bool) == true
-set_gtk_property!(s,:active,false)
+stop(s)
 @test get_gtk_property(s,:active,Bool) == false
+
 destroy(w)
 end
 
@@ -555,6 +583,10 @@ function cb_sbpop(ptr,evt,id)
 end
 on_signal_button_press(cb_sbpush, bpush, false, ctxid)
 on_signal_button_press(cb_sbpop, bpop, false, ctxid)
+
+click(bpush)
+click(bpop)
+empty!(sb,ctxid)
 destroy(w)
 end
 
@@ -698,6 +730,7 @@ select!(selmodel, it)
 iter = selected(selmodel)
 @test TreeModel(tmSorted)[iter, 1] == 35
 
+empty!(ls)
 
 destroy(w)
 end
@@ -833,6 +866,17 @@ end
     ### add css tests here
 
     destroy(w)
+end
+
+@testset "Builder" begin
+b=Builder(;filename="test.glade")
+widgets = [w for w in b]
+@test length(widgets)==length(b)
+button = b["a_button"]
+@test isa(button,Button)
+@test isa(b[1],Gtk.GtkWidget)
+
+@test_throws ErrorException b2 = Builder(;filename="test2.glade")
 end
 
 @testset "Subtyping from GObject" begin
