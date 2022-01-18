@@ -155,7 +155,7 @@ function __init__()
 
     GError() do error_check
         ccall((:gtk_init_with_args, libgtk), Bool,
-            (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{GError}),
+            (Ptr{Nothing}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Nothing}, Ptr{UInt8}, Ptr{Ptr{GError}}),
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 

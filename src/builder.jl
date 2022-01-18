@@ -35,7 +35,7 @@ function push!(builder::GtkBuilder; buffer = nothing, filename = nothing, resour
 end
 
 start_(builder::GtkBuilder) = glist_iter(ccall((:gtk_builder_get_objects, libgtk), Ptr{_GSList{GObject}}, (Ptr{GObject},), builder))
-iterate(w::GtkBuilder, list=start_(builder)) =
+iterate(builder::GtkBuilder, list=start_(builder)) =
    iterate(list[1], list)
 
 
