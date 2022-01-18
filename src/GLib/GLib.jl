@@ -41,8 +41,6 @@ cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
     end
 end
 
-const gtk_eventloop_f = Ref{Function}()
-
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
