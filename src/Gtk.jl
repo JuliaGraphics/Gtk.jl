@@ -160,40 +160,62 @@ function __init__()
     end
 
     auto_idle[] = get(ENV, "GTK_AUTO_IDLE", "true") == "true"
-
-    # by default, defer starting the event loop until either `show`, `showall`, or `g_idle_add` is called
-    enable_eventloop(!auto_idle[])
+    # by default, defer starting the event loop until widgets are "realized"
+    if auto_idle[]
+        # Start-stopping the event loop once makes the auto-stop process
+        # more stable. Reason unknown
+        enable_eventloop(true)
+        enable_eventloop(false)
+    else
+        enable_eventloop(true)
+    end
 end
 
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
 const enable_eventloop_lock = Base.ReentrantLock()
+const eventloop_instructed_to_stop = Ref{Bool}(false)
 
 """
     Gtk.enable_eventloop(b::Bool = true)
 
 Set whether Gtk's event loop is running.
 """
-function enable_eventloop(b::Bool = true)
+function enable_eventloop(b::Bool = true; wait = true)
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
         if b
             if !is_eventloop_running()
+                eventloop_instructed_to_stop[] = false
                 global gtk_main_task = schedule(Task(gtk_main))
+                if !is_eventloop_running() && wait
+                    t = Timer(5) # TODO: replace with Base.timedwait when 1.3 is dropped
+                    while isopen(t) && !is_eventloop_running()
+                        sleep(0.1)
+                    end
+                    isopen(t) || @debug "enable_eventloop: timed-out waiting for eventloop to start"
+                end
             end
         else
             if is_eventloop_running()
                 recursive_quit_main()
+                eventloop_instructed_to_stop[] = true
+                if is_eventloop_running() && wait
+                    t = Timer(5) # TODO: replace with Base.timedwait when 1.3 is dropped
+                    while isopen(t) && is_eventloop_running()
+                        sleep(0.1)
+                    end
+                    isopen(t) || @debug "enable_eventloop: timed-out waiting for eventloop to stop"
+                end
             end
         end
+        return is_eventloop_running()
     end
 end
-main_depth() = ccall((:g_main_depth, Gtk.GLib.libglib), Cint, ())
 
+# based on https://stackoverflow.com/a/44292631
 function recursive_quit_main()
     gtk_main_quit()
-    if main_depth() > 1
-        @idle_add begin
-            recursive_quit_main()
-        end
+    if GLib.main_depth() > 1
+        @idle_add recursive_quit_main()
     end
 end
 
@@ -205,12 +227,12 @@ pausing. Respects whether Gtk.jl is configured to allow auto-stopping of the
 eventloop, unless `force = true`.
 """
 function pause_eventloop(f; force = false)
-    was_running = is_eventloop_running()
+    was_running = eventloop_instructed_to_stop[] ? false : is_eventloop_running()
     (force || auto_idle[]) && enable_eventloop(false)
     try
         f()
     finally
-        (force || auto_idle[]) && was_running && enable_eventloop()
+        (force || auto_idle[]) && enable_eventloop(was_running)
     end
 end
 
@@ -219,7 +241,8 @@ end
 
 Check whether Gtk's event loop is running.
 """
-is_eventloop_running() = main_depth() > 0
+is_eventloop_running() = GLib.main_depth() > 0
+
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
