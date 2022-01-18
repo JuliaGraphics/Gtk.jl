@@ -875,6 +875,8 @@ widgets = [w for w in b]
 button = b["a_button"]
 @test isa(button,Button)
 @test isa(b[1],Gtk.GtkWidget)
+
+@test_throws ErrorException b2 = Builder(;filename="test2.glade")
 end
 
 @testset "Subtyping from GObject" begin
