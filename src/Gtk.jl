@@ -159,15 +159,6 @@ function __init__()
             C_NULL, C_NULL, "Julia Gtk Bindings", C_NULL, C_NULL, error_check)
     end
 
-    # if g_main_depth > 0, a glib main-loop is already running.
-    # unfortunately this call does not reliably reflect the state after the
-    # loop has been stopped or restarted, so only use it once at the start
-    gtk_main_running[] = ccall((:g_main_depth, GLib.libglib), Cint, ()) > 0
-
-    # Given GLib provides `g_idle_add` to specify what happens during idle, this allows
-    # that call to also start the eventloop
-    GLib.gtk_eventloop_f[] = enable_eventloop
-
     auto_idle[] = get(ENV, "GTK_AUTO_IDLE", "true") == "true"
 
     # by default, defer starting the event loop until either `show`, `showall`, or `g_idle_add` is called
@@ -175,8 +166,8 @@ function __init__()
 end
 
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
-const gtk_main_running = Ref{Bool}(false)
 const enable_eventloop_lock = Base.ReentrantLock()
+
 """
     Gtk.enable_eventloop(b::Bool = true)
 
@@ -187,13 +178,21 @@ function enable_eventloop(b::Bool = true)
         if b
             if !is_eventloop_running()
                 global gtk_main_task = schedule(Task(gtk_main))
-                gtk_main_running[] = true
             end
         else
             if is_eventloop_running()
-                gtk_quit()
-                gtk_main_running[] = false
+                recursive_quit_main()
             end
+        end
+    end
+end
+main_depth() = ccall((:g_main_depth, Gtk.GLib.libglib), Cint, ())
+
+function recursive_quit_main()
+    gtk_quit()
+    if main_depth() > 1
+        @idle_add begin
+            recursive_quit_main()
         end
     end
 end
@@ -211,7 +210,7 @@ function pause_eventloop(f; force = false)
     try
         f()
     finally
-        (force || auto_idle[]) && enable_eventloop(was_running)
+        (force || auto_idle[]) && was_running && enable_eventloop()
     end
 end
 
@@ -220,7 +219,7 @@ end
 
 Check whether Gtk's event loop is running.
 """
-is_eventloop_running() = gtk_main_running[]
+is_eventloop_running() = main_depth() > 0
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
