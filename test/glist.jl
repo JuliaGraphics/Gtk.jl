@@ -7,10 +7,10 @@ using Test
 
 @testset "pointers" begin
 
-w = Window("Window", 400, 300)
+w1 = Window("Window", 400, 300)
 nb = Notebook()
-w = push!(Window("Notebook"),nb)
-l = ccall((:gtk_container_get_children,Gtk.libgtk),Ptr{Gtk._GList{Gtk.GtkWidget}},(Ptr{Gtk.GObject},),w)
+w2 = push!(Window("Notebook"),nb)
+l = ccall((:gtk_container_get_children,Gtk.libgtk),Ptr{Gtk._GList{Gtk.GtkWidget}},(Ptr{Gtk.GObject},),w2)
 
 @test eltype(l)==Gtk.GtkWidget
 
@@ -21,6 +21,9 @@ l = ccall((:gtk_container_get_children,Gtk.libgtk),Ptr{Gtk._GList{Gtk.GtkWidget}
 for item in l
     @test item==nb
 end
+
+destroy(w1)
+destroy(w2)
 
 end
 

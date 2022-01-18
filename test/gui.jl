@@ -582,6 +582,7 @@ end
     @test mtrx.xx == 300
     @test mtrx.yy == 280
     @test mtrx.xy == mtrx.yx == mtrx.x0 == mtrx.y0 == 0
+    destroy(win)
 end
 
 @testset "Menus" begin

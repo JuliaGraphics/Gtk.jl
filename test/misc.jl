@@ -40,10 +40,7 @@ destroy(win)
 
 # make sure all shown widgets have been destroyed, otherwise the eventloop
 # won't stop automatically
-for (w,_) in Gtk.shown_widgets
-    destroy(w)
-end
-Gtk.wait_eventloop_stopping()
+@test length(Gtk.shown_widgets) == 0
 
 @testset "Eventloop control" begin
     before = Gtk.auto_idle[]
