@@ -176,16 +176,14 @@ end
 
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
 const gtk_main_running = Ref{Bool}(false)
-const quit_task = Ref{Task}()
 const enable_eventloop_lock = Base.ReentrantLock()
 """
     Gtk.enable_eventloop(b::Bool = true)
 
 Set whether Gtk's event loop is running.
 """
-function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
+function enable_eventloop(b::Bool = true)
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
-        wait_eventloop_stopping() # prevents starting while the async is still stopping
         if b
             if !is_eventloop_running()
                 global gtk_main_task = schedule(Task(gtk_main))
@@ -193,14 +191,8 @@ function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
             end
         else
             if is_eventloop_running()
-                # @async and short sleep is needer on MacOS at least, otherwise
-                # the window doesn't always finish closing before the eventloop stops.
-                quit_task[] = @async begin
-                    sleep(0.2)
-                    gtk_quit()
-                    gtk_main_running[] = false
-                end
-                wait_stopped && wait(quit_task[])
+                gtk_quit()
+                gtk_main_running[] = false
             end
         end
     end
@@ -215,7 +207,7 @@ eventloop, unless `force = true`.
 """
 function pause_eventloop(f; force = false)
     was_running = is_eventloop_running()
-    (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
+    (force || auto_idle[]) && enable_eventloop(false)
     try
         f()
     finally
@@ -229,16 +221,6 @@ end
 Check whether Gtk's event loop is running.
 """
 is_eventloop_running() = gtk_main_running[]
-
-"""
-    Gtk.wait_eventloop_stopping()
-
-If the eventloop is stopping, wait.
-"""
-function wait_eventloop_stopping()
-    isassigned(quit_task) && wait(quit_task[])
-    return
-end
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")

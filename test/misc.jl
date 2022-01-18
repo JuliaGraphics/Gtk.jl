@@ -64,7 +64,7 @@ destroy(win)
         @test !Gtk.is_eventloop_running()
     end
     @test Gtk.is_eventloop_running()
-    Gtk.enable_eventloop(false, wait_stopped = true)
+    Gtk.enable_eventloop(false)
     @test !Gtk.is_eventloop_running()
 
     @testset "pause_eventloop: multithreaded code doesn't block" begin
@@ -90,16 +90,14 @@ destroy(win)
         end
         @test Gtk.is_eventloop_running()
         destroy(win)
-        Gtk.wait_eventloop_stopping()
     end
 
-    @testset "wait_eventloop_stopping: waits for stop" begin
+    @testset "eventloop is stopped immediately after a destroy(win) completes" begin
         c = GtkCanvas()
         win = GtkWindow(c)
         showall(win)
         @test Gtk.is_eventloop_running()
         destroy(win)
-        Gtk.wait_eventloop_stopping()
         @test !Gtk.is_eventloop_running()
     end
 
