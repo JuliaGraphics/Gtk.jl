@@ -32,14 +32,14 @@ const shown_widgets = WeakKeyDict()
 function handle_auto_idle(w::GtkWidget)
     if auto_idle[]
         signal_connect(w, :realize) do w
-            enable_eventloop(true)
+            enable_eventloop(true, wait = false) # can't wait in a callback, unfortunately
             shown_widgets[w] = nothing
-            signal_connect(w, :destroy, #= after =# true) do w
+            signal_connect(w, :destroy, #= after =# false) do w
                 delete!(shown_widgets, w)
-                isempty(shown_widgets) && enable_eventloop(false)
+                isempty(shown_widgets) && enable_eventloop(false, wait = false)
             end
         end
-        @static Sys.iswindows() && yield() # issue #610
+        yield() # issue #610
     end
 end
 function show(w::GtkWidget)

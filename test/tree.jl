@@ -77,3 +77,5 @@ select!(selection, iter)
 
 # this crashes
 # iters = Gtk.selected_rows(selection)
+
+destroy(window)

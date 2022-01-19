@@ -41,8 +41,6 @@ cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
     end
 end
 
-const gtk_eventloop_f = Ref{Function}()
-
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
@@ -52,6 +50,8 @@ bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
 g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
+
+main_depth() = ccall((:g_main_depth, libglib), Cint, ())
 
 ccall((:g_type_init, libgobject), Nothing, ())
 

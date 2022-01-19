@@ -44,6 +44,6 @@ showall(win)
 
 # https://stackoverflow.com/a/33571506/1500988
 signal_connect(win, :destroy) do widget
-    Gtk.gtk_quit()
+    Gtk.gtk_main_quit()
 end
 Gtk.gtk_main()

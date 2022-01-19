@@ -381,7 +381,6 @@ end
 @deprecate g_timeout_add(interval, cb, user_data) g_timeout_add(() -> cb(user_data), interval)
 
 function g_idle_add(cb::Function)
-    gtk_eventloop_f[](true)
     callback = @cfunction(_g_callback, Cint, (Ref{Function},))
     ref, deref = gc_ref_closure(cb)
     return ccall((:g_idle_add_full , libglib),Cint,

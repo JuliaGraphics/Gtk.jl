@@ -24,6 +24,8 @@ repr = Base.print_to_string(wrap) #should display properties
 
 x = Ref{Int}(1)
 
+Gtk.enable_eventloop(true)
+
 function g_timeout_add_cb()
     x[] = 2
     false
@@ -81,6 +83,8 @@ x[] = 1 #reset
 g_timeout_add(()->g_timeout_add_cb(x), 1)
 sleep(0.5)
 @test x[] == 2
+
+Gtk.enable_eventloop(false)
 
 end
 

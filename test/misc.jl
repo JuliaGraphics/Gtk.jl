@@ -38,30 +38,4 @@ destroy(win)
 
 @test isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
 
-@testset "Eventloop control" begin
-    before = Gtk.auto_idle[]
-
-    Gtk.enable_eventloop(true)
-    @test Gtk.is_eventloop_running()
-
-    Gtk.auto_idle[] = true
-    Gtk.pause_eventloop() do
-        @test !Gtk.is_eventloop_running()
-    end
-    @test Gtk.is_eventloop_running()
-
-    Gtk.auto_idle[] = false
-    Gtk.pause_eventloop() do
-        @test Gtk.is_eventloop_running()
-    end
-    @test Gtk.is_eventloop_running()
-
-    Gtk.pause_eventloop(force = true) do
-        @test !Gtk.is_eventloop_running()
-    end
-    @test Gtk.is_eventloop_running()
-
-    Gtk.auto_idle[] = before
-end
-
 end
