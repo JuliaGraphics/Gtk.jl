@@ -278,7 +278,7 @@ deleteat!(treeStore::GtkTreeStore, iter::TRI) = delete!(treeStore, iter)
 
 ## insert by index
 function insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol = :parent, where::Symbol = :after)
-    piter = iter_from_index(treeStore, index)
+    iter = iter_from_index(treeStore, index)
     insert!(treeStore, iter, values; how = how, where = where)
 end
 
