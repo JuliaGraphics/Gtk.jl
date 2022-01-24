@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/MiscObjects.html
-
 #GtkAdjustment — A GObject representing an adjustable bounded value
 #GtkArrow — Displays an arrow
 #GtkCalendar — Displays a calendar and allows the user to select a date
@@ -14,5 +12,5 @@
 #GtkAccessible — Accessibility support for widgets
 
 #GtkEventBox — A widget used to catch events for widgets which do not have their own window
-Gtk.@gtktype GtkEventBox	
+Gtk.@gtktype GtkEventBox
 GtkEventBoxLeaf() =  GtkEventBoxLeaf(ccall((:gtk_event_box_new ,libgtk), Ptr{GObject},	()))

@@ -335,7 +335,6 @@ end
 
 sizeof_gclosure = 0
 function __init__gtype__()
-    ccall((:g_type_init, libgobject), Nothing, ())
     global jlref_quark = quark"julia_ref"
     global sizeof_gclosure = GLib.WORD_SIZE
     closure = C_NULL

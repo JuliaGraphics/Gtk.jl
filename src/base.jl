@@ -3,19 +3,11 @@ unsafe_convert(::Type{Ptr{GObject}}, w::AbstractStringLike) = unsafe_convert(Ptr
 destroy(w::GtkWidget) = @sigatom ccall((:gtk_widget_destroy, libgtk), Nothing, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent, libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 hasparent(w::GtkWidget) = ccall((:gtk_widget_get_parent, libgtk), Ptr{Nothing}, (Ptr{GObject},), w) != C_NULL
-function toplevel(w::GtkWidget)
-    p = unsafe_convert(Ptr{GObject}, w)
-    pp = p
-    while pp != C_NULL
-        p = pp
-        pp = ccall((:gtk_widget_get_parent, libgtk), Ptr{GObject}, (Ptr{GObject},), p)
-    end
-    convert(GtkWidget, p)
-end
+toplevel(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_toplevel, libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 function allocation(widget::Gtk.GtkWidget)
-    allocation_ = Array(GdkRectangle)
+    allocation_ = Ref{GdkRectangle}()
     ccall((:gtk_widget_get_allocation, libgtk), Nothing, (Ptr{GObject}, Ptr{GdkRectangle}), widget, allocation_)
-    return allocation_[1]
+    return allocation_[]
 end
 width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width, libgtk), Cint, (Ptr{GObject},), w)
 height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height, libgtk), Cint, (Ptr{GObject},), w)

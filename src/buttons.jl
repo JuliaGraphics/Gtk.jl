@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/ButtonWidgets.html
-
 #GtkButton — A widget that creates a signal when clicked on
 #GtkCheckButton — Create widgets with a discrete toggle button
 #GtkRadioButton — A choice from multiple check buttons

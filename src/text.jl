@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/TextWidgetObjects.html
-
 #GtkAccelLabel — A label which displays an accelerator key on the right of the text
 #GtkLabel — A widget that displays a small to medium amount of text
 
@@ -247,13 +245,13 @@ Base.skip(iter::Mutable{GtkTextIter}, count::Integer) =
 Moves `iter` according to the operation specified by `what`.
 Operations are :
 
-* :forward_line (gtk_text_iter_forward_line)
-* :backward_line (gtk_text_iter_backward_line)
-* :forward_to_line_end (gtk_text_iter_forward_to_line_end)
-* :backward_word_start (gtk_text_iter_forward_word_end)
-* :forward_word_end (gtk_text_iter_backward_word_start)
-* :backward_sentence_start (gtk_text_iter_backward_sentence_start)
-* :forward_sentence_end (gtk_text_iter_forward_sentence_end)
+* `:forward_line` (`gtk_text_iter_forward_line`)
+* `:backward_line` (`gtk_text_iter_backward_line`)
+* `:forward_to_line_end` (`gtk_text_iter_forward_to_line_end`)
+* `:backward_word_start` (`gtk_text_iter_forward_word_end`)
+* `:forward_word_end` (`gtk_text_iter_backward_word_start`)
+* `:backward_sentence_start` (`gtk_text_iter_backward_sentence_start`)
+* `:forward_sentence_end` (`gtk_text_iter_forward_sentence_end`)
 """
 function Base.skip(iter::Mutable{GtkTextIter}, what::Symbol)
     if     what === :backward_line
@@ -291,15 +289,15 @@ Moves `iter` according to the operation specified by `what` and
 `count`.
 Operations are :
 
-* :chars (gtk_text_iter_forward_chars)
-* :lines (gtk_text_iter_forward_lines)
-* :words (gtk_text_iter_forward_word_ends)
-* :word_cursor_positions (gtk_text_iter_forward_cursor_positions)
-* :sentences (gtk_text_iter_forward_sentence_ends)
-* :visible_words (gtk_text_iter_forward_visible_word_ends)
-* :visible_cursor_positions (gtk_text_iter_forward_visible_cursor_positions)
-* :visible_lines (gtk_text_iter_forward_visible_lines)
-* :line_ends (gtk_text_iter_forward_visible_lines)
+* `:chars` (`gtk_text_iter_forward_chars`)
+* `:lines` (`gtk_text_iter_forward_lines`)
+* `:words` (`gtk_text_iter_forward_word_ends`)
+* `:word_cursor_positions` (`gtk_text_iter_forward_cursor_positions`)
+* `:sentences` (`gtk_text_iter_forward_sentence_ends`)
+* `:visible_words` (`gtk_text_iter_forward_visible_word_ends`)
+* `:visible_cursor_positions` (`gtk_text_iter_forward_visible_cursor_positions`)
+* `:visible_lines` (`gtk_text_iter_forward_visible_lines`)
+* `:line_ends` (`gtk_text_iter_forward_visible_lines`)
 """
 function Base.skip(iter::Mutable{GtkTextIter}, count::Integer, what::Symbol)
     if     what === :char || what === :chars
@@ -355,7 +353,7 @@ end
         str::AbstractString, start::Mutable{GtkTextIter},
         stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
 
-    Implements `gtk_text_iter_forward_search`.
+Implements `gtk_text_iter_forward_search`.
 """
 function forward_search(iter::Mutable{GtkTextIter},
     str::AbstractString, start::Mutable{GtkTextIter},
@@ -373,7 +371,7 @@ end
         str::AbstractString, start::Mutable{GtkTextIter},
         stop::Mutable{GtkTextIter}, limit::Mutable{GtkTextIter}, flag::Int32)
 
-    Implements `gtk_text_iter_backward_search`.
+Implements `gtk_text_iter_backward_search`.
 """
 function backward_search(iter::Mutable{GtkTextIter},
     str::AbstractString, start::Mutable{GtkTextIter},
@@ -699,7 +697,7 @@ function buffer_to_window_coords(view::GtkTextView, buffer_x::Integer, buffer_y:
 	window_x, window_y = Gtk.mutable(Cint), Gtk.mutable(Cint)
 	ccall(
         (:gtk_text_view_buffer_to_window_coords, libgtk), Cvoid,
-        (Ptr{Gtk.GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}), 
+        (Ptr{Gtk.GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}),
         view, Int32(wintype), buffer_x, buffer_y, window_x, window_y
     )
 	return (window_x[], window_y[])
@@ -714,7 +712,7 @@ function window_to_buffer_coords(view::GtkTextView, window_x::Integer, window_y:
     buffer_x, buffer_y = Gtk.mutable(Cint), Gtk.mutable(Cint)
     ccall(
         (:gtk_text_view_window_to_buffer_coords, libgtk), Cvoid,
-        (Ptr{GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}), 
+        (Ptr{GObject}, Cint, Cint, Cint, Ptr{Cint}, Ptr{Cint}),
         view, Int32(wintype), window_x, window_y, buffer_x, buffer_y
     )
     return (buffer_x[],buffer_y[])
@@ -742,7 +740,7 @@ function cursor_locations(view::GtkTextView)
     weak = Gtk.mutable(GdkRectangle)
     strong = Gtk.mutable(GdkRectangle)
     buffer = view.buffer[GtkTextBuffer]
-    iter = mutable(GtkTextIter(buffer, buffer.cursor_position[Int])) 
+    iter = mutable(GtkTextIter(buffer, buffer.cursor_position[Int]))
 
     ccall(
         (:gtk_text_view_get_cursor_locations, libgtk), Cvoid,

@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/SelectorWidgets.html
-
 #GtkColorButton — A button to launch a color selection dialog
 #GtkColorSelectionDialog — A standard dialog box for selecting a color
 #GtkColorSelection — A widget used to select a color

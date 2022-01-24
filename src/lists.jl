@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/TreeWidgetObjects.html
-
 #Tree and List Widget Overview — Overview of GtkTreeModel, GtkTreeView, and friends
 #GtkTreeModel — The tree interface used by GtkTreeView
 #GtkTreeSelection — The selection object for GtkTreeView
@@ -280,7 +278,7 @@ deleteat!(treeStore::GtkTreeStore, iter::TRI) = delete!(treeStore, iter)
 
 ## insert by index
 function insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol = :parent, where::Symbol = :after)
-    piter = iter_from_index(treeStore, index)
+    iter = iter_from_index(treeStore, index)
     insert!(treeStore, iter, values; how = how, where = where)
 end
 
@@ -653,17 +651,19 @@ end
 function selected_rows(selection::GtkTreeSelection)
     hasselection(selection) || return GtkTreeIter[]
 
-    model = mutable(Ptr{GtkTreeModel})
+    model = Ref{Ptr{GtkTreeModel}}()
 
     paths = GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, libgtk),
-                                Ptr{GLib._GList{GtkTreePath}},
-                                (Ptr{GObject}, Ptr{GtkTreeModel}),
+                                Ptr{GLib._GList{Ptr{GtkTreePath}}},
+                                (Ptr{GObject}, Ptr{Ptr{GtkTreeModel}}),
                                 selection, model))
 
     iters = GtkTreeIter[]
     for path in paths
-        ret, it = iter(model, path)
-        ret && push!(iters, it)
+		it = Ref{GtkTreeIter}()
+		ret = ccall((:gtk_tree_model_get_iter, libgtk), Cint, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreePath}),
+	                      model[], it, path) != 0
+        ret && push!(iters, it[])
     end
 
     iters

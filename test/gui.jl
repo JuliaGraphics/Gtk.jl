@@ -218,6 +218,7 @@ g1 = Gtk.GtkBox(:h)
 g2 = Gtk.GtkBox(:h)
 push!(f,g1)
 push!(f,g2)
+@test f[1]==g1
 
 b11 = Button("first")
 push!(g1, b11)
@@ -239,6 +240,7 @@ set_gtk_property!(g1,:pack_type,b11,0) #GTK_PACK_START
 set_gtk_property!(g1,:pack_type,b12,0) #GTK_PACK_START
 set_gtk_property!(g2,:pack_type,b21,1) #GTK_PACK_END
 set_gtk_property!(g2,:pack_type,b22,1) #GTK_PACK_END
+@test get_gtk_property(g1,:pack_type, b11, Int) == 0
 
 ## Now shrink window
 showall(w)
@@ -331,6 +333,7 @@ pb2=copy(pb)
 @test size(pb2,2) == size(pb)[2]
 pb3=Gtk.slice(pb2,11:20,11:20)
 @test size(pb3) == (10,10)
+fill!(pb3,Gtk.RGB(0,0,0))
 destroy(w)
 end
 
@@ -614,6 +617,9 @@ end
     @test mtrx.xx == 300
     @test mtrx.yy == 280
     @test mtrx.xy == mtrx.yx == mtrx.x0 == mtrx.y0 == 0
+    surf = Gtk.cairo_surface(cnvs)
+    a = Gtk.allocation(cnvs)
+    @test isa(a,Gtk.GdkRectangle)
 end
 
 @testset "Menus" begin
@@ -694,8 +700,12 @@ end
 
 @testset "List view" begin
 ls=ListStore(Int32,Bool)
-push!(ls,(44,true))
+push!(ls,(42,true))
+ls[1,1]=44
 push!(ls,(33,true))
+pushfirst!(ls,(22,false))
+popfirst!(ls)
+@test size(ls)==(2,2)
 insert!(ls, 2, (35, false))
 tv=TreeView(TreeModel(ls))
 r1=CellRendererText()
@@ -722,10 +732,18 @@ select!(selmodel, Gtk.iter_from_index(ls, 1))
 iter = selected(selmodel)
 @test ls[iter, 1] == 35
 
+G_.mode(selmodel,Gtk.GConstants.GtkSelectionMode.MULTIPLE)
+selectall!(selmodel)
+iters = Gtk.selected_rows(selmodel)
+@test length(iters) == 2
+@test ls[iters[1],1] == 35
+unselectall!(selmodel)
+
 tmSorted=TreeModelSort(ls)
 G_.model(tv,tmSorted)
 G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
 it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
+G_.mode(selmodel,Gtk.GConstants.GtkSelectionMode.SINGLE)
 select!(selmodel, it)
 iter = selected(selmodel)
 @test TreeModel(tmSorted)[iter, 1] == 35
@@ -750,6 +768,7 @@ iter = Gtk.iter_from_index(ts, [1])
 ts[iter,1] = "ONE"
 @test ts[iter,1] == "ONE"
 @test map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
+@test Gtk.iter_n_children(TreeModel(ts), iter)==1
 
 destroy(w)
 end

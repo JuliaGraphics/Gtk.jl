@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/MenusAndCombos.html
-
 #GtkMenu — A menu widget
 #GtkMenuBar — A subclass widget for GtkMenuShell which holds GtkMenuItem widgets
 #GtkMenuItem — The widget used for item in menus
