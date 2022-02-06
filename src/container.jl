@@ -6,6 +6,20 @@ function delete!(w::GtkContainer, child::GtkWidget)
     ccall((:gtk_container_remove, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject},), w, child)
     w
 end
+
+function Base.deleteat!(w::GtkContainer, i::Integer)
+    i isa Bool && Base.depwarn("passing Bool as an index is deprecated", :deleteat!)
+    delete!(w, w[i])
+    w
+end
+function Base.deleteat!(w::GtkContainer, iterator)
+    for child in [w[i] for i in iterator]
+        delete!(w, child)
+    end
+    w
+end
+Base.firstindex(w::GtkContainer) = 1
+Base.lastindex(w::GtkContainer) = length(w)
 function empty!(w::GtkContainer)
     for child in w
         delete!(w, child)
