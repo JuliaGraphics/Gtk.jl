@@ -8,7 +8,7 @@ function delete!(w::GtkContainer, child::GtkWidget)
 end
 
 function Base.deleteat!(w::GtkContainer, i::Integer)
-    i isa Bool && depwarn("passing Bool as an index is deprecated", :deleteat!)
+    i isa Bool && Base.depwarn("passing Bool as an index is deprecated", :deleteat!)
     delete!(w, w[i])
     w
 end
@@ -18,7 +18,8 @@ function Base.deleteat!(w::GtkContainer, iterator)
     end
     w
 end
-
+Base.firstindex(w::GtkContainer) = 1
+Base.lastindex(w::GtkContainer) = length(w)
 function empty!(w::GtkContainer)
     for child in w
         delete!(w, child)
