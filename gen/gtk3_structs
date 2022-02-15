@@ -246,7 +246,6 @@ $(Expr(:toplevel, quote
     @Gtype GtkPaned libgtk3 gtk_paned
     @Gtype GtkPanedAccessible libgtk3 gtk_paned_accessible
     @Gtype GtkPlacesSidebar libgtk3 gtk_places_sidebar
-    @Gtype GtkPlug libgtk3 gtk_plug
     @Gtype GtkPlugAccessible libgtk3 gtk_plug_accessible
     @Gtype GtkPopover libgtk3 gtk_popover
     @Gtype GtkPopoverAccessible libgtk3 gtk_popover_accessible
@@ -292,7 +291,6 @@ $(Expr(:toplevel, quote
     @Gtype GtkShortcutsShortcut libgtk3 gtk_shortcuts_shortcut
     @Gtype GtkShortcutsWindow libgtk3 gtk_shortcuts_window
     @Gtype GtkSizeGroup libgtk3 gtk_size_group
-    @Gtype GtkSocket libgtk3 gtk_socket
     @Gtype GtkSocketAccessible libgtk3 gtk_socket_accessible
     @Gtype GtkSpinButton libgtk3 gtk_spin_button
     @Gtype GtkSpinButtonAccessible libgtk3 gtk_spin_button_accessible

@@ -70,6 +70,9 @@ end
 gtk3 = GINamespace(:Gtk, "3.0")
 
 for o in GI.get_all(gtk3,GI.GIObjectInfo)
+    if GI.get_name(o)===:Plug || GI.get_name(o)===:Socket
+        continue
+    end
     m=GI.obj_macro(o)
     push!(exprs,m)
     push!(exports.args, GI.get_full_name(o))

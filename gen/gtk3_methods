@@ -3387,24 +3387,6 @@ $(Expr(:toplevel, quote
         ret = ccall(("gtk_places_sidebar_set_show_trash", libgtk3), Nothing, (Ptr{GObject}, Cint), instance, _show_trash)
         nothing
     end
-    function get_embedded(instance::GtkPlug)
-        ret = ccall(("gtk_plug_get_embedded", libgtk3), Cint, (Ptr{GObject},), instance)
-        ret2 = convert(Bool, ret)
-        ret2
-    end
-    function get_id(instance::GtkPlug)
-        ret = ccall(("gtk_plug_get_id", libgtk3), UInt64, (Ptr{GObject},), instance)
-        ret
-    end
-    function get_socket_window(instance::GtkPlug)
-        ret = ccall(("gtk_plug_get_socket_window", libgtk3), Ptr{GObject}, (Ptr{GObject},), instance)
-        ret2 = if ret == C_NULL
-                nothing
-            else
-                convert(GdkWindow, ret, false)
-            end
-        ret2
-    end
     function get_id(instance::GtkPlugAccessible)
         ret = ccall(("gtk_plug_accessible_get_id", libgtk3), Cstring, (Ptr{GObject},), instance)
         ret2 = if ret == C_NULL
@@ -4371,19 +4353,6 @@ $(Expr(:toplevel, quote
     function set_mode(instance::GtkSizeGroup, _mode)
         ret = ccall(("gtk_size_group_set_mode", libgtk3), Nothing, (Ptr{GObject}, Int32), instance, _mode)
         nothing
-    end
-    function get_id(instance::GtkSocket)
-        ret = ccall(("gtk_socket_get_id", libgtk3), UInt64, (Ptr{GObject},), instance)
-        ret
-    end
-    function get_plug_window(instance::GtkSocket)
-        ret = ccall(("gtk_socket_get_plug_window", libgtk3), Ptr{GObject}, (Ptr{GObject},), instance)
-        ret2 = if ret == C_NULL
-                nothing
-            else
-                convert(GdkWindow, ret, false)
-            end
-        ret2
     end
     function get_adjustment(instance::GtkSpinButton)
         ret = ccall(("gtk_spin_button_get_adjustment", libgtk3), Ptr{GObject}, (Ptr{GObject},), instance)

@@ -12,6 +12,9 @@ for o in GI.get_all(gtk3,GI.GIObjectInfo)
     if GI.get_name(o)===:Gesture || GI.get_name(o)===:GestureSingle || GI.get_name(o)===:IMContext  # avoid problematic arguments
         continue
     end
+    if GI.get_name(o)===:Plug || GI.get_name(o)===:Socket
+        continue
+    end
     for m in GI.get_methods(o)
         if GI.is_deprecated(m)
             continue
