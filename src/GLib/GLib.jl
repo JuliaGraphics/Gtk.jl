@@ -30,7 +30,7 @@ export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export Maybe
 export g_timeout_add, g_idle_add, @idle_add
-export set_gtk_property!, get_gtk_property
+export set_gtk_property!, get_gtk_property, FieldRef
 export GConnectFlags
 export @sigatom, cfunction_
 

@@ -399,7 +399,7 @@ function search(buffer::GtkTextBuffer, str::AbstractString, direction = :forward
 
     start = mutable(GtkTextIter(buffer))
     stop  = mutable(GtkTextIter(buffer))
-    iter  = mutable(GtkTextIter(buffer, buffer.cursor_position[Int]))
+    iter  = mutable(GtkTextIter(buffer, buffer.props.cursor_position))
 
     if direction == :forward
         limit = mutable(GtkTextIter(buffer, length(buffer)+1))
@@ -724,7 +724,7 @@ end
 Implements `gtk_text_view_get_iter_at_position`.
 """
 function text_iter_at_position(view::GtkTextView, x::Integer, y::Integer)
-    buffer = view.buffer[GtkTextBuffer]
+    buffer = view.props.buffer
     iter = mutable(GtkTextIter(buffer))
     text_iter_at_position(view, iter, C_NULL, Int32(x), Int32(y))
     return GtkTextIter(buffer, char_offset(iter))
@@ -739,8 +739,8 @@ text_iter_at_position(view::GtkTextView, iter::Mutable{GtkTextIter}, trailing, x
 function cursor_locations(view::GtkTextView)
     weak = Gtk.mutable(GdkRectangle)
     strong = Gtk.mutable(GdkRectangle)
-    buffer = view.buffer[GtkTextBuffer]
-    iter = mutable(GtkTextIter(buffer, buffer.cursor_position[Int]))
+    buffer = view.props.buffer
+    iter = mutable(GtkTextIter(buffer, buffer.props.cursor_position))
 
     ccall(
         (:gtk_text_view_get_cursor_locations, libgtk), Cvoid,
