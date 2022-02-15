@@ -7,8 +7,6 @@
 #GtkLayout — Infinite scrollable area containing child widgets at (x, y) locations
 #GtkNotebook — A tabbed notebook container
 #GtkExpander — A container which can hide its child
-
-# Introduced in Gtk3
 #GtkGrid — Pack widgets in a rows and columns
 #GtkRevealer — Hide and show with animation
 #GtkListBox — A list container
@@ -72,10 +70,7 @@ function insert!(grid::GtkGrid, sibling, side::Symbol)
     ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, pos)
 end
 
-if libgtk_version >= v"3.16.0"
-    ### GtkGLArea was introduced inside Gtk3.16.0 (earlier it existed as a separate library)
-    GtkGLAreaLeaf() = GtkGLAreaLeaf(ccall((:gtk_gl_area_new, libgtk), Ptr{GObject}, ()))
-end
+GtkGLAreaLeaf() = GtkGLAreaLeaf(ccall((:gtk_gl_area_new, libgtk), Ptr{GObject}, ()))
 
 ### GtkTable was deprecated in Gtk3 (replaced by GtkGrid)
 GtkTableLeaf(x::Integer, y::Integer, homogeneous::Bool = false) = GtkTableLeaf(ccall((:gtk_table_new, libgtk), Ptr{GObject}, (Cint, Cint, Cint), x, y, homogeneous))

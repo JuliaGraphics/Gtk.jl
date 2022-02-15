@@ -1,0 +1,20 @@
+quote
+$(Expr(:toplevel, quote
+    @Gtype GBinding libgobject g_binding
+    @Giface GTypePlugin libgobject g_type_plugin
+    @Gtype GApplication libgio g_application
+    @Gtype GCancellable libgio g_cancellable
+    @Gtype GMenu libgio g_menu
+    @Gtype GMenuModel libgio g_menu_model
+    @Gtype GNotification libgio g_notification
+    @Gtype GPermission libgio g_permission
+    @Gtype GPropertyAction libgio g_property_action
+    @Gtype GSimpleAction libgio g_simple_action
+    @Gtype GSimpleActionGroup libgio g_simple_action_group
+    @Giface GActionGroup libgio g_action_group
+    @Giface GAsyncResult libgio g_async_result
+    @Giface GFile libgio g_file
+    @Giface GIcon libgio g_icon
+    export GBinding, GTypePlugin, GApplication, GCancellable, GMenu, GMenuModel, GNotification, GPermission, GPropertyAction, GSimpleAction, GSimpleActionGroup, GActionGroup, GAsyncResult, GFile, GIcon
+end))
+end

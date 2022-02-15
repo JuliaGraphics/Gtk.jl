@@ -92,7 +92,6 @@ length(list::LList{L}) where {L <: _GSList} = Int(ccall((:g_slist_length, libgli
 length(list::LList{L}) where {L <: _GList} = Int(ccall((:g_list_length, libglib), Cuint, (Ptr{L},), list))
 copy(list::GList{L}) where {L <: _GSList} = typeof(list)(ccall((:g_slist_copy, libglib), Ptr{L}, (Ptr{L},), list), false)
 copy(list::GList{L}) where {L <: _GList} = typeof(list)(ccall((:g_list_copy, libglib), Ptr{L}, (Ptr{L},), list), false)
-check_undefref(p::Ptr) = (p == C_NULL ? error(UndefRefError()) : p)
 nth_first(list::LList{L}) where {L <: _GSList} = unsafe_convert(Ptr{L}, list)
 nth_first(list::LList{L}) where {L <: _GList} =
     check_undefref(ccall((:g_list_first, libglib), Ptr{L}, (Ptr{L},), list))

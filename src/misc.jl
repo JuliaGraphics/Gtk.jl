@@ -12,5 +12,4 @@
 #GtkAccessible — Accessibility support for widgets
 
 #GtkEventBox — A widget used to catch events for widgets which do not have their own window
-Gtk.@gtktype GtkEventBox
 GtkEventBoxLeaf() =  GtkEventBoxLeaf(ccall((:gtk_event_box_new ,libgtk), Ptr{GObject},	()))

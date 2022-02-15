@@ -6,6 +6,7 @@ struct GValue
     field3::UInt64
     GValue() = new(0, 0, 0)
 end
+
 const GV = Union{Mutable{GValue}, Ptr{GValue}}
 Base.zero(::Type{GValue}) = GValue()
 function gvalue(::Type{T}) where T
@@ -84,6 +85,9 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, cm::Module, allow_reve
         Core.eval(cm, quote
             function Base.getindex(v::GLib.GV, ::Type{T}) where T <: $pass_x
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
+                if x == C_NULL
+                    return nothing
+                end
                 $(  if to_gtype == :string
                         :(x = GLib.bytestring(x))
                     elseif pass_x == Symbol
@@ -97,7 +101,8 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, cm::Module, allow_reve
         fn = Core.eval(cm, quote
             function(v::GLib.GV)
                 x = ccall(($(string("g_value_get_", to_gtype)), GLib.libgobject), $as_ctype, (Ptr{GLib.GValue},), v)
-                $(if to_gtype == :string; :(x = GLib.bytestring(x)) end)
+                $(if to_gtype == :string; :(x == C_NULL && return nothing; x = GLib.bytestring(x)) end)
+                $(if to_gtype == :object; :(x == C_NULL && return nothing) end)
                 $(if pass_x !== Union{}
                     :(return Base.convert($pass_x, x))
                 else
@@ -122,6 +127,7 @@ function make_gvalue_from_fundamental_type(i,cm)
 end
 
 const gvalue_types = Any[]
+const gboxed_types = Any[]
 const fundamental_fns = tuple(Function[ make_gvalue_from_fundamental_type(i, @__MODULE__) for
                               i in 1:length(fundamental_types)]...)
 @make_gvalue(Symbol, Ptr{UInt8}, :static_string, :(g_type(AbstractString)), false)
@@ -142,7 +148,13 @@ function getindex(gv::GV, ::Type{Any})
             return fundamental_fns[i](gv)
         end
     end
-    # second pass: user defined (sub)types
+    # second pass: GBoxed types
+    for typ in gboxed_types
+        if gtyp == g_type(typ)
+            return getindex(gv,typ)
+        end
+    end
+    # third pass: user defined (sub)types
     for (typ, typefn, getfn) in gvalue_types
         if g_isa(gtyp, typefn())
             return getfn(gv)
@@ -170,36 +182,83 @@ function get_gtk_property(w::GObject, name::String, ::Type{T}) where T
     return val
 end
 
+get_gtk_property(w::GObject, name::AbstractString) = get_gtk_property(w, String(name)::String)
+get_gtk_property(w::GObject, name::Symbol) = get_gtk_property(w, String(name))
+function get_gtk_property(w::GObject, name::String)
+    v = mutable(GValue())
+    p = ccall((:g_object_class_find_property, libgobject), Ptr{GParamSpec}, (Ptr{Nothing}, Ptr{UInt8}), G_OBJECT_GET_CLASS(w), name)
+    if p!=C_NULL
+        param = unsafe_load(p)
+        ccall((:g_value_init, libgobject), Nothing, (Ptr{GValue}, Csize_t), v, param.value_type)
+        ccall((:g_object_get_property, libgobject), Nothing,
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, v)
+        val = v[Any]
+        ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), v)
+        if (isa(val, GBoxed) || isa(val, GObject) || isa(val, GInterface)) && val.handle==C_NULL
+            return nothing
+        end
+        return val
+    end
+    error("No property by that name")
+end
+
 set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
 set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, String(name)::String, value)
 set_gtk_property!(w::GObject, name::Symbol, value) = set_gtk_property!(w::GObject, String(name), value)
 function set_gtk_property!(w::GObject, name::String, value)
+    if value!==nothing
+        gv=gvalue(value)
+    else
+        # need to get the type
+        gv = Ref(GValue())
+        ccall((:g_object_get_property, libgobject), Nothing,
+            (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, gv)
+            ccall((:g_value_reset, libgobject), Nothing, (Ptr{GValue},), gv)
+    end
     ccall((:g_object_set_property, libgobject), Nothing,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, gvalue(value))
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, gv)
 
     w
 end
 
-struct FieldRef{T}
-    obj::T
-    field::Symbol
-
-    global function getproperty(obj::T, field::Symbol) where {T <: GObject}
-        isdefined(obj, field) && return getfield(obj, field)
-        new{T}(obj, field)
+function gtk_propertynames(w::GObject)
+    n = Ref{Cuint}()
+    props = ccall((:g_object_class_list_properties, libgobject), Ptr{Ptr{GParamSpec}},
+        (Ptr{Nothing}, Ptr{Cuint}), G_OBJECT_GET_CLASS(w), n)
+    names=Symbol[]
+    for i = 1:n[]
+        param = unsafe_load(unsafe_load(props, i))
+        name=Symbol(replace(bytestring(param.name),"-"=>"_"))
+        push!(names,name)
     end
-
-    FieldRef(obj::T, field::Symbol) where T = new{T}(obj, field)
+    g_free(props)
+    names
 end
 
-getindex(f::FieldRef, ::Type{T}) where {T} = get_gtk_property(f.obj, f.field,T)
+propertynames(w::GObject) = ((:props,)...,fieldnames(typeof(w))...)
 
-function setindex!(f::FieldRef, value::T, ::Type{T}) where {T}
-    isdefined(f.obj,f.field) && return setfield!(f.obj, f.field, value)
-    set_gtk_property!(f.obj, f.field, value)
-    return f
+struct Props
+    obj::GObject
 end
-setindex!(f::FieldRef, value::K, ::Type{T}) where {K, T} = setindex!(f, convert(T,value), T)
+
+function getproperty(obj::GObject, field::Symbol)
+    isdefined(obj, field) && return getfield(obj, field)
+    if field === :props
+        return Props(obj)
+    end
+end
+
+function getproperty(p::Props, field::Symbol)
+    isdefined(p, field) && return getfield(p, field)
+    get_gtk_property(p.obj,field)
+end
+
+function setproperty!(p::Props, field::Symbol, val)
+    set_gtk_property!(p.obj,field,val)
+end
+
+# Alas: https://discourse.julialang.org/t/foo-bar-tab-completion-not-working/61052
+propertynames(p::Props) = gtk_propertynames(p.obj)
 
 function show(io::IO, w::GObject)
     READABLE   = 0x00000001
@@ -237,6 +296,7 @@ function show(io::IO, w::GObject)
             end
         end
     end
+    g_free(props)
     print(io, ')')
     ccall((:g_value_unset, libgobject), Ptr{Nothing}, (Ptr{GValue},), v)
 end

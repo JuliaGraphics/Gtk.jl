@@ -18,20 +18,23 @@ import Base: convert, copy, show, size, length, getindex, setindex!, get,
              iterate, eltype, isempty, ndims, stride, strides, popfirst!,
              empty!, append!, reverse!, pushfirst!, pop!, push!, splice!, insert!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
-             getindex, setindex!
+             getindex, setindex!, setproperty!, propertynames
 
 using Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export GEnum, GError, GValue, gvalue, make_gvalue, @make_gvalue, g_type
+export GHashTable, GByteArray, GArray, GPtrArray, GVariant, GParamSpec
 export GList, GSList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
+export Maybe
 export g_timeout_add, g_idle_add, @idle_add
 export set_gtk_property!, get_gtk_property
 export GConnectFlags
 export @sigatom, cfunction_
 
+Maybe(T) = Union{T,Nothing}
 
 cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
 
@@ -47,16 +50,49 @@ const gtk_eventloop_f = Ref{Function}()
 const  AbstractStringLike = Union{AbstractString, Symbol}
 bytestring(s) = String(s)
 bytestring(s::Symbol) = s
-bytestring(s::Ptr{UInt8}) = unsafe_string(s)
-# bytestring(s::Ptr{UInt8}, own::Bool=false) = unsafe_string(s)
+function bytestring(s::Union{Cstring,Ptr{UInt8}}, own::Bool=false)
+    str=unsafe_string(s)
+    if own
+        g_free(s)
+    end
+    str
+end
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
 g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
+g_free(p::Cstring) = ccall((:g_free, libglib), Nothing, (Cstring,), p)
+g_strfreev(p) = ccall((:g_strfreev, libglib), Nothing, (Ptr{Ptr{Nothing}},), p)
+
+# find the length of a zero-terminated array
+function length_zt(arr::Ptr)
+    if arr==C_NULL
+        return 0
+    end
+    i=1
+    while unsafe_load(arr,i)!=C_NULL
+        i+=1
+    end
+    i-1
+end
+
+function check_undefref(p::Ptr)
+    if p == C_NULL
+        throw(UndefRefError())
+    end
+    p
+end
 
 include("MutableTypes.jl")
 using .MutableTypes
 include("glist.jl")
 include("gtype.jl")
+#include("hashtable.jl")
+#include("arrays.jl")
+include("variant.jl")
+
+const suffix = "Leaf"
+eval(include("../../gen/glib_structs"))
+
 include("gvalues.jl")
 include("gerror.jl")
 include("signals.jl")
@@ -78,9 +114,7 @@ macro g_type_delegate(eq)
     end
 end
 
-if Base.VERSION >= v"1.4.2"
-    precompile(Tuple{typeof(addref),Any})   # time: 0.003988418
-    # precompile(Tuple{typeof(gc_ref),Any})   # time: 0.002649791
-end
+precompile(Tuple{typeof(addref),Any})   # time: 0.003988418
+# precompile(Tuple{typeof(gc_ref),Any})   # time: 0.002649791
 
 end

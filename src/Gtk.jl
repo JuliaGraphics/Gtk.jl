@@ -7,6 +7,7 @@ end
 
 # Import binary definitions
 using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
+using Pango_jll
 using Librsvg_jll
 using JLLWrappers
 using Pkg.Artifacts
@@ -19,7 +20,7 @@ const suffix = :Leaf
 include("GLib/GLib.jl")
 using .GLib
 using .GLib.MutableTypes
-import .GLib: set_gtk_property!, get_gtk_property, getproperty, FieldRef
+import .GLib: set_gtk_property!, get_gtk_property, getproperty, setproperty!
 import .GLib:
     signal_connect, signal_handler_disconnect,
     signal_handler_block, signal_handler_unblock, signal_handler_is_connected,
@@ -53,8 +54,8 @@ global const libgtk_version = VersionNumber(
       ccall((:gtk_get_minor_version, libgtk), Cint, ()),
       ccall((:gtk_get_micro_version, libgtk), Cint, ()))
 
+eval(include("../gen/gtk3_structs"))
 include("gdk.jl")
-include("interfaces.jl")
 include("boxes.jl")
 include("gtktypes.jl")
 include("base.jl")
@@ -244,6 +245,8 @@ let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
         map(eval, include(gboxcache).args)
         constcache = joinpath(cachedir, "gconsts$(libgtk_version.major)")
         map(eval, include(constcache).args)
+        getset = joinpath(cachedir, "gtk3_methods")
+        map(eval, include(getset).args)
     end
 end
 const _ = GAccessor
@@ -252,10 +255,8 @@ using .GConstants
 include("windows.jl")
 include("gl_area.jl")
 
-if Base.VERSION >= v"1.4.2"
-    include("precompile.jl")
-    _precompile_()
-end
+include("precompile.jl")
+_precompile_()
 
 # Alternative Interface (`using Gtk.ShortNames`)
 module ShortNames

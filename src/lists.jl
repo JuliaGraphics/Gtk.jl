@@ -79,17 +79,6 @@ Base.cconvert(::Type{Ref{GtkTreeIter}},x::Gtk.Mutable{GtkTreeIter}) = Ref(x[])
 #    indices::Ptr{Cint}
 # end
 
-mutable struct GtkTreePath <: GBoxed
-    handle::Ptr{GtkTreePath}
-    function GtkTreePath(pathIn::Ptr{GtkTreePath}, own::Bool = false)
-        x = new( own ? pathIn :
-            ccall((:gtk_tree_path_copy, Gtk.libgtk), Ptr{GtkTreePath}, (Ptr{GtkTreePath},), pathIn)
-        )
-        f = x::GtkTreePath -> ccall((:gtk_tree_path_free, libgtk), Nothing, (Ptr{GtkTreePath},), x.handle)
-        finalizer(f,x)
-        x
-    end
-end
 GtkTreePath() = GtkTreePath(ccall((:gtk_tree_path_new, libgtk), Ptr{GtkTreePath}, ()), true)
 copy(path::GtkTreePath) = GtkTreePath(path.handle)
 

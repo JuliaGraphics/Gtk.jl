@@ -102,17 +102,7 @@ GC.gc(); yield(); GC.gc()
 #@test w.value === nothing    ### fails inside @testset
 end
 
-@testset "get/set property" begin
-    w = Window("Window", 400, 300) |> showall
-    @test w.title[String] == "Window"
-    @test w.visible[Bool]
-    w.visible[Bool] = false
-    @test w.visible[Bool] == false
-    destroy(w)
-end
-
 @testset "change Window size" begin
-if  libgtk_version >= v"3.16.0"
   w = Window("Window", 400, 300)
   fullscreen(w)
   sleep(1)
@@ -127,7 +117,6 @@ if  libgtk_version >= v"3.16.0"
   sleep(1)
   @test !get_gtk_property(w, :is_maximized, Bool)
   destroy(w)
-end
 end
 
 @testset "Frame" begin
@@ -275,7 +264,7 @@ end
     insert!(grid,1,:top)
     insert!(grid,3,:bottom)
     insert!(grid,grid[1,2],:right)
-    libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
+    deleteat!(grid,1,:row)
     showall(w)
     empty!(grid)
     destroy(w)
@@ -386,11 +375,10 @@ r = RadioButtonGroup(choices,2)
 @test sum([get_gtk_property(b,:active,Bool) for b in r]) == 1
 itms = Vector{Any}(undef,length(r))
 for (i,e) in enumerate(r)
-    itms[i] = try
-            get_gtk_property(e,:label,AbstractString)
-        catch
-            e[1]
-        end
+    itms[i] = get_gtk_property(e,:label)
+    if itms[i]===nothing
+        itms[i]=e[1]
+    end
 end
 @test setdiff(choices, itms) == [choices[4],]
 @test setdiff(itms, choices) == ["choice four",]
@@ -907,10 +895,10 @@ showall(w)
 w.testfield = "setproperty!"
 @test w.testfield == "setproperty!"
 
-@test w.title[String] == "MyWindow"
-w.title[String] = "setindex!"
-@test w.title[String] == "setindex!"
-@test typeof(w.title) <: Gtk.GLib.FieldRef
+@test w.props.title == "MyWindow"
+w.props.title = "setindex!"
+@test w.props.title == "setindex!"
+@test typeof(w.props) <: Gtk.GLib.Props
 
 destroy(w)
 

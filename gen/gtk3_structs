@@ -1,0 +1,623 @@
+quote
+$(Expr(:toplevel, quote
+    begin
+        gboxed_types = Any[]
+    end
+    @Gtype PangoContext libpango pango_context
+    @Gtype PangoCoverage libpango pango_coverage
+    @Gtype PangoFont libpango pango_font
+    @Gtype PangoFontFace libpango pango_font_face
+    @Gtype PangoFontFamily libpango pango_font_family
+    @Gtype PangoFontMap libpango pango_font_map
+    @Gtype PangoFontset libpango pango_fontset
+    @Gtype PangoFontsetSimple libpango pango_fontset_simple
+    @Gtype PangoLayout libpango pango_layout
+    @Gtype PangoRenderer libpango pango_renderer
+    mutable struct PangoAttrList <: GBoxed
+        handle::Ptr{PangoAttrList}
+        begin
+            (GLib.g_type(::Type{T}) where T <: PangoAttrList) = begin
+                    ccall(("pango_attr_list_get_type", libpango), GType, ())
+                end
+            function PangoAttrList(ref::Ptr{PangoAttrList}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, PangoAttrList)
+        end
+    end
+    mutable struct PangoFontDescription <: GBoxed
+        handle::Ptr{PangoFontDescription}
+        begin
+            (GLib.g_type(::Type{T}) where T <: PangoFontDescription) = begin
+                    ccall(("pango_font_description_get_type", libpango), GType, ())
+                end
+            function PangoFontDescription(ref::Ptr{PangoFontDescription}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, PangoFontDescription)
+        end
+    end
+    mutable struct PangoTabArray <: GBoxed
+        handle::Ptr{PangoTabArray}
+        begin
+            (GLib.g_type(::Type{T}) where T <: PangoTabArray) = begin
+                    ccall(("pango_tab_array_get_type", libpango), GType, ())
+                end
+            function PangoTabArray(ref::Ptr{PangoTabArray}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, PangoTabArray)
+        end
+    end
+    @Gtype GdkPixbuf libgdkpixbuf gdk_pixbuf
+    @Gtype GdkPixbufAnimation libgdkpixbuf gdk_pixbuf_animation
+    @Gtype GdkPixbufAnimationIter libgdkpixbuf gdk_pixbuf_animation_iter
+    @Gtype GdkPixbufLoader libgdkpixbuf gdk_pixbuf_loader
+    @Gtype GdkPixbufNonAnim libgdkpixbuf gdk_pixbuf_non_anim
+    @Gtype GdkPixbufSimpleAnim libgdkpixbuf gdk_pixbuf_simple_anim
+    @Gtype GdkPixbufSimpleAnimIter libgdkpixbuf gdk_pixbuf_simple_anim_iter
+    @Gtype GdkDevice libgdk3 gdk_device
+    @Gtype GdkDisplay libgdk3 gdk_display
+    @Gtype GdkFrameClock libgdk3 gdk_frame_clock
+    @Gtype GdkMonitor libgdk3 gdk_monitor
+    @Gtype GdkScreen libgdk3 gdk_screen
+    @Gtype GdkVisual libgdk3 gdk_visual
+    @Gtype GdkWindow libgdk3 gdk_window
+    @Gtype GtkAboutDialog libgtk3 gtk_about_dialog
+    @Gtype GtkAccelGroup libgtk3 gtk_accel_group
+    @Gtype GtkAccelLabel libgtk3 gtk_accel_label
+    @Gtype GtkAccelMap libgtk3 gtk_accel_map
+    @Gtype GtkAccessible libgtk3 gtk_accessible
+    @Gtype GtkAction libgtk3 gtk_action
+    @Gtype GtkActionBar libgtk3 gtk_action_bar
+    @Gtype GtkActionGroup libgtk3 gtk_action_group
+    @Gtype GtkAdjustment libgtk3 gtk_adjustment
+    @Gtype GtkAlignment libgtk3 gtk_alignment
+    @Gtype GtkAppChooserButton libgtk3 gtk_app_chooser_button
+    @Gtype GtkAppChooserDialog libgtk3 gtk_app_chooser_dialog
+    @Gtype GtkAppChooserWidget libgtk3 gtk_app_chooser_widget
+    @Gtype GtkApplication libgtk3 gtk_application
+    @Gtype GtkApplicationWindow libgtk3 gtk_application_window
+    @Gtype GtkArrow libgtk3 gtk_arrow
+    @Gtype GtkArrowAccessible libgtk3 gtk_arrow_accessible
+    @Gtype GtkAspectFrame libgtk3 gtk_aspect_frame
+    @Gtype GtkAssistant libgtk3 gtk_assistant
+    @Gtype GtkBin libgtk3 gtk_bin
+    @Gtype GtkBooleanCellAccessible libgtk3 gtk_boolean_cell_accessible
+    @Gtype GtkBox libgtk3 gtk_box
+    @Gtype GtkBuilder libgtk3 gtk_builder
+    @Gtype GtkButton libgtk3 gtk_button
+    @Gtype GtkButtonAccessible libgtk3 gtk_button_accessible
+    @Gtype GtkButtonBox libgtk3 gtk_button_box
+    @Gtype GtkCalendar libgtk3 gtk_calendar
+    @Gtype GtkCellAccessible libgtk3 gtk_cell_accessible
+    @Gtype GtkCellArea libgtk3 gtk_cell_area
+    @Gtype GtkCellAreaBox libgtk3 gtk_cell_area_box
+    @Gtype GtkCellAreaContext libgtk3 gtk_cell_area_context
+    @Gtype GtkCellRenderer libgtk3 gtk_cell_renderer
+    @Gtype GtkCellRendererAccel libgtk3 gtk_cell_renderer_accel
+    @Gtype GtkCellRendererCombo libgtk3 gtk_cell_renderer_combo
+    @Gtype GtkCellRendererPixbuf libgtk3 gtk_cell_renderer_pixbuf
+    @Gtype GtkCellRendererProgress libgtk3 gtk_cell_renderer_progress
+    @Gtype GtkCellRendererSpin libgtk3 gtk_cell_renderer_spin
+    @Gtype GtkCellRendererSpinner libgtk3 gtk_cell_renderer_spinner
+    @Gtype GtkCellRendererText libgtk3 gtk_cell_renderer_text
+    @Gtype GtkCellRendererToggle libgtk3 gtk_cell_renderer_toggle
+    @Gtype GtkCellView libgtk3 gtk_cell_view
+    @Gtype GtkCheckButton libgtk3 gtk_check_button
+    @Gtype GtkCheckMenuItem libgtk3 gtk_check_menu_item
+    @Gtype GtkCheckMenuItemAccessible libgtk3 gtk_check_menu_item_accessible
+    @Gtype GtkClipboard libgtk3 gtk_clipboard
+    @Gtype GtkColorButton libgtk3 gtk_color_button
+    @Gtype GtkColorChooserDialog libgtk3 gtk_color_chooser_dialog
+    @Gtype GtkColorChooserWidget libgtk3 gtk_color_chooser_widget
+    @Gtype GtkColorSelection libgtk3 gtk_color_selection
+    @Gtype GtkColorSelectionDialog libgtk3 gtk_color_selection_dialog
+    @Gtype GtkComboBox libgtk3 gtk_combo_box
+    @Gtype GtkComboBoxAccessible libgtk3 gtk_combo_box_accessible
+    @Gtype GtkComboBoxText libgtk3 gtk_combo_box_text
+    @Gtype GtkContainer libgtk3 gtk_container
+    @Gtype GtkContainerAccessible libgtk3 gtk_container_accessible
+    @Gtype GtkContainerCellAccessible libgtk3 gtk_container_cell_accessible
+    @Gtype GtkCssProvider libgtk3 gtk_css_provider
+    @Gtype GtkDialog libgtk3 gtk_dialog
+    @Gtype GtkDrawingArea libgtk3 gtk_drawing_area
+    @Gtype GtkEntry libgtk3 gtk_entry
+    @Gtype GtkEntryAccessible libgtk3 gtk_entry_accessible
+    @Gtype GtkEntryBuffer libgtk3 gtk_entry_buffer
+    @Gtype GtkEntryCompletion libgtk3 gtk_entry_completion
+    @Gtype GtkEntryIconAccessible libgtk3 gtk_entry_icon_accessible
+    @Gtype GtkEventBox libgtk3 gtk_event_box
+    @Gtype GtkEventController libgtk3 gtk_event_controller
+    @Gtype GtkEventControllerKey libgtk3 gtk_event_controller_key
+    @Gtype GtkEventControllerMotion libgtk3 gtk_event_controller_motion
+    @Gtype GtkEventControllerScroll libgtk3 gtk_event_controller_scroll
+    @Gtype GtkExpander libgtk3 gtk_expander
+    @Gtype GtkExpanderAccessible libgtk3 gtk_expander_accessible
+    @Gtype GtkFileChooserButton libgtk3 gtk_file_chooser_button
+    @Gtype GtkFileChooserDialog libgtk3 gtk_file_chooser_dialog
+    @Gtype GtkFileChooserNative libgtk3 gtk_file_chooser_native
+    @Gtype GtkFileChooserWidget libgtk3 gtk_file_chooser_widget
+    @Gtype GtkFileChooserWidgetAccessible libgtk3 gtk_file_chooser_widget_accessible
+    @Gtype GtkFileFilter libgtk3 gtk_file_filter
+    @Gtype GtkFixed libgtk3 gtk_fixed
+    @Gtype GtkFlowBox libgtk3 gtk_flow_box
+    @Gtype GtkFlowBoxAccessible libgtk3 gtk_flow_box_accessible
+    @Gtype GtkFlowBoxChild libgtk3 gtk_flow_box_child
+    @Gtype GtkFlowBoxChildAccessible libgtk3 gtk_flow_box_child_accessible
+    @Gtype GtkFontButton libgtk3 gtk_font_button
+    @Gtype GtkFontChooserDialog libgtk3 gtk_font_chooser_dialog
+    @Gtype GtkFontChooserWidget libgtk3 gtk_font_chooser_widget
+    @Gtype GtkFontSelection libgtk3 gtk_font_selection
+    @Gtype GtkFontSelectionDialog libgtk3 gtk_font_selection_dialog
+    @Gtype GtkFrame libgtk3 gtk_frame
+    @Gtype GtkFrameAccessible libgtk3 gtk_frame_accessible
+    @Gtype GtkGLArea libgtk3 gtk_gl_area
+    @Gtype GtkGesture libgtk3 gtk_gesture
+    @Gtype GtkGestureDrag libgtk3 gtk_gesture_drag
+    @Gtype GtkGestureLongPress libgtk3 gtk_gesture_long_press
+    @Gtype GtkGestureMultiPress libgtk3 gtk_gesture_multi_press
+    @Gtype GtkGesturePan libgtk3 gtk_gesture_pan
+    @Gtype GtkGestureRotate libgtk3 gtk_gesture_rotate
+    @Gtype GtkGestureSingle libgtk3 gtk_gesture_single
+    @Gtype GtkGestureStylus libgtk3 gtk_gesture_stylus
+    @Gtype GtkGestureSwipe libgtk3 gtk_gesture_swipe
+    @Gtype GtkGestureZoom libgtk3 gtk_gesture_zoom
+    @Gtype GtkGrid libgtk3 gtk_grid
+    @Gtype GtkHBox libgtk3 gtk_hbox
+    @Gtype GtkHButtonBox libgtk3 gtk_hbutton_box
+    @Gtype GtkHPaned libgtk3 gtk_hpaned
+    @Gtype GtkHSV libgtk3 gtk_hsv
+    @Gtype GtkHScale libgtk3 gtk_hscale
+    @Gtype GtkHScrollbar libgtk3 gtk_hscrollbar
+    @Gtype GtkHSeparator libgtk3 gtk_hseparator
+    @Gtype GtkHandleBox libgtk3 gtk_handle_box
+    @Gtype GtkHeaderBar libgtk3 gtk_header_bar
+    @Gtype GtkHeaderBarAccessible libgtk3 gtk_header_bar_accessible
+    @Gtype GtkIMContext libgtk3 gtk_im_context
+    @Gtype GtkIMContextSimple libgtk3 gtk_im_context_simple
+    @Gtype GtkIMMulticontext libgtk3 gtk_im_multicontext
+    @Gtype GtkIconFactory libgtk3 gtk_icon_factory
+    @Gtype GtkIconInfo libgtk3 gtk_icon_info
+    @Gtype GtkIconTheme libgtk3 gtk_icon_theme
+    @Gtype GtkIconView libgtk3 gtk_icon_view
+    @Gtype GtkIconViewAccessible libgtk3 gtk_icon_view_accessible
+    @Gtype GtkImage libgtk3 gtk_image
+    @Gtype GtkImageAccessible libgtk3 gtk_image_accessible
+    @Gtype GtkImageCellAccessible libgtk3 gtk_image_cell_accessible
+    @Gtype GtkImageMenuItem libgtk3 gtk_image_menu_item
+    @Gtype GtkInfoBar libgtk3 gtk_info_bar
+    @Gtype GtkInvisible libgtk3 gtk_invisible
+    @Gtype GtkLabel libgtk3 gtk_label
+    @Gtype GtkLabelAccessible libgtk3 gtk_label_accessible
+    @Gtype GtkLayout libgtk3 gtk_layout
+    @Gtype GtkLevelBar libgtk3 gtk_level_bar
+    @Gtype GtkLevelBarAccessible libgtk3 gtk_level_bar_accessible
+    @Gtype GtkLinkButton libgtk3 gtk_link_button
+    @Gtype GtkLinkButtonAccessible libgtk3 gtk_link_button_accessible
+    @Gtype GtkListBox libgtk3 gtk_list_box
+    @Gtype GtkListBoxAccessible libgtk3 gtk_list_box_accessible
+    @Gtype GtkListBoxRow libgtk3 gtk_list_box_row
+    @Gtype GtkListBoxRowAccessible libgtk3 gtk_list_box_row_accessible
+    @Gtype GtkListStore libgtk3 gtk_list_store
+    @Gtype GtkLockButton libgtk3 gtk_lock_button
+    @Gtype GtkLockButtonAccessible libgtk3 gtk_lock_button_accessible
+    @Gtype GtkMenu libgtk3 gtk_menu
+    @Gtype GtkMenuAccessible libgtk3 gtk_menu_accessible
+    @Gtype GtkMenuBar libgtk3 gtk_menu_bar
+    @Gtype GtkMenuButton libgtk3 gtk_menu_button
+    @Gtype GtkMenuButtonAccessible libgtk3 gtk_menu_button_accessible
+    @Gtype GtkMenuItem libgtk3 gtk_menu_item
+    @Gtype GtkMenuItemAccessible libgtk3 gtk_menu_item_accessible
+    @Gtype GtkMenuShell libgtk3 gtk_menu_shell
+    @Gtype GtkMenuShellAccessible libgtk3 gtk_menu_shell_accessible
+    @Gtype GtkMenuToolButton libgtk3 gtk_menu_tool_button
+    @Gtype GtkMessageDialog libgtk3 gtk_message_dialog
+    @Gtype GtkMisc libgtk3 gtk_misc
+    @Gtype GtkModelButton libgtk3 gtk_model_button
+    @Gtype GtkMountOperation libgtk3 gtk_mount_operation
+    @Gtype GtkNativeDialog libgtk3 gtk_native_dialog
+    @Gtype GtkNotebook libgtk3 gtk_notebook
+    @Gtype GtkNotebookAccessible libgtk3 gtk_notebook_accessible
+    @Gtype GtkNotebookPageAccessible libgtk3 gtk_notebook_page_accessible
+    @Gtype GtkNumerableIcon libgtk3 gtk_numerable_icon
+    @Gtype GtkOffscreenWindow libgtk3 gtk_offscreen_window
+    @Gtype GtkOverlay libgtk3 gtk_overlay
+    @Gtype GtkPadController libgtk3 gtk_pad_controller
+    @Gtype GtkPageSetup libgtk3 gtk_page_setup
+    @Gtype GtkPaned libgtk3 gtk_paned
+    @Gtype GtkPanedAccessible libgtk3 gtk_paned_accessible
+    @Gtype GtkPlacesSidebar libgtk3 gtk_places_sidebar
+    @Gtype GtkPlug libgtk3 gtk_plug
+    @Gtype GtkPlugAccessible libgtk3 gtk_plug_accessible
+    @Gtype GtkPopover libgtk3 gtk_popover
+    @Gtype GtkPopoverAccessible libgtk3 gtk_popover_accessible
+    @Gtype GtkPopoverMenu libgtk3 gtk_popover_menu
+    @Gtype GtkPrintContext libgtk3 gtk_print_context
+    @Gtype GtkPrintOperation libgtk3 gtk_print_operation
+    @Gtype GtkPrintSettings libgtk3 gtk_print_settings
+    @Gtype GtkProgressBar libgtk3 gtk_progress_bar
+    @Gtype GtkProgressBarAccessible libgtk3 gtk_progress_bar_accessible
+    @Gtype GtkRadioAction libgtk3 gtk_radio_action
+    @Gtype GtkRadioButton libgtk3 gtk_radio_button
+    @Gtype GtkRadioButtonAccessible libgtk3 gtk_radio_button_accessible
+    @Gtype GtkRadioMenuItem libgtk3 gtk_radio_menu_item
+    @Gtype GtkRadioMenuItemAccessible libgtk3 gtk_radio_menu_item_accessible
+    @Gtype GtkRadioToolButton libgtk3 gtk_radio_tool_button
+    @Gtype GtkRange libgtk3 gtk_range
+    @Gtype GtkRangeAccessible libgtk3 gtk_range_accessible
+    @Gtype GtkRcStyle libgtk3 gtk_rc_style
+    @Gtype GtkRecentAction libgtk3 gtk_recent_action
+    @Gtype GtkRecentChooserDialog libgtk3 gtk_recent_chooser_dialog
+    @Gtype GtkRecentChooserMenu libgtk3 gtk_recent_chooser_menu
+    @Gtype GtkRecentChooserWidget libgtk3 gtk_recent_chooser_widget
+    @Gtype GtkRecentFilter libgtk3 gtk_recent_filter
+    @Gtype GtkRecentManager libgtk3 gtk_recent_manager
+    @Gtype GtkRendererCellAccessible libgtk3 gtk_renderer_cell_accessible
+    @Gtype GtkRevealer libgtk3 gtk_revealer
+    @Gtype GtkScale libgtk3 gtk_scale
+    @Gtype GtkScaleAccessible libgtk3 gtk_scale_accessible
+    @Gtype GtkScaleButton libgtk3 gtk_scale_button
+    @Gtype GtkScaleButtonAccessible libgtk3 gtk_scale_button_accessible
+    @Gtype GtkScrollbar libgtk3 gtk_scrollbar
+    @Gtype GtkScrolledWindow libgtk3 gtk_scrolled_window
+    @Gtype GtkScrolledWindowAccessible libgtk3 gtk_scrolled_window_accessible
+    @Gtype GtkSearchBar libgtk3 gtk_search_bar
+    @Gtype GtkSearchEntry libgtk3 gtk_search_entry
+    @Gtype GtkSeparator libgtk3 gtk_separator
+    @Gtype GtkSeparatorMenuItem libgtk3 gtk_separator_menu_item
+    @Gtype GtkSeparatorToolItem libgtk3 gtk_separator_tool_item
+    @Gtype GtkSettings libgtk3 gtk_settings
+    @Gtype GtkShortcutLabel libgtk3 gtk_shortcut_label
+    @Gtype GtkShortcutsGroup libgtk3 gtk_shortcuts_group
+    @Gtype GtkShortcutsSection libgtk3 gtk_shortcuts_section
+    @Gtype GtkShortcutsShortcut libgtk3 gtk_shortcuts_shortcut
+    @Gtype GtkShortcutsWindow libgtk3 gtk_shortcuts_window
+    @Gtype GtkSizeGroup libgtk3 gtk_size_group
+    @Gtype GtkSocket libgtk3 gtk_socket
+    @Gtype GtkSocketAccessible libgtk3 gtk_socket_accessible
+    @Gtype GtkSpinButton libgtk3 gtk_spin_button
+    @Gtype GtkSpinButtonAccessible libgtk3 gtk_spin_button_accessible
+    @Gtype GtkSpinner libgtk3 gtk_spinner
+    @Gtype GtkSpinnerAccessible libgtk3 gtk_spinner_accessible
+    @Gtype GtkStack libgtk3 gtk_stack
+    @Gtype GtkStackAccessible libgtk3 gtk_stack_accessible
+    @Gtype GtkStackSidebar libgtk3 gtk_stack_sidebar
+    @Gtype GtkStackSwitcher libgtk3 gtk_stack_switcher
+    @Gtype GtkStatusIcon libgtk3 gtk_status_icon
+    @Gtype GtkStatusbar libgtk3 gtk_statusbar
+    @Gtype GtkStatusbarAccessible libgtk3 gtk_statusbar_accessible
+    @Gtype GtkStyle libgtk3 gtk_style
+    @Gtype GtkStyleContext libgtk3 gtk_style_context
+    @Gtype GtkStyleProperties libgtk3 gtk_style_properties
+    @Gtype GtkSwitch libgtk3 gtk_switch
+    @Gtype GtkSwitchAccessible libgtk3 gtk_switch_accessible
+    @Gtype GtkTable libgtk3 gtk_table
+    @Gtype GtkTearoffMenuItem libgtk3 gtk_tearoff_menu_item
+    @Gtype GtkTextBuffer libgtk3 gtk_text_buffer
+    @Gtype GtkTextCellAccessible libgtk3 gtk_text_cell_accessible
+    @Gtype GtkTextChildAnchor libgtk3 gtk_text_child_anchor
+    @Gtype GtkTextMark libgtk3 gtk_text_mark
+    @Gtype GtkTextTag libgtk3 gtk_text_tag
+    @Gtype GtkTextTagTable libgtk3 gtk_text_tag_table
+    @Gtype GtkTextView libgtk3 gtk_text_view
+    @Gtype GtkTextViewAccessible libgtk3 gtk_text_view_accessible
+    @Gtype GtkThemingEngine libgtk3 gtk_theming_engine
+    @Gtype GtkToggleAction libgtk3 gtk_toggle_action
+    @Gtype GtkToggleButton libgtk3 gtk_toggle_button
+    @Gtype GtkToggleButtonAccessible libgtk3 gtk_toggle_button_accessible
+    @Gtype GtkToggleToolButton libgtk3 gtk_toggle_tool_button
+    @Gtype GtkToolButton libgtk3 gtk_tool_button
+    @Gtype GtkToolItem libgtk3 gtk_tool_item
+    @Gtype GtkToolItemGroup libgtk3 gtk_tool_item_group
+    @Gtype GtkToolPalette libgtk3 gtk_tool_palette
+    @Gtype GtkToolbar libgtk3 gtk_toolbar
+    @Gtype GtkTooltip libgtk3 gtk_tooltip
+    @Gtype GtkToplevelAccessible libgtk3 gtk_toplevel_accessible
+    @Gtype GtkTreeModelFilter libgtk3 gtk_tree_model_filter
+    @Gtype GtkTreeModelSort libgtk3 gtk_tree_model_sort
+    @Gtype GtkTreeSelection libgtk3 gtk_tree_selection
+    @Gtype GtkTreeStore libgtk3 gtk_tree_store
+    @Gtype GtkTreeView libgtk3 gtk_tree_view
+    @Gtype GtkTreeViewAccessible libgtk3 gtk_tree_view_accessible
+    @Gtype GtkTreeViewColumn libgtk3 gtk_tree_view_column
+    @Gtype GtkUIManager libgtk3 gtk_ui_manager
+    @Gtype GtkVBox libgtk3 gtk_vbox
+    @Gtype GtkVButtonBox libgtk3 gtk_vbutton_box
+    @Gtype GtkVPaned libgtk3 gtk_vpaned
+    @Gtype GtkVScale libgtk3 gtk_vscale
+    @Gtype GtkVScrollbar libgtk3 gtk_vscrollbar
+    @Gtype GtkVSeparator libgtk3 gtk_vseparator
+    @Gtype GtkViewport libgtk3 gtk_viewport
+    @Gtype GtkVolumeButton libgtk3 gtk_volume_button
+    @Gtype GtkWidget libgtk3 gtk_widget
+    @Gtype GtkWidgetAccessible libgtk3 gtk_widget_accessible
+    @Gtype GtkWindow libgtk3 gtk_window
+    @Gtype GtkWindowAccessible libgtk3 gtk_window_accessible
+    @Gtype GtkWindowGroup libgtk3 gtk_window_group
+    @Giface GtkActionable libgtk3 gtk_actionable
+    @Giface GtkActivatable libgtk3 gtk_activatable
+    @Giface GtkAppChooser libgtk3 gtk_app_chooser
+    @Giface GtkBuildable libgtk3 gtk_buildable
+    @Giface GtkCellAccessibleParent libgtk3 gtk_cell_accessible_parent
+    @Giface GtkCellEditable libgtk3 gtk_cell_editable
+    @Giface GtkCellLayout libgtk3 gtk_cell_layout
+    @Giface GtkColorChooser libgtk3 gtk_color_chooser
+    @Giface GtkEditable libgtk3 gtk_editable
+    @Giface GtkFileChooser libgtk3 gtk_file_chooser
+    @Giface GtkFontChooser libgtk3 gtk_font_chooser
+    @Giface GtkOrientable libgtk3 gtk_orientable
+    @Giface GtkPrintOperationPreview libgtk3 gtk_print_operation_preview
+    @Giface GtkRecentChooser libgtk3 gtk_recent_chooser
+    @Giface GtkScrollable libgtk3 gtk_scrollable
+    @Giface GtkStyleProvider libgtk3 gtk_style_provider
+    @Giface GtkToolShell libgtk3 gtk_tool_shell
+    @Giface GtkTreeDragDest libgtk3 gtk_tree_drag_dest
+    @Giface GtkTreeDragSource libgtk3 gtk_tree_drag_source
+    @Giface GtkTreeModel libgtk3 gtk_tree_model
+    @Giface GtkTreeSortable libgtk3 gtk_tree_sortable
+    mutable struct GtkCssSection <: GBoxed
+        handle::Ptr{GtkCssSection}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkCssSection) = begin
+                    ccall(("gtk_css_section_get_type", libgtk3), GType, ())
+                end
+            function GtkCssSection(ref::Ptr{GtkCssSection}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkCssSection)
+        end
+    end
+    mutable struct GtkGradient <: GBoxed
+        handle::Ptr{GtkGradient}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkGradient) = begin
+                    ccall(("gtk_gradient_get_type", libgtk3), GType, ())
+                end
+            function GtkGradient(ref::Ptr{GtkGradient}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkGradient)
+        end
+    end
+    mutable struct GtkIconSet <: GBoxed
+        handle::Ptr{GtkIconSet}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkIconSet) = begin
+                    ccall(("gtk_icon_set_get_type", libgtk3), GType, ())
+                end
+            function GtkIconSet(ref::Ptr{GtkIconSet}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkIconSet)
+        end
+    end
+    mutable struct GtkIconSource <: GBoxed
+        handle::Ptr{GtkIconSource}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkIconSource) = begin
+                    ccall(("gtk_icon_source_get_type", libgtk3), GType, ())
+                end
+            function GtkIconSource(ref::Ptr{GtkIconSource}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkIconSource)
+        end
+    end
+    mutable struct GtkLabelSelectionInfo
+        handle::Ptr{GtkLabelSelectionInfo}
+    end
+    mutable struct GtkPaperSize <: GBoxed
+        handle::Ptr{GtkPaperSize}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkPaperSize) = begin
+                    ccall(("gtk_paper_size_get_type", libgtk3), GType, ())
+                end
+            function GtkPaperSize(ref::Ptr{GtkPaperSize}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkPaperSize)
+        end
+    end
+    mutable struct GtkRecentInfo <: GBoxed
+        handle::Ptr{GtkRecentInfo}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkRecentInfo) = begin
+                    ccall(("gtk_recent_info_get_type", libgtk3), GType, ())
+                end
+            function GtkRecentInfo(ref::Ptr{GtkRecentInfo}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkRecentInfo)
+        end
+    end
+    mutable struct GtkSelectionData <: GBoxed
+        handle::Ptr{GtkSelectionData}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkSelectionData) = begin
+                    ccall(("gtk_selection_data_get_type", libgtk3), GType, ())
+                end
+            function GtkSelectionData(ref::Ptr{GtkSelectionData}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkSelectionData)
+        end
+    end
+    mutable struct GtkSymbolicColor <: GBoxed
+        handle::Ptr{GtkSymbolicColor}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkSymbolicColor) = begin
+                    ccall(("gtk_symbolic_color_get_type", libgtk3), GType, ())
+                end
+            function GtkSymbolicColor(ref::Ptr{GtkSymbolicColor}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkSymbolicColor)
+        end
+    end
+    mutable struct GtkTargetList <: GBoxed
+        handle::Ptr{GtkTargetList}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkTargetList) = begin
+                    ccall(("gtk_target_list_get_type", libgtk3), GType, ())
+                end
+            function GtkTargetList(ref::Ptr{GtkTargetList}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkTargetList)
+        end
+    end
+    mutable struct GtkTextAttributes <: GBoxed
+        handle::Ptr{GtkTextAttributes}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkTextAttributes) = begin
+                    ccall(("gtk_text_attributes_get_type", libgtk3), GType, ())
+                end
+            function GtkTextAttributes(ref::Ptr{GtkTextAttributes}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkTextAttributes)
+        end
+    end
+    mutable struct GtkTreePath <: GBoxed
+        handle::Ptr{GtkTreePath}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkTreePath) = begin
+                    ccall(("gtk_tree_path_get_type", libgtk3), GType, ())
+                end
+            function GtkTreePath(ref::Ptr{GtkTreePath}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkTreePath)
+        end
+    end
+    mutable struct GtkTreeRowReference <: GBoxed
+        handle::Ptr{GtkTreeRowReference}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkTreeRowReference) = begin
+                    ccall(("gtk_tree_row_reference_get_type", libgtk3), GType, ())
+                end
+            function GtkTreeRowReference(ref::Ptr{GtkTreeRowReference}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkTreeRowReference)
+        end
+    end
+    mutable struct GtkWidgetPath <: GBoxed
+        handle::Ptr{GtkWidgetPath}
+        begin
+            (GLib.g_type(::Type{T}) where T <: GtkWidgetPath) = begin
+                    ccall(("gtk_widget_path_get_type", libgtk3), GType, ())
+                end
+            function GtkWidgetPath(ref::Ptr{GtkWidgetPath}, own::Bool = false)
+                x = new(ref)
+                if own
+                    finalizer(x) do x
+                        GLib.delboxed(x)
+                    end
+                end
+                x
+            end
+            push!(gboxed_types, GtkWidgetPath)
+        end
+    end
+    mutable struct GtkWindowGeometryInfo
+        handle::Ptr{GtkWindowGeometryInfo}
+    end
+    begin
+        gboxed_cache_init() = begin
+                append!(GLib.gboxed_types, gboxed_types)
+            end
+    end
+end))
+end

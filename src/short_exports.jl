@@ -162,7 +162,6 @@ export G_, GObject,
     ColorChooserDialog,
     ColorButton
 
-const TypePlugin = GTypePlugin
 const Buildable = GtkBuildable
 const CellEditable = GtkCellEditable
 const CellLayout = GtkCellLayout
@@ -178,7 +177,6 @@ const TreeModel = GtkTreeModel
 const TreeSortable = GtkTreeSortable
 
 export
-    TypePlugin,
     Buildable,
     CellEditable,
     CellLayout,

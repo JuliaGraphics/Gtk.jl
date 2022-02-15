@@ -58,7 +58,10 @@ end
 
 G_TYPE_FROM_CLASS(w::Ptr{Nothing}) = unsafe_load(convert(Ptr{GType}, w))
 G_OBJECT_GET_CLASS(w::GObject) = G_OBJECT_GET_CLASS(w.handle)
-G_OBJECT_GET_CLASS(hnd::Ptr{GObject}) = unsafe_load(convert(Ptr{Ptr{Nothing}}, hnd))
+function G_OBJECT_GET_CLASS(hnd::Ptr{GObject})
+    hnd = check_undefref(hnd)
+    unsafe_load(convert(Ptr{Ptr{Nothing}}, hnd))
+end
 G_OBJECT_CLASS_TYPE(w) = G_TYPE_FROM_CLASS(G_OBJECT_GET_CLASS(w))
 
 g_isa(gtyp::GType, is_a_type::GType) = ccall((:g_type_is_a, libgobject), Cint, (GType, GType), gtyp, is_a_type) != 0
@@ -203,9 +206,14 @@ function get_type_decl(name, iname, gtyp, gtype_decl, cm)
         end
         mutable struct $ename <: $einame
             handle::Ptr{GObject}
-            function $ename(handle::Ptr{GObject})
+            function $ename(handle::Ptr{GObject},owns=false)
                 if handle == C_NULL
                     error($("Cannot construct $name with a NULL pointer"))
+                end
+                is_floating = (ccall(("g_object_is_floating", libgobject), Cint, (Ptr{GObject},), handle)!=0)
+                # TODO: there are some potential complications with floating references that should be looked into.
+                if !owns || is_floating # if owns is true then we already have a reference, but if it's floating we should sink it
+                    gc_ref_sink(handle)
                 end
                 return gobject_ref(new(handle))
             end
@@ -283,7 +291,7 @@ convert(::Type{T}, boxed::GBoxed) where {T <: GBoxed} = convert(T, boxed.handle)
 convert(::Type{GBoxed}, unbox::Ptr{GBoxed}) = GBoxedUnkown(unbox)
 convert(::Type{GBoxed}, unbox::Ptr{T}) where {T <: GBoxed} = GBoxedUnkown(unbox)
 convert(::Type{T}, unbox::Ptr{GBoxed}) where {T <: GBoxed} = convert(T, convert(Ptr{T}, unbox))
-convert(::Type{T}, unbox::Ptr{T}) where {T <: GBoxed} = T(unbox)
+convert(::Type{T}, unbox::Ptr{T}, owns=false) where {T <: GBoxed} = T(unbox, owns)
 
 cconvert(::Type{Ptr{GObject}}, @nospecialize(x::GObject)) = x
 
@@ -294,24 +302,32 @@ unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = getfield(w, :handle)
 
 # this method should be used by gtk methods returning widgets of unknown type
 # and/or that might have been wrapped by julia before,
-# instead of a direct call to the constructor
-convert(::Type{T}, w::Ptr{GObject}) where {T <: GObject} = convert_(T, convert(Ptr{T}, w)) # this definition must be first due to a 0.2 dispatch bug
-convert(::Type{T}, ptr::Ptr{T}) where T <: GObject = convert_(T, ptr)
+# instead of a direct call to the constructor. The argument owns should be set
+# to true when the method that produced the Ptr{GObject} transfers ownership to
+# the callee.
+convert(::Type{T}, w::Ptr{GObject}, owns=false) where {T <: GObject} = convert_(T, convert(Ptr{T}, w), owns) # this definition must be first due to a 0.2 dispatch bug
+convert(::Type{T}, ptr::Ptr{T}, owns=false) where T <: GObject = convert_(T, ptr, owns)
 
 # need to introduce convert_ since otherwise there was a StackOverFlow error
-function convert_(::Type{T}, ptr::Ptr{T}) where T <: GObject
+
+function convert_(::Type{T}, ptr::Ptr{T}, owns=false) where T <: GObject
     hnd = convert(Ptr{GObject}, ptr)
     if hnd == C_NULL
         throw(UndefRefError())
     end
+    # look for an existing wrapper we can re-use
     x = ccall((:g_object_get_qdata, libgobject), Ptr{GObject}, (Ptr{GObject}, UInt32), hnd, jlref_quark::UInt32)
     if x != C_NULL
+        if owns # we already had a reference so we should unreference the one we just received
+            gc_unref(hnd)
+        end
         return gobject_ref(unsafe_pointer_to_objref(x)::T)
     end
-    wrap_gobject(hnd)::T
+    # create a wrapper
+    wrap_gobject(hnd,owns)::T
 end
 
-function wrap_gobject(hnd::Ptr{GObject})
+function find_leaf_type(hnd::Ptr{GObject})
     gtyp = G_OBJECT_CLASS_TYPE(hnd)
     typname = g_type_name(gtyp)
     while !(typname in keys(gtype_wrappers))
@@ -319,8 +335,12 @@ function wrap_gobject(hnd::Ptr{GObject})
         @assert gtyp != 0
         typname = g_type_name(gtyp)
     end
-    T = gtype_wrappers[typname]
-    return T(hnd)
+    gtype_wrappers[typname]
+end
+
+function wrap_gobject(hnd::Ptr{GObject},owns=false)
+    T = find_leaf_type(hnd)
+    return T(hnd,owns)
 end
 
 eltype(::Type{_LList{T}}) where {T <: GObject} = T
@@ -374,6 +394,7 @@ gc_ref_closure(x::T) where {T} = (gc_ref(x), @cfunction(_gc_unref, Nothing, (Any
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
 gc_ref(x::Ptr{GObject}) = ccall((:g_object_ref, libgobject), Nothing, (Ptr{GObject},), x)
 gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Nothing, (Ptr{GObject},), x)
+gc_ref_sink(x::Ptr{GObject}) = ccall((:g_object_ref_sink, libgobject), Nothing, (Ptr{GObject},), x)
 
 const gc_preserve_glib = Dict{Union{WeakRef, GObject}, Bool}() # glib objects
 const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
@@ -414,7 +435,6 @@ function delref(@nospecialize(x::GObject))
 end
 function addref(@nospecialize(x::GObject))
     # internal helper function
-    ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
     finalizer(delref, x)
     delete!(gc_preserve_glib, x) # in v0.2, the WeakRef assignment below wouldn't update the key
     gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
@@ -465,7 +485,7 @@ function gc_unref_weak(x::GObject)
     # this strongly destroys and invalidates the object
     # it is intended to be called by GLib, not in user code function
     # note: this may be called multiple times by GLib
-    x.handle = C_NULL
+    x.handle = Ptr{GObject}(C_NULL)
     gc_preserve_glib_lock[] = true
     delete!(gc_preserve_glib, x)
     gc_preserve_glib_lock[] = false
@@ -502,4 +522,10 @@ function gobject_move_ref(new::GObject, old::GObject)
     gc_ref(new)
     gc_unref(h)
     new
+end
+
+function delboxed(x::GBoxed)
+    T=typeof(x)
+    gtype = g_type(T)
+    ccall((:g_boxed_free, libgobject), Nothing, (GType, Ptr{GBoxed},), gtype, x.handle)
 end
