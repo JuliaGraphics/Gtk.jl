@@ -38,6 +38,8 @@ destroy(win)
 
 @test isa(Gtk.GdkEventKey(), Gtk.GdkEventKey)
 
+if !Gtk.GLib.simple_loop[]
+
 @testset "Eventloop control" begin
     before = Gtk.auto_idle[]
 
@@ -62,6 +64,8 @@ destroy(win)
     @test Gtk.is_eventloop_running()
 
     Gtk.auto_idle[] = before
+end
+
 end
 
 end

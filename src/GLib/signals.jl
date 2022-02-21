@@ -400,8 +400,11 @@ macro idle_add(ex)
     end
 end
 
+const simple_loop = Ref{Bool}(false)
+
 const exiting = Ref(false)
 function __init__()
+    simple_loop[] = get(ENV, "GTK_SIMPLE_LOOP", "false") == "true"
     if isdefined(GLib, :__init__bindeps__)
         GLib.__init__bindeps__()
     end
@@ -410,6 +413,8 @@ function __init__()
     exiting[] = false
     atexit(() -> (exiting[] = true))
     __init__gtype__()
-    __init__gmainloop__()
+    if !simple_loop[]
+        __init__gmainloop__()
+    end
     nothing
 end

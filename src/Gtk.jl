@@ -174,6 +174,15 @@ function __init__()
     enable_eventloop(!auto_idle[])
 end
 
+function iteration(timer)
+    ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, false)
+end
+
+function glib_main_simple()
+    t=Timer(iteration,0.01;interval=0.005)
+    wait(t)
+end
+
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
 const gtk_main_running = Ref{Bool}(false)
 const quit_task = Ref{Task}()
@@ -184,6 +193,11 @@ const enable_eventloop_lock = Base.ReentrantLock()
 Set whether Gtk's event loop is running.
 """
 function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
+    if GLib.simple_loop[]
+        auto_idle[] = false
+        global glib_main_task = schedule(Task(glib_main_simple))
+        return
+    end
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
         isassigned(quit_task) && wait(quit_task[]) # prevents starting while the async is still stopping
         if b
@@ -214,6 +228,9 @@ pausing. Respects whether Gtk.jl is configured to allow auto-stopping of the
 eventloop, unless `force = true`.
 """
 function pause_eventloop(f; force = false)
+    if GLib.simple_loop[]  # should probably actually pause the loop here
+        return f()
+    end
     was_running = is_eventloop_running()
     (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
     try
