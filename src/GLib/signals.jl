@@ -404,7 +404,7 @@ const simple_loop = Ref{Bool}(false)
 
 const exiting = Ref(false)
 function __init__()
-    simple_loop[] = get(ENV, "GTK_SIMPLE_LOOP", "false") == "true"
+    simple_loop[] = get(ENV, "GTK_SIMPLE_LOOP", "true") == "true"
     if isdefined(GLib, :__init__bindeps__)
         GLib.__init__bindeps__()
     end
