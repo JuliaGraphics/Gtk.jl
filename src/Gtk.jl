@@ -174,12 +174,12 @@ function __init__()
     enable_eventloop(!auto_idle[])
 end
 
-function iteration(timer)
-    ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, false)
-end
+iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block)
+
+iterate(timer) = iteration(false)
 
 function glib_main_simple()
-    t=Timer(iteration,0.01;interval=0.005)
+    t=Timer(iterate,0.01;interval=0.005)
     wait(t)
 end
 

@@ -612,6 +612,9 @@ end
         set_coordinates(getgc(c), BoundingBox(0, 1, 0, 1))
     end
     Gtk.showall(win)
+    while ccall((:gtk_events_pending, Gtk.libgtk), Cint, ()) != 0  # next step requires a realized canvas
+        Gtk.iteration(true)
+    end
     sleep(0.5)
     mtrx = Gtk.Cairo.get_matrix(getgc(cnvs))
     @test mtrx.xx == 300
