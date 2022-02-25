@@ -248,14 +248,14 @@ function pause_eventloop(f; force = false)
         finally
             pause_loop[] = false
         end
-        return
-    end
-    was_running = is_eventloop_running()
-    (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
-    try
-        f()
-    finally
-        (force || auto_idle[]) && enable_eventloop(was_running)
+    else
+        was_running = is_eventloop_running()
+        (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
+        try
+            f()
+        finally
+            (force || auto_idle[]) && enable_eventloop(was_running)
+        end
     end
 end
 
