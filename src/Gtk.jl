@@ -177,6 +177,7 @@ end
 iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block)
 
 iterate(timer) = iteration(false)
+events_pending() = ccall((:gtk_events_pending, libgtk), Cint, ()) != 0
 
 function glib_main_simple()
     t=Timer(iterate,0.01;interval=0.005)
