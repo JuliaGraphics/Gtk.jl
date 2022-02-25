@@ -176,12 +176,19 @@ end
 
 iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block)
 
-iterate(timer) = iteration(false)
+const pause_loop = Ref{Bool}(false)
+
+function iterate(timer)
+    pause_loop[] || iteration(false)
+end
+
 events_pending() = ccall((:gtk_events_pending, libgtk), Cint, ()) != 0
 
+const mainloop_timer = Ref{Timer}()
+
 function glib_main_simple()
-    t=Timer(iterate,0.01;interval=0.005)
-    wait(t)
+    mainloop_timer[]=Timer(iterate,0.01;interval=0.005)
+    wait(mainloop_timer[])
 end
 
 const auto_idle = Ref{Bool}(true) # control default via ENV["GTK_AUTO_IDLE"]
@@ -195,9 +202,14 @@ Set whether Gtk's event loop is running.
 """
 function enable_eventloop(b::Bool = true; wait_stopped::Bool = false)
     if GLib.simple_loop[]
-        auto_idle[] = false
-        global glib_main_task = schedule(Task(glib_main_simple))
-        return
+        if b
+            auto_idle[] = false
+            global glib_main_task = schedule(Task(glib_main_simple))
+            return
+        else
+            close(mainloop_timer[])
+            return
+        end
     end
     lock(enable_eventloop_lock) do # handle widgets that are being shown/destroyed from different threads
         isassigned(quit_task) && wait(quit_task[]) # prevents starting while the async is still stopping
@@ -229,8 +241,14 @@ pausing. Respects whether Gtk.jl is configured to allow auto-stopping of the
 eventloop, unless `force = true`.
 """
 function pause_eventloop(f; force = false)
-    if GLib.simple_loop[]  # should probably actually pause the loop here
-        return f()
+    if GLib.simple_loop[]
+        pause_loop[] = true
+        try
+            f()
+        finally
+            pause_loop[] = false
+        end
+        return
     end
     was_running = is_eventloop_running()
     (force || auto_idle[]) && enable_eventloop(false, wait_stopped = true)
@@ -246,7 +264,13 @@ end
 
 Check whether Gtk's event loop is running.
 """
-is_eventloop_running() = gtk_main_running[]
+function is_eventloop_running()
+    if GLib.simple_loop[]
+        return !pause_loop[]
+    else
+        return gtk_main_running[]
+    end
+end
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")

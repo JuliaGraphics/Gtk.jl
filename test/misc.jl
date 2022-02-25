@@ -66,6 +66,18 @@ if !Gtk.GLib.simple_loop[]
     Gtk.auto_idle[] = before
 end
 
+else
+
+@testset "Eventloop control" begin
+    Gtk.enable_eventloop(true)
+    @test Gtk.is_eventloop_running()
+
+    Gtk.pause_eventloop() do
+        @test !Gtk.is_eventloop_running()
+    end
+    @test Gtk.is_eventloop_running()
+end
+
 end
 
 end
