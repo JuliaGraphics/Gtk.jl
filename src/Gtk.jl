@@ -178,9 +178,7 @@ iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (
 
 const pause_loop = Ref{Bool}(false)
 
-function iterate(timer)
-    pause_loop[] || iteration(false)
-end
+iterate(timer) = pause_loop[] || iteration(false)
 
 events_pending() = ccall((:gtk_events_pending, libgtk), Cint, ()) != 0
 
@@ -264,13 +262,7 @@ end
 
 Check whether Gtk's event loop is running.
 """
-function is_eventloop_running()
-    if GLib.simple_loop[]
-        return !pause_loop[]
-    else
-        return gtk_main_running[]
-    end
-end
+is_eventloop_running() = GLib.simple_loop[] ? !pause_loop[] : gtk_main_running[]
 
 const ser_version = Serialization.ser_version
 let cachedir = joinpath(splitdir(@__FILE__)[1], "..", "gen")
