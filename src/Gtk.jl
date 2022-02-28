@@ -77,6 +77,7 @@ include("gio.jl")
 include("application.jl")
 
 function __init__()
+    Sys.iswindows() && (ENV["GTK_CSD"] = 0)
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
     ENV["XDG_DATA_DIRS"] = join(filter(x -> x !== nothing, [
         dirname(adwaita_icons_dir),
