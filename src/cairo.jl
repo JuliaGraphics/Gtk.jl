@@ -115,7 +115,7 @@ function canvas_on_expose_event(::Ptr{GObject}, e::Ptr{Nothing}, widget::GtkCanv
 end
 
 function getgc(c::GtkCanvas)
-    while events_pending()  # next step requires a realized canvas
+    while GLib.simple_loop[] && events_pending()  # next step requires a realized canvas
         iteration(true)
     end
     if !isdefined(c,:backcc)

@@ -175,12 +175,27 @@ function __init__()
     enable_eventloop(!auto_idle[])
 end
 
-iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block)
+"""
+    Gtk.iteration(may_block)
+
+Run a single interation of the Gtk event loop. If `may_block` is true, this
+function will wait until events are ready to be processed. Otherwise, it will
+return immediately if no events need to be processed. Returns `true` if events
+were processed.
+"""
+iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block) != 0
 
 const pause_loop = Ref{Bool}(false)
 
 iterate(timer) = pause_loop[] || iteration(false)
 
+"""
+    Gtk.events_pending()
+
+Check whether events need processing by the Gtk's event loop. This function can
+be used in conjuction with `iterate` to refresh the GUI during long operations
+or in cases where widgets must be realized before proceeding.
+"""
 events_pending() = ccall((:gtk_events_pending, libgtk), Cint, ()) != 0
 
 const mainloop_timer = Ref{Timer}()
@@ -236,8 +251,8 @@ end
     Gtk.pause_eventloop(f; force = false)
 
 Pauses the eventloop around a function. Restores the state of the eventloop after
-pausing. Respects whether Gtk.jl is configured to allow auto-stopping of the
-eventloop, unless `force = true`.
+pausing. If GLib.simple_loop[] is disabled, respects whether Gtk.jl is configured
+to allow auto-stopping of the eventloop, unless `force = true`.
 """
 function pause_eventloop(f; force = false)
     if GLib.simple_loop[]
