@@ -357,7 +357,9 @@ function __init__gmainloop__()
     ccall((:g_source_set_callback, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{Nothing}, UInt, Ptr{Nothing}),
         src, @cfunction(g_yield, Cint, (UInt,)), 1, C_NULL)
 
-    uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
+    uv_fd = -1
+    # TODO: renable this after fixing integration with the default scheduler backend
+    # uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, 0x1)
     if (uv_pollfd::_GPollFD).fd != -1
         ccall((:g_source_add_poll, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{_GPollFD}), src, Ref(uv_pollfd::_GPollFD))
