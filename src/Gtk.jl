@@ -183,7 +183,11 @@ function will wait until events are ready to be processed. Otherwise, it will
 return immediately if no events need to be processed. Returns `true` if events
 were processed.
 """
-iteration(may_block::Bool) = ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block) != 0
+function iteration(may_block::Bool)
+    while events_pending()
+        ccall((:g_main_context_iteration, libglib), Cint, (Ptr{Cvoid}, Cint), C_NULL, may_block)
+    end
+end
 
 const pause_loop = Ref{Bool}(false)
 
