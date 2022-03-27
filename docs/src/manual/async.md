@@ -1,11 +1,14 @@
 # Asynchronous UI
 
-Here is an example of an asynchronous update of the user interface. Since
-Julia has currently no possibility of multithreading we use a second process
-to offload the work. The example is just a proof of principle.
+Here is an example of an asynchronous update of the user interface.
+Since Julia has currently no possibility of multithreading
+we use a second process to offload the work.
+The example is just a proof of principle.
 
 ```julia
-using Gtk
+using Gtk: GtkButton, GtkSpinner, GtkEntry, GtkGrid, GtkWindow
+using Gtk: start, stop, signal_connect, set_gtk_property!, showall, @sigatom
+using Distributed: addprocs, @fetchfrom
 
 btn = GtkButton("Start")
 sp = GtkSpinner()
@@ -20,13 +23,13 @@ id = addprocs(1)[1]
 
 signal_connect(btn, "clicked") do widget
  start(sp)
- @Gtk.sigatom begin
+ @sigatom begin
    @async begin
     s = @fetchfrom id begin
       sleep(4)
       return "I am back"
     end
-    @Gtk.sigatom begin
+    @sigatom begin
       stop(sp)
       set_gtk_property!(ent,:text,s)
     end
@@ -37,5 +40,3 @@ end
 win = GtkWindow(grid, "Progress Bar", 200, 200)
 showall(win)
 ```
-
-
