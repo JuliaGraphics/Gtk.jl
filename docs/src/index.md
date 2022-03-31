@@ -40,6 +40,13 @@ On very old Julia versions, you can use [PackageCompiler](https://github.com/Jul
 
   * See [Getting Started](@ref) for an introduction to using the package
 
+
+## Related packages
+
+* [Gizmos/GtkObservables](https://github.com/JuliaGizmos/GtkObservables.jl)
+  is designed to simplify the creation of GUIs using Gtk and Julia.
+
+
 ## Attribution
 
 Gtk logo is made by Andreas Nilsson [[GFDL](https://www.gnu.org/copyleft/fdl.html) or [CC-BY-SA-3.0](https://creativecommons.org/licenses/by-sa/3.0/)], via Wikimedia Commons
