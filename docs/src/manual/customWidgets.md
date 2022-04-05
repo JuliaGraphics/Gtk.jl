@@ -14,7 +14,7 @@ mutable struct MyButton <: Gtk.GtkButton
     other_fields
     function MyButton(label)
         btn = GtkButton(label)
-        return Gtk.gobject_move_ref(new(btn), btn)
+        return Gtk.gobject_move_ref(new(btn.handle), btn)
     end
 end
 ```
