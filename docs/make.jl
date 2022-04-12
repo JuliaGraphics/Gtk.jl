@@ -21,6 +21,7 @@ makedocs(
                      "manual/keyevents.md",
                      "manual/canvas.md",
                      "manual/customWidgets.md",
+                     "manual/slider.md",
                      "manual/async.md",
                      "manual/nonreplusage.md",
                      "manual/packages.md"
