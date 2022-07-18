@@ -187,7 +187,7 @@ signal_connect(selection, "changed") do widget
     currentIt = selected(selection)
 
     println("Name: ", GtkTreeModel(tmFiltered)[currentIt,1],
-            " Age: ", GtkTreeModel(tmFiltered)[currentIt,1])
+            " Age: ", GtkTreeModel(tmFiltered)[currentIt,2])
   end
 end
 
