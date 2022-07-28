@@ -77,6 +77,8 @@ include("gio.jl")
 include("application.jl")
 
 function __init__()
+    in(:Gtk4, names(Main, imported=true)) && error("Gtk is incompatible with Gtk4.")
+
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
     ENV["XDG_DATA_DIRS"] = join(filter(x -> x !== nothing, [
         dirname(adwaita_icons_dir),
