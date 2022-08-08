@@ -6,17 +6,16 @@ win = GtkWindow(&quot;Key Press Example&quot;)
 signal_connect(win, &quot;key-press-event&quot;) do widget, event
   k = event.keyval
   println(&quot;You pressed key &quot;, k, &quot; which is &#39;&quot;, Char(k), &quot;&#39;.&quot;)
-end</code></pre><p>You can then check if <code>event.keyval</code> has a certain value and invoke an action in that case.</p><h3 id="Key-release-events-1"><a class="docs-heading-anchor" href="#Key-release-events-1">Key release events</a><a class="docs-heading-anchor-permalink" href="#Key-release-events-1" title="Permalink"></a></h3><p>The following example captures the events for both a key press and a key release and reports the time duration between the two. There some state handling here because of the likely event that your keyboard is set to &quot;repeat&quot; a pressed key after some initial delay. This version reports the time elapsed between the <em>initial</em> key press and the key release.</p><pre><code class="language-julia">using Gtk
+end</code></pre><p>You can then check if <code>event.keyval</code> has a certain value and invoke an action in that case.</p><h3 id="Key-release-events-1"><a class="docs-heading-anchor" href="#Key-release-events-1">Key release events</a><a class="docs-heading-anchor-permalink" href="#Key-release-events-1" title="Permalink"></a></h3><p>The following example captures the events for both a key press and a key release and reports the time duration between the two. There some state handling here because of the likely event that your keyboard is set to &quot;repeat&quot; a pressed key after some initial delay and because it is possilbe to  press multiple keys at once. This version reports the time elapsed between the <em>initial</em> key press and the key release.</p><pre><code class="language-julia">using Gtk
 
-time0 = nothing
+const start_times = Dict{UInt32, UInt32}()
 
 w = GtkWindow(&quot;Key Press/Release Example&quot;)
 
 id1 = signal_connect(w, &quot;key-press-event&quot;) do widget, event
     k = event.keyval
-    global time0
-    if isnothing(time0)
-        time0 = event.time # archive the initial key press time
+    if k ∉ keys(start_times)
+        start_times[k] = event.time # save the initial key press time
         println(&quot;You pressed key &quot;, k, &quot; which is &#39;&quot;, Char(k), &quot;&#39;.&quot;)
     else
         println(&quot;repeating key &quot;, k)
@@ -25,7 +24,7 @@ end
 
 id2 = signal_connect(w, &quot;key-release-event&quot;) do widget, event
     k = event.keyval
-    duration = event.time - time0 # key press duration in msec
+    start_time = pop!(start_times, k) # remove the key from the dictionary
+    duration = event.time - start_time # key press duration in milliseconds
     println(&quot;You released key &quot;, k, &quot; after time &quot;, duration, &quot; msec.&quot;)
-    global time0 = nothing # revert to original state for next press
-end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../filedialogs/">« Dialogs</a><a class="docs-footer-nextpage" href="../canvas/">Drawing on Canvas »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 4 August 2022 08:03">Thursday 4 August 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../filedialogs/">« Dialogs</a><a class="docs-footer-nextpage" href="../canvas/">Drawing on Canvas »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 8 August 2022 20:47">Monday 8 August 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
