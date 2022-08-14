@@ -29,7 +29,7 @@ and reports the time duration between the two.
 There some state handling here
 because of the likely event
 that your keyboard is set to "repeat" a pressed key
-after some initial delay and because it is possilbe to 
+after some initial delay and because it is possible to
 press multiple keys at once.
 This version reports the time elapsed
 between the _initial_ key press and the key release.
