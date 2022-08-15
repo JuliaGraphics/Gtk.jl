@@ -2,7 +2,7 @@
 
 It is possible to perform background computation without interfering with user interface
 responsiveness either using multithreading or using separate processes. Use of a separate
-process includes slightly more overhead but also enusres user interface responsiveness more
+process includes slightly more overhead but also ensures user interface responsiveness more
 robustly.
 
 Here is an example using [threads](https://docs.julialang.org/en/v1/manual/multi-threading/).
