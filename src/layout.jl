@@ -53,17 +53,17 @@ function insert!(grid::GtkGrid, i::Integer, side::Symbol)
     elseif side == :bottom
         ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
     else
-        error(string("invalid GtkPositionType ", s))
+        error(string("Unknown side parameter $side: must be left, right, top or bottom "))
     end
 end
 
-function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
-    if side == :row
-        ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-    elseif side == :col
-        ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+function deleteat!(grid::GtkGrid, i::Integer, rowcol::Symbol)
+    if rowcol == :row
+        ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i-1)
+    elseif rowcol == :col
+        ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i-1)
     else
-        error(string("invalid GtkPositionType ", s))
+        error(string("rowcol must be row or col, got ", rowcol))
     end
 end
 

@@ -20,11 +20,15 @@ function Base.deleteat!(w::GtkContainer, iterator)
 end
 Base.firstindex(w::GtkContainer) = 1
 Base.lastindex(w::GtkContainer) = length(w)
-function empty!(w::GtkContainer)
-    for child in w
-        delete!(w, child)
-    end
-    w
+function _remove_widget(w, con)
+    ccall((:gtk_container_remove, Gtk.libgtk), Nothing, (Ref{GObject}, Ref{GtkWidget}), con, w)
+end
+
+function empty!(c::GtkContainer)
+    remove_widget_c = @cfunction(_remove_widget, Nothing, (Ptr{GtkWidget}, Ptr{GObject}))
+
+    ccall((:gtk_container_foreach, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{Cvoid}, Ptr{GObject}), c, remove_widget_c, c)
+    c
 end
 function append!(w::GtkContainer, children)
     for child in children
