@@ -28,6 +28,7 @@ function empty!(c::GtkContainer)
     remove_widget_c = @cfunction(_remove_widget, Nothing, (Ptr{GtkWidget}, Ptr{GObject}))
 
     ccall((:gtk_container_foreach, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{Cvoid}, Ptr{GObject}), c, remove_widget_c, c)
+    c
 end
 function append!(w::GtkContainer, children)
     for child in children
