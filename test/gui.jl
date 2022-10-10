@@ -131,11 +131,14 @@ end
 end
 
 @testset "Frame" begin
+fr=Frame()
 w = Window(
-    Frame(),
+    fr,
     "Frame", 400, 400)
 widgets=[f for f in w] # test iteration over GtkBin
 @test length(widgets)==1
+e=[c for c in fr] # test iteration over an empty GtkBin
+@test length(e)==0
 showall(w)
 destroy(w)
 end
@@ -179,6 +182,8 @@ showall(w)
 set_gtk_property!(nb,:page,2)
 @test get_gtk_property(nb,:page,Int) == 2
 showall(w)
+empty!(nb)
+@test length(nb) == 0
 destroy(w)
 end
 
@@ -242,6 +247,10 @@ set_gtk_property!(g2,:pack_type,b21,1) #GTK_PACK_END
 set_gtk_property!(g2,:pack_type,b22,1) #GTK_PACK_END
 @test get_gtk_property(g1,:pack_type, b11, Int) == 0
 
+@test length(g1)==2
+deleteat!(g1,1)
+@test length(g1)==1
+
 ## Now shrink window
 showall(w)
 destroy(w)
@@ -275,9 +284,12 @@ end
     insert!(grid,1,:top)
     insert!(grid,3,:bottom)
     insert!(grid,grid[1,2],:right)
+    @test_throws ErrorException insert!(grid,6,:above)
+    @test_throws ErrorException deleteat!(grid,6,:below)
     libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
     showall(w)
     empty!(grid)
+    @test length(grid)==0
     destroy(w)
 end
 
