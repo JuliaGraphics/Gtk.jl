@@ -205,11 +205,13 @@ getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store,
 function setindex!(store::GtkListStore, value, index::Int, column::Integer)
     setindex!(store, value, Gtk.iter_from_index(store, index), column)
 end
-setindex!(store::GtkListStore, value, index::Union{Int,CartesianIndex}, column::Union{Integer,CartesianIndex}) =
+setindex!(store::GtkListStore, value, index::Union{Int,CartesianIndex{1}}, column::Union{Integer,CartesianIndex{1}}) =
     setindex!(store, value, _integer(index), _integer(column))
+setindex!(store::GtkListStore, value, index::CartesianIndex{2}) =
+    setindex!(store, value, Tuple(index)...)
 
 _integer(i::Integer) = i
-_integer(i::CartesianIndex) = convert(Int, i)
+_integer(i::CartesianIndex{1}) = convert(Int, i)
 
 ### GtkTreeStore
 
