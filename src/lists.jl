@@ -194,6 +194,10 @@ function length(listStore::GtkListStore)
 end
 
 size(listStore::GtkListStore) = (length(listStore), ncolumns(GtkTreeModel(listStore)))
+Base.axes(listStore::GtkListStore) = Base.OneTo.(size(listStore))
+Base.axes(listStore::GtkListStore, d::Integer) = axes(listStore)[d]
+
+Base.keys(listStore::GtkListStore) = CartesianIndices(size(listStore))
 
 getindex(store::GtkListStore, row::Int, column) = getindex(store, iter_from_index(store, row), column)
 getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store, row))
@@ -201,6 +205,11 @@ getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store,
 function setindex!(store::GtkListStore, value, index::Int, column::Integer)
     setindex!(store, value, Gtk.iter_from_index(store, index), column)
 end
+setindex!(store::GtkListStore, value, index::Union{Int,CartesianIndex}, column::Union{Integer,CartesianIndex}) =
+    setindex!(store, value, _integer(index), _integer(column))
+
+_integer(i::Integer) = i
+_integer(i::CartesianIndex) = convert(Int, i)
 
 ### GtkTreeStore
 

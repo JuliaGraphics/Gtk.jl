@@ -1,4 +1,5 @@
 ## Tests
+using Test
 
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
@@ -195,6 +196,8 @@ push!(w, pw)
 push!(pw, Button("one"))
 push!(pw, pw2)
 @test pw[2]==pw2
+@test length(pw) == 2
+@test eachindex(pw) == 1:2
 pw2[1]=Button("two")
 pw2[2,true,false]=Button("three")
 showall(w)
@@ -207,6 +210,7 @@ l = Layout(600,600)
 push!(w,l)
 l[300,300]=Button("Button")
 s=size(l)
+@test s == (600, 600)
 @test width(l)==600
 @test height(l)==600
 showall(w)
@@ -224,6 +228,8 @@ g2 = Gtk.GtkBox(:h)
 push!(f,g1)
 push!(f,g2)
 @test f[1]==g1
+@test length(f) == 2
+@test eachindex(f) == 1:2
 
 b11 = Button("first")
 push!(g1, b11)
@@ -281,6 +287,7 @@ end
     grid[2,3] = Button("2,3")
     grid[1,1] = "grid"
     grid[3,1:3] = Button("Tall button")
+    @test_broken eachindex(grid) == CartesianIndices(size(grid))
     insert!(grid,1,:top)
     insert!(grid,3,:bottom)
     insert!(grid,grid[1,2],:right)
@@ -499,11 +506,13 @@ for c in choices
     push!(combo, c)
 end
 c = cells(CellLayout(combo))
+@test eachindex(c) == 1:1
 set_gtk_property!(c[1],"max_width_chars", 5)
 
 w = Window(combo, "ComboGtkBoxText")|>showall
 lsl = ListStoreLeaf(combo)
 @test length(lsl) == 3
+@test eachindex(lsl) == CartesianIndices(size(lsl))
 empty!(combo)
 @test length(lsl) == 0
 
@@ -718,6 +727,8 @@ push!(ls,(33,true))
 pushfirst!(ls,(22,false))
 popfirst!(ls)
 @test size(ls)==(2,2)
+@test eachindex(ls) == CartesianIndices(size(ls))
+@test axes(ls, 1) == axes(ls, 2) == 1:2
 insert!(ls, 2, (35, false))
 tv=TreeView(TreeModel(ls))
 r1=CellRendererText()
@@ -796,6 +807,7 @@ push!(toolbar,tb3)
 push!(toolbar,SeparatorToolItem(), ToggleToolButton("gtk-open"), MenuToolButton("gtk-new"))
 @test toolbar[0]==tb2  # FIXME: uses zero based indexing
 @test length(toolbar)==6
+@test eachindex(toolbar) == 0:5   # FIXME zero-based indexing
 G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = Window(toolbar, "Toolbar")|>showall
 destroy(w)
