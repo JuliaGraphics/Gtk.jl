@@ -528,6 +528,16 @@ G_.value(sl, 3)
 adj = Adjustment(sl)
 @test get_gtk_property(adj,:value,Float64) == 3
 set_gtk_property!(adj,:upper,11)
+
+Gtk.configure!(adj) # nothing should change
+@test G_.value(sl) == 3
+@test get_gtk_property(adj, :upper, Float64) == 11
+
+Gtk.configure!(adj; value = 13, lower = 3, upper = 13)
+@test get_gtk_property(adj, :value, Float64) == 13
+@test get_gtk_property(adj, :lower, Float64) == 3
+@test get_gtk_property(adj, :upper, Float64) == 13
+
 destroy(w)
 end
 
@@ -536,6 +546,14 @@ sp = SpinButton(1:10)
 w = Window(sp, "SpinButton")|>showall
 G_.value(sp, 3)
 @test G_.value(sp) == 3
+digits = get_gtk_property(sp, :digits, Int64)
+
+Gtk.configure!(sp) # nothing should change
+@test get_gtk_property(sp, :digits, Int64) == digits
+
+Gtk.configure!(sp; digits = 2)
+@test get_gtk_property(sp, :digits, Int64) == 2
+
 destroy(w)
 end
 
