@@ -80,8 +80,7 @@ GtkAdjustmentLeaf(spinButton::GtkSpinButton) = convert(GtkAdjustmentLeaf,
     configure!(sb::GtkSpinButton; adj = nothing, climb_rate = nothing, digits = nothing)
 
 Sets the adjustment `adj`, the `climb_rate`, and the number of `digits` of
-a `GtkSpinButton` with only one emission of its `changed` signal. If an argument is
-`nothing`, it is not changed.
+a `GtkSpinButton`. If an argument is `nothing`, it is not changed.
 """
 function configure!(sb::GtkSpinButton; adj = nothing, climb_rate = nothing, digits = nothing)
     if adj === nothing
