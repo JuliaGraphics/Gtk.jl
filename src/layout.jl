@@ -162,6 +162,8 @@ function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool
     end
 end
 
+Base.keys(::GtkPaned) = Base.OneTo(2)
+
 ### GtkLayout
 function GtkLayoutLeaf(width::Real, height::Real)
     layout = ccall((:gtk_layout_new, libgtk), Ptr{GObject},

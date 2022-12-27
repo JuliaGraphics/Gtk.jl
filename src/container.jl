@@ -41,6 +41,7 @@ Base.:|>(parent::GtkContainer, child::Union{GObject, AbstractString}) = push!(pa
 start_(w::GtkContainer) = glist_iter(ccall((:gtk_container_get_children, libgtk), Ptr{_GList{GObject}}, (Ptr{GObject},), w))
 iterate(w::GtkContainer, list=start_(w)) = iterate(list[1], list)
 length(w::GtkContainer) = length(start_(w)[1])
+Base.keys(w::GtkContainer) = Base.OneTo(length(w))
 getindex(w::GtkContainer, i::Integer) = convert(GtkWidget, start_(w)[1][i])::GtkWidget
 
 function start_(w::GtkBin)

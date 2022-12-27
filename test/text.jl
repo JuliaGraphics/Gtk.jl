@@ -107,6 +107,7 @@ place_cursor(b, ite)
 
 # GtkTextRange
 range=its:ite
+@test_broken eachindex(range) == 1:5
 @test range[1] == 'l'
 @test range[5] == '2'
 @test_throws BoundsError range[10]

@@ -31,6 +31,7 @@ end
 
 length(toolbar::GtkToolbar) =
   ccall((:gtk_toolbar_get_n_items, libgtk), Cint, (Ptr{GObject},), toolbar)
+Base.keys(toolbar::GtkToolbar) = 0:length(toolbar)-1   # FIXME zero-based indexing
 
 ### GtkToolButton
 GtkToolButtonLeaf(stock_id::AbstractString) = GtkToolButtonLeaf(

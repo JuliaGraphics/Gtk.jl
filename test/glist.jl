@@ -60,6 +60,7 @@ end
 @test length(g2)==8
 
 @test length(g)==10
+@test eachindex(g) == 1:10
 
 insert!(g,8,string(25))
 @test length(g)==11
