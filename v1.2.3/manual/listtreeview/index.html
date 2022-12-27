@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>List and Tree Widgets · Gtk.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="Gtk.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Gtk.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Manual</span><ul><li><a class="tocitem" href="../gettingStarted/">Getting Started</a></li><li><a class="tocitem" href="../properties/">Properties</a></li><li><a class="tocitem" href="../layout/">Layout</a></li><li><a class="tocitem" href="../signals/">Signals and Callbacks</a></li><li><a class="tocitem" href="../builder/">Builder and Glade</a></li><li><a class="tocitem" href="../textwidgets/">Text Widgets</a></li><li><a class="tocitem" href="../combobox/">Combobox</a></li><li class="is-active"><a class="tocitem" href>List and Tree Widgets</a><ul class="internal"><li><a class="tocitem" href="#List-Store-1"><span>List Store</span></a></li><li><a class="tocitem" href="#List-View-1"><span>List View</span></a></li><li><a class="tocitem" href="#Sorting-1"><span>Sorting</span></a></li><li><a class="tocitem" href="#Selection-1"><span>Selection</span></a></li><li><a class="tocitem" href="#Filtering-1"><span>Filtering</span></a></li><li><a class="tocitem" href="#Tree-Widget-1"><span>Tree Widget</span></a></li></ul></li><li><a class="tocitem" href="../filedialogs/">Dialogs</a></li><li><a class="tocitem" href="../keyevents/">Key Events</a></li><li><a class="tocitem" href="../canvas/">Drawing on Canvas</a></li><li><a class="tocitem" href="../customWidgets/">Custom/Composed Widgets</a></li><li><a class="tocitem" href="../slider/">Slider widgets (aka GtkScale) and dynamic adjustments</a></li><li><a class="tocitem" href="../async/">Asynchronous UI</a></li><li><a class="tocitem" href="../nonreplusage/">Non REPL Usage</a></li><li><a class="tocitem" href="../packages/">High-Level Packages</a></li></ul></li><li><a class="tocitem" href="../../doc/reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Manual</a></li><li class="is-active"><a href>List and Tree Widgets</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>List and Tree Widgets</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaGraphics/Gtk.jl/blob/master/docs/src/manual/listtreeview.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="List-and-Tree-Widgets-1"><a class="docs-heading-anchor" href="#List-and-Tree-Widgets-1">List and Tree Widgets</a><a class="docs-heading-anchor-permalink" href="#List-and-Tree-Widgets-1" title="Permalink"></a></h1><p>The <code>GtkTreeView</code> is a very powerful widgets for displaying table-like or hierarchical data. Other than the name might indicate the <code>GtkTreeView</code> is used for both lists and trees.</p><p>The power of this widget comes with a slightly more complex design that one has to understand when using the widget. The most important thing is that the widget itself does not store the displayed data. Instead there are dedicated <code>GtkListStore</code> and <code>GtkTreeStore</code> containers that will hold the data. The benefit of this approach is that it is possible to decouple the view from the data:</p><ul><li>The widget automatically updates when adding, removing or editing data from the store</li><li>The widget can sort its data without modifications in the store</li><li>Columns can be reordered and resized</li><li>Filtering can be used to show only subsets of data</li></ul><p>We will in the following introduce both widgets based on small and a more complex example.</p><h2 id="List-Store-1"><a class="docs-heading-anchor" href="#List-Store-1">List Store</a><a class="docs-heading-anchor-permalink" href="#List-Store-1" title="Permalink"></a></h2><p>Lets start with a very simple example: A table with three columns representing the name, the age and the gender of a person. Each column must have a specific type. Here, we chose to represent the gender using a boolean value where <code>true</code>  represents female and <code>false</code> represents male. We thus initialize the list store using</p><pre><code class="language-julia">ls = GtkListStore(String, Int, Bool)</code></pre><p>Now we will the store with data</p><pre><code class="language-julia">push!(ls,(&quot;Peter&quot;,20,false))
+push!(ls,(&quot;Paul&quot;,30,false))
+push!(ls,(&quot;Mary&quot;,25,true))</code></pre><p>If we want so insert the data at a specific position we can use the insert function</p><pre><code class="language-julia">insert!(ls, 2, (&quot;Susanne&quot;, 35, true))</code></pre><p>You can use <code>ls</code> like a matrix like container. Calling <code>length</code> and <code>size</code> will give you</p><pre><code class="language-julia">julia&gt; length(ls)
+4
+
+julia&gt; size(ls)
+(4,3)</code></pre><p>Specific element can be be accessed using</p><pre><code class="language-julia">julia&gt; ls[1,1]
+&quot;Peter&quot;
+julia&gt; ls[1,1] = &quot;Pete&quot;
+&quot;Pete&quot;</code></pre><h2 id="List-View-1"><a class="docs-heading-anchor" href="#List-View-1">List View</a><a class="docs-heading-anchor-permalink" href="#List-View-1" title="Permalink"></a></h2><p>Now we actually want to display our data. To this end we create a tree view object</p><pre><code class="language-julia">tv = GtkTreeView(GtkTreeModel(ls))</code></pre><p>Then we need specific renderers for each of the columns. Usually you will only need a text renderer, but in our example we want to display the boolean value using a checkbox.</p><pre><code class="language-julia">rTxt = GtkCellRendererText()
+rTog = GtkCellRendererToggle()</code></pre><p>Finally we create for each column a <code>TreeViewColumn</code> object</p><pre><code class="language-julia">c1 = GtkTreeViewColumn(&quot;Name&quot;, rTxt, Dict([(&quot;text&quot;,0)]))
+c2 = GtkTreeViewColumn(&quot;Age&quot;, rTxt, Dict([(&quot;text&quot;,1)]))
+c3 = GtkTreeViewColumn(&quot;Female&quot;, rTog, Dict([(&quot;active&quot;,2)]))</code></pre><p>We need to push these column description objects to the tree view</p><pre><code class="language-julia">push!(tv, c1, c2, c3)</code></pre><p>Then we can display the tree view widget in a window</p><pre><code class="language-julia">win = GtkWindow(tv, &quot;List View&quot;)
+showall(win)</code></pre><p>If you prefer that the columns are resizable by the user call</p><pre><code class="language-julia">for c in [c1, c2, c3]
+    GAccessor.resizable(c, true)
+end</code></pre><p><img src="../../assets/listview1.jpg" alt="listview1"/></p><h2 id="Sorting-1"><a class="docs-heading-anchor" href="#Sorting-1">Sorting</a><a class="docs-heading-anchor-permalink" href="#Sorting-1" title="Permalink"></a></h2><p>We next want to make the tree view sortable</p><pre><code class="language-julia">for (i,c) in enumerate([c1,c2,c3])
+  GAccessor.sort_column_id(c,i-1)
+end</code></pre><p>If you now click on one of the column headers, the data will be sorted with respect to the selected column. You can even make the columns reorderable</p><pre><code class="language-julia">for (i,c) in enumerate([c1, c2, c3])
+    GAccessor.reorderable(c, i)
+end</code></pre><h2 id="Selection-1"><a class="docs-heading-anchor" href="#Selection-1">Selection</a><a class="docs-heading-anchor-permalink" href="#Selection-1" title="Permalink"></a></h2><p>Usually the interesting bit of a list will be the entry being selected. This is done using an additional <code>GtkTreeSelection</code> object that can be retrieved by</p><pre><code class="language-julia">selection = GAccessor.selection(tv)</code></pre><p>One either have single selection or multiple selections. We toggle this by calling</p><pre><code class="language-julia">selection = GAccessor.mode(selection,Gtk.GConstants.GtkSelectionMode.MULTIPLE)</code></pre><p>We will stick with single selection for now and want to know the index of the selected item</p><pre><code class="language-julia">julia&gt; ls[selected(selection),1]
+&quot;Pete&quot;</code></pre><p>Since it can happen that no item has been selected at all, it is a good idea to put this into an if statement</p><pre><code class="language-julia">if hasselection(selection)
+  # do something with selected(selection)
+end</code></pre><p>Sometimes you want to invoke an action of an item is selected. This can be done by</p><pre><code class="language-julia">signal_connect(selection, &quot;changed&quot;) do widget
+  if hasselection(selection)
+    currentIt = selected(selection)
+
+    # now you can to something with the selected item
+    println(&quot;Name: &quot;, ls[currentIt,1], &quot; Age: &quot;, ls[currentIt,1])
+  end
+end</code></pre><p>Another useful signal is &quot;row-activated&quot; that will be triggered by a double click of the user.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>getting multiple selections still not implemented.</p></div></div><h2 id="Filtering-1"><a class="docs-heading-anchor" href="#Filtering-1">Filtering</a><a class="docs-heading-anchor-permalink" href="#Filtering-1" title="Permalink"></a></h2><p>A very useful thing is to apply a filter to a list view such that only a subset of data is shown. We can do this using the <code>GtkTreeModelFilter</code> type. It is as the <code>GtkListStore</code> a <code>GtkTreeModel</code> and therefore we can assign it to a tree view. So the idea is to wrap a <code>GtkListStore</code> in a <code>GtkTreeModelFilter</code> and assign that to the tree view.</p><p>Next question is how to decide which row of the list store should be shown and which shouldn&#39;t. We will do this by adding an additional column to the list store that is hidden. The column will be of type <code>Bool</code> and a value <code>true</code> indicates that the entry is to be shown while <code>false</code> indicates the opposite. We make the filtering based on this column by a call to <code>GAccessor.visible_column</code>. The full example now looks like this:</p><pre><code class="language-julia">using Gtk
+
+ls = GtkListStore(String, Int, Bool, Bool)
+push!(ls,(&quot;Peter&quot;,20,false,true))
+push!(ls,(&quot;Paul&quot;,30,false,true))
+push!(ls,(&quot;Mary&quot;,25,true,true))
+insert!(ls, 2, (&quot;Susanne&quot;,35,true,true))
+
+rTxt = GtkCellRendererText()
+rTog = GtkCellRendererToggle()
+
+c1 = GtkTreeViewColumn(&quot;Name&quot;, rTxt, Dict([(&quot;text&quot;,0)]), sort_column_id=0)
+c2 = GtkTreeViewColumn(&quot;Age&quot;, rTxt, Dict([(&quot;text&quot;,1)]), sort_column_id=1)
+c3 = GtkTreeViewColumn(&quot;Female&quot;, rTog, Dict([(&quot;active&quot;,2)]), sort_column_id=2)
+
+tmFiltered = GtkTreeModelFilter(ls)
+GAccessor.visible_column(tmFiltered,3)
+tv = GtkTreeView(GtkTreeModel(tmFiltered))
+push!(tv, c1, c2, c3)
+
+selection = GAccessor.selection(tv)
+
+signal_connect(selection, &quot;changed&quot;) do widget
+  if hasselection(selection)
+    currentIt = selected(selection)
+
+    println(&quot;Name: &quot;, GtkTreeModel(tmFiltered)[currentIt,1],
+            &quot; Age: &quot;, GtkTreeModel(tmFiltered)[currentIt,2])
+  end
+end
+
+ent = GtkEntry()
+
+signal_connect(ent, &quot;changed&quot;) do widget
+  searchText = get_gtk_property(ent, :text, String)
+
+  for l=1:length(ls)
+    showMe = true
+
+    if length(searchText) &gt; 0
+      showMe = showMe &amp;&amp; occursin(lowercase(searchText), lowercase(ls[l,1]))
+    end
+
+    ls[l,4] = showMe
+  end
+end
+
+vbox = GtkBox(:v)
+push!(vbox,ent,tv)
+
+win = GtkWindow(vbox, &quot;List View with Filter&quot;)
+showall(win)</code></pre><p>You can see that we have added a little search bar such that you can see the filtering in action. It is furthermore important to note that we had to replace <code>ls</code> with <code>GtkTreeModel(tmFiltered)</code> in the selection changed callback since the selection will give an iterator that is only valid in the filtered tree model.</p><h2 id="Tree-Widget-1"><a class="docs-heading-anchor" href="#Tree-Widget-1">Tree Widget</a><a class="docs-heading-anchor-permalink" href="#Tree-Widget-1" title="Permalink"></a></h2><p>Here is an example of the tree model in action:</p><pre><code class="language-julia">using Gtk
+
+ts = GtkTreeStore(String)
+iter1 = push!(ts,(&quot;one&quot;,))
+iter2 = push!(ts,(&quot;two&quot;,),iter1)
+iter3 = push!(ts,(&quot;three&quot;,),iter2)
+tv = GtkTreeView(GtkTreeModel(ts))
+r1 = GtkCellRendererText()
+c1 = GtkTreeViewColumn(&quot;A&quot;, r1, Dict([(&quot;text&quot;,0)]))
+push!(tv,c1)
+win = GtkWindow(tv, &quot;Tree View&quot;)
+showall(win)
+
+iter = Gtk.iter_from_index(ts, [1])
+ts[iter,1] = &quot;ONE&quot;</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../combobox/">« Combobox</a><a class="docs-footer-nextpage" href="../filedialogs/">Dialogs »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 27 December 2022 02:11">Tuesday 27 December 2022</span>. Using Julia version 1.8.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
