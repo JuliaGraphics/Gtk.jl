@@ -68,9 +68,7 @@ function make_gvalue(pass_x, as_ctype, to_gtype, with_id, cm::Module, allow_reve
                     elseif to_gtype == :gtype
                         :(x = GLib.g_type(x))
                     end)
-                GC.@preserve x begin
-                    ccall(($(string("g_value_set_", to_gtype)), GLib.libgobject), Nothing, (Ptr{GLib.GValue}, $as_ctype), v, x)
-                end
+                ccall(($(string("g_value_set_", to_gtype)), GLib.libgobject), Nothing, (Ptr{GLib.GValue}, $as_ctype), v, x)
                 if isa(v, GLib.MutableTypes.MutableX)
                     finalizer((v::GLib.MutableTypes.MutableX) -> ccall((:g_value_unset, GLib.libgobject), Nothing, (Ptr{GLib.GValue},), v), v)
                 end
