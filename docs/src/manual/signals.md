@@ -51,10 +51,10 @@ julia> GtkButton(action-name=NULL, action-target, related-action, use-action-app
 "Press me" was clicked!
 ```
 Notice that _both_ of the callback functions executed!
-Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://developer.gnome.org/gobject/stable/gobject-Signals.html#gobject-Signals.description).
-Callbacks for some [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
+Gtk+ allows you to define multiple signal handlers for a given object; even the execution order can be [specified](https://docs.gtk.org/gobject/concepts.html#signals).
+Callbacks for some [signals](https://docs.gtk.org/gtk3/signal.Widget.accel-closures-changed.html) require that you return an `Int32`, with value 0 if you want the next handler to run or 1 if you want to prevent any other handlers from running on this event.
 
-The [`"clicked"` signal callback](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) should return `nothing` (`void` in C parlance), so you can't prevent other callbacks from running.
+The [`"clicked"` signal callback](https://docs.gtk.org/gtk3/method.Button.clicked.html) should return `nothing` (`void` in C parlance), so you can't prevent other callbacks from running.
 However, we can disconnect the first signal handler:
 ```julia
 signal_handler_disconnect(b, id)
@@ -75,7 +75,7 @@ id = signal_connect(b, "button-press-event") do widget, event
 end
 ```
 Note that this signal requires two arguments, here `widget` and `event`, and that `event` contained useful information.
-Arguments and their meaning are described along with their corresponding [signals](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed).
+Arguments and their meaning are described along with their corresponding [signals](https://docs.gtk.org/gtk3/signal.Widget.accel-closures-changed.html).
 **You should omit the final `user_data` argument described in the Gtk documentation**;
 keep in mind that you can always address other variables from inside your function block, or define the callback in terms of an anonymous function:
 ```julia
@@ -83,9 +83,3 @@ id = signal_connect((widget, event) -> cb_buttonpressed(widget, event, guistate,
 ```
 
 In some situations you may want or need to use an [approach that is more analogous to julia's `@cfunction` callback syntax](../doc/more_signals.md). One advantage of this alternative approach is that, in cases of error, the backtraces are much more informative.
-
-Warning: it is essential to avoid task switching inside Gtk callbacks,
-as this corrupts the Gtk C-stack. For example, use `@async print` or queue a message for yourself.
-You can also call `GLib.g_yield()` if you need to block. However, if you are still seeing segfaults in some random method due to there existing a callback that recursively calls the glib main loop (such as making a dialog box) or otherwise causes `g_yield` to be called, wrap the faulting code in `GLib.@sigatom`. This will postpone execution of that code block until it can be run on the proper stack (but will otherwise acts like normal control flow).
-
-These restrictions should be fixed once https://github.com/JuliaLang/julia/pull/13099 is merged.

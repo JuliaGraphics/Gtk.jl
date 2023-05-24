@@ -6,11 +6,29 @@ function delete!(w::GtkContainer, child::GtkWidget)
     ccall((:gtk_container_remove, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject},), w, child)
     w
 end
-function empty!(w::GtkContainer)
-    for child in w
+
+function Base.deleteat!(w::GtkContainer, i::Integer)
+    i isa Bool && Base.depwarn("passing Bool as an index is deprecated", :deleteat!)
+    delete!(w, w[i])
+    w
+end
+function Base.deleteat!(w::GtkContainer, iterator)
+    for child in [w[i] for i in iterator]
         delete!(w, child)
     end
     w
+end
+Base.firstindex(w::GtkContainer) = 1
+Base.lastindex(w::GtkContainer) = length(w)
+function _remove_widget(w, con)
+    ccall((:gtk_container_remove, Gtk.libgtk), Nothing, (Ref{GObject}, Ref{GtkWidget}), con, w)
+end
+
+function empty!(c::GtkContainer)
+    remove_widget_c = @cfunction(_remove_widget, Nothing, (Ptr{GtkWidget}, Ptr{GObject}))
+
+    ccall((:gtk_container_foreach, Gtk.libgtk), Nothing, (Ptr{GObject}, Ptr{Cvoid}, Ptr{GObject}), c, remove_widget_c, c)
+    c
 end
 function append!(w::GtkContainer, children)
     for child in children
@@ -23,6 +41,7 @@ Base.:|>(parent::GtkContainer, child::Union{GObject, AbstractString}) = push!(pa
 start_(w::GtkContainer) = glist_iter(ccall((:gtk_container_get_children, libgtk), Ptr{_GList{GObject}}, (Ptr{GObject},), w))
 iterate(w::GtkContainer, list=start_(w)) = iterate(list[1], list)
 length(w::GtkContainer) = length(start_(w)[1])
+Base.keys(w::GtkContainer) = Base.OneTo(length(w))
 getindex(w::GtkContainer, i::Integer) = convert(GtkWidget, start_(w)[1][i])::GtkWidget
 
 function start_(w::GtkBin)

@@ -1,5 +1,9 @@
 module GLib
 
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 1
+end
+
 # Import `libgobject` and whatnot
 using Glib_jll
 
@@ -12,7 +16,7 @@ end
 
 import Base: convert, copy, show, size, length, getindex, setindex!, get,
              iterate, eltype, isempty, ndims, stride, strides, popfirst!,
-             empty!, append!, reverse!, pushfirst!, pop!, push!, splice!,
+             empty!, append!, reverse!, pushfirst!, pop!, push!, splice!, insert!,
              sigatomic_begin, sigatomic_end, Sys.WORD_SIZE, unsafe_convert, getproperty,
              getindex, setindex!
 
@@ -20,7 +24,7 @@ using Libdl
 
 export GInterface, GType, GObject, GBoxed, @Gtype, @Gabstract, @Giface
 export GEnum, GError, GValue, gvalue, make_gvalue, @make_gvalue, g_type
-export GList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
+export GList, GSList, glist_iter, _GSList, _GList, gobject_ref, gobject_move_ref
 export signal_connect, signal_emit, signal_handler_disconnect
 export signal_handler_block, signal_handler_unblock
 export g_timeout_add, g_idle_add, @idle_add
@@ -29,11 +33,15 @@ export GConnectFlags
 export @sigatom, cfunction_
 
 
-cfunction_(f, r, a::Tuple) = cfunction_(f, r, Tuple{a...})
-@noinline function cfunction_(f, r, a)
-    @nospecialize(f, r, a)
-    return ccall((:jl_function_ptr,:libjulia), Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+cfunction_(@nospecialize(f), r, a::Tuple) = cfunction_(f, r, Tuple{a...})
+
+@generated function cfunction_(f, R::Type{rt}, A::Type{at}) where {rt, at<:Tuple}
+    quote
+        @cfunction($(Expr(:$,:f)), $rt, ($(at.parameters...),))
+    end
 end
+
+const gtk_eventloop_f = Ref{Function}()
 
 # local function, handles Symbol and makes UTF8-strings easier
 const  AbstractStringLike = Union{AbstractString, Symbol}
@@ -44,8 +52,6 @@ bytestring(s::Ptr{UInt8}) = unsafe_string(s)
 
 g_malloc(s::Integer) = ccall((:g_malloc, libglib), Ptr{Nothing}, (Csize_t,), s)
 g_free(p::Ptr) = ccall((:g_free, libglib), Nothing, (Ptr{Nothing},), p)
-
-ccall((:g_type_init, libgobject), Nothing, ())
 
 include("MutableTypes.jl")
 using .MutableTypes
@@ -70,6 +76,11 @@ macro g_type_delegate(eq)
             Expr(:macrocall, $macroreal, map(esc, args)...)
         end
     end
+end
+
+if Base.VERSION >= v"1.4.2"
+    precompile(Tuple{typeof(addref),Any})   # time: 0.003988418
+    # precompile(Tuple{typeof(gc_ref),Any})   # time: 0.002649791
 end
 
 end

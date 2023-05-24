@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/TreeWidgetObjects.html
-
 #Tree and List Widget Overview — Overview of GtkTreeModel, GtkTreeView, and friends
 #GtkTreeModel — The tree interface used by GtkTreeView
 #GtkTreeSelection — The selection object for GtkTreeView
@@ -183,7 +181,7 @@ end
 
 deleteat!(listStore::GtkListStoreLeaf, index::Int) = delete!(listStore, iter_from_index(listStore, index))
 pop!(listStore::GtkListStoreLeaf) = deleteat!(listStore, length(listStore))
-popfirst!(listSTore::GtkListStoreLeaf) = deleteat!(listStore, 1)
+popfirst!(listStore::GtkListStoreLeaf) = deleteat!(listStore, 1)
 
 
 isvalid(listStore::GtkListStore, iter::TRI) =
@@ -196,6 +194,10 @@ function length(listStore::GtkListStore)
 end
 
 size(listStore::GtkListStore) = (length(listStore), ncolumns(GtkTreeModel(listStore)))
+Base.axes(listStore::GtkListStore) = Base.OneTo.(size(listStore))
+Base.axes(listStore::GtkListStore, d::Integer) = axes(listStore)[d]
+
+Base.keys(listStore::GtkListStore) = CartesianIndices(size(listStore))
 
 getindex(store::GtkListStore, row::Int, column) = getindex(store, iter_from_index(store, row), column)
 getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store, row))
@@ -203,6 +205,13 @@ getindex(store::GtkListStore, row::Int) = getindex(store, iter_from_index(store,
 function setindex!(store::GtkListStore, value, index::Int, column::Integer)
     setindex!(store, value, Gtk.iter_from_index(store, index), column)
 end
+setindex!(store::GtkListStore, value, index::Union{Int,CartesianIndex{1}}, column::Union{Integer,CartesianIndex{1}}) =
+    setindex!(store, value, _integer(index), _integer(column))
+setindex!(store::GtkListStore, value, index::CartesianIndex{2}) =
+    setindex!(store, value, Tuple(index)...)
+
+_integer(i::Integer) = i
+_integer(i::CartesianIndex{1}) = convert(Int, i)
 
 ### GtkTreeStore
 
@@ -280,7 +289,7 @@ deleteat!(treeStore::GtkTreeStore, iter::TRI) = delete!(treeStore, iter)
 
 ## insert by index
 function insert!(treeStore::GtkTreeStoreLeaf, index::Vector{Int}, values; how::Symbol = :parent, where::Symbol = :after)
-    piter = iter_from_index(treeStore, index)
+    iter = iter_from_index(treeStore, index)
     insert!(treeStore, iter, values; how = how, where = where)
 end
 
@@ -443,13 +452,14 @@ function iter_n_children(treeModel::GtkTreeModel, iter::TRI)
     ret
 end
 
-
 ## update iter pointing to nth child n in 1:nchildren)
+## As a special case, if parent is NULL, then the n-th root node is set
 ## return boolean
-function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, piter::TRI, n::Int)
+function iter_nth_child(treeModel::GtkTreeModel, iter::Mutable{GtkTreeIter}, parent_iter::Union{TRI, Nothing}, n::Int)
+    parent_iter = isnothing(parent_iter) ? C_NULL : mutable(parent_iter)
     ret = ccall((:gtk_tree_model_iter_nth_child, libgtk), Cint,
           (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreeIter}, Cint),
-          treeModel, iter, mutable(piter), n - 1) # 0-based
+          treeModel, iter, parent_iter, n - 1) # 0-based
     ret != 0
 end
 
@@ -652,17 +662,19 @@ end
 function selected_rows(selection::GtkTreeSelection)
     hasselection(selection) || return GtkTreeIter[]
 
-    model = mutable(Ptr{GtkTreeModel})
+    model = Ref{Ptr{GtkTreeModel}}()
 
     paths = GLib.GList(ccall((:gtk_tree_selection_get_selected_rows, libgtk),
-                                Ptr{GLib._GList{GtkTreePath}},
-                                (Ptr{GObject}, Ptr{GtkTreeModel}),
+                                Ptr{GLib._GList{Ptr{GtkTreePath}}},
+                                (Ptr{GObject}, Ptr{Ptr{GtkTreeModel}}),
                                 selection, model))
 
     iters = GtkTreeIter[]
     for path in paths
-        ret, it = iter(model, path)
-        ret && push!(iters, it)
+		it = Ref{GtkTreeIter}()
+		ret = ccall((:gtk_tree_model_get_iter, libgtk), Cint, (Ptr{GObject}, Ptr{GtkTreeIter}, Ptr{GtkTreePath}),
+	                      model[], it, path) != 0
+        ret && push!(iters, it[])
     end
 
     iters
@@ -700,6 +712,44 @@ function push!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
     treeView
 end
 
+function insert!(treeView::GtkTreeView, index::Integer, treeColumn::GtkTreeViewColumn)
+    ccall((:gtk_tree_view_insert_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), treeView, treeColumn, index - 1)
+    treeView
+end
+
+function delete!(treeView::GtkTreeView, treeColumns::GtkTreeViewColumn...)
+    for col in treeColumns
+        ccall((:gtk_tree_view_remove_column, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}), treeView, col)
+    end
+    treeView
+end
+
+function expand_to_path(tree_view::GtkTreeView, path::GtkTreePath)
+    return ccall(
+        (:gtk_tree_view_expand_to_path, libgtk), Cvoid,
+        (Ptr{GObject}, Ptr{GtkTreePath}), tree_view, path
+    )
+end
+
+function treepath(path::AbstractString)
+    ptr = ccall(
+        (:gtk_tree_path_new_from_string, libgtk), Ptr{GtkTreePath},
+        (Ptr{UInt8},), bytestring(path)
+    )
+    return ptr == C_NULL ? GtkTreePath() : convert(GtkTreePath, ptr)
+end
+
+# There's a method wrapped in GAccessor but tries to convert to a GtkTreeModel, which
+# is an interface in Gtk
+function model(tree_view::GtkTreeView)
+    return convert(GtkTreeStore, ccall(
+        (:gtk_tree_view_get_model, Gtk.libgtk),
+        Ptr{Gtk.GObject},
+        (Ptr{Gtk.GObject},),
+        tree_view)
+    )
+end
+
 # TODO Use internal accessor with default values?
 function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     pathPtr = Ref{Ptr{GtkTreePath}}(0)
@@ -710,7 +760,7 @@ function path_at_pos(treeView::GtkTreeView, x::Integer, y::Integer)
     if ret
         path = GtkTreePath(pathPtr[], true)
     else
-      path = GtkTreePath()
+        path = GtkTreePath()
     end
     ret, path
 end

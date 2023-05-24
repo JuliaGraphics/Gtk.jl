@@ -107,7 +107,7 @@ end
 end
 function g_type(name::Symbol, lib, symname::Symbol, cm)
     if name in keys(gtype_wrappers)
-        return g_type(gtype_wrappers[name], cm)
+        return g_type(gtype_wrappers[name])
     end
     fnptr = get_fn_ptr(string(symname, "_get_type"), lib, cm)
     if fnptr != C_NULL
@@ -285,10 +285,12 @@ convert(::Type{GBoxed}, unbox::Ptr{T}) where {T <: GBoxed} = GBoxedUnkown(unbox)
 convert(::Type{T}, unbox::Ptr{GBoxed}) where {T <: GBoxed} = convert(T, convert(Ptr{T}, unbox))
 convert(::Type{T}, unbox::Ptr{T}) where {T <: GBoxed} = T(unbox)
 
+cconvert(::Type{Ptr{GObject}}, @nospecialize(x::GObject)) = x
+
 # All GObjects are expected to have a 'handle' field
 # of type Ptr{GObject} corresponding to the GLib object
 # or to override this method (e.g. GtkNullContainer, AbstractString)
-unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = w.handle
+unsafe_convert(::Type{Ptr{GObject}}, w::GObject) = getfield(w, :handle)
 
 # this method should be used by gtk methods returning widgets of unknown type
 # and/or that might have been wrapped by julia before,
@@ -366,6 +368,7 @@ function gc_unref(@nospecialize(x))
     nothing
 end
 _gc_unref(@nospecialize(x), ::Ptr{Nothing}) = gc_unref(x)
+gc_ref_closure(@nospecialize(cb::Function)) = (invoke(gc_ref, Tuple{Any}, cb), @cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
 gc_ref_closure(x::T) where {T} = (gc_ref(x), @cfunction(_gc_unref, Nothing, (Any, Ptr{Nothing})))
 
 # generally, you shouldn't be calling gc_ref(::Ptr{GObject})
@@ -375,9 +378,11 @@ gc_unref(x::Ptr{GObject}) = ccall((:g_object_unref, libgobject), Nothing, (Ptr{G
 const gc_preserve_glib = Dict{Union{WeakRef, GObject}, Bool}() # glib objects
 const gc_preserve_glib_lock = Ref(false) # to satisfy this lock, must never decrement a ref counter while it is held
 const topfinalizer = Ref(true) # keep recursion to a minimum by only iterating from the top
-const await_finalize = Any[]
+const await_finalize = Set{Any}()
 
-function finalize_gc_unref(@nospecialize(x))
+Base.isequal(x::GObject, w::WeakRef) = x === w.value   # cuts the number of MethodInstances from O(N^2) to O(N)
+
+function finalize_gc_unref(@nospecialize(x::GObject))
     # this records that the are no user references left to the object from Julia
     # and notifies GLib that it can free the object (if no reference exist from C)
     # it is intended to be called by GC, not in user code function
@@ -385,7 +390,7 @@ function finalize_gc_unref(@nospecialize(x))
     topfinalizer[] = false
     gc_preserve_glib_lock[] = true
     delete!(gc_preserve_glib, x)
-    if x.handle != C_NULL
+    if getfield(x, :handle) != C_NULL
         gc_preserve_glib[x] = true # convert to a strong-reference
         gc_preserve_glib_lock[] = false
         gc_unref(unsafe_convert(Ptr{GObject}, x)) # may clear the strong reference
@@ -397,7 +402,7 @@ function finalize_gc_unref(@nospecialize(x))
     nothing
 end
 
-function delref(@nospecialize(x))
+function delref(@nospecialize(x::GObject))
     # internal helper function
     exiting[] && return # unnecessary to cleanup if we are about to die anyways
     if gc_preserve_glib_lock[] || g_yielded[]
@@ -407,7 +412,7 @@ function delref(@nospecialize(x))
     finalize_gc_unref(x)
     nothing
 end
-function addref(@nospecialize(x))
+function addref(@nospecialize(x::GObject))
     # internal helper function
     ccall((:g_object_ref_sink, libgobject), Ptr{GObject}, (Ptr{GObject},), x)
     finalizer(delref, x)
@@ -419,15 +424,23 @@ function gobject_ref(x::T) where T <: GObject
     gc_preserve_glib_lock[] = true
     strong = get(gc_preserve_glib, x, nothing)
     if strong === nothing
-        # we haven't seen this before, setup the metadata
-        deref = @cfunction(gc_unref, Nothing, (Ref{T},))
-        ccall((:g_object_set_qdata_full, libgobject), Nothing,
-            (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
-            deref) # add a circular reference to the Julia object in the GObject
-        addref(x)
+        if ccall((:g_object_get_qdata, libgobject), Ptr{Cvoid},
+                 (Ptr{GObject}, UInt32), x, jlref_quark::UInt32) != C_NULL
+            # have set up metadata for this before, but its weakref has been cleared. restore the ref.
+            delete!(await_finalize, x)
+            finalizer(delref, x)
+            gc_preserve_glib[WeakRef(x)] = false # record the existence of the object, but allow the finalizer
+        else
+            # we haven't seen this before, setup the metadata
+            deref = @cfunction(gc_unref, Nothing, (Ref{T},))
+            ccall((:g_object_set_qdata_full, libgobject), Nothing,
+                  (Ptr{GObject}, UInt32, Any, Ptr{Nothing}), x, jlref_quark::UInt32, x,
+                  deref) # add a circular reference to the Julia object in the GObject
+            addref(Ref{GObject}(x)[])
+        end
     elseif strong
         # oops, we previously deleted the link, but now it's back
-        addref(x)
+        addref(Ref{GObject}(x)[])
     else
         # already gc-protected, nothing to do
     end

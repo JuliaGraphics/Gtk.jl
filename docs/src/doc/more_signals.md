@@ -16,7 +16,7 @@ where:
   (i.e., one defined as `function foo(x,y,z) ... end`), and the
   arguments and return type should match the GTK+ documentation for
   the widget and signal ([see
-  examples](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-accel-closures-changed)).
+  examples](https://docs.gtk.org/gtk3/signal.Widget.accel-closures-changed.html)).
   **In contrast with the simpler
   interface, when writing these
   callbacks you must include the `user_data` argument**.  See examples below.
@@ -27,9 +27,9 @@ where:
   callback. Usually `Nothing` (for `void`) or `Cint` (for `gboolean`)
 - `parameter_type_tuple` specifies the types of the *middle* arguments
   to the callback function, omitting the first (the widget) and last
-  (`user_data`).  For example, for [`"clicked"`](https://developer.gnome.org/gtk3/stable/GtkButton.html#GtkButton-clicked) we have
+  (`user_data`).  For example, for [`"clicked"`](https://docs.gtk.org/gtk3/method.Button.clicked.html) we have
   `parameter_type_tuple = ()` (because there are no middle arguments)
-  and for [`"button-press-event"`](https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-button-press-event) we have `parameter_type_tuple =
+  and for [`"button-press-event"`](https://docs.gtk.org/gtk3/signal.Widget.button-press-event.html) we have `parameter_type_tuple =
   (Ptr{GdkEventButton},)`.
 - `after` is a boolean, `true` if you want your callback to run after
   the default handler for your signal. When in doubt, specify `false`.

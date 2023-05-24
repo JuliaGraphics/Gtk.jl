@@ -1,0 +1,21 @@
+---
+kind: pipeline
+name: linux - arm64 - Julia 1.6
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build
+  image: julia:1.6
+  commands:
+  - apt-get update
+  - apt-get install -y xvfb xauth
+  - "xvfb-run julia --project=. --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true); using Pkg; Pkg.build(); Pkg.test(coverage=true)'"
+
+trigger:
+  branch:
+  - master
+
+...

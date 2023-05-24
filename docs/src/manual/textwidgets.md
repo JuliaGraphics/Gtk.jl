@@ -22,7 +22,7 @@ GAccessor.markup(label,"""<b>My bold text</b>\n
                           <a href=\"https://www.gtk.org\"
                           title=\"Our website\">GTK+ website</a>""")
 ```
-The syntax for this markup text is borrowed from html and explained [here](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html).
+The syntax for this markup text is borrowed from html and explained [here](https://docs.gtk.org/Pango/pango_markup.html).
 
 A label can be made selectable using
 ```julia

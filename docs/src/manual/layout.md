@@ -1,6 +1,6 @@
 # Layout
 
-You will usually want to add more than one widget to you application. To this end, Gtk provides several layout widget. Instead of using a precise positioning, the Gtk layout widgets take an approach where widgets are aligned in boxes and tables.
+You will usually want to add more than one widget to you application. To this end, Gtk provides several layout widgets. Instead of using a precise positioning, the Gtk layout widgets take an approach where widgets are aligned in boxes and tables.
 
 !!! note
     While doing the layout using Julia code is possible for small examples it is in general advised to instead create the layout using Glade in combination with GtkBuilder [Builder and Glade](@ref).
@@ -48,6 +48,7 @@ hbox = GtkButtonBox(:h)
 push!(win, hbox)
 push!(hbox, cancel)
 push!(hbox, ok)
+showall(win)
 ```
 
 Now we get this:

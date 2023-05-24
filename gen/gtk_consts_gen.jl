@@ -1,13 +1,22 @@
+const PLATFORM_SPECIFIC = Dict{String, Any}(
+    "G_DIR_SEPARATOR"           => :(Base.Filesystem.path_separator[1]),
+    "G_DIR_SEPARATOR_S"         => :(Base.Filesystem.path_separator),
+    "G_SEARCHPATH_SEPARATOR"    => :(Sys.iswindows() ? ';' : ':'),
+    "G_SEARCHPATH_SEPARATOR_S"  => :(Sys.iswindows() ? ";" :  ":"),
+    "G_MODULE_SUFFIX"           => :(Sys.iswindows() ? "dll" : "so"), #For "most" Unices and Linux this is "so".
+    "G_PID_FORMAT"              => :(Sys.iswindows() ? "p" : "i"), #Incorrectly stated as only "i" in Glib reference.
+)
+
 function gen_consts(body, gtk_h)
     count = 0
     exports = Expr(:export)
     push!(body.args,exports)
-
-    tdecls = cindex.search(gtk_h, cindex.TypedefDecl)
+    
+    tdecls = Clang.search(gtk_h, Clang.CXCursor_TypedefDecl)
     for tdecl in tdecls
-        ctype = cindex.getCanonicalType(cindex.getCursorType(tdecl))
-        if isa(ctype,cindex.Enum)
-            name = cindex.spelling(tdecl)
+        ctype = canonical(type(tdecl))
+        if isa(ctype, CLEnum)
+            name = spelling(tdecl)
             m = match(r"^(G\w+)$", name)
             if m === nothing
                 continue
@@ -16,13 +25,13 @@ function gen_consts(body, gtk_h)
             push!(exports.args, name)
             consts = Expr(:block)
             push!(body.args, Expr(:toplevel, Expr(:module, false, name, consts)))
-            children = cindex.children(cindex.getTypeDeclaration(ctype))
+            children = Clang.children(typedecl(ctype))
             mask = true
-            c1 = cindex.spelling(children[1])
+            c1 = spelling(children[1])
             splitc1 = split(c1,'_')
             prefix = length(splitc1)
             for child in children
-                c2 = cindex.spelling(child)
+                c2 = spelling(child)
                 if !endswith(c2,"_MASK")
                     mask = false
                 end
@@ -44,13 +53,13 @@ function gen_consts(body, gtk_h)
                 lprefix += length(splitc1[i])+1
             end
             for child in children
-                decl = cindex.spelling(child)
+                decl = spelling(child)
                 if mask
                     shortdecl = decl[lprefix:end-5]
                 else
                     shortdecl = decl[lprefix:end]
                 end
-                jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), cindex.value(child))))
+                jldecl = Expr(:const, Expr(:(=), Symbol(decl), Expr(:call, :(Main.Base.convert), :(Main.Base.Int32), value(child))))
                 if occursin(r"^[A-Za-z]", shortdecl)
                     push!(consts.args, Expr(:const, Expr(:(=), Symbol(shortdecl), jldecl)))
                 else
@@ -63,14 +72,19 @@ function gen_consts(body, gtk_h)
             count += 1
         end
     end
-    mdecls = cindex.search(gtk_h, cindex.MacroDefinition)
+    
+    mdecls = Clang.search(gtk_h, Clang.CXCursor_MacroDefinition)
     for mdecl in mdecls
-        name = cindex.spelling(mdecl)
+        name = spelling(mdecl)
         if occursin(r"^G\w*[A-Za-z]$", name)
-            tokens = cindex.tokenize(mdecl)
-            if length(tokens) == 3 && isa(tokens[2], cindex.Literal)
-                tok2 = Clang.wrap_c.handle_macro_exprn(tokens, 2)[1]
-                tok2 = replace(tok2, "\$", "\\\$")
+            if haskey(PLATFORM_SPECIFIC, name)
+                push!(body.args, Expr(:const, Expr(:(=), Symbol(name), PLATFORM_SPECIFIC[name])))
+                continue
+            end
+            tokens = tokenize(mdecl)
+            if length(tokens) == 2 && isa(tokens[2], Literal)
+                tok2 = Clang.handle_macro_exprn(tokens, 2)[1]
+                tok2 = replace(tok2, "\$"=>"\\\$")
                 push!(body.args, Expr(:const, Expr(:(=), Symbol(name), Meta.parse(tok2))))
             else
                 #println("Skipping: ", name, " = ", [tokens...])

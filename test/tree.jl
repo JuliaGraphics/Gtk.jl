@@ -1,5 +1,7 @@
 #using Gtk, Test
 
+@testset "tree" begin
+
 window = GtkWindow("GtkTree", 300, 100)
 boxtop = GtkBox(:v) # vertical box, basic structure
 
@@ -40,6 +42,8 @@ showall(window);
 
 push!(store, (1, "London"))
 iter = push!(store, (2, "Grenoble"))
+iter2 = pushfirst!(store, (0, "Slough"))
+deleteat!(store, iter2)
 
 @test isvalid(store,iter)
 @test Gtk.ncolumns(treeModel) == 2
@@ -61,9 +65,17 @@ iter = Gtk.iter_from_string_index(store,"0")
 iter = insert!(store, iter, (0,"Paris"); how = :sibling, where=:before)
 @test store[iter] == (0,"Paris")
 
+@test store[[1]] == (0,"Paris")
+
 iter = insert!(store, iter, (3,"Paris child"); how = :parent, where=:after)
 path = Gtk.path(treeModel,iter)
 @test depth(path) == 2
+@test depth(store, iter) == 1
+
+iter = insert!(store, [3], (4, "Barcelona"); how = :sibling, where=:after)
+@test store[[4],2] == "Barcelona"
+store[[4],2] = "Madrid"
+splice!(store, [4])
 
 ##
 
@@ -75,5 +87,10 @@ select!(selection, iter)
 
 @test length(selection) == 1
 
-# this crashes
-# iters = Gtk.selected_rows(selection)
+iters = Gtk.selected_rows(selection)
+@test length(iters) == 1
+@test store[iters[1],1] == 0
+
+empty!(store)
+
+end

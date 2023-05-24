@@ -1,6 +1,6 @@
 # Getting Started
 
-We start this tutorial with a very simple example that creats an empty window of size 400x200 pixels
+We start this tutorial with a very simple example that creates an empty window of size 400x200 pixels
 and adds a button to it
 ```julia
 using Gtk
@@ -17,8 +17,6 @@ We will now go through this example step by step. First the package is loaded `u
 push!(win,b)
 ```
 Finally, `showall(win)` will render the entire application on the screen.
-
-Note that if you run the above example and only a blank window renders, see the `Common Issues` section [here](../index.md#common-issues). 
 
 ## Extended Example
 

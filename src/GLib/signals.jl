@@ -1,12 +1,12 @@
 # id = VERSION >= v"0.4-"get, :event, Nothing, (ArgsT...)) do ptr, evt_args..., closure
 #    stuff
 # end
-function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike,
+function signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike,
         ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}
     signal_connect_generic(cb, w, sig, RT, param_types, after, user_data)
 end
 
-function signal_connect_generic(cb::Function, w::GObject, sig::AbstractStringLike,
+function signal_connect_generic(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike,
         ::Type{RT}, param_types::Tuple, after::Bool = false, user_data::CT = w) where {CT, RT}  #TODO: assert that length(param_types) is correct
     callback = cfunction_(cb, RT, tuple(Ptr{GObject}, param_types..., Ref{CT}))
     ref, deref = gc_ref_closure(user_data)
@@ -23,10 +23,10 @@ end
 # id = signal_connect(widget, :event) do obj, evt_args...
 #    stuff
 # end
-function signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool = false)
+function signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike, after::Bool = false)
     _signal_connect(cb, w, sig, after, false, nothing, nothing)
 end
-function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
+function _signal_connect(@nospecialize(cb::Function), w::GObject, sig::AbstractStringLike, after::Bool, gtk_call_conv::Bool, param_types, user_data)
     @assert sizeof_gclosure > 0
     closuref = ccall((:g_closure_new_object, libgobject), Ptr{Nothing}, (Cuint, Ptr{GObject}), sizeof_gclosure::Int + GLib.WORD_SIZE * 2, w)
     closure_env = convert(Ptr{Ptr{Nothing}}, closuref + sizeof_gclosure)
@@ -39,7 +39,7 @@ function _signal_connect(cb::Function, w::GObject, sig::AbstractStringLike, afte
     else
         unsafe_store!(convert(Ptr{Int}, closure_env), 0, 2)
     end
-    ref_cb, deref_cb = gc_ref_closure(cb)
+    ref_cb, deref_cb = invoke(gc_ref_closure, Tuple{Function}, cb)
     unsafe_store!(closure_env, ref_cb, 1)
     ccall((:g_closure_add_invalidate_notifier, libgobject), Nothing,
         (Ptr{Nothing}, Ptr{Nothing}, Ptr{Nothing}), closuref, ref_cb, deref_cb)
@@ -52,10 +52,9 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
                          param_values::Ptr{GValue}, invocation_hint::Ptr{Nothing}, marshal_data::Ptr{Nothing})
     @assert sizeof_gclosure > 0
     closure_env = convert(Ptr{Any}, closuref + sizeof_gclosure)
-    cb = unsafe_load(closure_env, 1)
+    cb = unsafe_load(closure_env, 1)::Function
     gtk_calling_convention = (0 != unsafe_load(convert(Ptr{Int}, closure_env),  2))
     params = Vector{Any}(undef, n_param_values)
-    local retval = nothing
     g_siginterruptible(cb) do
         if gtk_calling_convention
             # compatibility mode, if we must
@@ -103,8 +102,8 @@ function GClosureMarshal(closuref::Ptr{Nothing}, return_value::Ptr{GValue}, n_pa
     return nothing
 end
 
-function blame(cb)
-    warn("Executing ", cb, ":")
+function blame(@nospecialize(cb))
+    @warn "Executing $cb:"
 end
 
 # Signals API for the cb pointer
@@ -133,7 +132,7 @@ the given `id`.
 signal_handler_is_connected(w::GObject, handler_id::Culong) =
     ccall((:g_signal_handler_is_connected, libgobject), Cint, (Ptr{GObject}, Culong), w, handler_id) == 1
 
-function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
+function signal_emit(w::GObject, sig::AbstractStringLike, ::Type{RT}, args...) where RT
     i = isa(sig, AbstractString) ? something(findfirst("::", sig), 0:-1) : (0:-1)
     if !isempty(i)
         detail = @quark_str sig[last(i) + 1:end]
@@ -143,7 +142,8 @@ function signal_emit(w::GObject, sig::AbstractStringLike, RT::Type, args...)
     end
     signal_id = ccall((:g_signal_lookup, libgobject), Cuint, (Ptr{UInt8}, Csize_t), sig, G_OBJECT_CLASS_TYPE(w))
     return_value = RT === Nothing ? C_NULL : gvalue(RT)
-    ccall((:g_signal_emitv, libgobject), Nothing, (Ptr{GValue}, Cuint, UInt32, Ptr{GValue}), gvalues(w, args...), signal_id, detail, return_value)
+    gvals = gvalues(w, args...)
+    GC.@preserve gvals return_value ccall((:g_signal_emitv, libgobject), Nothing, (Ptr{GValue}, Cuint, UInt32, Ptr{GValue}), gvals, signal_id, detail, return_value)
     RT === Nothing ? nothing : return_value[RT]
 end
 
@@ -203,7 +203,7 @@ macro sigatom(f)
     end
 end
 
-function g_siginterruptible(f::Base.Callable, cb) # calls f (which may throw), but this function never throws
+function g_siginterruptible(f::Base.Callable, @nospecialize(cb)) # calls f (which may throw), but this function never throws
     global g_sigatom_flag, g_stack
     prev = g_sigatom_flag[]
     @assert xor(prev, (current_task() !== g_stack))
@@ -297,7 +297,7 @@ function uv_prepare(src::Ptr{Nothing}, timeout::Ptr{Cint})
     else
         ccall(:uv_update_time, Nothing, (Ptr{Nothing},), evt)
         tmout_ms = ccall(:uv_backend_timeout, Cint, (Ptr{Nothing},), evt)
-        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 100 : 5000
+        tmout_min::Cint = (uv_pollfd::_GPollFD).fd == -1 ? 10 : 5000
         if tmout_ms < 0 || tmout_ms > tmout_min
             tmout_ms = tmout_min
         end
@@ -329,13 +329,12 @@ function uv_check(src::Ptr{Nothing})
         return Int32(ex <= now)
     end
 end
-function uv_dispatch(src::Ptr{Nothing}, callback::Ptr{Nothing}, data::T) where T
-    return ccall(callback, Cint, (T,), data)
+function uv_dispatch(src::Ptr{Nothing}, callback::Ptr{Nothing}, data)
+    return ccall(callback, Cint, (UInt,), data)
 end
 
 sizeof_gclosure = 0
 function __init__gtype__()
-    ccall((:g_type_init, libgobject), Nothing, ())
     global jlref_quark = quark"julia_ref"
     global sizeof_gclosure = GLib.WORD_SIZE
     closure = C_NULL
@@ -358,7 +357,9 @@ function __init__gmainloop__()
     ccall((:g_source_set_callback, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{Nothing}, UInt, Ptr{Nothing}),
         src, @cfunction(g_yield, Cint, (UInt,)), 1, C_NULL)
 
-    uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
+    uv_fd = -1
+    # TODO: renable this after fixing integration with the default scheduler backend
+    # uv_fd = Sys.iswindows() ? -1 : ccall(:uv_backend_fd, Cint, (Ptr{Nothing},), Base.eventloop())
     global uv_pollfd = _GPollFD(uv_fd, 0x1)
     if (uv_pollfd::_GPollFD).fd != -1
         ccall((:g_source_add_poll, GLib.libglib), Nothing, (Ptr{Nothing}, Ptr{_GPollFD}), src, Ref(uv_pollfd::_GPollFD))
@@ -381,6 +382,7 @@ end
 @deprecate g_timeout_add(interval, cb, user_data) g_timeout_add(() -> cb(user_data), interval)
 
 function g_idle_add(cb::Function)
+    gtk_eventloop_f[](true)
     callback = @cfunction(_g_callback, Cint, (Ref{Function},))
     ref, deref = gc_ref_closure(cb)
     return ccall((:g_idle_add_full , libglib),Cint,

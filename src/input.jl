@@ -1,5 +1,3 @@
-#https://developer.gnome.org/gtk2/stable/NumericEntry.html
-
 #GtkEntry — A single line text entry field
 #GtkEntryBuffer — Text buffer for GtkEntry
 #GtkEntryCompletion — Completion functionality for GtkEntry

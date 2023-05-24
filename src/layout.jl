@@ -53,22 +53,23 @@ function insert!(grid::GtkGrid, i::Integer, side::Symbol)
     elseif side == :bottom
         ccall((:gtk_grid_insert_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
     else
-        error(string("invalid GtkPositionType ", s))
+        error(string("Unknown side parameter $side: must be left, right, top or bottom "))
     end
 end
 
-function deleteat!(grid::GtkGrid, i::Integer, side::Symbol)
-    if side == :row
-        ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
-    elseif side == :col
-        ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i)
+function deleteat!(grid::GtkGrid, i::Integer, rowcol::Symbol)
+    if rowcol == :row
+        ccall((:gtk_grid_remove_row, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i-1)
+    elseif rowcol == :col
+        ccall((:gtk_grid_remove_column, libgtk), Nothing, (Ptr{GObject}, Cint), grid, i-1)
     else
-        error(string("invalid GtkPositionType ", s))
+        error(string("rowcol must be row or col, got ", rowcol))
     end
 end
 
 function insert!(grid::GtkGrid, sibling, side::Symbol)
-    ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, GtkPositionType.(side))
+    pos=getfield(GtkPositionType,Symbol(uppercase(string(side))))
+    ccall((:gtk_grid_insert_next_to, libgtk), Nothing, (Ptr{GObject}, Ptr{GObject}, Cint), grid, sibling, pos)
 end
 
 if libgtk_version >= v"3.16.0"
@@ -161,6 +162,8 @@ function setindex!(pane::GtkPaned, child, i::Integer, resize::Bool, shrink::Bool
     end
 end
 
+Base.keys(::GtkPaned) = Base.OneTo(2)
+
 ### GtkLayout
 function GtkLayoutLeaf(width::Real, height::Real)
     layout = ccall((:gtk_layout_new, libgtk), Ptr{GObject},
@@ -211,11 +214,11 @@ function splice!(w::GtkNotebook, i::Integer)
 end
 
 pagenumber(w::GtkNotebook, child::GtkWidget) =
-    ccall((:gtk_notebook_page_num, libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child)
+    ccall((:gtk_notebook_page_num, libgtk), Cint, (Ptr{GObject}, Ptr{GObject}), w, child) + 1
 
 ### GtkOverlay
 GtkOverlayLeaf() = GtkOverlayLeaf(ccall((:gtk_overlay_new, libgtk), Ptr{GObject}, () ))
-GtkOverlayLeaf(w::GtkWidget) = invoke(push!, (GtkContainer,), GtkOverlayLeaf(), w)
+GtkOverlayLeaf(w::GtkWidget) = invoke(push!, Tuple{GtkContainer,Any}, GtkOverlayLeaf(), w)
 function push!(w::GtkOverlay, x::GtkWidget)
     ccall((:gtk_overlay_add_overlay, libgtk), Cint,
         (Ptr{GObject}, Ptr{GObject}), w, x)

@@ -3,19 +3,11 @@ unsafe_convert(::Type{Ptr{GObject}}, w::AbstractStringLike) = unsafe_convert(Ptr
 destroy(w::GtkWidget) = @sigatom ccall((:gtk_widget_destroy, libgtk), Nothing, (Ptr{GObject},), w)
 parent(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_parent, libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 hasparent(w::GtkWidget) = ccall((:gtk_widget_get_parent, libgtk), Ptr{Nothing}, (Ptr{GObject},), w) != C_NULL
-function toplevel(w::GtkWidget)
-    p = unsafe_convert(Ptr{GObject}, w)
-    pp = p
-    while pp != C_NULL
-        p = pp
-        pp = ccall((:gtk_widget_get_parent, libgtk), Ptr{GObject}, (Ptr{GObject},), p)
-    end
-    convert(GtkWidget, p)
-end
+toplevel(w::GtkWidget) = convert(GtkWidget, ccall((:gtk_widget_get_toplevel, libgtk), Ptr{GObject}, (Ptr{GObject},), w))
 function allocation(widget::Gtk.GtkWidget)
-    allocation_ = Array(GdkRectangle)
+    allocation_ = Ref{GdkRectangle}()
     ccall((:gtk_widget_get_allocation, libgtk), Nothing, (Ptr{GObject}, Ptr{GdkRectangle}), widget, allocation_)
-    return allocation_[1]
+    return allocation_[]
 end
 width(w::GtkWidget) = ccall((:gtk_widget_get_allocated_width, libgtk), Cint, (Ptr{GObject},), w)
 height(w::GtkWidget) = ccall((:gtk_widget_get_allocated_height, libgtk), Cint, (Ptr{GObject},), w)
@@ -27,8 +19,40 @@ screen_size(w::GtkWindowLeaf) = screen_size(Gtk.GAccessor.screen(w))
 ### Functions and methods common to all GtkWidget objects
 visible(w::GtkWidget) = Bool(ccall((:gtk_widget_get_visible, libgtk), Cint, (Ptr{GObject},), w))
 visible(w::GtkWidget, state::Bool) = @sigatom ccall((:gtk_widget_set_visible, libgtk), Nothing, (Ptr{GObject}, Cint), w, state)
-show(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w); w)
-showall(w::GtkWidget) = (@sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w); w)
+
+const shown_widgets = WeakKeyDict()
+function handle_auto_idle(w::GtkWidget)
+    if auto_idle[]
+        signal_connect(w, :realize) do w
+            enable_eventloop(true)
+            shown_widgets[w] = nothing
+            signal_connect(w, :destroy, #= after =# true) do w
+                delete!(shown_widgets, w)
+                isempty(shown_widgets) && enable_eventloop(false)
+            end
+        end
+        @static Sys.iswindows() && yield() # issue #610
+    end
+end
+function show(w::GtkWidget)
+    handle_auto_idle(w)
+    @sigatom ccall((:gtk_widget_show, libgtk), Nothing, (Ptr{GObject},), w)
+    w
+end
+
+"""
+    showall(w::Gtk.GtkWidget)
+Recursively show a widget, and any child widgets (if the widget is a container).
+
+This function overrides the `visible` property in all widgets in the hierarchy. Widgets can be
+protected from `showall` by setting the `no_show_all` property on the object to `true`.
+"""
+function showall(w::GtkWidget)
+    handle_auto_idle(w)
+    @sigatom ccall((:gtk_widget_show_all, libgtk), Nothing, (Ptr{GObject},), w)
+    w
+end
+
 hide(w::GtkWidget) = (@sigatom ccall((:gtk_widget_hide , libgtk),Cvoid,(Ptr{GObject},),w); w)
 grab_focus(w::GtkWidget) = (@sigatom ccall((:gtk_widget_grab_focus , libgtk), Cvoid, (Ptr{GObject},), w); w)
 
@@ -87,8 +111,7 @@ function _guarded(ex, retval)
             try
                 $(ex.args[2])
             catch err
-                @warn("Error in @guarded callback")
-                Base.display_error(err, catch_backtrace())
+                @warn("Error in @guarded callback", exception=(err, catch_backtrace()))
                 $retval
             end
         end

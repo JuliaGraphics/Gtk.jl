@@ -54,7 +54,7 @@ connector between the XML definition and our Julia code.
 ```julia
 b = GtkBuilder(filename="path/to/myapp.glade")
 ```
-Alternatively, if we would store above XML definition in a Julia string `myapp` we can initalize
+Alternatively, if we would store above XML definition in a Julia string `myapp` we can initialize
 the builder by
 ```julia
 b = GtkBuilder(buffer=myapp)

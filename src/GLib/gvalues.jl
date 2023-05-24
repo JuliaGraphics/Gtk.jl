@@ -159,21 +159,23 @@ function getindex(gv::GV, ::Type{Any})
 end
 #end
 
-get_gtk_property(w::GObject, name::AbstractString, ::Type{T}) where T = get_gtk_property(w, Symbol(name), T)
-function get_gtk_property(w::GObject, name::Symbol, ::Type{T}) where T
+get_gtk_property(w::GObject, name::AbstractString, ::Type{T}) where T = get_gtk_property(w, String(name)::String, T)
+get_gtk_property(w::GObject, name::Symbol, ::Type{T}) where T = get_gtk_property(w, String(name), T)
+function get_gtk_property(w::GObject, name::String, ::Type{T}) where T
     v = gvalue(T)
     ccall((:g_object_get_property, libgobject), Nothing,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), v)
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, v)
     val = v[T]
     ccall((:g_value_unset, libgobject), Nothing, (Ptr{GValue},), v)
     return val
 end
 
 set_gtk_property!(w::GObject, name, ::Type{T}, value) where T = set_gtk_property!(w, name, convert(T, value))
-set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, Symbol(name), value)
-function set_gtk_property!(w::GObject, name::Symbol, value)
+set_gtk_property!(w::GObject, name::AbstractString, value) = set_gtk_property!(w::GObject, String(name)::String, value)
+set_gtk_property!(w::GObject, name::Symbol, value) = set_gtk_property!(w::GObject, String(name), value)
+function set_gtk_property!(w::GObject, name::String, value)
     ccall((:g_object_set_property, libgobject), Nothing,
-        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, GLib.bytestring(name), gvalue(value))
+        (Ptr{GObject}, Ptr{UInt8}, Ptr{GValue}), w, name, gvalue(value))
 
     w
 end
@@ -186,7 +188,7 @@ struct FieldRef{T}
         isdefined(obj, field) && return getfield(obj, field)
         new{T}(obj, field)
     end
-    
+
     FieldRef(obj::T, field::Symbol) where T = new{T}(obj, field)
 end
 

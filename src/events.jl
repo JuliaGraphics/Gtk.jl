@@ -16,26 +16,26 @@ add_events(widget::GtkWidget, mask::Integer) = ccall((:gtk_widget_add_events, li
 #end
 
 
-function on_signal_resize(resize_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_resize(@nospecialize(resize_cb::Function), widget::GtkWidget, vargs...)
     signal_connect(resize_cb, widget, "size-allocate", Nothing, (Ptr{GdkRectangle},), vargs...)
 end
 
-function on_signal_destroy(destroy_cb::Function, widget::GObject, vargs...)
+function on_signal_destroy(@nospecialize(destroy_cb::Function), widget::GObject, vargs...)
     signal_connect(destroy_cb, widget, "destroy", Nothing, (), vargs...)
 end
 
-function on_signal_button_press(press_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_button_press(@nospecialize(press_cb::Function), widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_PRESS)
     signal_connect(press_cb, widget, "button-press-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
-function on_signal_button_release(release_cb::Function, widget::GtkWidget, vargs...)
+function on_signal_button_release(@nospecialize(release_cb::Function), widget::GtkWidget, vargs...)
     add_events(widget, GdkEventMask.BUTTON_RELEASE)
     signal_connect(release_cb, widget, "button-release-event", Cint, (Ptr{GdkEventButton},), vargs...)
 end
 
 mutable struct Gtk_signal_motion{T}
     closure::T
-    callback::Ptr{Nothing}
+    callback::Function
     include::UInt32
     exclude::UInt32
 end
@@ -43,11 +43,7 @@ function notify_motion(p::Ptr{GObject}, eventp::Ptr{GdkEventMotion}, closure::Gt
     event = unsafe_load(eventp)
     if event.state & closure.include == closure.include &&
        event.state & closure.exclude == 0
-        if isbitstype(T)
-            ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T), p, eventp, closure.closure)
-        else
-            ret = ccall(closure.callback, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Any), p, eventp, closure.closure)
-        end
+        ret = closure.callback(p, eventp, closure.closure)
     else
         ret = Int32(false)
     end
@@ -70,14 +66,8 @@ function on_signal_motion(move_cb::Function, widget::GtkWidget,
         mask |= GdkEventMask.BUTTON_MOTION
     end
     add_events(widget, mask)
-    @assert Base.isstructtype(T)
-    if isbitstype(T)
-        cb = cfunction_(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, T))
-    else
-        cb = cfunction_(move_cb, Cint, (Ptr{GObject}, Ptr{GdkEventMotion}, Ref{T}))
-    end
     closure = Gtk_signal_motion{T}(
-        closure, cb,
+        closure, move_cb,
         UInt32(include),
         UInt32(exclude)
         )

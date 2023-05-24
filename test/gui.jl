@@ -1,4 +1,5 @@
 ## Tests
+using Test
 
 using Gtk.ShortNames, Gtk.GConstants, Gtk.Graphics
 import Gtk.deleteat!, Gtk.libgtk_version, Gtk.GtkToolbarStyle, Gtk.GtkFileChooserAction, Gtk.GtkResponseType
@@ -48,6 +49,9 @@ mutable struct MyWindow <: Window
     end
 end
 
+# For testing callbacks
+click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
+
 @testset "gui" begin
 
 wdth, hght = screen_size()
@@ -84,6 +88,9 @@ visible(w,false)
 @test visible(w) == false
 visible(w,true)
 @test visible(w) == true
+
+gw = Gtk.gdk_window(w)
+ox, oy = Gtk.get_origin(gw)
 
 hide(w)
 show(w)
@@ -125,21 +132,32 @@ end
 end
 
 @testset "Frame" begin
+fr=Frame()
 w = Window(
-    Frame(),
+    fr,
     "Frame", 400, 400)
+widgets=[f for f in w] # test iteration over GtkBin
+@test length(widgets)==1
+e=[c for c in fr] # test iteration over an empty GtkBin
+@test length(e)==0
 showall(w)
 destroy(w)
 end
 
 @testset "Initially Hidden Canvas" begin
 nb = Notebook()
+@test hasparent(nb)==false
 vbox = Gtk.GtkBox(:v)
 c = Canvas()
 push!(nb, vbox, "A")
 push!(nb, c, "B")
+insert!(nb, 2, Label("Something in the middle"), "A*")
+pushfirst!(nb, Label("Something at the beginning"), "First")
+splice!(nb, 3)
 w = Window("TestDataViewer",600,600)
+@test pagenumber(nb,c)==3
 push!(w,nb)
+@test parent(nb)==w
 showall(w)
 destroy(w)
 end
@@ -165,6 +183,8 @@ showall(w)
 set_gtk_property!(nb,:page,2)
 @test get_gtk_property(nb,:page,Int) == 2
 showall(w)
+empty!(nb)
+@test length(nb) == 0
 destroy(w)
 end
 
@@ -175,8 +195,24 @@ pw2 = Paned(:v)
 push!(w, pw)
 push!(pw, Button("one"))
 push!(pw, pw2)
-push!(pw2,Button("two"))
-push!(pw2,Button("three"))
+@test pw[2]==pw2
+@test length(pw) == 2
+@test eachindex(pw) == 1:2
+pw2[1]=Button("two")
+pw2[2,true,false]=Button("three")
+showall(w)
+destroy(w)
+end
+
+@testset "Layout" begin
+w = Window("Layout", 400, 400)
+l = Layout(600,600)
+push!(w,l)
+l[300,300]=Button("Button")
+s=size(l)
+@test s == (600, 600)
+@test width(l)==600
+@test height(l)==600
 showall(w)
 destroy(w)
 end
@@ -191,6 +227,9 @@ g1 = Gtk.GtkBox(:h)
 g2 = Gtk.GtkBox(:h)
 push!(f,g1)
 push!(f,g2)
+@test f[1]==g1
+@test length(f) == 2
+@test eachindex(f) == 1:2
 
 b11 = Button("first")
 push!(g1, b11)
@@ -212,6 +251,11 @@ set_gtk_property!(g1,:pack_type,b11,0) #GTK_PACK_START
 set_gtk_property!(g1,:pack_type,b12,0) #GTK_PACK_START
 set_gtk_property!(g2,:pack_type,b21,1) #GTK_PACK_END
 set_gtk_property!(g2,:pack_type,b22,1) #GTK_PACK_END
+@test get_gtk_property(g1,:pack_type, b11, Int) == 0
+
+@test length(g1)==2
+deleteat!(g1,1)
+@test length(g1)==1
 
 ## Now shrink window
 showall(w)
@@ -224,8 +268,7 @@ bb = ButtonBox(:h)
 w = Window(bb, "ButtonBox")
 cancel = Button("Cancel")
 ok = Button("OK")
-push!(bb, cancel)
-push!(bb, ok)
+append!(bb, [cancel,ok])
 
 # Expander
 delete!(w, bb)
@@ -238,12 +281,22 @@ end
 @testset "Grid" begin
     grid = Grid()
     w = Window(grid, "Grid", 400, 400)
-    grid[2,2] = Button("2,2")
+    b=Button("2,2")
+    grid[2,2] = b
+    @test grid[2,2] == b
     grid[2,3] = Button("2,3")
     grid[1,1] = "grid"
+    grid[3,1:3] = Button("Tall button")
+    @test_broken eachindex(grid) == CartesianIndices(size(grid))
     insert!(grid,1,:top)
+    insert!(grid,3,:bottom)
+    insert!(grid,grid[1,2],:right)
+    @test_throws ErrorException insert!(grid,6,:above)
+    @test_throws ErrorException deleteat!(grid,6,:below)
     libgtk_version >= v"3.10.0" && deleteat!(grid,1,:row)
     showall(w)
+    empty!(grid)
+    @test length(grid)==0
     destroy(w)
 end
 
@@ -266,8 +319,6 @@ id = signal_connect(b, "clicked") do widget
     counter::Int += 1
 end
 @test signal_handler_is_connected(b, id)
-# For testing callbacks
-click(b::Button) = ccall((:gtk_button_clicked,Gtk.libgtk),Nothing,(Ptr{Gtk.GObject},),b)
 
 @test counter == 0
 click(b)
@@ -289,10 +340,35 @@ end
 icon = Matrix{Gtk.RGB}(undef, 40, 20)
 fill!(icon, Gtk.RGB(0,0xff,0))
 icon[5:end-5, 3:end-3] .= Ref(Gtk.RGB(0,0,0xff))
-b = Button(Image(Pixbuf(data=icon, has_alpha=false)))
-w = Window(b, "Icon button", 60, 40)
+pb=Pixbuf(data=icon, has_alpha=false)
+@test eltype(pb) == Gtk.RGB
+@test size(pb) == (40, 20)
+@test pb[1,1].g==0xff
+pb[10,10]=Gtk.RGB(0,0,0)
+pb[20:30,1:5]=Gtk.RGB(0xff,0,0)
+w = Window(Button(Image(pb)), "Icon button", 60, 40)
 showall(w)
+pb2=copy(pb)
+@test size(pb2,2) == size(pb)[2]
+pb3=Gtk.slice(pb2,11:20,11:20)
+@test size(pb3) == (10,10)
+fill!(pb3,Gtk.RGB(0,0,0))
 destroy(w)
+end
+
+@testset "Transparent pixbuf" begin
+icon = Matrix{Gtk.RGBA}(undef, 40, 20)
+fill!(icon, Gtk.RGBA(0,0xff,0, 0xff))
+icon[5:end-5, 3:end-3] .= Ref(Gtk.RGBA(0,0,0xff,0x80))
+pb=Pixbuf(data=icon, has_alpha=true)
+@test eltype(pb) == Gtk.RGBA
+end
+
+@testset "Icon theme" begin
+img = Image(; icon_name = "document-open", size=:BUTTON)
+icon_theme = Gtk.icon_theme_get_default()
+pb=Gtk.icon_theme_load_icon_for_scale(icon_theme, "document-open", 60, 60, Gtk.GConstants.GtkIconLookupFlags.GTK_ICON_LOOKUP_NO_SVG)
+@test isa(pb,GdkPixbuf)
 end
 
 @testset "checkbox" begin
@@ -416,6 +492,13 @@ w = Window(b, "VolumeButton", 50, 50)|>showall
 destroy(w)
 end
 
+@testset "ColorButton" begin
+b = ColorButton(Gtk.GdkRGBA(0, 0.8, 1.0, 0.3))
+w = Window(b, "ColorButton", 50, 50)|>showall
+GAccessor.rgba(ColorChooser(b), GLib.mutable(Gtk.GdkRGBA(0, 0, 0, 0)))
+destroy(w)
+end
+
 @testset "combobox" begin
 combo = ComboBoxText()
 choices = ["Strawberry", "Vanilla", "Chocolate"]
@@ -423,11 +506,13 @@ for c in choices
     push!(combo, c)
 end
 c = cells(CellLayout(combo))
+@test eachindex(c) == 1:1
 set_gtk_property!(c[1],"max_width_chars", 5)
 
 w = Window(combo, "ComboGtkBoxText")|>showall
 lsl = ListStoreLeaf(combo)
 @test length(lsl) == 3
+@test eachindex(lsl) == CartesianIndices(size(lsl))
 empty!(combo)
 @test length(lsl) == 0
 
@@ -437,6 +522,9 @@ combo = ComboBoxText(true)
 for c in choices
     push!(combo, c)
 end
+pushfirst!(combo, "Rocky road")
+insert!(combo, 3, "Pistachio")
+delete!(combo, 3)
 w = Window(combo, "ComboBoxText with entry")|>showall
 destroy(w)
 end
@@ -465,16 +553,18 @@ pb = ProgressBar()
 w = Window(pb, "Progress bar")|>showall
 set_gtk_property!(pb,:fraction,0.7)
 @test get_gtk_property(pb,:fraction,Float64) == 0.7
+pulse(pb)
 destroy(w)
 end
 
 @testset "spinner" begin
 s = Spinner()
 w = Window(s, "Spinner")|>showall
-set_gtk_property!(s,:active,true)
+start(s)
 @test get_gtk_property(s,:active,Bool) == true
-set_gtk_property!(s,:active,false)
+stop(s)
 @test get_gtk_property(s,:active,Bool) == false
+
 destroy(w)
 end
 
@@ -517,6 +607,10 @@ function cb_sbpop(ptr,evt,id)
 end
 on_signal_button_press(cb_sbpush, bpush, false, ctxid)
 on_signal_button_press(cb_sbpop, bpop, false, ctxid)
+
+click(bpush)
+click(bpop)
+empty!(sb,ctxid)
 destroy(w)
 end
 
@@ -541,14 +635,12 @@ end
     Gtk.showall(win)
     sleep(0.5)
     mtrx = Gtk.Cairo.get_matrix(getgc(cnvs))
-    if get(ENV, "CI", nothing) === nothing || !Sys.islinux()
-        @test mtrx.xx == 300
-        @test mtrx.yy == 280
-    else
-        @test_broken mtrx.xx == 300
-        @test_broken mtrx.yy == 280
-    end
+    @test mtrx.xx == 300
+    @test mtrx.yy == 280
     @test mtrx.xy == mtrx.yx == mtrx.x0 == mtrx.y0 == 0
+    surf = Gtk.cairo_surface(cnvs)
+    a = Gtk.allocation(cnvs)
+    @test isa(a,Gtk.GdkRectangle)
 end
 
 @testset "Menus" begin
@@ -615,17 +707,28 @@ end
 #@test get_value(tr)[1] == choices[2]
 #destroy(w)
 
-@testset "Selectors" begin
+@testset "File Chooser" begin
     dlg = FileChooserDialog("Select file", Null(), GtkFileChooserAction.OPEN,
                             (("_Cancel", GtkResponseType.CANCEL),
                              ("_Open", GtkResponseType.ACCEPT)))
     destroy(dlg)
 end
 
+@testset "Color Chooser" begin
+dlg = ColorChooserDialog("Select color", Null())
+destroy(dlg)
+end
+
 @testset "List view" begin
 ls=ListStore(Int32,Bool)
-push!(ls,(44,true))
+push!(ls,(42,true))
+ls[1,1]=44
 push!(ls,(33,true))
+pushfirst!(ls,(22,false))
+popfirst!(ls)
+@test size(ls)==(2,2)
+@test eachindex(ls) == CartesianIndices(size(ls))
+@test axes(ls, 1) == axes(ls, 2) == 1:2
 insert!(ls, 2, (35, false))
 tv=TreeView(TreeModel(ls))
 r1=CellRendererText()
@@ -634,6 +737,8 @@ c1=TreeViewColumn("A", r1, Dict([("text",0)]))
 c2=TreeViewColumn("B", r2, Dict([("active",1)]))
 push!(tv,c1)
 push!(tv,c2)
+delete!(tv, c1)
+insert!(tv, 1, c1)
 w = Window(tv, "List View")|>showall
 
 ## selection
@@ -646,16 +751,27 @@ iter = selected(selmodel)
 @test Gtk.index_from_iter(ls, iter) == 1
 @test ls[iter, 1] == 44
 deleteat!(ls, iter)
-@test isvalid(ls, iter) == false
+select!(selmodel, Gtk.iter_from_index(ls, 1))
+iter = selected(selmodel)
+@test ls[iter, 1] == 35
+
+G_.mode(selmodel,Gtk.GConstants.GtkSelectionMode.MULTIPLE)
+selectall!(selmodel)
+iters = Gtk.selected_rows(selmodel)
+@test length(iters) == 2
+@test ls[iters[1],1] == 35
+unselectall!(selmodel)
 
 tmSorted=TreeModelSort(ls)
 G_.model(tv,tmSorted)
 G_.sort_column_id(TreeSortable(tmSorted),0,GtkSortType.ASCENDING)
 it = convert_child_iter_to_iter(tmSorted,Gtk.iter_from_index(ls, 1))
+G_.mode(selmodel,Gtk.GConstants.GtkSelectionMode.SINGLE)
 select!(selmodel, it)
 iter = selected(selmodel)
 @test TreeModel(tmSorted)[iter, 1] == 35
 
+empty!(ls)
 
 destroy(w)
 end
@@ -675,6 +791,7 @@ iter = Gtk.iter_from_index(ts, [1])
 ts[iter,1] = "ONE"
 @test ts[iter,1] == "ONE"
 @test map(i -> ts[i, 1], Gtk.TreeIterator(ts, iter)) == ["two", "three"]
+@test Gtk.iter_n_children(TreeModel(ts), iter)==1
 
 destroy(w)
 end
@@ -688,6 +805,9 @@ push!(toolbar,tb1)
 pushfirst!(toolbar,tb2)
 push!(toolbar,tb3)
 push!(toolbar,SeparatorToolItem(), ToggleToolButton("gtk-open"), MenuToolButton("gtk-new"))
+@test toolbar[0]==tb2  # FIXME: uses zero based indexing
+@test length(toolbar)==6
+@test eachindex(toolbar) == 0:5   # FIXME zero-based indexing
 G_.style(toolbar,GtkToolbarStyle.BOTH)
 w = Window(toolbar, "Toolbar")|>showall
 destroy(w)
@@ -762,7 +882,9 @@ destroy(w)
 end
 
 @testset "overlay" begin
-o = Overlay()
+c = Canvas()
+o = Overlay(c)
+push!(o,Button("Button"))
 w = Window(o, "overlay")|>showall
 destroy(w)
 end
@@ -787,6 +909,17 @@ end
     ### add css tests here
 
     destroy(w)
+end
+
+@testset "Builder" begin
+b=Builder(;filename="test.glade")
+widgets = [w for w in b]
+@test length(widgets)==length(b)
+button = b["a_button"]
+@test isa(button,Button)
+@test isa(b[1],Gtk.GtkWidget)
+
+@test_throws ErrorException b2 = Builder(;filename="test2.glade")
 end
 
 @testset "Subtyping from GObject" begin

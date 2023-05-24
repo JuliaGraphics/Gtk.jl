@@ -25,8 +25,6 @@ This `draw` function will get called each time the window gets resized or otherw
 
 ![canvas](../doc/figures/canvas.png)
 
-See Julia's standard-library documentation for more information on graphics.
-
 Errors in the `draw` function can corrupt Gtk's internal state; if
 this happens, you have to quit julia and start a fresh session. To
 avoid this problem, the `@guarded` macro wraps your code in a

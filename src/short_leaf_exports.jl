@@ -74,6 +74,8 @@
 @g_type_delegate TreeViewColumn = GtkTreeViewColumn
 @g_type_delegate VolumeButton = GtkVolumeButton
 @g_type_delegate Window = GtkWindow
+@g_type_delegate ColorChooserDialog = GtkColorChooserDialog
+@g_type_delegate ColorButton = GtkColorButton
 
 export @G_,
     @AboutDialog,
@@ -149,7 +151,9 @@ export @G_,
     @TreeView,
     @TreeViewColumn,
     @VolumeButton,
-    @Window
+    @Window,
+    @ColorChooserDialog,
+    @ColorButton
 
 export G_Leaf,
     AboutDialogLeaf,
@@ -222,7 +226,9 @@ export G_Leaf,
     TreeViewLeaf,
     TreeViewColumnLeaf,
     VolumeButtonLeaf,
-    WindowLeaf
+    WindowLeaf,
+    ColorChooserDialog,
+    ColorButton
 
 # Gtk 3
 @g_type_delegate Grid = GtkGrid

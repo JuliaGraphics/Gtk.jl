@@ -1,6 +1,6 @@
 quote
 $(Expr(:toplevel, :(module GConstants
-    export GUserDirectory, GFormatSizeFlags, GThreadError, GOnceStatus, GBookmarkFileError, GChecksumType, GConvertError, GDateDMY, GDateWeekday, GDateMonth, GTimeType, GFileError, GFileTest, GTraverseFlags, GTraverseType, GHookFlagMask, GIOCondition, GUnicodeType, GUnicodeBreakType, GUnicodeScript, GNormalizeMode, GIOError, GIOChannelError, GIOStatus, GSeekType, GIOFlags, GKeyFileError, GKeyFileFlags, GMarkupError, GMarkupParseFlags, GMarkupCollectType, GVariantClass, GVariantParseError, GLogLevelFlags, GLogWriterOutput, GOptionFlags, GOptionArg, GOptionError, GRegexError, GRegexCompileFlags, GRegexMatchFlags, GErrorType, GTokenType, GShellError, GSliceConfig, GSpawnError, GSpawnFlags, GAsciiType, GTestTrapFlags, GTestSubprocessFlags, GTestLogType, GTestFileType, GThreadPriority, GTypeDebugFlags, GTypeFundamentalFlags, GTypeFlags, GParamFlags, GSignalFlags, GConnectFlags, GSignalMatchType, GBindingFlags, GAppInfoCreateFlags, GConverterFlags, GConverterResult, GDataStreamByteOrder, GDataStreamNewlineType, GFileAttributeType, GFileAttributeInfoFlags, GFileAttributeStatus, GFileQueryInfoFlags, GFileCreateFlags, GFileMeasureFlags, GMountMountFlags, GMountUnmountFlags, GDriveStartFlags, GDriveStartStopType, GFileCopyFlags, GFileMonitorFlags, GFileType, GFilesystemPreviewType, GFileMonitorEvent, GIOErrorEnum, GAskPasswordFlags, GPasswordSave, GMountOperationResult, GOutputStreamSpliceFlags, GIOStreamSpliceFlags, GEmblemOrigin, GResolverError, GResolverRecordType, GResourceError, GResourceFlags, GResourceLookupFlags, GSocketFamily, GSocketType, GSocketMsgFlags, GSocketProtocol, GZlibCompressorFormat, GUnixSocketAddressType, GBusType, GBusNameOwnerFlags, GBusNameWatcherFlags, GDBusProxyFlags, GDBusError, GDBusConnectionFlags, GDBusCapabilityFlags, GDBusCallFlags, GDBusMessageType, GDBusMessageFlags, GDBusMessageHeaderField, GDBusPropertyInfoFlags, GDBusSubtreeFlags, GDBusServerFlags, GDBusSignalFlags, GDBusSendMessageFlags, GCredentialsType, GDBusMessageByteOrder, GApplicationFlags, GTlsError, GTlsCertificateFlags, GTlsAuthenticationMode, GTlsRehandshakeMode, GTlsPasswordFlags, GTlsInteractionResult, GDBusInterfaceSkeletonFlags, GDBusObjectManagerClientFlags, GTlsDatabaseVerifyFlags, GTlsDatabaseLookupFlags, GTlsCertificateRequestFlags, GIOModuleScopeFlags, GSocketClientEvent, GSocketListenerEvent, GTestDBusFlags, GSubprocessFlags, GNotificationPriority, GNetworkConnectivity, GModuleFlags, GSettingsBindFlags, GdkByteOrder, GdkModifierType, GdkModifierIntent, GdkStatus, GdkGrabStatus, GdkGrabOwnership, GdkEventMask, GdkGLError, GdkWindowTypeHint, GdkAxisUse, GdkAxisFlags, GdkInputSource, GdkInputMode, GdkDeviceType, GdkDragAction, GdkDragCancelReason, GdkDragProtocol, GdkDeviceToolType, GdkFilterReturn, GdkEventType, GdkVisibilityState, GdkTouchpadGesturePhase, GdkScrollDirection, GdkNotifyType, GdkCrossingMode, GdkPropertyState, GdkWindowState, GdkSettingAction, GdkOwnerChange, GdkFrameClockPhase, GdkWindowWindowClass, GdkWindowType, GdkWindowAttributesType, GdkWindowHints, GdkWMDecoration, GdkWMFunction, GdkGravity, GdkAnchorHints, GdkWindowEdge, GdkFullscreenMode, GdkSeatCapabilities, GdkSubpixelLayout, GdkPixbufAlphaMode, GdkColorspace, GdkPixbufError, GdkInterpType, GdkPixbufRotation, GdkCursorType, GdkDevicePadFeature, GdkPropMode, GdkVisualType, GtkAlign, GtkArrowType, GtkBaselinePosition, GtkDeleteType, GtkDirectionType, GtkIconSize, GtkSensitivityType, GtkTextDirection, GtkJustification, GtkMenuDirectionType, GtkMessageType, GtkMovementStep, GtkScrollStep, GtkOrientation, GtkPackType, GtkPositionType, GtkReliefStyle, GtkScrollType, GtkSelectionMode, GtkShadowType, GtkStateType, GtkToolbarStyle, GtkWrapMode, GtkSortType, GtkIMPreeditStyle, GtkIMStatusStyle, GtkPackDirection, GtkPrintPages, GtkPageSet, GtkNumberUpLayout, GtkPageOrientation, GtkPrintQuality, GtkPrintDuplex, GtkUnit, GtkTreeViewGridLines, GtkDragResult, GtkSizeGroupMode, GtkSizeRequestMode, GtkScrollablePolicy, GtkStateFlags, GtkRegionFlags, GtkJunctionSides, GtkBorderStyle, GtkLevelBarMode, GtkInputPurpose, GtkInputHints, GtkPropagationPhase, GtkEventSequenceState, GtkPanDirection, GtkPopoverConstraint, GtkAccelFlags, GtkWidgetHelpType, GtkApplicationInhibitFlags, GtkResizeMode, GtkWindowType, GtkWindowPosition, GtkDialogFlags, GtkResponseType, GtkLicense, GtkArrowPlacement, GtkTreeModelFlags, GtkCellRendererState, GtkCellRendererMode, GtkTreeViewColumnSizing, GtkTextSearchFlags, GtkTargetFlags, GtkImageType, GtkEntryIconPosition, GtkTreeViewDropPosition, GtkAssistantPageType, GtkButtonBoxStyle, GtkBuilderError, GtkCalendarDisplayOptions, GtkCellRendererAccelMode, GtkCssSectionType, GtkCssProviderError, GtkDebugFlag, GtkDestDefaults, GtkFileFilterFlags, GtkFileChooserAction, GtkFileChooserConfirmation, GtkFileChooserError, GtkStyleContextPrintFlags, GtkIconLookupFlags, GtkIconThemeError, GtkIconViewDropPosition, GtkButtonsType, GtkButtonRole, GtkNotebookTab, GtkPadActionType, GtkPlacesOpenFlags, GtkPrintStatus, GtkPrintOperationResult, GtkPrintOperationAction, GtkPrintError, GtkRecentManagerError, GtkRecentFilterFlags, GtkRecentSortType, GtkRecentChooserError, GtkRevealerTransitionType, GtkCornerType, GtkPolicyType, GtkShortcutType, GtkStackTransitionType, GtkSpinButtonUpdatePolicy, GtkSpinType, GtkTextBufferTargetInfo, GtkTextWindowType, GtkTextViewLayer, GtkTextExtendSelection, GtkToolbarSpaceStyle, GtkToolPaletteDragTargets, GtkRcFlags, GtkRcTokenType, GtkPathPriorityType, GtkPathType, GtkExpanderStyle, GtkAttachOptions, GtkUIManagerItemType
+    export GUserDirectory, GFormatSizeFlags, GThreadError, GOnceStatus, GBookmarkFileError, GChecksumType, GConvertError, GDateDMY, GDateWeekday, GDateMonth, GTimeType, GFileError, GFileTest, GTraverseFlags, GTraverseType, GHookFlagMask, GIOCondition, GUnicodeType, GUnicodeBreakType, GUnicodeScript, GNormalizeMode, GIOError, GIOChannelError, GIOStatus, GSeekType, GIOFlags, GKeyFileError, GKeyFileFlags, GMarkupError, GMarkupParseFlags, GMarkupCollectType, GVariantClass, GVariantParseError, GLogLevelFlags, GLogWriterOutput, GOptionFlags, GOptionArg, GOptionError, GRegexError, GRegexCompileFlags, GRegexMatchFlags, GErrorType, GTokenType, GShellError, GSliceConfig, GSpawnError, GSpawnFlags, GAsciiType, GNumberParserError, GTestTrapFlags, GTestSubprocessFlags, GTestResult, GTestLogType, GTestFileType, GWin32OSType, GThreadPriority, GTypeDebugFlags, GTypeFundamentalFlags, GTypeFlags, GParamFlags, GSignalFlags, GConnectFlags, GSignalMatchType, GBindingFlags, GAppInfoCreateFlags, GConverterFlags, GConverterResult, GDataStreamByteOrder, GDataStreamNewlineType, GFileAttributeType, GFileAttributeInfoFlags, GFileAttributeStatus, GFileQueryInfoFlags, GFileCreateFlags, GFileMeasureFlags, GMountMountFlags, GMountUnmountFlags, GDriveStartFlags, GDriveStartStopType, GFileCopyFlags, GFileMonitorFlags, GFileType, GFilesystemPreviewType, GFileMonitorEvent, GIOErrorEnum, GAskPasswordFlags, GPasswordSave, GMountOperationResult, GOutputStreamSpliceFlags, GIOStreamSpliceFlags, GEmblemOrigin, GResolverError, GResolverRecordType, GResourceError, GResourceFlags, GResourceLookupFlags, GSocketFamily, GSocketType, GSocketMsgFlags, GSocketProtocol, GZlibCompressorFormat, GUnixSocketAddressType, GBusType, GBusNameOwnerFlags, GBusNameWatcherFlags, GDBusProxyFlags, GDBusError, GDBusConnectionFlags, GDBusCapabilityFlags, GDBusCallFlags, GDBusMessageType, GDBusMessageFlags, GDBusMessageHeaderField, GDBusPropertyInfoFlags, GDBusSubtreeFlags, GDBusServerFlags, GDBusSignalFlags, GDBusSendMessageFlags, GCredentialsType, GDBusMessageByteOrder, GApplicationFlags, GTlsError, GTlsCertificateFlags, GTlsAuthenticationMode, GTlsRehandshakeMode, GTlsPasswordFlags, GTlsInteractionResult, GDBusInterfaceSkeletonFlags, GDBusObjectManagerClientFlags, GTlsDatabaseVerifyFlags, GTlsDatabaseLookupFlags, GTlsCertificateRequestFlags, GIOModuleScopeFlags, GSocketClientEvent, GSocketListenerEvent, GTestDBusFlags, GSubprocessFlags, GNotificationPriority, GNetworkConnectivity, GModuleFlags, GResolverNameLookupFlags, GSettingsBindFlags, GdkByteOrder, GdkModifierType, GdkModifierIntent, GdkStatus, GdkGrabStatus, GdkGrabOwnership, GdkEventMask, GdkGLError, GdkWindowTypeHint, GdkAxisUse, GdkAxisFlags, GdkInputSource, GdkInputMode, GdkDeviceType, GdkDragAction, GdkDragCancelReason, GdkDragProtocol, GdkDeviceToolType, GdkFilterReturn, GdkEventType, GdkVisibilityState, GdkTouchpadGesturePhase, GdkScrollDirection, GdkNotifyType, GdkCrossingMode, GdkPropertyState, GdkWindowState, GdkSettingAction, GdkOwnerChange, GdkFrameClockPhase, GdkWindowWindowClass, GdkWindowType, GdkWindowAttributesType, GdkWindowHints, GdkWMDecoration, GdkWMFunction, GdkGravity, GdkAnchorHints, GdkWindowEdge, GdkFullscreenMode, GdkSeatCapabilities, GdkSubpixelLayout, GdkPixbufAlphaMode, GdkColorspace, GdkPixbufError, GdkInterpType, GdkPixbufRotation, GdkCursorType, GdkDevicePadFeature, GdkPropMode, GdkVisualType, GtkAlign, GtkArrowType, GtkBaselinePosition, GtkDeleteType, GtkDirectionType, GtkIconSize, GtkSensitivityType, GtkTextDirection, GtkJustification, GtkMenuDirectionType, GtkMessageType, GtkMovementStep, GtkScrollStep, GtkOrientation, GtkPackType, GtkPositionType, GtkReliefStyle, GtkScrollType, GtkSelectionMode, GtkShadowType, GtkStateType, GtkToolbarStyle, GtkWrapMode, GtkSortType, GtkIMPreeditStyle, GtkIMStatusStyle, GtkPackDirection, GtkPrintPages, GtkPageSet, GtkNumberUpLayout, GtkPageOrientation, GtkPrintQuality, GtkPrintDuplex, GtkUnit, GtkTreeViewGridLines, GtkDragResult, GtkSizeGroupMode, GtkSizeRequestMode, GtkScrollablePolicy, GtkStateFlags, GtkRegionFlags, GtkJunctionSides, GtkBorderStyle, GtkLevelBarMode, GtkInputPurpose, GtkInputHints, GtkPropagationPhase, GtkEventSequenceState, GtkPanDirection, GtkPopoverConstraint, GtkAccelFlags, GtkWidgetHelpType, GtkApplicationInhibitFlags, GtkResizeMode, GtkWindowType, GtkWindowPosition, GtkDialogFlags, GtkResponseType, GtkLicense, GtkArrowPlacement, GtkTreeModelFlags, GtkCellRendererState, GtkCellRendererMode, GtkTreeViewColumnSizing, GtkTextSearchFlags, GtkTargetFlags, GtkImageType, GtkEntryIconPosition, GtkTreeViewDropPosition, GtkAssistantPageType, GtkButtonBoxStyle, GtkBuilderError, GtkCalendarDisplayOptions, GtkCellRendererAccelMode, GtkCssSectionType, GtkCssProviderError, GtkDebugFlag, GtkDestDefaults, GtkEventControllerScrollFlags, GtkFileFilterFlags, GtkFileChooserAction, GtkFileChooserConfirmation, GtkFileChooserError, GtkFontChooserLevel, GtkStyleContextPrintFlags, GtkIconLookupFlags, GtkIconThemeError, GtkIconViewDropPosition, GtkButtonsType, GtkButtonRole, GtkNotebookTab, GtkPadActionType, GtkPlacesOpenFlags, GtkPrintStatus, GtkPrintOperationResult, GtkPrintOperationAction, GtkPrintError, GtkRecentManagerError, GtkRecentFilterFlags, GtkRecentSortType, GtkRecentChooserError, GtkRevealerTransitionType, GtkCornerType, GtkPolicyType, GtkShortcutType, GtkStackTransitionType, GtkSpinButtonUpdatePolicy, GtkSpinType, GtkTextBufferTargetInfo, GtkTextWindowType, GtkTextViewLayer, GtkTextExtendSelection, GtkToolbarSpaceStyle, GtkToolPaletteDragTargets, GtkRcFlags, GtkRcTokenType, GtkPathPriorityType, GtkPathType, GtkExpanderStyle, GtkAttachOptions, GtkUIManagerItemType
     $(Expr(:toplevel, :(baremodule GUserDirectory
     const DIRECTORY_DESKTOP = const G_USER_DIRECTORY_DESKTOP = Main.Base.convert(Main.Base.Int32, 0)
     const DIRECTORY_DOCUMENTS = const G_USER_DIRECTORY_DOCUMENTS = Main.Base.convert(Main.Base.Int32, 1)
@@ -16,6 +16,7 @@ $(Expr(:toplevel, :(module GConstants
     const DEFAULT = const G_FORMAT_SIZE_DEFAULT = Main.Base.convert(Main.Base.Int32, 0)
     const LONG_FORMAT = const G_FORMAT_SIZE_LONG_FORMAT = Main.Base.convert(Main.Base.Int32, 1)
     const IEC_UNITS = const G_FORMAT_SIZE_IEC_UNITS = Main.Base.convert(Main.Base.Int32, 2)
+    const BITS = const G_FORMAT_SIZE_BITS = Main.Base.convert(Main.Base.Int32, 4)
     end)))
     $(Expr(:toplevel, :(baremodule GThreadError
     const AGAIN = const G_THREAD_ERROR_AGAIN = Main.Base.convert(Main.Base.Int32, 0)
@@ -40,6 +41,7 @@ $(Expr(:toplevel, :(module GConstants
     const SHA1 = const G_CHECKSUM_SHA1 = Main.Base.convert(Main.Base.Int32, 1)
     const SHA256 = const G_CHECKSUM_SHA256 = Main.Base.convert(Main.Base.Int32, 2)
     const SHA512 = const G_CHECKSUM_SHA512 = Main.Base.convert(Main.Base.Int32, 3)
+    const SHA384 = const G_CHECKSUM_SHA384 = Main.Base.convert(Main.Base.Int32, 4)
     end)))
     $(Expr(:toplevel, :(baremodule GConvertError
     const NO_CONVERSION = const G_CONVERT_ERROR_NO_CONVERSION = Main.Base.convert(Main.Base.Int32, 0)
@@ -49,6 +51,7 @@ $(Expr(:toplevel, :(module GConstants
     const BAD_URI = const G_CONVERT_ERROR_BAD_URI = Main.Base.convert(Main.Base.Int32, 4)
     const NOT_ABSOLUTE_PATH = const G_CONVERT_ERROR_NOT_ABSOLUTE_PATH = Main.Base.convert(Main.Base.Int32, 5)
     const NO_MEMORY = const G_CONVERT_ERROR_NO_MEMORY = Main.Base.convert(Main.Base.Int32, 6)
+    const EMBEDDED_NUL = const G_CONVERT_ERROR_EMBEDDED_NUL = Main.Base.convert(Main.Base.Int32, 7)
     end)))
     $(Expr(:toplevel, :(baremodule GDateDMY
     const DAY = const G_DATE_DAY = Main.Base.convert(Main.Base.Int32, 0)
@@ -363,6 +366,17 @@ $(Expr(:toplevel, :(module GConstants
     const NEWA = const G_UNICODE_SCRIPT_NEWA = Main.Base.convert(Main.Base.Int32, 135)
     const OSAGE = const G_UNICODE_SCRIPT_OSAGE = Main.Base.convert(Main.Base.Int32, 136)
     const TANGUT = const G_UNICODE_SCRIPT_TANGUT = Main.Base.convert(Main.Base.Int32, 137)
+    const MASARAM_GONDI = const G_UNICODE_SCRIPT_MASARAM_GONDI = Main.Base.convert(Main.Base.Int32, 138)
+    const NUSHU = const G_UNICODE_SCRIPT_NUSHU = Main.Base.convert(Main.Base.Int32, 139)
+    const SOYOMBO = const G_UNICODE_SCRIPT_SOYOMBO = Main.Base.convert(Main.Base.Int32, 140)
+    const ZANABAZAR_SQUARE = const G_UNICODE_SCRIPT_ZANABAZAR_SQUARE = Main.Base.convert(Main.Base.Int32, 141)
+    const DOGRA = const G_UNICODE_SCRIPT_DOGRA = Main.Base.convert(Main.Base.Int32, 142)
+    const GUNJALA_GONDI = const G_UNICODE_SCRIPT_GUNJALA_GONDI = Main.Base.convert(Main.Base.Int32, 143)
+    const HANIFI_ROHINGYA = const G_UNICODE_SCRIPT_HANIFI_ROHINGYA = Main.Base.convert(Main.Base.Int32, 144)
+    const MAKASAR = const G_UNICODE_SCRIPT_MAKASAR = Main.Base.convert(Main.Base.Int32, 145)
+    const MEDEFAIDRIN = const G_UNICODE_SCRIPT_MEDEFAIDRIN = Main.Base.convert(Main.Base.Int32, 146)
+    const OLD_SOGDIAN = const G_UNICODE_SCRIPT_OLD_SOGDIAN = Main.Base.convert(Main.Base.Int32, 147)
+    const SOGDIAN = const G_UNICODE_SCRIPT_SOGDIAN = Main.Base.convert(Main.Base.Int32, 148)
     end)))
     $(Expr(:toplevel, :(baremodule GNormalizeMode
     const DEFAULT = const G_NORMALIZE_DEFAULT = Main.Base.convert(Main.Base.Int32, 0)
@@ -723,6 +737,10 @@ $(Expr(:toplevel, :(module GConstants
     const UPPER = const G_ASCII_UPPER = Main.Base.convert(Main.Base.Int32, 512)
     const XDIGIT = const G_ASCII_XDIGIT = Main.Base.convert(Main.Base.Int32, 1024)
     end)))
+    $(Expr(:toplevel, :(baremodule GNumberParserError
+    const INVALID = const G_NUMBER_PARSER_ERROR_INVALID = Main.Base.convert(Main.Base.Int32, 0)
+    const OUT_OF_BOUNDS = const G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS = Main.Base.convert(Main.Base.Int32, 1)
+    end)))
     $(Expr(:toplevel, :(baremodule GTestTrapFlags
     const SILENCE_STDOUT = const G_TEST_TRAP_SILENCE_STDOUT = Main.Base.convert(Main.Base.Int32, 128)
     const SILENCE_STDERR = const G_TEST_TRAP_SILENCE_STDERR = Main.Base.convert(Main.Base.Int32, 256)
@@ -732,6 +750,12 @@ $(Expr(:toplevel, :(module GConstants
     const STDIN = const G_TEST_SUBPROCESS_INHERIT_STDIN = Main.Base.convert(Main.Base.Int32, 1)
     const STDOUT = const G_TEST_SUBPROCESS_INHERIT_STDOUT = Main.Base.convert(Main.Base.Int32, 2)
     const STDERR = const G_TEST_SUBPROCESS_INHERIT_STDERR = Main.Base.convert(Main.Base.Int32, 4)
+    end)))
+    $(Expr(:toplevel, :(baremodule GTestResult
+    const SUCCESS = const G_TEST_RUN_SUCCESS = Main.Base.convert(Main.Base.Int32, 0)
+    const SKIPPED = const G_TEST_RUN_SKIPPED = Main.Base.convert(Main.Base.Int32, 1)
+    const FAILURE = const G_TEST_RUN_FAILURE = Main.Base.convert(Main.Base.Int32, 2)
+    const INCOMPLETE = const G_TEST_RUN_INCOMPLETE = Main.Base.convert(Main.Base.Int32, 3)
     end)))
     $(Expr(:toplevel, :(baremodule GTestLogType
     const NONE = const G_TEST_LOG_NONE = Main.Base.convert(Main.Base.Int32, 0)
@@ -750,6 +774,11 @@ $(Expr(:toplevel, :(module GConstants
     $(Expr(:toplevel, :(baremodule GTestFileType
     const DIST = const G_TEST_DIST = Main.Base.convert(Main.Base.Int32, 0)
     const BUILT = const G_TEST_BUILT = Main.Base.convert(Main.Base.Int32, 1)
+    end)))
+    $(Expr(:toplevel, :(baremodule GWin32OSType
+    const ANY = const G_WIN32_OS_ANY = Main.Base.convert(Main.Base.Int32, 0)
+    const WORKSTATION = const G_WIN32_OS_WORKSTATION = Main.Base.convert(Main.Base.Int32, 1)
+    const SERVER = const G_WIN32_OS_SERVER = Main.Base.convert(Main.Base.Int32, 2)
     end)))
     $(Expr(:toplevel, :(baremodule GThreadPriority
     const LOW = const G_THREAD_PRIORITY_LOW = Main.Base.convert(Main.Base.Int32, 0)
@@ -998,6 +1027,7 @@ $(Expr(:toplevel, :(module GConstants
     const NEED_DOMAIN = const G_ASK_PASSWORD_NEED_DOMAIN = Main.Base.convert(Main.Base.Int32, 4)
     const SAVING_SUPPORTED = const G_ASK_PASSWORD_SAVING_SUPPORTED = Main.Base.convert(Main.Base.Int32, 8)
     const ANONYMOUS_SUPPORTED = const G_ASK_PASSWORD_ANONYMOUS_SUPPORTED = Main.Base.convert(Main.Base.Int32, 16)
+    const TCRYPT = const G_ASK_PASSWORD_TCRYPT = Main.Base.convert(Main.Base.Int32, 32)
     end)))
     $(Expr(:toplevel, :(baremodule GPasswordSave
     const NEVER = const G_PASSWORD_SAVE_NEVER = Main.Base.convert(Main.Base.Int32, 0)
@@ -1053,7 +1083,7 @@ $(Expr(:toplevel, :(module GConstants
     const INVALID = const G_SOCKET_FAMILY_INVALID = Main.Base.convert(Main.Base.Int32, 0)
     const UNIX = const G_SOCKET_FAMILY_UNIX = Main.Base.convert(Main.Base.Int32, 1)
     const IPV4 = const G_SOCKET_FAMILY_IPV4 = Main.Base.convert(Main.Base.Int32, 2)
-    const IPV6 = const G_SOCKET_FAMILY_IPV6 = Main.Base.convert(Main.Base.Int32, 10)
+    const IPV6 = const G_SOCKET_FAMILY_IPV6 = Main.Base.convert(Main.Base.Int32, 23)
     end)))
     $(Expr(:toplevel, :(baremodule GSocketType
     const INVALID = const G_SOCKET_TYPE_INVALID = Main.Base.convert(Main.Base.Int32, 0)
@@ -1096,6 +1126,7 @@ $(Expr(:toplevel, :(module GConstants
     const NONE = const G_BUS_NAME_OWNER_FLAGS_NONE = Main.Base.convert(Main.Base.Int32, 0)
     const ALLOW_REPLACEMENT = const G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT = Main.Base.convert(Main.Base.Int32, 1)
     const REPLACE = const G_BUS_NAME_OWNER_FLAGS_REPLACE = Main.Base.convert(Main.Base.Int32, 2)
+    const DO_NOT_QUEUE = const G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE = Main.Base.convert(Main.Base.Int32, 4)
     end)))
     $(Expr(:toplevel, :(baremodule GBusNameWatcherFlags
     const NONE = const G_BUS_NAME_WATCHER_FLAGS_NONE = Main.Base.convert(Main.Base.Int32, 0)
@@ -1243,6 +1274,8 @@ $(Expr(:toplevel, :(module GConstants
     const SEND_ENVIRONMENT = const G_APPLICATION_SEND_ENVIRONMENT = Main.Base.convert(Main.Base.Int32, 16)
     const NON_UNIQUE = const G_APPLICATION_NON_UNIQUE = Main.Base.convert(Main.Base.Int32, 32)
     const CAN_OVERRIDE_APP_ID = const G_APPLICATION_CAN_OVERRIDE_APP_ID = Main.Base.convert(Main.Base.Int32, 64)
+    const ALLOW_REPLACEMENT = const G_APPLICATION_ALLOW_REPLACEMENT = Main.Base.convert(Main.Base.Int32, 128)
+    const REPLACE = const G_APPLICATION_REPLACE = Main.Base.convert(Main.Base.Int32, 256)
     end)))
     $(Expr(:toplevel, :(baremodule GTlsError
     const UNAVAILABLE = const G_TLS_ERROR_UNAVAILABLE = Main.Base.convert(Main.Base.Int32, 0)
@@ -1252,6 +1285,7 @@ $(Expr(:toplevel, :(module GConstants
     const HANDSHAKE = const G_TLS_ERROR_HANDSHAKE = Main.Base.convert(Main.Base.Int32, 4)
     const CERTIFICATE_REQUIRED = const G_TLS_ERROR_CERTIFICATE_REQUIRED = Main.Base.convert(Main.Base.Int32, 5)
     const EOF = const G_TLS_ERROR_EOF = Main.Base.convert(Main.Base.Int32, 6)
+    const INAPPROPRIATE_FALLBACK = const G_TLS_ERROR_INAPPROPRIATE_FALLBACK = Main.Base.convert(Main.Base.Int32, 7)
     end)))
     $(Expr(:toplevel, :(baremodule GTlsCertificateFlags
     const UNKNOWN_CA = const G_TLS_CERTIFICATE_UNKNOWN_CA = Main.Base.convert(Main.Base.Int32, 1)
@@ -1353,6 +1387,11 @@ $(Expr(:toplevel, :(module GConstants
     const LAZY = const G_MODULE_BIND_LAZY = Main.Base.convert(Main.Base.Int32, 1)
     const LOCAL = const G_MODULE_BIND_LOCAL = Main.Base.convert(Main.Base.Int32, 2)
     const MASK = const G_MODULE_BIND_MASK = Main.Base.convert(Main.Base.Int32, 3)
+    end)))
+    $(Expr(:toplevel, :(baremodule GResolverNameLookupFlags
+    const DEFAULT = const G_RESOLVER_NAME_LOOKUP_FLAGS_DEFAULT = Main.Base.convert(Main.Base.Int32, 0)
+    const IPV4_ONLY = const G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY = Main.Base.convert(Main.Base.Int32, 1)
+    const IPV6_ONLY = const G_RESOLVER_NAME_LOOKUP_FLAGS_IPV6_ONLY = Main.Base.convert(Main.Base.Int32, 2)
     end)))
     $(Expr(:toplevel, :(baremodule GSettingsBindFlags
     const DEFAULT = const G_SETTINGS_BIND_DEFAULT = Main.Base.convert(Main.Base.Int32, 0)
@@ -1456,7 +1495,7 @@ $(Expr(:toplevel, :(module GConstants
     const SMOOTH_SCROLL = const GDK_SMOOTH_SCROLL_MASK = Main.Base.convert(Main.Base.Int32, 8388608)
     const TOUCHPAD_GESTURE = const GDK_TOUCHPAD_GESTURE_MASK = Main.Base.convert(Main.Base.Int32, 16777216)
     const TABLET_PAD = const GDK_TABLET_PAD_MASK = Main.Base.convert(Main.Base.Int32, 33554432)
-    const ALL_EVENTS = const GDK_ALL_EVENTS_MASK = Main.Base.convert(Main.Base.Int32, 16777214)
+    const ALL_EVENTS = const GDK_ALL_EVENTS_MASK = Main.Base.convert(Main.Base.Int32, 67108862)
     end)))
     $(Expr(:toplevel, :(baremodule GdkGLError
     const NOT_AVAILABLE = const GDK_GL_ERROR_NOT_AVAILABLE = Main.Base.convert(Main.Base.Int32, 0)
@@ -1666,6 +1705,14 @@ $(Expr(:toplevel, :(module GConstants
     const BELOW = const GDK_WINDOW_STATE_BELOW = Main.Base.convert(Main.Base.Int32, 64)
     const FOCUSED = const GDK_WINDOW_STATE_FOCUSED = Main.Base.convert(Main.Base.Int32, 128)
     const TILED = const GDK_WINDOW_STATE_TILED = Main.Base.convert(Main.Base.Int32, 256)
+    const TOP_TILED = const GDK_WINDOW_STATE_TOP_TILED = Main.Base.convert(Main.Base.Int32, 512)
+    const TOP_RESIZABLE = const GDK_WINDOW_STATE_TOP_RESIZABLE = Main.Base.convert(Main.Base.Int32, 1024)
+    const RIGHT_TILED = const GDK_WINDOW_STATE_RIGHT_TILED = Main.Base.convert(Main.Base.Int32, 2048)
+    const RIGHT_RESIZABLE = const GDK_WINDOW_STATE_RIGHT_RESIZABLE = Main.Base.convert(Main.Base.Int32, 4096)
+    const BOTTOM_TILED = const GDK_WINDOW_STATE_BOTTOM_TILED = Main.Base.convert(Main.Base.Int32, 8192)
+    const BOTTOM_RESIZABLE = const GDK_WINDOW_STATE_BOTTOM_RESIZABLE = Main.Base.convert(Main.Base.Int32, 16384)
+    const LEFT_TILED = const GDK_WINDOW_STATE_LEFT_TILED = Main.Base.convert(Main.Base.Int32, 32768)
+    const LEFT_RESIZABLE = const GDK_WINDOW_STATE_LEFT_RESIZABLE = Main.Base.convert(Main.Base.Int32, 65536)
     end)))
     $(Expr(:toplevel, :(baremodule GdkSettingAction
     const NEW = const GDK_SETTING_ACTION_NEW = Main.Base.convert(Main.Base.Int32, 0)
@@ -2253,6 +2300,8 @@ $(Expr(:toplevel, :(module GConstants
     const UPPERCASE_SENTENCES = const GTK_INPUT_HINT_UPPERCASE_SENTENCES = Main.Base.convert(Main.Base.Int32, 64)
     const INHIBIT_OSK = const GTK_INPUT_HINT_INHIBIT_OSK = Main.Base.convert(Main.Base.Int32, 128)
     const VERTICAL_WRITING = const GTK_INPUT_HINT_VERTICAL_WRITING = Main.Base.convert(Main.Base.Int32, 256)
+    const EMOJI = const GTK_INPUT_HINT_EMOJI = Main.Base.convert(Main.Base.Int32, 512)
+    const NO_EMOJI = const GTK_INPUT_HINT_NO_EMOJI = Main.Base.convert(Main.Base.Int32, 1024)
     end)))
     $(Expr(:toplevel, :(baremodule GtkPropagationPhase
     const NONE = const GTK_PHASE_NONE = Main.Base.convert(Main.Base.Int32, 0)
@@ -2339,6 +2388,7 @@ $(Expr(:toplevel, :(module GConstants
     const LGPL_2_1_ONLY = const GTK_LICENSE_LGPL_2_1_ONLY = Main.Base.convert(Main.Base.Int32, 11)
     const LGPL_3_0_ONLY = const GTK_LICENSE_LGPL_3_0_ONLY = Main.Base.convert(Main.Base.Int32, 12)
     const AGPL_3_0 = const GTK_LICENSE_AGPL_3_0 = Main.Base.convert(Main.Base.Int32, 13)
+    const AGPL_3_0_ONLY = const GTK_LICENSE_AGPL_3_0_ONLY = Main.Base.convert(Main.Base.Int32, 14)
     end)))
     $(Expr(:toplevel, :(baremodule GtkArrowPlacement
     const BOTH = const GTK_ARROWS_BOTH = Main.Base.convert(Main.Base.Int32, 0)
@@ -2491,6 +2541,14 @@ $(Expr(:toplevel, :(module GConstants
     const DROP = const GTK_DEST_DEFAULT_DROP = Main.Base.convert(Main.Base.Int32, 4)
     const ALL = const GTK_DEST_DEFAULT_ALL = Main.Base.convert(Main.Base.Int32, 7)
     end)))
+    $(Expr(:toplevel, :(baremodule GtkEventControllerScrollFlags
+    const NONE = const GTK_EVENT_CONTROLLER_SCROLL_NONE = Main.Base.convert(Main.Base.Int32, 0)
+    const VERTICAL = const GTK_EVENT_CONTROLLER_SCROLL_VERTICAL = Main.Base.convert(Main.Base.Int32, 1)
+    const HORIZONTAL = const GTK_EVENT_CONTROLLER_SCROLL_HORIZONTAL = Main.Base.convert(Main.Base.Int32, 2)
+    const DISCRETE = const GTK_EVENT_CONTROLLER_SCROLL_DISCRETE = Main.Base.convert(Main.Base.Int32, 4)
+    const KINETIC = const GTK_EVENT_CONTROLLER_SCROLL_KINETIC = Main.Base.convert(Main.Base.Int32, 8)
+    const BOTH_AXES = const GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES = Main.Base.convert(Main.Base.Int32, 3)
+    end)))
     $(Expr(:toplevel, :(baremodule GtkFileFilterFlags
     const FILENAME = const GTK_FILE_FILTER_FILENAME = Main.Base.convert(Main.Base.Int32, 1)
     const URI = const GTK_FILE_FILTER_URI = Main.Base.convert(Main.Base.Int32, 2)
@@ -2513,6 +2571,13 @@ $(Expr(:toplevel, :(module GConstants
     const BAD_FILENAME = const GTK_FILE_CHOOSER_ERROR_BAD_FILENAME = Main.Base.convert(Main.Base.Int32, 1)
     const ALREADY_EXISTS = const GTK_FILE_CHOOSER_ERROR_ALREADY_EXISTS = Main.Base.convert(Main.Base.Int32, 2)
     const INCOMPLETE_HOSTNAME = const GTK_FILE_CHOOSER_ERROR_INCOMPLETE_HOSTNAME = Main.Base.convert(Main.Base.Int32, 3)
+    end)))
+    $(Expr(:toplevel, :(baremodule GtkFontChooserLevel
+    const FAMILY = const GTK_FONT_CHOOSER_LEVEL_FAMILY = Main.Base.convert(Main.Base.Int32, 0)
+    const STYLE = const GTK_FONT_CHOOSER_LEVEL_STYLE = Main.Base.convert(Main.Base.Int32, 1)
+    const SIZE = const GTK_FONT_CHOOSER_LEVEL_SIZE = Main.Base.convert(Main.Base.Int32, 2)
+    const VARIATIONS = const GTK_FONT_CHOOSER_LEVEL_VARIATIONS = Main.Base.convert(Main.Base.Int32, 4)
+    const FEATURES = const GTK_FONT_CHOOSER_LEVEL_FEATURES = Main.Base.convert(Main.Base.Int32, 8)
     end)))
     $(Expr(:toplevel, :(baremodule GtkStyleContextPrintFlags
     const NONE = const GTK_STYLE_CONTEXT_PRINT_NONE = Main.Base.convert(Main.Base.Int32, 0)
@@ -2816,36 +2881,54 @@ $(Expr(:toplevel, :(module GConstants
     const G_GINT32_MODIFIER = ""
     const G_GINT32_FORMAT = "i"
     const G_GUINT32_FORMAT = "u"
-    const G_GINT64_MODIFIER = "l"
-    const G_GINT64_FORMAT = "li"
-    const G_GUINT64_FORMAT = "lu"
+    const G_GINT64_MODIFIER = "ll"
+    const G_GINT64_FORMAT = "lli"
+    const G_GUINT64_FORMAT = "llu"
     const GLIB_SIZEOF_VOID_P = 8
-    const GLIB_SIZEOF_LONG = 8
+    const GLIB_SIZEOF_LONG = 4
     const GLIB_SIZEOF_SIZE_T = 8
     const GLIB_SIZEOF_SSIZE_T = 8
-    const G_GSIZE_MODIFIER = "l"
-    const G_GSSIZE_MODIFIER = "l"
-    const G_GSIZE_FORMAT = "lu"
-    const G_GSSIZE_FORMAT = "li"
-    const G_POLLFD_FORMAT = "%d"
-    const G_GINTPTR_MODIFIER = "l"
-    const G_GINTPTR_FORMAT = "li"
-    const G_GUINTPTR_FORMAT = "lu"
+    const G_GSIZE_MODIFIER = "ll"
+    const G_GSSIZE_MODIFIER = "ll"
+    const G_GSIZE_FORMAT = "llu"
+    const G_GSSIZE_FORMAT = "lli"
+    const G_POLLFD_FORMAT = "%#llx"
+    const G_GINTPTR_MODIFIER = "ll"
+    const G_GINTPTR_FORMAT = "lli"
+    const G_GUINTPTR_FORMAT = "llu"
     const GLIB_MAJOR_VERSION = 2
-    const GLIB_MINOR_VERSION = 50
-    const GLIB_MICRO_VERSION = 3
-    const G_VA_COPY_AS_ARRAY = 1
+    const GLIB_MINOR_VERSION = 59
+    const GLIB_MICRO_VERSION = 0
     const G_HAVE_ISO_VARARGS = 1
     const G_HAVE_GNUC_VARARGS = 1
     const G_HAVE_GROWING_STACK = 0
-    const G_HAVE_GNUC_VISIBILITY = 1
-    const G_MODULE_SUFFIX = "so"
-    const G_PID_FORMAT = "i"
+    const G_MODULE_SUFFIX = if Sys.iswindows()
+                "dll"
+            else
+                "so"
+            end
+    const G_PID_FORMAT = if Sys.iswindows()
+                "p"
+            else
+                "i"
+            end
     const GLIB_SYSDEF_AF_UNIX = 1
     const GLIB_SYSDEF_AF_INET = 2
     const GLIB_SYSDEF_MSG_OOB = 1
     const GLIB_SYSDEF_MSG_PEEK = 2
     const GLIB_SYSDEF_MSG_DONTROUTE = 4
+    const G_DIR_SEPARATOR = Base.Filesystem.path_separator[1]
+    const G_DIR_SEPARATOR_S = Base.Filesystem.path_separator
+    const G_SEARCHPATH_SEPARATOR = if Sys.iswindows()
+                ';'
+            else
+                ':'
+            end
+    const G_SEARCHPATH_SEPARATOR_S = if Sys.iswindows()
+                ";"
+            else
+                ":"
+            end
     const G_E = 2.718281828459045
     const G_PI = 3.141592653589793
     const G_LITTLE_ENDIAN = 1234
@@ -2855,15 +2938,12 @@ $(Expr(:toplevel, :(module GConstants
     const G_DATE_BAD_JULIAN = UInt32(0)
     const G_DATE_BAD_DAY = UInt32(0)
     const G_DATE_BAD_YEAR = UInt32(0)
-    const G_DIR_SEPARATOR = '/'
-    const G_DIR_SEPARATOR_S = "/"
-    const G_SEARCHPATH_SEPARATOR = ':'
-    const G_SEARCHPATH_SEPARATOR_S = ":"
     const G_PRIORITY_DEFAULT = 0
     const G_PRIORITY_HIGH_IDLE = 100
     const G_PRIORITY_DEFAULT_IDLE = 200
     const G_PRIORITY_LOW = 300
     const G_UNICHAR_MAX_DECOMPOSITION_LENGTH = 18
+    const G_WIN32_MSG_HANDLE = 19981206
     const G_KEY_FILE_DESKTOP_GROUP = "Desktop Entry"
     const G_KEY_FILE_DESKTOP_KEY_TYPE = "Type"
     const G_KEY_FILE_DESKTOP_KEY_VERSION = "Version"
@@ -2886,9 +2966,6 @@ $(Expr(:toplevel, :(module GConstants
     const G_KEY_FILE_DESKTOP_KEY_URL = "URL"
     const G_KEY_FILE_DESKTOP_KEY_DBUS_ACTIVATABLE = "DBusActivatable"
     const G_KEY_FILE_DESKTOP_KEY_ACTIONS = "Actions"
-    const G_KEY_FILE_DESKTOP_KEY_GETTEXT_DOMAIN = "X-GNOME-Gettext-Domain"
-    const G_KEY_FILE_DESKTOP_KEY_FULLNAME = "X-GNOME-FullName"
-    const G_KEY_FILE_DESKTOP_KEY_KEYWORDS = "Keywords"
     const G_KEY_FILE_DESKTOP_TYPE_APPLICATION = "Application"
     const G_KEY_FILE_DESKTOP_TYPE_LINK = "Link"
     const G_KEY_FILE_DESKTOP_TYPE_DIRECTORY = "Directory"
@@ -2897,6 +2974,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_CSET_a_2_z = "abcdefghijklmnopqrstuvwxyz"
     const G_CSET_DIGITS = "0123456789"
     const G_STR_DELIMITERS = "_-|> <."
+    const G_TEST_OPTION_ISOLATE_DIRS = "isolate_dirs"
     const G_USEC_PER_SEC = 1000000
     const G_URI_RESERVED_CHARS_GENERIC_DELIMITERS = ":/?#[]@"
     const G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS = "!\$&'()*+,;="
@@ -2907,6 +2985,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_ALLOCATOR_NODE = 3
     const G_SIGNAL_FLAGS_MASK = Float32(0x1f)
     const G_SIGNAL_MATCH_MASK = Float32(0x03)
+    const G_DRIVE_IDENTIFIER_KIND_UNIX_DEVICE = "unix-device"
     const G_FILE_ATTRIBUTE_STANDARD_TYPE = "standard::type"
     const G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN = "standard::is-hidden"
     const G_FILE_ATTRIBUTE_STANDARD_IS_BACKUP = "standard::is-backup"
@@ -2968,6 +3047,8 @@ $(Expr(:toplevel, :(module GConstants
     const G_FILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT = "unix::is-mountpoint"
     const G_FILE_ATTRIBUTE_DOS_IS_ARCHIVE = "dos::is-archive"
     const G_FILE_ATTRIBUTE_DOS_IS_SYSTEM = "dos::is-system"
+    const G_FILE_ATTRIBUTE_DOS_IS_MOUNTPOINT = "dos::is-mountpoint"
+    const G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG = "dos::reparse-point-tag"
     const G_FILE_ATTRIBUTE_OWNER_USER = "owner::user"
     const G_FILE_ATTRIBUTE_OWNER_USER_REAL = "owner::user-real"
     const G_FILE_ATTRIBUTE_OWNER_GROUP = "owner::group"
@@ -2987,6 +3068,7 @@ $(Expr(:toplevel, :(module GConstants
     const G_FILE_ATTRIBUTE_TRASH_ITEM_COUNT = "trash::item-count"
     const G_FILE_ATTRIBUTE_TRASH_ORIG_PATH = "trash::orig-path"
     const G_FILE_ATTRIBUTE_TRASH_DELETION_DATE = "trash::deletion-date"
+    const G_FILE_ATTRIBUTE_RECENT_MODIFIED = "recent::modified"
     const G_VOLUME_MONITOR_EXTENSION_POINT_NAME = "gio-volume-monitor"
     const G_NATIVE_VOLUME_MONITOR_EXTENSION_POINT_NAME = "gio-native-volume-monitor"
     const G_NETWORK_MONITOR_EXTENSION_POINT_NAME = "gio-network-monitor"
@@ -3013,7 +3095,7 @@ $(Expr(:toplevel, :(module GConstants
     const GDK_PARENT_RELATIVE = Int32(1)
     const GDK_MAX_TIMECOORD_AXES = 128
     const GDK_PIXBUF_FEATURES_H = 1
-    const GDK_PIXBUF_VERSION = "2.36.5"
+    const GDK_PIXBUF_VERSION = "2.39.3"
     const GDK_KEY_VoidSymbol = Float32(0x000fffff)
     const GDK_KEY_BackSpace = 0xff08
     const GDK_KEY_Tab = 0xff09
