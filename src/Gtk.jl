@@ -154,7 +154,8 @@ function __init__()
     # that call to also start the eventloop
     GLib.gtk_eventloop_f[] = enable_eventloop
 
-    auto_idle[] = get(ENV, "GTK_AUTO_IDLE", "true") == "true"
+    default_auto_idle = Sys.iswindows() ? "false" : "true"
+    auto_idle[] = get(ENV, "GTK_AUTO_IDLE", default_auto_idle) == "true"
 
     # by default, defer starting the event loop until either `show`, `showall`, or `g_idle_add` is called
     enable_eventloop(!auto_idle[])
