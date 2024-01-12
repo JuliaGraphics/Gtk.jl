@@ -1,0 +1,6 @@
+[adwaita_icon_theme]
+git-tree-sha1 = "043d0732f572e66059278f5964e3752f018a5cdf"
+
+    [[adwaita_icon_theme.download]]
+    sha256 = "19b4b36662b2894c2eb2dd348438656df91a2402b5de6e83a0523d53ff6ced64"
+    url = "https://github.com/medyan-dev/SmallZarrGroups.jl/releases/download/v0.6.6/copy_symlinks_adwaita_icon_theme.v3.33.92.any.tar.gz"

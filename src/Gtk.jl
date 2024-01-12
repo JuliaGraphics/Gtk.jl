@@ -6,7 +6,7 @@ if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optle
 end
 
 # Import binary definitions
-using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_icon_theme_jll, hicolor_icon_theme_jll
+using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, hicolor_icon_theme_jll
 using Librsvg_jll
 using JLLWrappers
 using Pkg.Artifacts, Scratch
@@ -76,12 +76,34 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
+#=
+# This script was how the new adwaita_icon_theme artifact was generated.
+using Tar
+using Pkg.Artifacts
+using Pkg: Pkg, PlatformEngines
+# This is the url that the source artifact will be available from:
+url_src = "https://github.com/JuliaBinaryWrappers/adwaita_icon_theme_jll.jl/releases/download/adwaita_icon_theme-v3.33.92+4/adwaita_icon_theme.v3.33.92.any.tar.gz"
+# This is the url that the new artifact will be available from:
+url_to_upload_to = "https://github.com/medyan-dev/SmallZarrGroups.jl/releases/download/v0.6.6/copy_symlinks_adwaita_icon_theme.v3.33.92.any.tar.gz"
+# This is the path to the Artifacts.toml we will manipulate
+artifact_toml = "Artifacts.toml"
+hash = create_artifact() do dir
+    Tar.extract(`$(PlatformEngines.exe7z()) x $(download(url_src)) -so`, dir;
+        copy_symlinks=true
+    )
+end
+tar_hash = archive_artifact(hash, "copy_symlinks_adwaita_icon_theme.v3.33.92.any.tar.gz")
+bind_artifact!(artifact_toml, "adwaita_icon_theme", hash; force=true,
+    download_info = [(url_to_upload_to, tar_hash)]
+)
+=#
+
 function __init__()
     in(:Gtk4, names(Main, imported=true)) && error("Gtk is incompatible with Gtk4.")
 
     # Set XDG_DATA_DIRS so that Gtk can find its icons and schemas
     ENV["XDG_DATA_DIRS"] = join(filter(x -> x !== nothing, [
-        dirname(adwaita_icons_dir),
+        joinpath(artifact"adwaita_icon_theme", "share"),
         dirname(hicolor_icons_dir),
         joinpath(dirname(GTK3_jll.libgdk3_path::String), "..", "share"),
         get(ENV, "XDG_DATA_DIRS", nothing)::Union{String,Nothing},
