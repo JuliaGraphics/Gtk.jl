@@ -76,28 +76,6 @@ include("theme.jl")
 include("gio.jl")
 include("application.jl")
 
-#=
-# This script was how the new adwaita_icon_theme artifact was generated.
-using Tar
-using Pkg.Artifacts
-using Pkg: Pkg, PlatformEngines
-# This is the url that the source artifact will be available from:
-url_src = "https://github.com/JuliaBinaryWrappers/adwaita_icon_theme_jll.jl/releases/download/adwaita_icon_theme-v3.33.92+4/adwaita_icon_theme.v3.33.92.any.tar.gz"
-# This is the url that the new artifact will be available from:
-url_to_upload_to = "https://github.com/medyan-dev/SmallZarrGroups.jl/releases/download/v0.6.6/copy_symlinks_adwaita_icon_theme.v3.33.92.any.tar.gz"
-# This is the path to the Artifacts.toml we will manipulate
-artifact_toml = "Artifacts.toml"
-hash = create_artifact() do dir
-    Tar.extract(`$(PlatformEngines.exe7z()) x $(download(url_src)) -so`, dir;
-        copy_symlinks=true
-    )
-end
-tar_hash = archive_artifact(hash, "copy_symlinks_adwaita_icon_theme.v3.33.92.any.tar.gz")
-bind_artifact!(artifact_toml, "adwaita_icon_theme", hash; force=true,
-    download_info = [(url_to_upload_to, tar_hash)]
-)
-=#
-
 function __init__()
     in(:Gtk4, names(Main, imported=true)) && error("Gtk is incompatible with Gtk4.")
 
