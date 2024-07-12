@@ -10,9 +10,8 @@ using GTK3_jll, Glib_jll, Xorg_xkeyboard_config_jll, gdk_pixbuf_jll, adwaita_ico
 using Librsvg_jll
 using JLLWrappers
 using Pkg.Artifacts, Scratch
-const libgdk = libgdk3
-const libgtk = libgtk3
-const libgdk_pixbuf = libgdkpixbuf
+using GTK3_jll: libgdk3 as libgdk, libgtk3 as libgtk
+using gdk_pixbuf_jll: libgdkpixbuf as libgdk_pixbuf
 
 
 const suffix = :Leaf
