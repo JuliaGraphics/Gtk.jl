@@ -90,6 +90,9 @@ end
 @gtktype GtkCellView
 @gtktype GtkIconView
 @gtktype GtkMenuItem
+@gtktype GtkRadioMenuItem
+@gtktype GtkImageMenuItem
+@gtktype GtkCheckMenuItem
 @gtktype GtkSeparatorMenuItem
 @gtktype GtkMenu
 @gtktype GtkMenuBar
