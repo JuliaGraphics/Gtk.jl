@@ -168,7 +168,7 @@ function get_itype_decl(iname::Symbol, gtyp::GType, cm)
     piface_decl = get_itype_decl(piname, parent, cm)
     quote
         if $(QuoteNode(iname)) in keys(gtype_abstracts)
-            $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
+            const $(esc(iname)) = gtype_abstracts[$(QuoteNode(iname))]
         else
             $piface_decl
             abstract type $(esc(iname)) <: $(esc(piname)) end
